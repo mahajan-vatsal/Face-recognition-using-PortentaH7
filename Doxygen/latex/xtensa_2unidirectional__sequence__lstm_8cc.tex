@@ -1,0 +1,91 @@
+\doxysection{Arduino/\+Get\+Started\+With\+Machine\+Learning\+On\+Arduino/tflite-\/micro-\/main/tensorflow/lite/micro/kernels/xtensa/unidirectional\+\_\+sequence\+\_\+lstm.cc File Reference}
+\hypertarget{xtensa_2unidirectional__sequence__lstm_8cc}{}\label{xtensa_2unidirectional__sequence__lstm_8cc}\index{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/main/tensorflow/lite/micro/kernels/xtensa/unidirectional\_sequence\_lstm.cc@{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/main/tensorflow/lite/micro/kernels/xtensa/unidirectional\_sequence\_lstm.cc}}
+{\ttfamily \#include $<$math.\+h$>$}\newline
+{\ttfamily \#include $<$stdio.\+h$>$}\newline
+{\ttfamily \#include $<$cstddef$>$}\newline
+{\ttfamily \#include "{}tensorflow/lite/c/builtin\+\_\+op\+\_\+data.\+h"{}}\newline
+{\ttfamily \#include "{}tensorflow/lite/c/common.\+h"{}}\newline
+{\ttfamily \#include "{}tensorflow/lite/kernels/internal/compatibility.\+h"{}}\newline
+{\ttfamily \#include "{}tensorflow/lite/kernels/internal/quantization\+\_\+util.\+h"{}}\newline
+{\ttfamily \#include "{}tensorflow/lite/kernels/internal/tensor\+\_\+ctypes.\+h"{}}\newline
+{\ttfamily \#include "{}tensorflow/lite/kernels/kernel\+\_\+util.\+h"{}}\newline
+{\ttfamily \#include "{}tensorflow/lite/micro/kernels/xtensa/lstm\+\_\+eval.\+h"{}}\newline
+{\ttfamily \#include "{}tensorflow/lite/micro/kernels/xtensa/lstm\+\_\+shared.\+h"{}}\newline
+{\ttfamily \#include "{}tensorflow/lite/micro/micro\+\_\+log.\+h"{}}\newline
+Include dependency graph for unidirectional\+\_\+sequence\+\_\+lstm.\+cc\+:
+% FIG 0
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacetflite}{tflite}}
+\item 
+namespace \mbox{\hyperlink{namespacetflite_1_1ops}{tflite\+::ops}}
+\item 
+namespace \mbox{\hyperlink{namespacetflite_1_1ops_1_1micro}{tflite\+::ops\+::micro}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum \mbox{\hyperlink{namespacetflite_1_1ops_1_1micro_a969e8a189f369de19f0d63f5dc0d04d5}{tflite\+::ops\+::micro\+::\+Temporary\+Tensor}} \{ \newline
+\mbox{\hyperlink{namespacetflite_1_1ops_1_1micro_a969e8a189f369de19f0d63f5dc0d04d5a785f5b4ede58b6dbde64761f9b191b60}{tflite\+::ops\+::micro\+::k\+Scratch\+Buffer}} = 0
+, \mbox{\hyperlink{namespacetflite_1_1ops_1_1micro_a969e8a189f369de19f0d63f5dc0d04d5a7a7b98c6ee7dc495253c4f1fbbe0b6f9}{tflite\+::ops\+::micro\+::k\+Input\+Quantized}} = 1
+, \mbox{\hyperlink{namespacetflite_1_1ops_1_1micro_a969e8a189f369de19f0d63f5dc0d04d5a1c8aa9db88e45472f0b06b21674c5d69}{tflite\+::ops\+::micro\+::k\+Output\+State\+Quantized}} = 2
+, \mbox{\hyperlink{namespacetflite_1_1ops_1_1micro_a969e8a189f369de19f0d63f5dc0d04d5aeacdabb77ce0aac3d65191505baad4b2}{tflite\+::ops\+::micro\+::k\+Cell\+State\+Quantized}} = 3
+, \newline
+\mbox{\hyperlink{namespacetflite_1_1ops_1_1micro_a969e8a189f369de19f0d63f5dc0d04d5a931cd59161220f076331cd2f6a45317b}{tflite\+::ops\+::micro\+::k\+Input\+Scaling\+Factors}} = 4
+, \mbox{\hyperlink{namespacetflite_1_1ops_1_1micro_a969e8a189f369de19f0d63f5dc0d04d5a54fd9926ba7c23bcc9a9e775b87be45d}{tflite\+::ops\+::micro\+::k\+Output\+State\+Scaling\+Factors}} = 5
+, \mbox{\hyperlink{namespacetflite_1_1ops_1_1micro_a969e8a189f369de19f0d63f5dc0d04d5a918ee59249f19373b9613c4dae84fdae}{tflite\+::ops\+::micro\+::k\+Product\+Scaling\+Factors}} = 6
+, \mbox{\hyperlink{namespacetflite_1_1ops_1_1micro_a969e8a189f369de19f0d63f5dc0d04d5a2e6a3d48ed3d0babb3fc0d5acc37f2e4}{tflite\+::ops\+::micro\+::k\+Recovered\+Cell\+Weights}} = 7
+, \newline
+\mbox{\hyperlink{namespacetflite_1_1ops_1_1micro_a969e8a189f369de19f0d63f5dc0d04d5a06c843e7e99a4dd275c937a0ba405b67}{tflite\+::ops\+::micro\+::k\+Accum\+Scratch}} = 8
+, \mbox{\hyperlink{namespacetflite_1_1ops_1_1micro_a969e8a189f369de19f0d63f5dc0d04d5a9e350b4c7fce19be60bc33f15cfbce1c}{tflite\+::ops\+::micro\+::k\+Input\+Zero\+Points}} = 9
+, \mbox{\hyperlink{namespacetflite_1_1ops_1_1micro_a969e8a189f369de19f0d63f5dc0d04d5aaf649d000fca8f1d9837a36236d9f23b}{tflite\+::ops\+::micro\+::k\+Output\+State\+Zero\+Points}} = 10
+, \mbox{\hyperlink{namespacetflite_1_1ops_1_1micro_a969e8a189f369de19f0d63f5dc0d04d5aee4f2bd9c86092186c76387c8dc89209}{tflite\+::ops\+::micro\+::k\+Row\+Sums}} = 11
+, \newline
+\mbox{\hyperlink{namespacetflite_1_1ops_1_1micro_a969e8a189f369de19f0d63f5dc0d04d5a6f9841164d01cbe2da3461b1033496db}{tflite\+::ops\+::micro\+::k\+Num\+Temporary\+Tensors}} = 12
+ \}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespacetflite_1_1ops_1_1micro_af3bc69d959ad88f4d1db752db8d8a627}{tflite\+::ops\+::micro\+::\+Init}} (\mbox{\hyperlink{struct_tf_lite_context}{Tf\+Lite\+Context}} \texorpdfstring{$\ast$}{*}context, const char \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{nano__ble33__sense__accelerometer__continuous_8ino_a221f01f29c6cba77d9479aba615283f5}{buffer}}, size\+\_\+t length)
+\item 
+\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{Tf\+Lite\+Status}} \mbox{\hyperlink{namespacetflite_1_1ops_1_1micro_ab5a0267a4a91d8e9b06104b0e8ec0b3a}{tflite\+::ops\+::micro\+::\+Check\+Input\+Tensor\+Dimensions}} (\mbox{\hyperlink{struct_tf_lite_context}{Tf\+Lite\+Context}} \texorpdfstring{$\ast$}{*}context, \mbox{\hyperlink{struct_tf_lite_node}{Tf\+Lite\+Node}} \texorpdfstring{$\ast$}{*}node, int n\+\_\+input, int n\+\_\+output, int n\+\_\+cell, bool \mbox{\hyperlink{xtensa_2unidirectional__sequence__lstm_8cc_a6aa0947a13402c9d414d51b3566bd947}{use\+\_\+layer\+\_\+norm}}, bool is\+\_\+integer)
+\item 
+\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{Tf\+Lite\+Status}} \mbox{\hyperlink{namespacetflite_1_1ops_1_1micro_a8ff7a210951c3c2c6bb7b632213f4417}{tflite\+::ops\+::micro\+::\+Precompute\+Zero\+Point\+Times\+Weight\+With\+Bias}} (\mbox{\hyperlink{struct_tf_lite_context}{Tf\+Lite\+Context}} \texorpdfstring{$\ast$}{*}context, int32\+\_\+t \mbox{\hyperlink{batch__matmul__test_8cc_a26c07acd3fa6a6da13ddae2bc5c64b55}{zero\+\_\+point}}, const \mbox{\hyperlink{struct_tf_lite_tensor}{Tf\+Lite\+Tensor}} \texorpdfstring{$\ast$}{*}weight\+\_\+tensor, const \mbox{\hyperlink{struct_tf_lite_tensor}{Tf\+Lite\+Tensor}} \texorpdfstring{$\ast$}{*}bias\+\_\+tensor, std\+::unique\+\_\+ptr$<$ int32\+\_\+t\mbox{[}$\,$\mbox{]}$>$ \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbcd3bbe90c4644d53fde1ce4e312f437_a7a2a916a8059078c2d7a05f46c7126fd}{output}})
+\item 
+\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{Tf\+Lite\+Status}} \mbox{\hyperlink{namespacetflite_1_1ops_1_1micro_a247d2a99fc8f8e6807a2c2ec43b2fbba}{tflite\+::ops\+::micro\+::\+Populate\+Precomputed\+ZPTimes\+Weights\+With\+Bias}} (\mbox{\hyperlink{struct_tf_lite_context}{Tf\+Lite\+Context}} \texorpdfstring{$\ast$}{*}context, Op\+Data \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{batch__matmul_8cc_a0f851164a16c8d772c43d8da3ec4be95}{op\+\_\+data}}, \mbox{\hyperlink{struct_tf_lite_node}{Tf\+Lite\+Node}} \texorpdfstring{$\ast$}{*}node)
+\item 
+\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{Tf\+Lite\+Status}} \mbox{\hyperlink{namespacetflite_1_1ops_1_1micro_a25de77005440d74699e6fa2c71b1a10b}{tflite\+::ops\+::micro\+::\+Prepare}} (\mbox{\hyperlink{struct_tf_lite_context}{Tf\+Lite\+Context}} \texorpdfstring{$\ast$}{*}context, \mbox{\hyperlink{struct_tf_lite_node}{Tf\+Lite\+Node}} \texorpdfstring{$\ast$}{*}node)
+\item 
+\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{Tf\+Lite\+Status}} \mbox{\hyperlink{namespacetflite_1_1ops_1_1micro_a3ba756de8cb3f4e04d35690c22195592}{tflite\+::ops\+::micro\+::\+Eval}} (\mbox{\hyperlink{struct_tf_lite_context}{Tf\+Lite\+Context}} \texorpdfstring{$\ast$}{*}context, \mbox{\hyperlink{struct_tf_lite_node}{Tf\+Lite\+Node}} \texorpdfstring{$\ast$}{*}node)
+\item 
+\mbox{\hyperlink{struct_tf_lite_registration}{Tf\+Lite\+Registration}} \mbox{\hyperlink{namespacetflite_a042f5482a60e789425228901400a72e3}{tflite\+::\+Register\+\_\+\+UNIDIRECTIONAL\+\_\+\+SEQUENCE\+\_\+\+LSTM}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Variable Documentation}
+\Hypertarget{xtensa_2unidirectional__sequence__lstm_8cc_a58b1f1cca64a5f505e2170a29e471ae9}\index{unidirectional\_sequence\_lstm.cc@{unidirectional\_sequence\_lstm.cc}!compute\_row\_sums@{compute\_row\_sums}}
+\index{compute\_row\_sums@{compute\_row\_sums}!unidirectional\_sequence\_lstm.cc@{unidirectional\_sequence\_lstm.cc}}
+\doxysubsubsection{\texorpdfstring{compute\_row\_sums}{compute\_row\_sums}}
+{\footnotesize\ttfamily \label{xtensa_2unidirectional__sequence__lstm_8cc_a58b1f1cca64a5f505e2170a29e471ae9} 
+bool compute\+\_\+row\+\_\+sums = false}
+
+\Hypertarget{xtensa_2unidirectional__sequence__lstm_8cc_a7b5bf6c37885d7907e66ccafcb711947}\index{unidirectional\_sequence\_lstm.cc@{unidirectional\_sequence\_lstm.cc}!integer\_lstm\_param@{integer\_lstm\_param}}
+\index{integer\_lstm\_param@{integer\_lstm\_param}!unidirectional\_sequence\_lstm.cc@{unidirectional\_sequence\_lstm.cc}}
+\doxysubsubsection{\texorpdfstring{integer\_lstm\_param}{integer\_lstm\_param}}
+{\footnotesize\ttfamily \label{xtensa_2unidirectional__sequence__lstm_8cc_a7b5bf6c37885d7907e66ccafcb711947} 
+lstm\+\_\+eval\+::\+Integer\+Lstm\+Parameter integer\+\_\+lstm\+\_\+param}
+
+\Hypertarget{xtensa_2unidirectional__sequence__lstm_8cc_a631ecd392998e2ac2d4dbaff0e9b8398}\index{unidirectional\_sequence\_lstm.cc@{unidirectional\_sequence\_lstm.cc}!scratch\_tensor\_index@{scratch\_tensor\_index}}
+\index{scratch\_tensor\_index@{scratch\_tensor\_index}!unidirectional\_sequence\_lstm.cc@{unidirectional\_sequence\_lstm.cc}}
+\doxysubsubsection{\texorpdfstring{scratch\_tensor\_index}{scratch\_tensor\_index}}
+{\footnotesize\ttfamily \label{xtensa_2unidirectional__sequence__lstm_8cc_a631ecd392998e2ac2d4dbaff0e9b8398} 
+int scratch\+\_\+tensor\+\_\+index}
+
+\Hypertarget{xtensa_2unidirectional__sequence__lstm_8cc_a6aa0947a13402c9d414d51b3566bd947}\index{unidirectional\_sequence\_lstm.cc@{unidirectional\_sequence\_lstm.cc}!use\_layer\_norm@{use\_layer\_norm}}
+\index{use\_layer\_norm@{use\_layer\_norm}!unidirectional\_sequence\_lstm.cc@{unidirectional\_sequence\_lstm.cc}}
+\doxysubsubsection{\texorpdfstring{use\_layer\_norm}{use\_layer\_norm}}
+{\footnotesize\ttfamily \label{xtensa_2unidirectional__sequence__lstm_8cc_a6aa0947a13402c9d414d51b3566bd947} 
+bool use\+\_\+layer\+\_\+norm}
+

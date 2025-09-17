@@ -1,0 +1,84 @@
+\doxysection{dequantize.\+h}
+\hypertarget{tflite-micro-main_2tensorflow_2lite_2kernels_2internal_2reference_2dequantize_8h_source}{}\label{tflite-micro-main_2tensorflow_2lite_2kernels_2internal_2reference_2dequantize_8h_source}\index{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/main/tensorflow/lite/kernels/internal/reference/dequantize.h@{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/main/tensorflow/lite/kernels/internal/reference/dequantize.h}}
+\mbox{\hyperlink{tflite-micro-main_2tensorflow_2lite_2kernels_2internal_2reference_2dequantize_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{/*\ Copyright\ 2019\ The\ TensorFlow\ Authors.\ All\ Rights\ Reserved.}}
+\DoxyCodeLine{00002\ \textcolor{comment}{}}
+\DoxyCodeLine{00003\ \textcolor{comment}{Licensed\ under\ the\ Apache\ License,\ Version\ 2.0\ (the\ "{}License"{});}}
+\DoxyCodeLine{00004\ \textcolor{comment}{you\ may\ not\ use\ this\ file\ except\ in\ compliance\ with\ the\ License.}}
+\DoxyCodeLine{00005\ \textcolor{comment}{You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{00006\ \textcolor{comment}{}}
+\DoxyCodeLine{00007\ \textcolor{comment}{\ \ \ \ http://www.apache.org/licenses/LICENSE-\/2.0}}
+\DoxyCodeLine{00008\ \textcolor{comment}{}}
+\DoxyCodeLine{00009\ \textcolor{comment}{Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ software}}
+\DoxyCodeLine{00010\ \textcolor{comment}{distributed\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,}}
+\DoxyCodeLine{00011\ \textcolor{comment}{WITHOUT\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,\ either\ express\ or\ implied.}}
+\DoxyCodeLine{00012\ \textcolor{comment}{See\ the\ License\ for\ the\ specific\ language\ governing\ permissions\ and}}
+\DoxyCodeLine{00013\ \textcolor{comment}{limitations\ under\ the\ License.}}
+\DoxyCodeLine{00014\ \textcolor{comment}{==============================================================================*/}}
+\DoxyCodeLine{00015\ \textcolor{preprocessor}{\#ifndef\ TENSORFLOW\_LITE\_KERNELS\_INTERNAL\_REFERENCE\_DEQUANTIZE\_H\_}}
+\DoxyCodeLine{00016\ \textcolor{preprocessor}{\#define\ TENSORFLOW\_LITE\_KERNELS\_INTERNAL\_REFERENCE\_DEQUANTIZE\_H\_}}
+\DoxyCodeLine{00017\ }
+\DoxyCodeLine{00018\ \textcolor{preprocessor}{\#include\ <limits.h>}}
+\DoxyCodeLine{00019\ }
+\DoxyCodeLine{00020\ \textcolor{preprocessor}{\#include\ <vector>}}
+\DoxyCodeLine{00021\ }
+\DoxyCodeLine{00022\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/kernels/internal/common.h"{}}}
+\DoxyCodeLine{00023\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/kernels/internal/types.h"{}}}
+\DoxyCodeLine{00024\ }
+\DoxyCodeLine{00025\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacetflite}{tflite}}\ \{}
+\DoxyCodeLine{00026\ }
+\DoxyCodeLine{00027\ \textcolor{keyword}{namespace\ }reference\_ops\ \{}
+\DoxyCodeLine{00028\ }
+\DoxyCodeLine{00029\ \textcolor{comment}{//\ Dequantizes\ into\ a\ float\ without\ rounding.}}
+\DoxyCodeLine{00030\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ InputT,\ \textcolor{keyword}{typename}\ OutputT>}
+\DoxyCodeLine{00031\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1reference__ops_a0feb44fb29c227b764bfa8a26c701b69}{Dequantize}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structtflite_1_1_dequantization_params}{tflite::DequantizationParams}}\&\ op\_params,}
+\DoxyCodeLine{00032\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ RuntimeShape\&\ input\_shape,}
+\DoxyCodeLine{00033\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ InputT*\ \mbox{\hyperlink{add__n__test_8cc_a5612ba79d1f0b544c7aeae4621166fea}{input\_data}},}
+\DoxyCodeLine{00034\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ RuntimeShape\&\ output\_shape,\ OutputT*\ \mbox{\hyperlink{add__n__test_8cc_a3305b43869c4b837b0a33c12cff5069b}{output\_data}})\ \{}
+\DoxyCodeLine{00035\ \ \ int32\_t\ \mbox{\hyperlink{batch__matmul__test_8cc_a2be4e05b1d1f5ff4043c3bd42b8f5f44}{zero\_point}}\ =\ op\_params.\mbox{\hyperlink{structtflite_1_1_dequantization_params_ad7971b83711dde95cecb4ece4e4fc119}{zero\_point}};}
+\DoxyCodeLine{00036\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{double}\ \mbox{\hyperlink{batch__matmul__test_8cc_a1d28dec57cce925ad92342891bd71e7c}{scale}}\ =\ op\_params.\mbox{\hyperlink{structtflite_1_1_dequantization_params_a67c657af47d5c9ea904b63b03b1a0690}{scale}};}
+\DoxyCodeLine{00037\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ flat\_size\ =\ \mbox{\hyperlink{namespacetflite_a8d6998b7eb7b2f0d21f8352da6f6271f}{MatchingFlatSize}}(input\_shape,\ output\_shape);}
+\DoxyCodeLine{00038\ }
+\DoxyCodeLine{00039\ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ flat\_size;\ i++)\ \{}
+\DoxyCodeLine{00040\ \ \ \ \ \textcolor{keyword}{const}\ int32\_t\ val\ =\ \mbox{\hyperlink{add__n__test_8cc_a5612ba79d1f0b544c7aeae4621166fea}{input\_data}}[i];}
+\DoxyCodeLine{00041\ \ \ \ \ \textcolor{keyword}{const}\ OutputT\ result\ =\ \textcolor{keyword}{static\_cast<}OutputT\textcolor{keyword}{>}(\mbox{\hyperlink{batch__matmul__test_8cc_a1d28dec57cce925ad92342891bd71e7c}{scale}}\ *\ (val\ -\/\ \mbox{\hyperlink{batch__matmul__test_8cc_a2be4e05b1d1f5ff4043c3bd42b8f5f44}{zero\_point}}));}
+\DoxyCodeLine{00042\ \ \ \ \ \mbox{\hyperlink{add__n__test_8cc_a3305b43869c4b837b0a33c12cff5069b}{output\_data}}[i]\ =\ result;}
+\DoxyCodeLine{00043\ \ \ \}}
+\DoxyCodeLine{00044\ \}}
+\DoxyCodeLine{00045\ }
+\DoxyCodeLine{00046\ \textcolor{comment}{//\ Dequantizes\ per-\/channel\ quantized\ tensor\ to\ float.}}
+\DoxyCodeLine{00047\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{00048\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1reference__ops_a7560d1732b02d28bef8c8a6b393f9537}{PerChannelDequantize}}(}
+\DoxyCodeLine{00049\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structtflite_1_1_per_channel_dequantization_params}{tflite::PerChannelDequantizationParams}}\&\ op\_params,}
+\DoxyCodeLine{00050\ \ \ \ \ \textcolor{keyword}{const}\ RuntimeShape\&\ input\_shape,\ \textcolor{keyword}{const}\ T*\ \mbox{\hyperlink{add__n__test_8cc_a5612ba79d1f0b544c7aeae4621166fea}{input\_data}},}
+\DoxyCodeLine{00051\ \ \ \ \ \textcolor{keyword}{const}\ RuntimeShape\&\ output\_shape,\ \textcolor{keywordtype}{float}*\ \mbox{\hyperlink{add__n__test_8cc_a3305b43869c4b837b0a33c12cff5069b}{output\_data}})\ \{}
+\DoxyCodeLine{00052\ \ \ \textcolor{comment}{//\ Ensure\ flat\ size\ is\ same.}}
+\DoxyCodeLine{00053\ \ \ \mbox{\hyperlink{namespacetflite_a8d6998b7eb7b2f0d21f8352da6f6271f}{MatchingFlatSize}}(input\_shape,\ output\_shape);}
+\DoxyCodeLine{00054\ }
+\DoxyCodeLine{00055\ \ \ \textcolor{keyword}{const}\ int32\_t*\ \mbox{\hyperlink{batch__matmul__test_8cc_a2be4e05b1d1f5ff4043c3bd42b8f5f44}{zero\_point}}\ =\ op\_params.\mbox{\hyperlink{structtflite_1_1_per_channel_dequantization_params_ae33ae91c33197fb69e0fbf3b7450d8af}{zero\_point}};}
+\DoxyCodeLine{00056\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{float}*\ \mbox{\hyperlink{batch__matmul__test_8cc_a1d28dec57cce925ad92342891bd71e7c}{scale}}\ =\ op\_params.\mbox{\hyperlink{structtflite_1_1_per_channel_dequantization_params_abc9b6e1f0fd2b67ab79e7c13203d294a}{scale}};}
+\DoxyCodeLine{00057\ \ \ \textcolor{keyword}{const}\ int32\_t\ quantized\_dimension\ =\ op\_params.\mbox{\hyperlink{structtflite_1_1_per_channel_dequantization_params_aed7790278f10eb099070e02bbb0f3beb}{quantized\_dimension}};}
+\DoxyCodeLine{00058\ \ \ \textcolor{keyword}{const}\ int32\_t\ num\_dims\ =\ \mbox{\hyperlink{namespace_m_n_i_s_t_afa2c1de24d40248bcf9a833cf7e9e0bc}{input\_shape}}.DimensionsCount();}
+\DoxyCodeLine{00059\ \ \ \textcolor{keyword}{const}\ int32\_t*\ dims\_data\ =\ \mbox{\hyperlink{namespace_m_n_i_s_t_afa2c1de24d40248bcf9a833cf7e9e0bc}{input\_shape}}.DimsData();}
+\DoxyCodeLine{00060\ \ \ std::vector<int>\ current\_dim(num\_dims,\ 0);}
+\DoxyCodeLine{00061\ }
+\DoxyCodeLine{00062\ \ \ \textcolor{keywordflow}{do}\ \{}
+\DoxyCodeLine{00063\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{mirror__pad_8cpp_aed7ea92f45bd273dde380a45ddced592}{offset}}\ =}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_a0a91a18b90dfd4c4505f630ec80e00d5}{ReducedOutputOffset}}(num\_dims,\ \textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\textcolor{keywordtype}{int}*\textcolor{keyword}{>}(dims\_data),}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ current\_dim.data(),\ 0,\ \textcolor{keyword}{nullptr});}
+\DoxyCodeLine{00066\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ channel\ =\ current\_dim[quantized\_dimension];}
+\DoxyCodeLine{00067\ \ \ \ \ \textcolor{keyword}{const}\ int32\_t\ val\ =\ \mbox{\hyperlink{add__n__test_8cc_a5612ba79d1f0b544c7aeae4621166fea}{input\_data}}[\mbox{\hyperlink{mirror__pad_8cpp_aed7ea92f45bd273dde380a45ddced592}{offset}}];}
+\DoxyCodeLine{00068\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{float}\ result\ =}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{float}\textcolor{keyword}{>}(\mbox{\hyperlink{batch__matmul__test_8cc_a1d28dec57cce925ad92342891bd71e7c}{scale}}[channel]\ *\ (val\ -\/\ \mbox{\hyperlink{batch__matmul__test_8cc_a2be4e05b1d1f5ff4043c3bd42b8f5f44}{zero\_point}}[channel]));}
+\DoxyCodeLine{00070\ \ \ \ \ \mbox{\hyperlink{add__n__test_8cc_a3305b43869c4b837b0a33c12cff5069b}{output\_data}}[\mbox{\hyperlink{mirror__pad_8cpp_aed7ea92f45bd273dde380a45ddced592}{offset}}]\ =\ result;}
+\DoxyCodeLine{00071\ \ \ \}\ \textcolor{keywordflow}{while}\ (\mbox{\hyperlink{namespacetflite_a852937183ae246d19c3d429f41ad8d14}{NextIndex}}(num\_dims,\ \textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\textcolor{keywordtype}{int}*\textcolor{keyword}{>}(dims\_data),}
+\DoxyCodeLine{00072\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ current\_dim.data()));}
+\DoxyCodeLine{00073\ \}}
+\DoxyCodeLine{00074\ }
+\DoxyCodeLine{00075\ \}\ \ \textcolor{comment}{//\ namespace\ reference\_ops}}
+\DoxyCodeLine{00076\ }
+\DoxyCodeLine{00077\ \}\ \ \textcolor{comment}{//\ namespace\ tflite}}
+\DoxyCodeLine{00078\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ TENSORFLOW\_LITE\_KERNELS\_INTERNAL\_REFERENCE\_DEQUANTIZE\_H\_}}
+
+\end{DoxyCode}

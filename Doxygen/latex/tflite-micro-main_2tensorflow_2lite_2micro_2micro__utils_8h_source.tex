@@ -1,0 +1,168 @@
+\doxysection{micro\+\_\+utils.\+h}
+\hypertarget{tflite-micro-main_2tensorflow_2lite_2micro_2micro__utils_8h_source}{}\label{tflite-micro-main_2tensorflow_2lite_2micro_2micro__utils_8h_source}\index{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/main/tensorflow/lite/micro/micro\_utils.h@{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/main/tensorflow/lite/micro/micro\_utils.h}}
+\mbox{\hyperlink{tflite-micro-main_2tensorflow_2lite_2micro_2micro__utils_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{/*\ Copyright\ 2019\ The\ TensorFlow\ Authors.\ All\ Rights\ Reserved.}}
+\DoxyCodeLine{00002\ \textcolor{comment}{}}
+\DoxyCodeLine{00003\ \textcolor{comment}{Licensed\ under\ the\ Apache\ License,\ Version\ 2.0\ (the\ "{}License"{});}}
+\DoxyCodeLine{00004\ \textcolor{comment}{you\ may\ not\ use\ this\ file\ except\ in\ compliance\ with\ the\ License.}}
+\DoxyCodeLine{00005\ \textcolor{comment}{You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{00006\ \textcolor{comment}{}}
+\DoxyCodeLine{00007\ \textcolor{comment}{\ \ \ \ http://www.apache.org/licenses/LICENSE-\/2.0}}
+\DoxyCodeLine{00008\ \textcolor{comment}{}}
+\DoxyCodeLine{00009\ \textcolor{comment}{Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ software}}
+\DoxyCodeLine{00010\ \textcolor{comment}{distributed\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,}}
+\DoxyCodeLine{00011\ \textcolor{comment}{WITHOUT\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,\ either\ express\ or\ implied.}}
+\DoxyCodeLine{00012\ \textcolor{comment}{See\ the\ License\ for\ the\ specific\ language\ governing\ permissions\ and}}
+\DoxyCodeLine{00013\ \textcolor{comment}{limitations\ under\ the\ License.}}
+\DoxyCodeLine{00014\ \textcolor{comment}{==============================================================================*/}}
+\DoxyCodeLine{00015\ }
+\DoxyCodeLine{00016\ \textcolor{preprocessor}{\#ifndef\ TENSORFLOW\_LITE\_MICRO\_MICRO\_UTILS\_H\_}}
+\DoxyCodeLine{00017\ \textcolor{preprocessor}{\#define\ TENSORFLOW\_LITE\_MICRO\_MICRO\_UTILS\_H\_}}
+\DoxyCodeLine{00018\ }
+\DoxyCodeLine{00019\ \textcolor{preprocessor}{\#include\ <algorithm>}}
+\DoxyCodeLine{00020\ \textcolor{preprocessor}{\#include\ <cmath>}}
+\DoxyCodeLine{00021\ \textcolor{preprocessor}{\#include\ <cstdint>}}
+\DoxyCodeLine{00022\ \textcolor{preprocessor}{\#include\ <limits>}}
+\DoxyCodeLine{00023\ }
+\DoxyCodeLine{00024\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/c/common.h"{}}}
+\DoxyCodeLine{00025\ }
+\DoxyCodeLine{00026\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacetflite}{tflite}}\ \{}
+\DoxyCodeLine{00027\ }
+\DoxyCodeLine{00028\ \textcolor{comment}{//\ Returns\ number\ of\ elements\ in\ the\ shape\ array.}}
+\DoxyCodeLine{00029\ }
+\DoxyCodeLine{00030\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{namespacetflite_a9c3966c3298709a2ae18d6c87223e612}{ElementCount}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{struct_tf_lite_int_array}{TfLiteIntArray}}\&\ \mbox{\hyperlink{strided__slice_8cpp_aedadeec3ef499c79fc32c00079f7982d}{dims}});}
+\DoxyCodeLine{00031\ }
+\DoxyCodeLine{00032\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{namespacetflite_a7538ebfb64b7cdf38bb1f6de5638ca81}{EvalTensorBytes}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{struct_tf_lite_eval_tensor}{TfLiteEvalTensor}}*\ \mbox{\hyperlink{namespacetensor}{tensor}});}
+\DoxyCodeLine{00033\ }
+\DoxyCodeLine{00034\ \textcolor{comment}{//\ C++11\ does\ not\ support\ constexpr\ max;\ hence,\ use\ ternary\ conditional\ to}}
+\DoxyCodeLine{00035\ \textcolor{comment}{//\ create\ our\ own\ constexpr\ Max\ function.}}
+\DoxyCodeLine{00036\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{namespacetflite_ad32516463d82cc5309397109f086d398}{Max}}(\textcolor{keywordtype}{int}\ a,\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}})\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacetflite-camera-button_ac1be43aa5f1883983bb8e5bb88cd53a1}{a}}\ >=\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}}\ ?\ \mbox{\hyperlink{namespacetflite-camera-button_ac1be43aa5f1883983bb8e5bb88cd53a1}{a}}\ :\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}};\ \}}
+\DoxyCodeLine{00037\ }
+\DoxyCodeLine{00038\ \textcolor{comment}{//\ Converts\ a\ float\ value\ into\ a\ quantized\ value.\ \ Note\ that\ large\ values\ (close}}
+\DoxyCodeLine{00039\ \textcolor{comment}{//\ to\ max\ int\ and\ min\ int)\ may\ see\ significant\ error\ due\ to\ a\ lack\ of\ floating}}
+\DoxyCodeLine{00040\ \textcolor{comment}{//\ point\ granularity\ for\ large\ values.}}
+\DoxyCodeLine{00041\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{00042\ T\ \mbox{\hyperlink{namespacetflite_a07868fb8bef8b0d31ac039a67c56ca3c}{FloatToQuantizedType}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{float}\ \mbox{\hyperlink{wm8960__regs_8h_a638e4503e0ae6ce655b7ad2e17e8f0ad}{value}},\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{float}\ \mbox{\hyperlink{batch__matmul__test_8cc_a1d28dec57cce925ad92342891bd71e7c}{scale}},\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{batch__matmul__test_8cc_a2be4e05b1d1f5ff4043c3bd42b8f5f44}{zero\_point}})\ \{}
+\DoxyCodeLine{00043\ \ \ int32\_t\ result\ =\ round(\mbox{\hyperlink{wm8960__regs_8h_a638e4503e0ae6ce655b7ad2e17e8f0ad}{value}}\ /\ \mbox{\hyperlink{batch__matmul__test_8cc_a1d28dec57cce925ad92342891bd71e7c}{scale}})\ +\ \mbox{\hyperlink{batch__matmul__test_8cc_a2be4e05b1d1f5ff4043c3bd42b8f5f44}{zero\_point}};}
+\DoxyCodeLine{00044\ \ \ result\ =}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ std::max(\textcolor{keyword}{static\_cast<}int32\_t\textcolor{keyword}{>}(std::numeric\_limits<T>::min()),\ result);}
+\DoxyCodeLine{00046\ \ \ result\ =}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ std::min(\textcolor{keyword}{static\_cast<}int32\_t\textcolor{keyword}{>}(std::numeric\_limits<T>::max()),\ result);}
+\DoxyCodeLine{00048\ \ \ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{00049\ \}}
+\DoxyCodeLine{00050\ }
+\DoxyCodeLine{00051\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{00052\ T\ \mbox{\hyperlink{namespacetflite_a2cccd5f671fe0b58511b951686014147}{FloatToSymmetricQuantizedType}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{float}\ \mbox{\hyperlink{wm8960__regs_8h_a638e4503e0ae6ce655b7ad2e17e8f0ad}{value}},\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{float}\ \mbox{\hyperlink{batch__matmul__test_8cc_a1d28dec57cce925ad92342891bd71e7c}{scale}})\ \{}
+\DoxyCodeLine{00053\ \ \ \textcolor{comment}{//\ 64-\/bit\ values\ are\ required\ since\ 8x16\ conv\ accumulates\ to\ int64,\ meaning}}
+\DoxyCodeLine{00054\ \ \ \textcolor{comment}{//\ an\ int64\ bias\ is\ required.}}
+\DoxyCodeLine{00055\ \ \ std::int64\_t\ result\ =\ round(\mbox{\hyperlink{wm8960__regs_8h_a638e4503e0ae6ce655b7ad2e17e8f0ad}{value}}\ /\ \mbox{\hyperlink{batch__matmul__test_8cc_a1d28dec57cce925ad92342891bd71e7c}{scale}});}
+\DoxyCodeLine{00056\ \ \ result\ =\ std::max(}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \textcolor{keyword}{static\_cast<}std::int64\_t\textcolor{keyword}{>}(std::numeric\_limits<T>::min()\ +\ 1),\ result);}
+\DoxyCodeLine{00058\ \ \ result\ =\ std::min(\textcolor{keyword}{static\_cast<}std::int64\_t\textcolor{keyword}{>}(std::numeric\_limits<T>::max()),}
+\DoxyCodeLine{00059\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ result);}
+\DoxyCodeLine{00060\ \ \ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{00061\ \}}
+\DoxyCodeLine{00062\ }
+\DoxyCodeLine{00063\ \textcolor{comment}{//\ Helper\ methods\ to\ quantize\ arrays\ of\ floats\ to\ the\ desired\ format.}}
+\DoxyCodeLine{00064\ \textcolor{comment}{//}}
+\DoxyCodeLine{00065\ \textcolor{comment}{//\ There\ are\ several\ key\ flavors\ of\ quantization\ in\ TfLite:}}
+\DoxyCodeLine{00066\ \textcolor{comment}{//\ \ \ \ \ \ \ \ asymmetric\ symmetric\ \ per\ channel}}
+\DoxyCodeLine{00067\ \textcolor{comment}{//\ int8\_t\ \ |\ \ \ \ \ X\ \ \ \ |\ \ \ \ X\ \ \ \ |\ \ \ \ \ X\ \ \ \ \ \ |}}
+\DoxyCodeLine{00068\ \textcolor{comment}{//\ uint8\_t\ |\ \ \ \ \ X\ \ \ \ |\ \ \ \ X\ \ \ \ |\ \ \ \ \ \ \ \ \ \ \ \ |}}
+\DoxyCodeLine{00069\ \textcolor{comment}{//\ int16\_t\ |\ \ \ \ \ X\ \ \ \ |\ \ \ \ \ \ \ \ \ |\ \ \ \ \ \ \ \ \ \ \ \ |}}
+\DoxyCodeLine{00070\ \textcolor{comment}{//\ int32\_t\ |\ \ \ \ \ \ \ \ \ \ |\ \ \ \ X\ \ \ \ |\ \ \ \ \ X\ \ \ \ \ \ |}}
+\DoxyCodeLine{00071\ \textcolor{comment}{//}}
+\DoxyCodeLine{00072\ \textcolor{comment}{//\ The\ per-\/op\ quantization\ spec\ can\ be\ found\ here:}}
+\DoxyCodeLine{00073\ \textcolor{comment}{//\ https://www.tensorflow.org/lite/performance/quantization\_spec}}
+\DoxyCodeLine{00074\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{00075\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_a30bddb28b851da7d4a5c3eea35bfc779}{Quantize}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{float}*\ \mbox{\hyperlink{squeeze_8cpp_a9cebfb3d6ddd692fbdd268cf4b9ad024}{input}},\ T*\ \mbox{\hyperlink{maximum__minimum_8cpp_a7a2a916a8059078c2d7a05f46c7126fd}{output}},\ \textcolor{keywordtype}{int}\ num\_elements,\ \textcolor{keywordtype}{float}\ \mbox{\hyperlink{batch__matmul__test_8cc_a1d28dec57cce925ad92342891bd71e7c}{scale}},}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{batch__matmul__test_8cc_a2be4e05b1d1f5ff4043c3bd42b8f5f44}{zero\_point}})\ \{}
+\DoxyCodeLine{00077\ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ num\_elements;\ i++)\ \{}
+\DoxyCodeLine{00078\ \ \ \ \ \mbox{\hyperlink{maximum__minimum_8cpp_a7a2a916a8059078c2d7a05f46c7126fd}{output}}[i]\ =\ \mbox{\hyperlink{namespacetflite_a07868fb8bef8b0d31ac039a67c56ca3c}{FloatToQuantizedType<T>}}(\mbox{\hyperlink{squeeze_8cpp_a9cebfb3d6ddd692fbdd268cf4b9ad024}{input}}[i],\ \mbox{\hyperlink{batch__matmul__test_8cc_a1d28dec57cce925ad92342891bd71e7c}{scale}},\ \mbox{\hyperlink{batch__matmul__test_8cc_a2be4e05b1d1f5ff4043c3bd42b8f5f44}{zero\_point}});}
+\DoxyCodeLine{00079\ \ \ \}}
+\DoxyCodeLine{00080\ \}}
+\DoxyCodeLine{00081\ }
+\DoxyCodeLine{00082\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{00083\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_af3d20f2457626c466fa9a278773261d9}{SymmetricQuantize}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{float}*\ \mbox{\hyperlink{squeeze_8cpp_a9cebfb3d6ddd692fbdd268cf4b9ad024}{input}},\ T*\ \mbox{\hyperlink{maximum__minimum_8cpp_a7a2a916a8059078c2d7a05f46c7126fd}{output}},\ \textcolor{keywordtype}{int}\ num\_elements,}
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}\ \mbox{\hyperlink{batch__matmul__test_8cc_a1d28dec57cce925ad92342891bd71e7c}{scale}})\ \{}
+\DoxyCodeLine{00085\ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ num\_elements;\ i++)\ \{}
+\DoxyCodeLine{00086\ \ \ \ \ \mbox{\hyperlink{maximum__minimum_8cpp_a7a2a916a8059078c2d7a05f46c7126fd}{output}}[i]\ =\ \mbox{\hyperlink{namespacetflite_a2cccd5f671fe0b58511b951686014147}{FloatToSymmetricQuantizedType<T>}}(\mbox{\hyperlink{squeeze_8cpp_a9cebfb3d6ddd692fbdd268cf4b9ad024}{input}}[i],\ \mbox{\hyperlink{batch__matmul__test_8cc_a1d28dec57cce925ad92342891bd71e7c}{scale}});}
+\DoxyCodeLine{00087\ \ \ \}}
+\DoxyCodeLine{00088\ \}}
+\DoxyCodeLine{00089\ }
+\DoxyCodeLine{00090\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{00091\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_a28fe643d7cb041f2b045bab0f5bad89b}{SymmetricPerChannelQuantize}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{float}*\ \mbox{\hyperlink{squeeze_8cpp_a9cebfb3d6ddd692fbdd268cf4b9ad024}{input}},\ T*\ \mbox{\hyperlink{maximum__minimum_8cpp_a7a2a916a8059078c2d7a05f46c7126fd}{output}},}
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ num\_elements,\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{stacker_8cc_a345cae2db28059ee72015d7c6acc9dd5}{num\_channels}},}
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}*\ scales)\ \{}
+\DoxyCodeLine{00094\ \ \ \textcolor{keywordtype}{int}\ elements\_per\_channel\ =\ num\_elements\ /\ \mbox{\hyperlink{stacker_8cc_a345cae2db28059ee72015d7c6acc9dd5}{num\_channels}};}
+\DoxyCodeLine{00095\ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ \mbox{\hyperlink{stacker_8cc_a345cae2db28059ee72015d7c6acc9dd5}{num\_channels}};\ i++)\ \{}
+\DoxyCodeLine{00096\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ j\ =\ 0;\ j\ <\ elements\_per\_channel;\ j++)\ \{}
+\DoxyCodeLine{00097\ \ \ \ \ \ \ \mbox{\hyperlink{maximum__minimum_8cpp_a7a2a916a8059078c2d7a05f46c7126fd}{output}}[i\ *\ elements\_per\_channel\ +\ j]\ =\ \mbox{\hyperlink{namespacetflite_a2cccd5f671fe0b58511b951686014147}{FloatToSymmetricQuantizedType<T>}}(}
+\DoxyCodeLine{00098\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{squeeze_8cpp_a9cebfb3d6ddd692fbdd268cf4b9ad024}{input}}[i\ *\ elements\_per\_channel\ +\ j],\ scales[i]);}
+\DoxyCodeLine{00099\ \ \ \ \ \}}
+\DoxyCodeLine{00100\ \ \ \}}
+\DoxyCodeLine{00101\ \}}
+\DoxyCodeLine{00102\ }
+\DoxyCodeLine{00103\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_a4fad380ebe8c417990a027dbaee65ab5}{SignedSymmetricPerChannelQuantize}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{float}*\ values,}
+\DoxyCodeLine{00104\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_tf_lite_int_array}{TfLiteIntArray}}*\ \mbox{\hyperlink{strided__slice_8cpp_aedadeec3ef499c79fc32c00079f7982d}{dims}},}
+\DoxyCodeLine{00105\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ quantized\_dimension,}
+\DoxyCodeLine{00106\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ int8\_t*\ quantized\_values,}
+\DoxyCodeLine{00107\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}*\ scaling\_factor,}
+\DoxyCodeLine{00108\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2core_2c_2c__api__types_8h_a8a47ba81bdef28b5c479ee7928a7d123}{TfLiteType}}\ \mbox{\hyperlink{micro_2kernels_2overlap__add_8cc_a231b67310ea6e901bd0df1bded3963cf}{type}}\ =\ \mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2core_2c_2c__api__types_8h_a8a47ba81bdef28b5c479ee7928a7d123abe7e67b1f37873e602f2b20b9b42c6c8}{kTfLiteNoType}});}
+\DoxyCodeLine{00109\ }
+\DoxyCodeLine{00110\ \textcolor{comment}{//\ Quantizes\ inputs\ based\ on\ the\ values\ provided,\ choosing\ the\ smallest\ range}}
+\DoxyCodeLine{00111\ \textcolor{comment}{//\ which\ includes\ all\ input\ values.}}
+\DoxyCodeLine{00112\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{00113\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_a7cfeeb6d228de3ed768396d99f9d9e56}{SymmetricQuantizeCalculateScales}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{float}*\ values,\ \mbox{\hyperlink{struct_tf_lite_int_array}{TfLiteIntArray}}*\ \mbox{\hyperlink{strided__slice_8cpp_aedadeec3ef499c79fc32c00079f7982d}{dims}},}
+\DoxyCodeLine{00114\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ T*\ \mbox{\hyperlink{maximum__minimum_8cpp_a7a2a916a8059078c2d7a05f46c7126fd}{output}},\ \textcolor{keywordtype}{float}*\ \mbox{\hyperlink{batch__matmul__test_8cc_a1d28dec57cce925ad92342891bd71e7c}{scale}})\ \{}
+\DoxyCodeLine{00115\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{irfft_8cc_a56f49c6b551e4aec18e30116c206dd5b}{input\_size}}\ =\ \mbox{\hyperlink{namespacetflite_a9c3966c3298709a2ae18d6c87223e612}{ElementCount}}(*\mbox{\hyperlink{strided__slice_8cpp_aedadeec3ef499c79fc32c00079f7982d}{dims}});}
+\DoxyCodeLine{00116\ }
+\DoxyCodeLine{00117\ \ \ \textcolor{keywordtype}{float}\ min\ =\ 0;}
+\DoxyCodeLine{00118\ \ \ \textcolor{keywordtype}{float}\ max\ =\ 0;}
+\DoxyCodeLine{00119\ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ \mbox{\hyperlink{irfft_8cc_a56f49c6b551e4aec18e30116c206dd5b}{input\_size}};\ i++)\ \{}
+\DoxyCodeLine{00120\ \ \ \ \ min\ =\ fminf(min,\ values[i]);}
+\DoxyCodeLine{00121\ \ \ \ \ max\ =\ fmaxf(max,\ values[i]);}
+\DoxyCodeLine{00122\ \ \ \}}
+\DoxyCodeLine{00123\ \ \ *\mbox{\hyperlink{batch__matmul__test_8cc_a1d28dec57cce925ad92342891bd71e7c}{scale}}\ =\ fmaxf(std::abs(min),\ std::abs(max))\ /\ std::numeric\_limits<T>::max();}
+\DoxyCodeLine{00124\ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ \mbox{\hyperlink{irfft_8cc_a56f49c6b551e4aec18e30116c206dd5b}{input\_size}};\ i++)\ \{}
+\DoxyCodeLine{00125\ \ \ \ \ \textcolor{keyword}{const}\ int32\_t\ quantized\_value\ =}
+\DoxyCodeLine{00126\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static\_cast<}int32\_t\textcolor{keyword}{>}(roundf(values[i]\ /\ *\mbox{\hyperlink{batch__matmul__test_8cc_a1d28dec57cce925ad92342891bd71e7c}{scale}}));}
+\DoxyCodeLine{00127\ \ \ \ \ \textcolor{comment}{//\ Clamp:\ just\ in\ case\ some\ odd\ numeric\ offset.}}
+\DoxyCodeLine{00128\ \ \ \ \ quantized\_value\ =\ fminf(std::numeric\_limits<T>::max(),\ quantized\_value);}
+\DoxyCodeLine{00129\ \ \ \ \ quantized\_value\ =\ fmaxf(std::numeric\_limits<T>::min()\ +\ 1,\ quantized\_value);}
+\DoxyCodeLine{00130\ \ \ \ \ \mbox{\hyperlink{maximum__minimum_8cpp_a7a2a916a8059078c2d7a05f46c7126fd}{output}}[i]\ =\ quantized\_value;}
+\DoxyCodeLine{00131\ \ \ \}}
+\DoxyCodeLine{00132\ \}}
+\DoxyCodeLine{00133\ }
+\DoxyCodeLine{00134\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{00135\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_acbaa6df3b3aa80e048db237c1e59a6b7}{Dequantize}}(\textcolor{keyword}{const}\ T*\ values,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{hello__world__model_8cc_a439227feff9d7f55384e8780cfc2eb82}{size}},\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{float}\ \mbox{\hyperlink{batch__matmul__test_8cc_a1d28dec57cce925ad92342891bd71e7c}{scale}},}
+\DoxyCodeLine{00136\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{batch__matmul__test_8cc_a2be4e05b1d1f5ff4043c3bd42b8f5f44}{zero\_point}},\ \textcolor{keywordtype}{float}*\ dequantized\_values)\ \{}
+\DoxyCodeLine{00137\ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ \mbox{\hyperlink{hello__world__model_8cc_a439227feff9d7f55384e8780cfc2eb82}{size}};\ ++i)\ \{}
+\DoxyCodeLine{00138\ \ \ \ \ dequantized\_values[i]\ =\ (values[i]\ -\/\ \mbox{\hyperlink{batch__matmul__test_8cc_a2be4e05b1d1f5ff4043c3bd42b8f5f44}{zero\_point}})\ *\ \mbox{\hyperlink{batch__matmul__test_8cc_a1d28dec57cce925ad92342891bd71e7c}{scale}};}
+\DoxyCodeLine{00139\ \ \ \}}
+\DoxyCodeLine{00140\ \}}
+\DoxyCodeLine{00141\ }
+\DoxyCodeLine{00142\ \textcolor{comment}{//\ based\ on\ TfLiteType\ passed\ in\ to\ these\ functions\ the\ corresponding\ max\ /\ min}}
+\DoxyCodeLine{00143\ \textcolor{comment}{//\ int\ for\ that\ type\ are\ returned}}
+\DoxyCodeLine{00144\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{namespacetflite_aa1773b1daefcdf1824994a796bb6ac56}{QMinFromTfLiteType}}(\mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2core_2c_2c__api__types_8h_a8a47ba81bdef28b5c479ee7928a7d123}{TfLiteType}}\ \mbox{\hyperlink{micro_2kernels_2overlap__add_8cc_a231b67310ea6e901bd0df1bded3963cf}{type}})\ \{}
+\DoxyCodeLine{00145\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{micro_2kernels_2overlap__add_8cc_a231b67310ea6e901bd0df1bded3963cf}{type}}\ ==\ \mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2core_2c_2c__api__types_8h_a8a47ba81bdef28b5c479ee7928a7d123a4e54c2a154168f98718766a230c244ee}{kTfLiteInt4}})\ \{}
+\DoxyCodeLine{00146\ \ \ \ \ \textcolor{keywordflow}{return}\ -\/8;}
+\DoxyCodeLine{00147\ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00148\ \ \ \ \ \textcolor{keywordflow}{return}\ std::numeric\_limits<int8\_t>::min();}
+\DoxyCodeLine{00149\ \ \ \}}
+\DoxyCodeLine{00150\ \}}
+\DoxyCodeLine{00151\ }
+\DoxyCodeLine{00152\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{namespacetflite_a03648655fcc27f8c801b89fd4f2e21f3}{QMaxFromTfLiteType}}(\mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2core_2c_2c__api__types_8h_a8a47ba81bdef28b5c479ee7928a7d123}{TfLiteType}}\ \mbox{\hyperlink{micro_2kernels_2overlap__add_8cc_a231b67310ea6e901bd0df1bded3963cf}{type}})\ \{}
+\DoxyCodeLine{00153\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{micro_2kernels_2overlap__add_8cc_a231b67310ea6e901bd0df1bded3963cf}{type}}\ ==\ \mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2core_2c_2c__api__types_8h_a8a47ba81bdef28b5c479ee7928a7d123a4e54c2a154168f98718766a230c244ee}{kTfLiteInt4}})\ \{}
+\DoxyCodeLine{00154\ \ \ \ \ \textcolor{keywordflow}{return}\ 7;}
+\DoxyCodeLine{00155\ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00156\ \ \ \ \ \textcolor{keywordflow}{return}\ std::numeric\_limits<int8\_t>::max();}
+\DoxyCodeLine{00157\ \ \ \}}
+\DoxyCodeLine{00158\ \}}
+\DoxyCodeLine{00159\ }
+\DoxyCodeLine{00160\ \}\ \ \textcolor{comment}{//\ namespace\ tflite}}
+\DoxyCodeLine{00161\ }
+\DoxyCodeLine{00162\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ TENSORFLOW\_LITE\_MICRO\_MICRO\_UTILS\_H\_}}
+
+\end{DoxyCode}

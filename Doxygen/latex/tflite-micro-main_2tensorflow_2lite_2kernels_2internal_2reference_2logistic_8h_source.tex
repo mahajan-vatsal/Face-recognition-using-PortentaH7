@@ -1,0 +1,138 @@
+\doxysection{logistic.\+h}
+\hypertarget{tflite-micro-main_2tensorflow_2lite_2kernels_2internal_2reference_2logistic_8h_source}{}\label{tflite-micro-main_2tensorflow_2lite_2kernels_2internal_2reference_2logistic_8h_source}\index{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/main/tensorflow/lite/kernels/internal/reference/logistic.h@{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/main/tensorflow/lite/kernels/internal/reference/logistic.h}}
+\mbox{\hyperlink{tflite-micro-main_2tensorflow_2lite_2kernels_2internal_2reference_2logistic_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{/*\ Copyright\ 2019\ The\ TensorFlow\ Authors.\ All\ Rights\ Reserved.}}
+\DoxyCodeLine{00002\ \textcolor{comment}{}}
+\DoxyCodeLine{00003\ \textcolor{comment}{Licensed\ under\ the\ Apache\ License,\ Version\ 2.0\ (the\ "{}License"{});}}
+\DoxyCodeLine{00004\ \textcolor{comment}{you\ may\ not\ use\ this\ file\ except\ in\ compliance\ with\ the\ License.}}
+\DoxyCodeLine{00005\ \textcolor{comment}{You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{00006\ \textcolor{comment}{}}
+\DoxyCodeLine{00007\ \textcolor{comment}{\ \ \ \ http://www.apache.org/licenses/LICENSE-\/2.0}}
+\DoxyCodeLine{00008\ \textcolor{comment}{}}
+\DoxyCodeLine{00009\ \textcolor{comment}{Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ software}}
+\DoxyCodeLine{00010\ \textcolor{comment}{distributed\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,}}
+\DoxyCodeLine{00011\ \textcolor{comment}{WITHOUT\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,\ either\ express\ or\ implied.}}
+\DoxyCodeLine{00012\ \textcolor{comment}{See\ the\ License\ for\ the\ specific\ language\ governing\ permissions\ and}}
+\DoxyCodeLine{00013\ \textcolor{comment}{limitations\ under\ the\ License.}}
+\DoxyCodeLine{00014\ \textcolor{comment}{==============================================================================*/}}
+\DoxyCodeLine{00015\ \textcolor{preprocessor}{\#ifndef\ TENSORFLOW\_LITE\_KERNELS\_INTERNAL\_REFERENCE\_LOGISTIC\_H\_}}
+\DoxyCodeLine{00016\ \textcolor{preprocessor}{\#define\ TENSORFLOW\_LITE\_KERNELS\_INTERNAL\_REFERENCE\_LOGISTIC\_H\_}}
+\DoxyCodeLine{00017\ }
+\DoxyCodeLine{00018\ \textcolor{preprocessor}{\#include\ <cmath>}}
+\DoxyCodeLine{00019\ }
+\DoxyCodeLine{00020\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{fixedpoint_8h}{fixedpoint/fixedpoint.h}}"{}}}
+\DoxyCodeLine{00021\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/kernels/internal/common.h"{}}}
+\DoxyCodeLine{00022\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/kernels/internal/cppmath.h"{}}}
+\DoxyCodeLine{00023\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/kernels/internal/quantization\_util.h"{}}}
+\DoxyCodeLine{00024\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/kernels/internal/types.h"{}}}
+\DoxyCodeLine{00025\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/kernels/op\_macros.h"{}}}
+\DoxyCodeLine{00026\ }
+\DoxyCodeLine{00027\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacetflite}{tflite}}\ \{}
+\DoxyCodeLine{00028\ \textcolor{keyword}{namespace\ }reference\_ops\ \{}
+\DoxyCodeLine{00029\ }
+\DoxyCodeLine{00030\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1reference__ops_a246e15e0f5ce80fb636776cce39bad3f}{Logistic}}(\textcolor{keyword}{const}\ RuntimeShape\&\ input\_shape,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{float}*\ \mbox{\hyperlink{add__n__test_8cc_a5612ba79d1f0b544c7aeae4621166fea}{input\_data}},}
+\DoxyCodeLine{00031\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ RuntimeShape\&\ output\_shape,\ \textcolor{keywordtype}{float}*\ \mbox{\hyperlink{add__n__test_8cc_a3305b43869c4b837b0a33c12cff5069b}{output\_data}})\ \{}
+\DoxyCodeLine{00032\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{float}\ cutoff\_upper\ =\ 16.619047164916992188f;}
+\DoxyCodeLine{00033\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{float}\ cutoff\_lower\ =\ -\/9.f;}
+\DoxyCodeLine{00034\ }
+\DoxyCodeLine{00035\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ flat\_size\ =\ \mbox{\hyperlink{namespacetflite_a8d6998b7eb7b2f0d21f8352da6f6271f}{MatchingFlatSize}}(input\_shape,\ output\_shape);}
+\DoxyCodeLine{00036\ }
+\DoxyCodeLine{00037\ \ \ \textcolor{comment}{//\ Rational\ for\ using\ approximation\ in\ reference\ kernel.}}
+\DoxyCodeLine{00038\ \ \ \textcolor{comment}{//\ 0.\ This\ approximation\ gives\ enough\ precision\ for\ float.}}
+\DoxyCodeLine{00039\ \ \ \textcolor{comment}{//\ 1.\ This\ works\ around\ an\ issue\ on\ an\ embedded\ chipset\ where\ exp()\ does\ not}}
+\DoxyCodeLine{00040\ \ \ \textcolor{comment}{//\ return\ correctly\ as\ expected\ -\/\ exp(x)\ should\ return\ inf\ when\ overflown}}
+\DoxyCodeLine{00041\ \ \ \textcolor{comment}{//\ not\ 1.701417\ \ \ IEEE\ 754\ defines\ representation\ for\ inf.}}
+\DoxyCodeLine{00042\ \ \ \textcolor{comment}{//\ 2.\ This\ will\ speed\ up\ calculation\ and\ is\ matching\ the\ behavior\ in\ the}}
+\DoxyCodeLine{00043\ \ \ \textcolor{comment}{//\ optimized\ kernels.\ (check\ the\ definition\ of\ scalar\_logistic\_op<float>)}}
+\DoxyCodeLine{00044\ }
+\DoxyCodeLine{00045\ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ flat\_size;\ i++)\ \{}
+\DoxyCodeLine{00046\ \ \ \ \ \textcolor{keywordtype}{float}\ val\ =\ \mbox{\hyperlink{add__n__test_8cc_a5612ba79d1f0b544c7aeae4621166fea}{input\_data}}[i];}
+\DoxyCodeLine{00047\ \ \ \ \ \textcolor{keywordtype}{float}\ result;}
+\DoxyCodeLine{00048\ \ \ \ \ \textcolor{keywordflow}{if}\ (val\ >\ cutoff\_upper)\ \{}
+\DoxyCodeLine{00049\ \ \ \ \ \ \ result\ =\ 1.0f;}
+\DoxyCodeLine{00050\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (val\ <\ cutoff\_lower)\ \{}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ result\ =\ std::exp(val);}
+\DoxyCodeLine{00052\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ result\ =\ 1.f\ /\ (1.f\ +\ std::exp(-\/val));}
+\DoxyCodeLine{00054\ \ \ \ \ \}}
+\DoxyCodeLine{00055\ \ \ \ \ \mbox{\hyperlink{add__n__test_8cc_a3305b43869c4b837b0a33c12cff5069b}{output\_data}}[i]\ =\ result;}
+\DoxyCodeLine{00056\ \ \ \}}
+\DoxyCodeLine{00057\ \}}
+\DoxyCodeLine{00058\ }
+\DoxyCodeLine{00059\ \textcolor{comment}{//\ Convenience\ version\ that\ allows,\ for\ example,\ generated-\/code\ calls\ to\ be}}
+\DoxyCodeLine{00060\ \textcolor{comment}{//\ uniform\ between\ data\ types.}}
+\DoxyCodeLine{00061\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1reference__ops_a246e15e0f5ce80fb636776cce39bad3f}{Logistic}}(\textcolor{keyword}{const}\ LogisticParams\&,\ \textcolor{keyword}{const}\ RuntimeShape\&\ input\_shape,}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{float}*\ \mbox{\hyperlink{add__n__test_8cc_a5612ba79d1f0b544c7aeae4621166fea}{input\_data}},\ \textcolor{keyword}{const}\ RuntimeShape\&\ output\_shape,}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}*\ \mbox{\hyperlink{add__n__test_8cc_a3305b43869c4b837b0a33c12cff5069b}{output\_data}})\ \{}
+\DoxyCodeLine{00064\ \ \ \textcolor{comment}{//\ Drop\ params:\ not\ needed.}}
+\DoxyCodeLine{00065\ \ \ \mbox{\hyperlink{namespacetflite_1_1reference__ops_a246e15e0f5ce80fb636776cce39bad3f}{Logistic}}(input\_shape,\ \mbox{\hyperlink{add__n__test_8cc_a5612ba79d1f0b544c7aeae4621166fea}{input\_data}},\ output\_shape,\ \mbox{\hyperlink{add__n__test_8cc_a3305b43869c4b837b0a33c12cff5069b}{output\_data}});}
+\DoxyCodeLine{00066\ \}}
+\DoxyCodeLine{00067\ }
+\DoxyCodeLine{00068\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1reference__ops_a246e15e0f5ce80fb636776cce39bad3f}{Logistic}}(\textcolor{keyword}{const}\ LogisticParams\&\ \mbox{\hyperlink{comparisons_8cpp_a434686eb00eea897154eb5c3f9364ef7}{params}},}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ RuntimeShape\&\ input\_shape,\ \textcolor{keyword}{const}\ int16\_t*\ \mbox{\hyperlink{add__n__test_8cc_a5612ba79d1f0b544c7aeae4621166fea}{input\_data}},}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ RuntimeShape\&\ output\_shape,\ int16\_t*\ \mbox{\hyperlink{add__n__test_8cc_a3305b43869c4b837b0a33c12cff5069b}{output\_data}})\ \{}
+\DoxyCodeLine{00071\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ flat\_size\ =\ \mbox{\hyperlink{namespacetflite_a8d6998b7eb7b2f0d21f8352da6f6271f}{MatchingFlatSize}}(input\_shape,\ output\_shape);}
+\DoxyCodeLine{00072\ }
+\DoxyCodeLine{00073\ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ flat\_size;\ i++)\ \{}
+\DoxyCodeLine{00074\ \ \ \ \ \textcolor{comment}{//\ F0\ uses\ 0\ integer\ bits,\ range\ [-\/1,\ 1].}}
+\DoxyCodeLine{00075\ \ \ \ \ \textcolor{comment}{//\ This\ is\ the\ return\ type\ of\ math\ functions\ such\ as\ tanh,\ logistic,}}
+\DoxyCodeLine{00076\ \ \ \ \ \textcolor{comment}{//\ whose\ range\ is\ in\ [-\/1,\ 1].}}
+\DoxyCodeLine{00077\ \ \ \ \ \textcolor{keyword}{using\ }F0\ =\ \mbox{\hyperlink{classgemmlowp_1_1_fixed_point}{gemmlowp::FixedPoint<std::int16\_t,\ 0>}};}
+\DoxyCodeLine{00078\ \ \ \ \ \textcolor{comment}{//\ F3\ uses\ 3\ integer\ bits,\ range\ [-\/8,\ 8],\ the\ input\ range\ expected\ here.}}
+\DoxyCodeLine{00079\ \ \ \ \ \textcolor{keyword}{using\ }F3\ =\ \mbox{\hyperlink{classgemmlowp_1_1_fixed_point}{gemmlowp::FixedPoint<std::int16\_t,\ 3>}};}
+\DoxyCodeLine{00080\ }
+\DoxyCodeLine{00081\ \ \ \ \ \textcolor{keyword}{const}\ F3\ \mbox{\hyperlink{squeeze_8cpp_a9cebfb3d6ddd692fbdd268cf4b9ad024}{input}}\ =\ F3::FromRaw(\mbox{\hyperlink{add__n__test_8cc_a5612ba79d1f0b544c7aeae4621166fea}{input\_data}}[i]);}
+\DoxyCodeLine{00082\ \ \ \ \ F0\ \mbox{\hyperlink{maximum__minimum_8cpp_a7a2a916a8059078c2d7a05f46c7126fd}{output}}\ =\ \mbox{\hyperlink{namespacegemmlowp_a5d47140a7399ebb6f11d4c7eb9a7112c}{gemmlowp::logistic}}(\mbox{\hyperlink{squeeze_8cpp_a9cebfb3d6ddd692fbdd268cf4b9ad024}{input}});}
+\DoxyCodeLine{00083\ \ \ \ \ \mbox{\hyperlink{add__n__test_8cc_a3305b43869c4b837b0a33c12cff5069b}{output\_data}}[i]\ =\ \mbox{\hyperlink{maximum__minimum_8cpp_a7a2a916a8059078c2d7a05f46c7126fd}{output}}.raw();}
+\DoxyCodeLine{00084\ \ \ \}}
+\DoxyCodeLine{00085\ \}}
+\DoxyCodeLine{00086\ }
+\DoxyCodeLine{00087\ \textcolor{comment}{//\ Quantized\ int8\_t\ logistic\ activation.\ \ Cheats\ by\ dequantizing\ and}}
+\DoxyCodeLine{00088\ \textcolor{comment}{//\ requantizing\ around\ the\ floating\ point\ logistic\ method.\ \ This\ implementation}}
+\DoxyCodeLine{00089\ \textcolor{comment}{//\ is\ slow\ on\ platforms\ without\ a\ floating\ point\ unit.}}
+\DoxyCodeLine{00090\ }
+\DoxyCodeLine{00091\ \textcolor{comment}{//\ TODO(b/141211002):\ Delete\ this\ int8\_t\ implementation\ once\ we\ can\ reuse\ the}}
+\DoxyCodeLine{00092\ \textcolor{comment}{//\ approach\ used\ in\ TFLite\ for\ int8\_t\ Logistic.}}
+\DoxyCodeLine{00093\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1reference__ops_a246e15e0f5ce80fb636776cce39bad3f}{Logistic}}(\textcolor{keyword}{const}\ RuntimeShape\&\ input\_shape,\ \textcolor{keyword}{const}\ int8\_t*\ \mbox{\hyperlink{add__n__test_8cc_a5612ba79d1f0b544c7aeae4621166fea}{input\_data}},}
+\DoxyCodeLine{00094\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}\ input\_scale,\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{tanh_8cpp_a3d0e49fe7ae38f6479154745fcddfdd1}{input\_zero\_point}},}
+\DoxyCodeLine{00095\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ RuntimeShape\&\ output\_shape,\ int8\_t*\ \mbox{\hyperlink{add__n__test_8cc_a3305b43869c4b837b0a33c12cff5069b}{output\_data}},}
+\DoxyCodeLine{00096\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}\ \mbox{\hyperlink{micro_2kernels_2filter__bank__log_8cc_aad7699ab55cc1f497d8d2861fd2d0dd2}{output\_scale}},\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{div_8cpp_a01779cbc43b9b8996d7f980787aa369a}{output\_zero\_point}})\ \{}
+\DoxyCodeLine{00097\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{float}\ cutoff\_upper\ =\ 16.619047164916992188f;}
+\DoxyCodeLine{00098\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{float}\ cutoff\_lower\ =\ -\/9.f;}
+\DoxyCodeLine{00099\ }
+\DoxyCodeLine{00100\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ flat\_size\ =\ \mbox{\hyperlink{namespacetflite_a8d6998b7eb7b2f0d21f8352da6f6271f}{MatchingFlatSize}}(input\_shape,\ output\_shape);}
+\DoxyCodeLine{00101\ }
+\DoxyCodeLine{00102\ \ \ \textcolor{comment}{//\ Rational\ for\ using\ approximation\ in\ reference\ kernel.}}
+\DoxyCodeLine{00103\ \ \ \textcolor{comment}{//\ 0.\ This\ approximation\ gives\ enough\ precision\ for\ float.}}
+\DoxyCodeLine{00104\ \ \ \textcolor{comment}{//\ 1.\ This\ works\ around\ an\ issue\ on\ an\ embedded\ chipset\ where\ exp()\ does\ not}}
+\DoxyCodeLine{00105\ \ \ \textcolor{comment}{//\ return\ correctly\ as\ expected\ -\/\ exp(x)\ should\ return\ inf\ when\ overflown}}
+\DoxyCodeLine{00106\ \ \ \textcolor{comment}{//\ not\ 1.701417\ \ \ IEEE\ 754\ defines\ representation\ for\ inf.}}
+\DoxyCodeLine{00107\ \ \ \textcolor{comment}{//\ 2.\ This\ will\ speed\ up\ calculation\ and\ is\ matching\ the\ behavior\ in\ the}}
+\DoxyCodeLine{00108\ \ \ \textcolor{comment}{//\ optimized\ kernels.\ (check\ the\ definition\ of\ scalar\_logistic\_op<float>)}}
+\DoxyCodeLine{00109\ }
+\DoxyCodeLine{00110\ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ flat\_size;\ i++)\ \{}
+\DoxyCodeLine{00111\ \ \ \ \ \textcolor{comment}{//\ Dequantize.}}
+\DoxyCodeLine{00112\ \ \ \ \ \textcolor{keywordtype}{float}\ val\ =}
+\DoxyCodeLine{00113\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{float}\textcolor{keyword}{>}((\mbox{\hyperlink{add__n__test_8cc_a5612ba79d1f0b544c7aeae4621166fea}{input\_data}}[i]\ -\/\ \mbox{\hyperlink{tanh_8cpp_a3d0e49fe7ae38f6479154745fcddfdd1}{input\_zero\_point}})\ *\ input\_scale);}
+\DoxyCodeLine{00114\ \ \ \ \ \textcolor{keywordtype}{float}\ result;}
+\DoxyCodeLine{00115\ \ \ \ \ \textcolor{keywordflow}{if}\ (val\ >\ cutoff\_upper)\ \{}
+\DoxyCodeLine{00116\ \ \ \ \ \ \ result\ =\ 1.0f;}
+\DoxyCodeLine{00117\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (val\ <\ cutoff\_lower)\ \{}
+\DoxyCodeLine{00118\ \ \ \ \ \ \ result\ =\ std::exp(val);}
+\DoxyCodeLine{00119\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00120\ \ \ \ \ \ \ result\ =\ 1.f\ /\ (1.f\ +\ std::exp(-\/val));}
+\DoxyCodeLine{00121\ \ \ \ \ \}}
+\DoxyCodeLine{00122\ \ \ \ \ \textcolor{comment}{//\ Requantize}}
+\DoxyCodeLine{00123\ \ \ \ \ int8\_t\ \mbox{\hyperlink{maximum__minimum_8cpp_a7a2a916a8059078c2d7a05f46c7126fd}{output}}\ =}
+\DoxyCodeLine{00124\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static\_cast<}int8\_t\textcolor{keyword}{>}(result\ /\ \mbox{\hyperlink{micro_2kernels_2filter__bank__log_8cc_aad7699ab55cc1f497d8d2861fd2d0dd2}{output\_scale}}\ +\ \mbox{\hyperlink{div_8cpp_a01779cbc43b9b8996d7f980787aa369a}{output\_zero\_point}});}
+\DoxyCodeLine{00125\ \ \ \ \ \mbox{\hyperlink{add__n__test_8cc_a3305b43869c4b837b0a33c12cff5069b}{output\_data}}[i]\ =\ \mbox{\hyperlink{maximum__minimum_8cpp_a7a2a916a8059078c2d7a05f46c7126fd}{output}};}
+\DoxyCodeLine{00126\ \ \ \}}
+\DoxyCodeLine{00127\ \}}
+\DoxyCodeLine{00128\ }
+\DoxyCodeLine{00129\ \}\ \ \textcolor{comment}{//\ namespace\ reference\_ops}}
+\DoxyCodeLine{00130\ \}\ \ \textcolor{comment}{//\ namespace\ tflite}}
+\DoxyCodeLine{00131\ }
+\DoxyCodeLine{00132\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ TENSORFLOW\_LITE\_KERNELS\_INTERNAL\_REFERENCE\_LOGISTIC\_H\_}}
+
+\end{DoxyCode}

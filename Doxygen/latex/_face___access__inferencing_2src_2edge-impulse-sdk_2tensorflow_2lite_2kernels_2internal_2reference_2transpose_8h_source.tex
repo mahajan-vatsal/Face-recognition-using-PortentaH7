@@ -1,0 +1,209 @@
+\doxysection{transpose.\+h}
+\hypertarget{_face___access__inferencing_2src_2edge-impulse-sdk_2tensorflow_2lite_2kernels_2internal_2reference_2transpose_8h_source}{}\label{_face___access__inferencing_2src_2edge-impulse-sdk_2tensorflow_2lite_2kernels_2internal_2reference_2transpose_8h_source}\index{Face\_Access\_inferencing/src/edge-\/impulse-\/sdk/tensorflow/lite/kernels/internal/reference/transpose.h@{Face\_Access\_inferencing/src/edge-\/impulse-\/sdk/tensorflow/lite/kernels/internal/reference/transpose.h}}
+\mbox{\hyperlink{_face___access__inferencing_2src_2edge-impulse-sdk_2tensorflow_2lite_2kernels_2internal_2reference_2transpose_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{/*\ Copyright\ 2020\ The\ TensorFlow\ Authors.\ All\ Rights\ Reserved.}}
+\DoxyCodeLine{00002\ \textcolor{comment}{}}
+\DoxyCodeLine{00003\ \textcolor{comment}{Licensed\ under\ the\ Apache\ License,\ Version\ 2.0\ (the\ "{}License"{});}}
+\DoxyCodeLine{00004\ \textcolor{comment}{you\ may\ not\ use\ this\ file\ except\ in\ compliance\ with\ the\ License.}}
+\DoxyCodeLine{00005\ \textcolor{comment}{You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{00006\ \textcolor{comment}{}}
+\DoxyCodeLine{00007\ \textcolor{comment}{\ \ \ \ http://www.apache.org/licenses/LICENSE-\/2.0}}
+\DoxyCodeLine{00008\ \textcolor{comment}{}}
+\DoxyCodeLine{00009\ \textcolor{comment}{Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ software}}
+\DoxyCodeLine{00010\ \textcolor{comment}{distributed\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,}}
+\DoxyCodeLine{00011\ \textcolor{comment}{WITHOUT\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,\ either\ express\ or\ implied.}}
+\DoxyCodeLine{00012\ \textcolor{comment}{See\ the\ License\ for\ the\ specific\ language\ governing\ permissions\ and}}
+\DoxyCodeLine{00013\ \textcolor{comment}{limitations\ under\ the\ License.}}
+\DoxyCodeLine{00014\ \textcolor{comment}{==============================================================================*/}}
+\DoxyCodeLine{00015\ \textcolor{preprocessor}{\#ifndef\ TENSORFLOW\_LITE\_KERNELS\_INTERNAL\_REFERENCE\_TRANSPOSE\_H\_}}
+\DoxyCodeLine{00016\ \textcolor{preprocessor}{\#define\ TENSORFLOW\_LITE\_KERNELS\_INTERNAL\_REFERENCE\_TRANSPOSE\_H\_}}
+\DoxyCodeLine{00017\ }
+\DoxyCodeLine{00018\ \textcolor{preprocessor}{\#include\ <array>}}
+\DoxyCodeLine{00019\ }
+\DoxyCodeLine{00020\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{_face___access__inferencing_2src_2edge-impulse-sdk_2tensorflow_2lite_2kernels_2internal_2types_8h}{edge-\/impulse-\/sdk/tensorflow/lite/kernels/internal/types.h}}"{}}}
+\DoxyCodeLine{00021\ }
+\DoxyCodeLine{00022\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacetflite}{tflite}}\ \{}
+\DoxyCodeLine{00023\ }
+\DoxyCodeLine{00024\ \textcolor{keyword}{namespace\ }reference\_ops\ \{}
+\DoxyCodeLine{00025\ }
+\DoxyCodeLine{00026\ \textcolor{keyword}{namespace\ }transpose\_internal\ \{}
+\DoxyCodeLine{00027\ }
+\DoxyCodeLine{00028\ \textcolor{comment}{//\ Recursively\ explores\ all\ the\ dimensions\ of\ the\ output\ tensor\ and\ writes\ the}}
+\DoxyCodeLine{00029\ \textcolor{comment}{//\ corresponding\ input\ tensor\ data.}}
+\DoxyCodeLine{00030\ \textcolor{comment}{//}}
+\DoxyCodeLine{00031\ \textcolor{comment}{//\ -\/\ depth:\ the\ current\ depth\ of\ the\ recursion.}}
+\DoxyCodeLine{00032\ \textcolor{comment}{//\ -\/\ dims:\ tensor\ dimension\ count,\ also\ \`{}perm`\ size.}}
+\DoxyCodeLine{00033\ \textcolor{comment}{//\ -\/\ perm:\ permutation\ array.}}
+\DoxyCodeLine{00034\ \textcolor{comment}{//\ -\/\ input\_data:\ Running\ input\ data\ pointer.\ If\ depth\ ==\ num\_dims-\/1,\ this\ points}}
+\DoxyCodeLine{00035\ \textcolor{comment}{//\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ to\ the\ first\ element\ of\ the\ last\ dimension\ to\ traverse.}}
+\DoxyCodeLine{00036\ \textcolor{comment}{//\ -\/\ input\_stride:\ Reverse\ partial\ product\ of\ input\ shapes.}}
+\DoxyCodeLine{00037\ \textcolor{comment}{//\ -\/\ output\_data:\ Running\ output\ data\ pointer.\ If\ depth\ ==\ num\_dims-\/1,\ this}}
+\DoxyCodeLine{00038\ \textcolor{comment}{//\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ points\ to\ the\ first\ element\ of\ the\ last\ dimension\ to\ traverse.}}
+\DoxyCodeLine{00039\ \textcolor{comment}{//\ -\/\ output\_stride:\ Reverse\ partial\ product\ of\ output\ shapes.}}
+\DoxyCodeLine{00040\ \textcolor{comment}{//\ -\/\ output\_shape:\ Shape\ of\ the\ output\ tensor.}}
+\DoxyCodeLine{00041\ \textcolor{comment}{//}}
+\DoxyCodeLine{00042\ \textcolor{comment}{//\ \#\#\ Algorithm\ explanation}}
+\DoxyCodeLine{00043\ \textcolor{comment}{//}}
+\DoxyCodeLine{00044\ \textcolor{comment}{//\ Assume\ a\ 3D\ tensor\ T\ with\ a\ shape\ of\ [I,\ J,\ K]\ stored\ in\ row\ major\ order.}}
+\DoxyCodeLine{00045\ \textcolor{comment}{//\ T[i,\ j,\ k]\ is\ at\ position\ \`{}i*J*K\ +\ j*K\ +\ k`\ in\ the\ tensor\ buffer.}}
+\DoxyCodeLine{00046\ \textcolor{comment}{//}}
+\DoxyCodeLine{00047\ \textcolor{comment}{//\ If\ we\ want\ to\ go\ through\ the\ whole\ tensor\ iteratively,\ we\ can\ use\ loops.}}
+\DoxyCodeLine{00048\ \textcolor{comment}{//}}
+\DoxyCodeLine{00049\ \textcolor{comment}{//\ \`{}\`{}\`{}}}
+\DoxyCodeLine{00050\ \textcolor{comment}{//\ for(i\ =\ 0;\ i\ <\ I;\ ++i)\ \{}}
+\DoxyCodeLine{00051\ \textcolor{comment}{//\ \ \ for(j\ =\ 0;\ j\ <\ J;\ ++j)\ \{}}
+\DoxyCodeLine{00052\ \textcolor{comment}{//\ \ \ \ \ for(k\ =\ 0;\ k\ <\ K;\ ++k)\ \{}}
+\DoxyCodeLine{00053\ \textcolor{comment}{//\ \ \ \ \ \ \ \ T.data[i*J*K\ +\ j*K\ +\ k]\ =\ ...}}
+\DoxyCodeLine{00054\ \textcolor{comment}{//\ \ \ \ \ \}}}
+\DoxyCodeLine{00055\ \textcolor{comment}{//\ \ \ \}}}
+\DoxyCodeLine{00056\ \textcolor{comment}{//\ \}}}
+\DoxyCodeLine{00057\ \textcolor{comment}{//\ \`{}\`{}\`{}}}
+\DoxyCodeLine{00058\ \textcolor{comment}{//}}
+\DoxyCodeLine{00059\ \textcolor{comment}{//\ We\ can\ also\ compute\ the\ offset\ as\ we\ go\ through\ the\ loops.}}
+\DoxyCodeLine{00060\ \textcolor{comment}{//}}
+\DoxyCodeLine{00061\ \textcolor{comment}{//\ \`{}\`{}\`{}}}
+\DoxyCodeLine{00062\ \textcolor{comment}{//\ stride\_i\ =\ K\ *\ J;}}
+\DoxyCodeLine{00063\ \textcolor{comment}{//\ stride\_j\ =\ K;}}
+\DoxyCodeLine{00064\ \textcolor{comment}{//\ stride\_k\ =\ 1;}}
+\DoxyCodeLine{00065\ \textcolor{comment}{//\ for(i\ =\ 0;\ i\ <\ I;\ ++i)\ \{}}
+\DoxyCodeLine{00066\ \textcolor{comment}{//\ \ \ offset\_i\ =\ i\ *\ stride\_i;}}
+\DoxyCodeLine{00067\ \textcolor{comment}{//\ \ \ offset\_j\ =\ 0;}}
+\DoxyCodeLine{00068\ \textcolor{comment}{//\ \ \ for(j\ =\ 0;\ j\ <\ J;\ ++j)\ \{}}
+\DoxyCodeLine{00069\ \textcolor{comment}{//\ \ \ \ \ offset\_j\ +=\ stride\_j;}}
+\DoxyCodeLine{00070\ \textcolor{comment}{//\ \ \ \ \ offset\_k\ =\ 0;}}
+\DoxyCodeLine{00071\ \textcolor{comment}{//\ \ \ \ \ for(k\ =\ 0;\ k\ <\ K;\ ++k)\ \{}}
+\DoxyCodeLine{00072\ \textcolor{comment}{//\ \ \ \ \ \ \ \ offset\_k\ +=\ stride\_k;}}
+\DoxyCodeLine{00073\ \textcolor{comment}{//\ \ \ \ \ \ \ \ T.data[offset\_i\ +\ offset\_j\ +\ offset\_k]\ =\ ...}}
+\DoxyCodeLine{00074\ \textcolor{comment}{//\ \ \ \ \ \}}}
+\DoxyCodeLine{00075\ \textcolor{comment}{//\ \ \ \}}}
+\DoxyCodeLine{00076\ \textcolor{comment}{//\ \}}}
+\DoxyCodeLine{00077\ \textcolor{comment}{//\ \`{}\`{}\`{}}}
+\DoxyCodeLine{00078\ \textcolor{comment}{//}}
+\DoxyCodeLine{00079\ \textcolor{comment}{//\ This\ nicely\ extends\ to\ a\ recursive\ version\ which\ is\ the\ base\ of\ this}}
+\DoxyCodeLine{00080\ \textcolor{comment}{//\ algorithm\ and\ supports\ any\ number\ of\ dimensions.}}
+\DoxyCodeLine{00081\ \textcolor{comment}{//}}
+\DoxyCodeLine{00082\ \textcolor{comment}{//\ \`{}\`{}\`{}}}
+\DoxyCodeLine{00083\ \textcolor{comment}{//\ shape\ =\ [I,\ J,\ K]}}
+\DoxyCodeLine{00084\ \textcolor{comment}{//\ strides\ =\ [K*J,\ K,\ 1]}}
+\DoxyCodeLine{00085\ \textcolor{comment}{//\ void\ recurse(T*\ data,\ shape,\ strides,\ depth\ =\ 0)\ \{}}
+\DoxyCodeLine{00086\ \textcolor{comment}{//\ \ \ if(depth\ ==\ shape.size)\ \{}}
+\DoxyCodeLine{00087\ \textcolor{comment}{//\ \ \ \ \ *data\ =\ ...}}
+\DoxyCodeLine{00088\ \textcolor{comment}{//\ \ \ \}\ else\ \{}}
+\DoxyCodeLine{00089\ \textcolor{comment}{//\ \ \ \ \ for(a\ =\ 0;\ a\ <\ shape[depth];\ ++a)\ \{}}
+\DoxyCodeLine{00090\ \textcolor{comment}{//\ \ \ \ \ \ \ recurse(data,\ shape,\ strides,\ depth+1);}}
+\DoxyCodeLine{00091\ \textcolor{comment}{//\ \ \ \ \ \ \ data\ +=\ strides[depth];}}
+\DoxyCodeLine{00092\ \textcolor{comment}{//\ \ \ \ \ \}}}
+\DoxyCodeLine{00093\ \textcolor{comment}{//\ \ \ \}}}
+\DoxyCodeLine{00094\ \textcolor{comment}{//\ \}}}
+\DoxyCodeLine{00095\ \textcolor{comment}{//\ \`{}\`{}\`{}}}
+\DoxyCodeLine{00096\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{00097\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1reference__ops_1_1transpose__internal_a7092d1e32b348435f18d2a35ddb38555}{TransposeImpl}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src22d562cad0a0e140a9fafc1c6a662e94_a820c167ceaaa9759b0ca2695d22db55c}{depth}},\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcdc91c794b43404000e39f72876c1c287_aedadeec3ef499c79fc32c00079f7982d}{dims}},\ \textcolor{keyword}{const}\ int32\_t*\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src5dc2470fb2499b5531a6cb4a01b15718_aac99223186df90c64778b5c3da391777}{perm}},}
+\DoxyCodeLine{00098\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ T*\ \mbox{\hyperlink{add__n__test_8cc_a5612ba79d1f0b544c7aeae4621166fea}{input\_data}},\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}*\ input\_stride,\ T*\ \mbox{\hyperlink{add__n__test_8cc_a3305b43869c4b837b0a33c12cff5069b}{output\_data}},}
+\DoxyCodeLine{00099\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}*\ output\_stride,\ \textcolor{keyword}{const}\ int32\_t*\ output\_shape)\ \{}
+\DoxyCodeLine{00100\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ dimension\_size\ =\ output\_shape[\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src22d562cad0a0e140a9fafc1c6a662e94_a820c167ceaaa9759b0ca2695d22db55c}{depth}}];}
+\DoxyCodeLine{00101\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src22d562cad0a0e140a9fafc1c6a662e94_a820c167ceaaa9759b0ca2695d22db55c}{depth}}\ ==\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcdc91c794b43404000e39f72876c1c287_aedadeec3ef499c79fc32c00079f7982d}{dims}}\ -\/\ 1)\ \{}
+\DoxyCodeLine{00102\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ loop\_stride\ =\ input\_stride[\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src5dc2470fb2499b5531a6cb4a01b15718_aac99223186df90c64778b5c3da391777}{perm}}[\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src22d562cad0a0e140a9fafc1c6a662e94_a820c167ceaaa9759b0ca2695d22db55c}{depth}}]];}
+\DoxyCodeLine{00103\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ dimension\_size;\ ++i)\ \{}
+\DoxyCodeLine{00104\ \ \ \ \ \ \ \mbox{\hyperlink{add__n__test_8cc_a3305b43869c4b837b0a33c12cff5069b}{output\_data}}[i]\ =\ *\mbox{\hyperlink{add__n__test_8cc_a5612ba79d1f0b544c7aeae4621166fea}{input\_data}};}
+\DoxyCodeLine{00105\ \ \ \ \ \ \ \mbox{\hyperlink{add__n__test_8cc_a5612ba79d1f0b544c7aeae4621166fea}{input\_data}}\ +=\ loop\_stride;}
+\DoxyCodeLine{00106\ \ \ \ \ \}}
+\DoxyCodeLine{00107\ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00108\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ dimension\_size;\ ++i)\ \{}
+\DoxyCodeLine{00109\ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_1_1reference__ops_1_1transpose__internal_a7092d1e32b348435f18d2a35ddb38555}{TransposeImpl}}(\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src22d562cad0a0e140a9fafc1c6a662e94_a820c167ceaaa9759b0ca2695d22db55c}{depth}}\ +\ 1,\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcdc91c794b43404000e39f72876c1c287_aedadeec3ef499c79fc32c00079f7982d}{dims}},\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src5dc2470fb2499b5531a6cb4a01b15718_aac99223186df90c64778b5c3da391777}{perm}},\ \mbox{\hyperlink{add__n__test_8cc_a5612ba79d1f0b544c7aeae4621166fea}{input\_data}},\ input\_stride,}
+\DoxyCodeLine{00110\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{add__n__test_8cc_a3305b43869c4b837b0a33c12cff5069b}{output\_data}},\ output\_stride,\ output\_shape);}
+\DoxyCodeLine{00111\ }
+\DoxyCodeLine{00112\ \ \ \ \ \ \ \mbox{\hyperlink{add__n__test_8cc_a5612ba79d1f0b544c7aeae4621166fea}{input\_data}}\ +=\ input\_stride[\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src5dc2470fb2499b5531a6cb4a01b15718_aac99223186df90c64778b5c3da391777}{perm}}[\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src22d562cad0a0e140a9fafc1c6a662e94_a820c167ceaaa9759b0ca2695d22db55c}{depth}}]];}
+\DoxyCodeLine{00113\ \ \ \ \ \ \ \mbox{\hyperlink{add__n__test_8cc_a3305b43869c4b837b0a33c12cff5069b}{output\_data}}\ +=\ output\_stride[\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src22d562cad0a0e140a9fafc1c6a662e94_a820c167ceaaa9759b0ca2695d22db55c}{depth}}];}
+\DoxyCodeLine{00114\ \ \ \ \ \}}
+\DoxyCodeLine{00115\ \ \ \}}
+\DoxyCodeLine{00116\ \}}
+\DoxyCodeLine{00117\ }
+\DoxyCodeLine{00118\ \textcolor{comment}{//\ Compile-\/time\ switch\ to\ get\ the\ storage\ type\ of\ the\ transposition.}}
+\DoxyCodeLine{00119\ \textcolor{keyword}{template}\ <\textcolor{keywordtype}{int}\ Size>}
+\DoxyCodeLine{00120\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structtflite_1_1reference__ops_1_1transpose__internal_1_1_transpose_storage_type}{TransposeStorageType}};}
+\DoxyCodeLine{00121\ }
+\DoxyCodeLine{00122\ \textcolor{keyword}{template}\ <>}
+\DoxyCodeLine{00123\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structtflite_1_1reference__ops_1_1transpose__internal_1_1_transpose_storage_type}{TransposeStorageType}}<1>\ \{}
+\DoxyCodeLine{00124\ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{structtflite_1_1reference__ops_1_1transpose__internal_1_1_transpose_storage_type_3_011_01_4_ac635574cd2159ca4d819bce6c924113d}{type}}\ =\ int8\_t;}
+\DoxyCodeLine{00125\ \};}
+\DoxyCodeLine{00126\ }
+\DoxyCodeLine{00127\ \textcolor{keyword}{template}\ <>}
+\DoxyCodeLine{00128\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structtflite_1_1reference__ops_1_1transpose__internal_1_1_transpose_storage_type}{TransposeStorageType}}<2>\ \{}
+\DoxyCodeLine{00129\ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{structtflite_1_1reference__ops_1_1transpose__internal_1_1_transpose_storage_type_3_012_01_4_af873c5bda62b4455f9db8afb653e4710}{type}}\ =\ int16\_t;}
+\DoxyCodeLine{00130\ \};}
+\DoxyCodeLine{00131\ }
+\DoxyCodeLine{00132\ \textcolor{keyword}{template}\ <>}
+\DoxyCodeLine{00133\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structtflite_1_1reference__ops_1_1transpose__internal_1_1_transpose_storage_type}{TransposeStorageType}}<4>\ \{}
+\DoxyCodeLine{00134\ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{structtflite_1_1reference__ops_1_1transpose__internal_1_1_transpose_storage_type_3_014_01_4_aef3fbdcdc5271afe959d36fccc5f91e8}{type}}\ =\ int32\_t;}
+\DoxyCodeLine{00135\ \};}
+\DoxyCodeLine{00136\ }
+\DoxyCodeLine{00137\ \textcolor{keyword}{template}\ <>}
+\DoxyCodeLine{00138\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structtflite_1_1reference__ops_1_1transpose__internal_1_1_transpose_storage_type}{TransposeStorageType}}<8>\ \{}
+\DoxyCodeLine{00139\ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{structtflite_1_1reference__ops_1_1transpose__internal_1_1_transpose_storage_type_3_018_01_4_ae1872cc1c80cc23e0467e0ef4e4c2d35}{type}}\ =\ int64\_t;}
+\DoxyCodeLine{00140\ \};}
+\DoxyCodeLine{00141\ }
+\DoxyCodeLine{00142\ \textcolor{comment}{//\ Sets\ up\ the\ stride\ arrays\ for\ the\ recursive\ transpose\ algorithm.}}
+\DoxyCodeLine{00143\ \textcolor{comment}{//}}
+\DoxyCodeLine{00144\ \textcolor{comment}{//\ Implementation\ notes:}}
+\DoxyCodeLine{00145\ \textcolor{comment}{//}}
+\DoxyCodeLine{00146\ \textcolor{comment}{//\ This\ is\ a\ reverse\ partial\ product.\ We\ could\ use\ standard\ algorithms\ to}}
+\DoxyCodeLine{00147\ \textcolor{comment}{//\ implement\ this\ but\ the\ result\ is\ not\ a\ readable\ and\ is\ tricky\ to\ get\ right}}
+\DoxyCodeLine{00148\ \textcolor{comment}{//\ because\ the\ first\ element\ must\ be\ set\ to\ 1,\ which\ leads\ to\ offset}}
+\DoxyCodeLine{00149\ \textcolor{comment}{//\ shenanigans:}}
+\DoxyCodeLine{00150\ \textcolor{comment}{//}}
+\DoxyCodeLine{00151\ \textcolor{comment}{//\ \`{}\`{}\`{}}}
+\DoxyCodeLine{00152\ \textcolor{comment}{//\ \ \ stride[dims\ -\/\ 1]\ =\ 1;}}
+\DoxyCodeLine{00153\ \textcolor{comment}{//\ \ \ std::partial\_sum(std::make\_reverse\_iterator(shape\ +\ dims),}}
+\DoxyCodeLine{00154\ \textcolor{comment}{//\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::make\_reverse\_iterator(shape\ +\ 1),}}
+\DoxyCodeLine{00155\ \textcolor{comment}{//\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ stride.rend()\ -\/\ input\_rank\ +\ 1,\ std::multiplies());}}
+\DoxyCodeLine{00156\ \textcolor{comment}{//\ \`{}\`{}\`{}}}
+\DoxyCodeLine{00157\ \textcolor{comment}{//}}
+\DoxyCodeLine{00158\ \textcolor{comment}{//\ Note\ that\ Abseil\ isn't\ used\ in\ kernels\ implementation.\ That\ would\ make\ the}}
+\DoxyCodeLine{00159\ \textcolor{comment}{//\ above\ solution\ more\ readable.}}
+\DoxyCodeLine{00160\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1reference__ops_1_1transpose__internal_acea7b9a65bcc731af12c7b552b9a6016}{SetupTransposeStrides}}(}
+\DoxyCodeLine{00161\ \ \ \ \ std::array<int,\ kTransposeMaxDimensions>\&\ stride,\ \textcolor{keyword}{const}\ int32\_t*\ shape,}
+\DoxyCodeLine{00162\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcdc91c794b43404000e39f72876c1c287_aedadeec3ef499c79fc32c00079f7982d}{dims}})\ \{}
+\DoxyCodeLine{00163\ \ \ stride[\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcdc91c794b43404000e39f72876c1c287_aedadeec3ef499c79fc32c00079f7982d}{dims}}\ -\/\ 1]\ =\ 1;}
+\DoxyCodeLine{00164\ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcdc91c794b43404000e39f72876c1c287_aedadeec3ef499c79fc32c00079f7982d}{dims}}\ -\/\ 2;\ i\ >=\ 0;\ -\/-\/i)\ \{}
+\DoxyCodeLine{00165\ \ \ \ \ stride[i]\ =\ stride[i\ +\ 1]\ *\ shape[i\ +\ 1];}
+\DoxyCodeLine{00166\ \ \ \}}
+\DoxyCodeLine{00167\ \}}
+\DoxyCodeLine{00168\ }
+\DoxyCodeLine{00169\ \}\ \ \textcolor{comment}{//\ namespace\ transpose\_internal}}
+\DoxyCodeLine{00170\ }
+\DoxyCodeLine{00171\ \textcolor{comment}{//\ Copies\ a\ tensor\ to\ an\ other\ buffer\ and\ permutes\ its\ dimensions.}}
+\DoxyCodeLine{00172\ \textcolor{comment}{//}}
+\DoxyCodeLine{00173\ \textcolor{comment}{//\ Note:\ template\ parameter\ N\ is\ not\ used\ anymore.\ It\ is\ kept\ for\ API}}
+\DoxyCodeLine{00174\ \textcolor{comment}{//\ compatibility\ with\ TFLite\ micro.}}
+\DoxyCodeLine{00175\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T,\ \textcolor{keywordtype}{int}\ N\ =\ kTransposeMaxDimensions>}
+\DoxyCodeLine{00176\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1reference__ops_a56af4b71e3bb960a00a080c92a99d0dd}{Transpose}}(\textcolor{keyword}{const}\ TransposeParams\&\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src4cbee0bfdfed30e8771023cedb1bab0d_a434686eb00eea897154eb5c3f9364ef7}{params}},\ \textcolor{keyword}{const}\ RuntimeShape\&\ \mbox{\hyperlink{akida_8h_a0792621910eb31f95019ddc94eb3dece}{input\_shape}},}
+\DoxyCodeLine{00177\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ T*\ \mbox{\hyperlink{add__n__test_8cc_a5612ba79d1f0b544c7aeae4621166fea}{input\_data}},\ \textcolor{keyword}{const}\ RuntimeShape\&\ output\_shape,}
+\DoxyCodeLine{00178\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ T*\ \mbox{\hyperlink{add__n__test_8cc_a3305b43869c4b837b0a33c12cff5069b}{output\_data}})\ \{}
+\DoxyCodeLine{00179\ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{namespacetflite_1_1reference__ops_1_1transpose__internal_acea7b9a65bcc731af12c7b552b9a6016}{transpose\_internal::SetupTransposeStrides}};}
+\DoxyCodeLine{00180\ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{namespacetflite_1_1reference__ops_1_1transpose__internal_a7092d1e32b348435f18d2a35ddb38555}{transpose\_internal::TransposeImpl}};}
+\DoxyCodeLine{00181\ \ \ \textcolor{keyword}{using\ }transpose\_internal::TransposeStorageType;}
+\DoxyCodeLine{00182\ \ \ \textcolor{comment}{//\ Transpose\ kernel\ only\ does\ rearranging\ values\ not\ numeric\ evaluations\ on}}
+\DoxyCodeLine{00183\ \ \ \textcolor{comment}{//\ each\ cell.\ It's\ safe\ to\ implement\ per\ size\ of\ scalar\ type\ and\ this\ trick}}
+\DoxyCodeLine{00184\ \ \ \textcolor{comment}{//\ keeps\ the\ total\ code\ size\ in\ a\ reasonable\ range.}}
+\DoxyCodeLine{00185\ \ \ \textcolor{keyword}{using\ }StorageType\ =\ \textcolor{keyword}{typename}\ TransposeStorageType<\textcolor{keyword}{sizeof}(T)>\mbox{\hyperlink{micro_2kernels_2overlap__add_8cc_a231b67310ea6e901bd0df1bded3963cf}{::type}};}
+\DoxyCodeLine{00186\ \ \ \textcolor{keyword}{const}\ StorageType*\ \textcolor{keyword}{const}\ input\_data\_storage\ =}
+\DoxyCodeLine{00187\ \ \ \ \ \ \ \textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }StorageType*\textcolor{keyword}{>}(\mbox{\hyperlink{add__n__test_8cc_a5612ba79d1f0b544c7aeae4621166fea}{input\_data}});}
+\DoxyCodeLine{00188\ \ \ StorageType*\ \textcolor{keyword}{const}\ output\_data\_storage\ =}
+\DoxyCodeLine{00189\ \ \ \ \ \ \ \textcolor{keyword}{reinterpret\_cast<}StorageType*\textcolor{keyword}{>}(\mbox{\hyperlink{add__n__test_8cc_a3305b43869c4b837b0a33c12cff5069b}{output\_data}});}
+\DoxyCodeLine{00190\ }
+\DoxyCodeLine{00191\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcdc91c794b43404000e39f72876c1c287_aedadeec3ef499c79fc32c00079f7982d}{dims}}\ =\ \mbox{\hyperlink{akida_8h_a0792621910eb31f95019ddc94eb3dece}{input\_shape}}.DimensionsCount();}
+\DoxyCodeLine{00192\ \ \ std::array<int,\ kTransposeMaxDimensions>\ input\_stride,\ output\_stride;}
+\DoxyCodeLine{00193\ \ \ SetupTransposeStrides(input\_stride,\ \mbox{\hyperlink{akida_8h_a0792621910eb31f95019ddc94eb3dece}{input\_shape}}.DimsData(),\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcdc91c794b43404000e39f72876c1c287_aedadeec3ef499c79fc32c00079f7982d}{dims}});}
+\DoxyCodeLine{00194\ \ \ SetupTransposeStrides(output\_stride,\ output\_shape.DimsData(),\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcdc91c794b43404000e39f72876c1c287_aedadeec3ef499c79fc32c00079f7982d}{dims}});}
+\DoxyCodeLine{00195\ \ \ TransposeImpl(0,\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcdc91c794b43404000e39f72876c1c287_aedadeec3ef499c79fc32c00079f7982d}{dims}},\ \&\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src4cbee0bfdfed30e8771023cedb1bab0d_a434686eb00eea897154eb5c3f9364ef7}{params}}.perm[0],\ input\_data\_storage,}
+\DoxyCodeLine{00196\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ input\_stride.data(),\ output\_data\_storage,\ output\_stride.data(),}
+\DoxyCodeLine{00197\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ output\_shape.DimsData());}
+\DoxyCodeLine{00198\ \}}
+\DoxyCodeLine{00199\ }
+\DoxyCodeLine{00200\ \}\ \ \textcolor{comment}{//\ namespace\ reference\_ops}}
+\DoxyCodeLine{00201\ \}\ \ \textcolor{comment}{//\ namespace\ tflite}}
+\DoxyCodeLine{00202\ }
+\DoxyCodeLine{00203\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ TENSORFLOW\_LITE\_KERNELS\_INTERNAL\_REFERENCE\_TRANSPOSE\_H\_}}
+
+\end{DoxyCode}

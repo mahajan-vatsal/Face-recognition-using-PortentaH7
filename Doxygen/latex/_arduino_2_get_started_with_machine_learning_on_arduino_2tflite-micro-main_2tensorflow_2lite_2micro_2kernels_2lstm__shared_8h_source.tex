@@ -1,0 +1,156 @@
+\doxysection{lstm\+\_\+shared.\+h}
+\hypertarget{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_2micro_2kernels_2lstm__shared_8h_source}{}\label{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_2micro_2kernels_2lstm__shared_8h_source}\index{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/main/tensorflow/lite/micro/kernels/lstm\_shared.h@{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/main/tensorflow/lite/micro/kernels/lstm\_shared.h}}
+\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_2micro_2kernels_2lstm__shared_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{/*\ Copyright\ 2019\ The\ TensorFlow\ Authors.\ All\ Rights\ Reserved.}}
+\DoxyCodeLine{00002\ \textcolor{comment}{}}
+\DoxyCodeLine{00003\ \textcolor{comment}{Licensed\ under\ the\ Apache\ License,\ Version\ 2.0\ (the\ "{}License"{});}}
+\DoxyCodeLine{00004\ \textcolor{comment}{you\ may\ not\ use\ this\ file\ except\ in\ compliance\ with\ the\ License.}}
+\DoxyCodeLine{00005\ \textcolor{comment}{You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{00006\ \textcolor{comment}{}}
+\DoxyCodeLine{00007\ \textcolor{comment}{\ \ \ \ http://www.apache.org/licenses/LICENSE-\/2.0}}
+\DoxyCodeLine{00008\ \textcolor{comment}{}}
+\DoxyCodeLine{00009\ \textcolor{comment}{Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ software}}
+\DoxyCodeLine{00010\ \textcolor{comment}{distributed\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,}}
+\DoxyCodeLine{00011\ \textcolor{comment}{WITHOUT\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,\ either\ express\ or\ implied.}}
+\DoxyCodeLine{00012\ \textcolor{comment}{See\ the\ License\ for\ the\ specific\ language\ governing\ permissions\ and}}
+\DoxyCodeLine{00013\ \textcolor{comment}{limitations\ under\ the\ License.}}
+\DoxyCodeLine{00014\ \textcolor{comment}{==============================================================================*/}}
+\DoxyCodeLine{00015\ \textcolor{preprocessor}{\#ifndef\ TENSORFLOW\_LITE\_MICRO\_KERNELS\_LSTM\_SHARED\_H\_}}
+\DoxyCodeLine{00016\ \textcolor{preprocessor}{\#define\ TENSORFLOW\_LITE\_MICRO\_KERNELS\_LSTM\_SHARED\_H\_}}
+\DoxyCodeLine{00017\ }
+\DoxyCodeLine{00018\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/c/builtin\_op\_data.h"{}}}
+\DoxyCodeLine{00019\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/kernels/internal/types.h"{}}}
+\DoxyCodeLine{00020\ }
+\DoxyCodeLine{00021\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacetflite}{tflite}}\ \{}
+\DoxyCodeLine{00022\ }
+\DoxyCodeLine{00023\ \textcolor{comment}{//\ Input\ Tensors\ of\ size\ \{n\_batch,\ n\_input\}}}
+\DoxyCodeLine{00024\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{namespacetflite_a0d543ffd50ba6ad339fbc52e8a794464}{kLstmInputTensor}}\ =\ 0;}
+\DoxyCodeLine{00025\ }
+\DoxyCodeLine{00026\ \textcolor{comment}{//\ Input\ weight\ tensors\ of\ size:\ \{n\_cell,\ n\_input\}}}
+\DoxyCodeLine{00027\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{namespacetflite_a70ac6f91cf3d2a90cdc2dec1ffef7721}{kLstmInputToInputWeightsTensor}}\ =\ 1;\ \ \textcolor{comment}{//\ Optional}}
+\DoxyCodeLine{00028\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{namespacetflite_a925381bc9bd766738a79b6f283cddf30}{kLstmInputToForgetWeightsTensor}}\ =\ 2;}
+\DoxyCodeLine{00029\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{namespacetflite_ac673b42d7a9a1c014a7e2a9f6006fa57}{kLstmInputToCellWeightsTensor}}\ =\ 3;}
+\DoxyCodeLine{00030\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{namespacetflite_a43be7892b85e0722fdab31b8f46cb307}{kLstmInputToOutputWeightsTensor}}\ =\ 4;}
+\DoxyCodeLine{00031\ }
+\DoxyCodeLine{00032\ \textcolor{comment}{//\ Recurrent\ weight\ tensors\ of\ size\ \{n\_cell,\ n\_output\}}}
+\DoxyCodeLine{00033\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{namespacetflite_ad894a248e3c08cb48e79ccf07dd9e4af}{kLstmRecurrentToInputWeightsTensor}}\ =\ 5;\ \ \textcolor{comment}{//\ Optional}}
+\DoxyCodeLine{00034\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{namespacetflite_a818c88048026b3f09e45c58f37642218}{kLstmRecurrentToForgetWeightsTensor}}\ =\ 6;}
+\DoxyCodeLine{00035\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{namespacetflite_a1e09e035ffa219ffae9554361910fd6d}{kLstmRecurrentToCellWeightsTensor}}\ =\ 7;}
+\DoxyCodeLine{00036\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{namespacetflite_af8bab5715b38a29112bd4fa262b466e2}{kLstmRecurrentToOutputWeightsTensor}}\ =\ 8;}
+\DoxyCodeLine{00037\ }
+\DoxyCodeLine{00038\ \textcolor{comment}{//\ Peephole\ weights\ tensors\ of\ size\ \{n\_cell\},\ representing\ a\ diagonal\ matrix.}}
+\DoxyCodeLine{00039\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{namespacetflite_afea886d4b46e8513556b467442c2daf8}{kLstmCellToInputWeightsTensor}}\ =\ 9;\ \ \ \ \textcolor{comment}{//\ Optional}}
+\DoxyCodeLine{00040\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{namespacetflite_aa0a28e5da49a1839cefa7af92a8270c0}{kLstmCellToForgetWeightsTensor}}\ =\ 10;\ \ \textcolor{comment}{//\ Optional}}
+\DoxyCodeLine{00041\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{namespacetflite_a5069609b19eec32b09f430fab77e69b7}{kLstmCellToOutputWeightsTensor}}\ =\ 11;\ \ \textcolor{comment}{//\ Optional}}
+\DoxyCodeLine{00042\ }
+\DoxyCodeLine{00043\ \textcolor{comment}{//\ Gates\ bias\ tensors\ of\ size\ \{n\_cell\}}}
+\DoxyCodeLine{00044\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{namespacetflite_aa68401a0fd81bb1294d483da8e3cd3ee}{kLstmInputGateBiasTensor}}\ =\ 12;\ \ \textcolor{comment}{//\ Optional}}
+\DoxyCodeLine{00045\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{namespacetflite_aeb1e7ea3b1d025a81fd7e66e8a117fd4}{kLstmForgetGateBiasTensor}}\ =\ 13;}
+\DoxyCodeLine{00046\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{namespacetflite_a483156fb3ce48333d464c3cbdc220739}{kLstmCellGateBiasTensor}}\ =\ 14;}
+\DoxyCodeLine{00047\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{namespacetflite_ac291e27747f1bcec3796f91332e247f5}{kLstmOutputGateBiasTensor}}\ =\ 15;}
+\DoxyCodeLine{00048\ }
+\DoxyCodeLine{00049\ \textcolor{comment}{//\ Projection\ weight\ tensor\ of\ size\ \{n\_output,\ n\_cell\}}}
+\DoxyCodeLine{00050\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{namespacetflite_a3848296d1d6d0bf2cd3bfca1c6e3adec}{kLstmProjectionWeightsTensor}}\ =\ 16;\ \ \textcolor{comment}{//\ Optional}}
+\DoxyCodeLine{00051\ \textcolor{comment}{//\ Projection\ bias\ tensor\ of\ size\ \{n\_output\}}}
+\DoxyCodeLine{00052\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{namespacetflite_a7f6fed781461be7399f709a6f93c622c}{kLstmProjectionBiasTensor}}\ =\ 17;\ \ \textcolor{comment}{//\ Optional}}
+\DoxyCodeLine{00053\ }
+\DoxyCodeLine{00054\ \textcolor{comment}{//\ These\ state\ tensors\ are\ defined\ as\ variable\ tensors,\ and\ will\ be\ modified\ by}}
+\DoxyCodeLine{00055\ \textcolor{comment}{//\ this\ op.}}
+\DoxyCodeLine{00056\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{namespacetflite_aae0ff0c18408d6ef583741da24e612e4}{kLstmOutputStateTensor}}\ =\ 18;}
+\DoxyCodeLine{00057\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{namespacetflite_a7068c4580fa7e971c41c9f1c60b978d5}{kLstmCellStateTensor}}\ =\ 19;}
+\DoxyCodeLine{00058\ }
+\DoxyCodeLine{00059\ \textcolor{comment}{//\ Layer\ norm\ coefficient\ tensors\ of\ size\ \{n\_cell\},\ representing\ a\ diagonal}}
+\DoxyCodeLine{00060\ \textcolor{comment}{//\ matrix.}}
+\DoxyCodeLine{00061\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{namespacetflite_a4571e8226fe81894720edc57037eb8c1}{kLstmInputLayerNormCoefficientsTensor}}\ =\ 20;\ \ \ \textcolor{comment}{//\ Optional}}
+\DoxyCodeLine{00062\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{namespacetflite_a8e9113d4b167f6bc643770310a11f67d}{kLstmForgetLayerNormCoefficientsTensor}}\ =\ 21;\ \ \textcolor{comment}{//\ Optional}}
+\DoxyCodeLine{00063\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{namespacetflite_aa13af0b979ba6bade3c6b130dbc10dd7}{kLstmCellLayerNormCoefficientsTensor}}\ =\ 22;\ \ \ \ \textcolor{comment}{//\ Optional}}
+\DoxyCodeLine{00064\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{namespacetflite_a85ca5d2f5b14839c648e7449a59a6924}{kLstmOutputLayerNormCoefficientsTensor}}\ =\ 23;\ \ \textcolor{comment}{//\ Optional}}
+\DoxyCodeLine{00065\ }
+\DoxyCodeLine{00066\ \textcolor{comment}{//\ Output\ tensors.}}
+\DoxyCodeLine{00067\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{namespacetflite_ace2cbab4286bfb0ae84349ce25c559c1}{kLstmOutputTensor}}\ =\ 0;}
+\DoxyCodeLine{00068\ }
+\DoxyCodeLine{00069\ \textcolor{comment}{//\ Parameters\ for\ the\ two\ fully\ conncted\ computation\ inside\ each\ gate}}
+\DoxyCodeLine{00070\ \textcolor{keyword}{struct\ }GateParameters\ \{}
+\DoxyCodeLine{00071\ \ \ FullyConnectedParams\ \mbox{\hyperlink{structtflite_1_1_gate_parameters_aab65796622836af884d2f10c8924924d}{input\_fc\_params}};}
+\DoxyCodeLine{00072\ \ \ FullyConnectedParams\ \mbox{\hyperlink{structtflite_1_1_gate_parameters_ab86410c8768e1d39ae70b7cf87eca425}{recurrent\_fc\_params}};}
+\DoxyCodeLine{00073\ \};}
+\DoxyCodeLine{00074\ }
+\DoxyCodeLine{00075\ \textcolor{comment}{//\ Paramaters\ for\ the\ element\ wise\ multiplications\ between\ gate\ outputs}}
+\DoxyCodeLine{00076\ \textcolor{keyword}{struct\ }InterGateParameters\ \{}
+\DoxyCodeLine{00077\ \ \ ArithmeticParams\ \mbox{\hyperlink{structtflite_1_1_inter_gate_parameters_a05b187ed2b5c89992df6c055eaa082b5}{forget\_cell\_mul\_params}};}
+\DoxyCodeLine{00078\ \ \ ArithmeticParams\ \mbox{\hyperlink{structtflite_1_1_inter_gate_parameters_adbfc74c3008bc9f3e8c247bf95e92ccc}{input\_mul\_params}};}
+\DoxyCodeLine{00079\ \ \ ArithmeticParams\ \mbox{\hyperlink{structtflite_1_1_inter_gate_parameters_ad36d74da5dc77ff2384dd8f32341ee6d}{output\_mul\_params}};}
+\DoxyCodeLine{00080\ \};}
+\DoxyCodeLine{00081\ }
+\DoxyCodeLine{00082\ \textcolor{comment}{//\ Size\ information\ about\ the\ LSTM\ kernel,\ which\ is\ deduced\ from\ tensors\ stored}}
+\DoxyCodeLine{00083\ \textcolor{comment}{//\ in\ the\ flat\ buffer\ file.}}
+\DoxyCodeLine{00084\ \textcolor{keyword}{struct\ }LstmSizeInfo\ \{}
+\DoxyCodeLine{00085\ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{structtflite_1_1_lstm_size_info_a1afde6481ed7db1c006bbe246ca5133a}{time\_major}};}
+\DoxyCodeLine{00086\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{structtflite_1_1_lstm_size_info_afacab269322d86176d17558fda9d0957}{batch\_size}};}
+\DoxyCodeLine{00087\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{structtflite_1_1_lstm_size_info_a6362ef7a4ad12a61cea2101608c9222e}{time\_steps}};}
+\DoxyCodeLine{00088\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{structtflite_1_1_lstm_size_info_a29b08b5bc8a2ca2c690fca7c6ce2f185}{input\_dimension}};}
+\DoxyCodeLine{00089\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{structtflite_1_1_lstm_size_info_a667b91538a2c1985fea23ef453da621d}{state\_dimension}};}
+\DoxyCodeLine{00090\ \};}
+\DoxyCodeLine{00091\ }
+\DoxyCodeLine{00092\ \textcolor{comment}{//\ Contains\ information\ about\ the\ cell\ state\ tensor}}
+\DoxyCodeLine{00093\ \textcolor{keyword}{struct\ }CellStateInfo\ \{}
+\DoxyCodeLine{00094\ \ \ \textcolor{keywordtype}{float}\ \mbox{\hyperlink{structtflite_1_1_cell_state_info_a7f16c0cdeaf5b2d37e6a0d4e725c80c6}{cell\_clip}};}
+\DoxyCodeLine{00095\ \ \ \textcolor{comment}{//\ clipping\ range\ for\ cell\ state\ only\ 16\ bits\ cell\ is\ supported\ (could\ be}}
+\DoxyCodeLine{00096\ \ \ \textcolor{comment}{//\ generalized\ through\ templatation)}}
+\DoxyCodeLine{00097\ \ \ int16\_t\ \mbox{\hyperlink{structtflite_1_1_cell_state_info_a4d8b2a8c131445316de28f5ce6072611}{quantized\_cell\_clip}};}
+\DoxyCodeLine{00098\ \ \ \textcolor{comment}{//\ 2\string^-\/cell\_state\_scale\_power\ =\ cell\ state\ scale,\ required\ by\ integer\ tanh}}
+\DoxyCodeLine{00099\ \ \ \textcolor{comment}{//\ computation}}
+\DoxyCodeLine{00100\ \ \ int32\_t\ \mbox{\hyperlink{structtflite_1_1_cell_state_info_af136d8c90e3c68449d75ec8527bec4b1}{cell\_state\_scale\_power}};}
+\DoxyCodeLine{00101\ \};}
+\DoxyCodeLine{00102\ }
+\DoxyCodeLine{00103\ \textcolor{comment}{//\ Contains\ required\ computation\ information\ for\ LSTM\ kernel\ evaluation.}}
+\DoxyCodeLine{00104\ \textcolor{comment}{//\ Specifically,\ it\ includes\ shape\ and\ quantization\ settings\ for\ the\ LSTM}}
+\DoxyCodeLine{00105\ \textcolor{comment}{//\ internal\ operations.\ Formatted\ to\ support\ operations\ defined\ in\ the}}
+\DoxyCodeLine{00106\ \textcolor{comment}{//\ tensorflow/lite/kernels/internal/reference/integer\_ops}}
+\DoxyCodeLine{00107\ \textcolor{comment}{//\ Should\ be\ constructed\ during\ the\ preparation\ phase}}
+\DoxyCodeLine{00108\ \textcolor{keyword}{struct\ }OpDataLSTM\ \{}
+\DoxyCodeLine{00109\ \ \ LstmSizeInfo\ \mbox{\hyperlink{structtflite_1_1_op_data_l_s_t_m_aea53a27bdb8a51d99b07045dc8b077df}{size\_info}};}
+\DoxyCodeLine{00110\ \ \ CellStateInfo\ \mbox{\hyperlink{structtflite_1_1_op_data_l_s_t_m_af277a7e02bd40e0660f1cadd6875b595}{cell\_state\_info}};}
+\DoxyCodeLine{00111\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src7f67a4373e2a0d20daf1d1ff4e1f4339_acc9e377dbc009d68bbfa5480d2559565}{TfLiteFusedActivation}}\ \mbox{\hyperlink{structtflite_1_1_op_data_l_s_t_m_a169a2a622776b941218bbc2172602019}{cell\_gate\_nonlinear\_type}};}
+\DoxyCodeLine{00112\ \ \ GateParameters\ \mbox{\hyperlink{structtflite_1_1_op_data_l_s_t_m_aa6d1550bee26d86f44de12be2a984d18}{forget\_gate\_parameters}};}
+\DoxyCodeLine{00113\ \ \ GateParameters\ \mbox{\hyperlink{structtflite_1_1_op_data_l_s_t_m_a94e31d7a084a129d6f5e8432a578d8eb}{input\_gate\_parameters}};}
+\DoxyCodeLine{00114\ \ \ GateParameters\ \mbox{\hyperlink{structtflite_1_1_op_data_l_s_t_m_ad0b2d151f4ae65c7d0f775c727cd1526}{cell\_gate\_parameters}};}
+\DoxyCodeLine{00115\ \ \ GateParameters\ \mbox{\hyperlink{structtflite_1_1_op_data_l_s_t_m_aaa9ec34973500260fbb2cb77931ee17f}{output\_gate\_parameters}};}
+\DoxyCodeLine{00116\ \ \ InterGateParameters\ \mbox{\hyperlink{structtflite_1_1_op_data_l_s_t_m_a7e0cfedb727b52e1e89b10439c595344}{inter\_gate\_parameters}};}
+\DoxyCodeLine{00117\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{structtflite_1_1_op_data_l_s_t_m_a58af651a55aca9c0ce836aa7b2fa2f20}{buffer\_indices}}[4];\ \ \textcolor{comment}{//\ TFLM\ only}}
+\DoxyCodeLine{00118\ \};}
+\DoxyCodeLine{00119\ }
+\DoxyCodeLine{00120\ \textcolor{comment}{//\ Provide\ an\ interface\ to\ access\ the\ internal\ tensors\ and\ buffers\ used\ for\ LSTM}}
+\DoxyCodeLine{00121\ \textcolor{comment}{//\ invocation.\ Constructed\ during\ the\ invocation\ phase}}
+\DoxyCodeLine{00122\ \textcolor{keyword}{struct\ }LSTMKernelContents\ \{}
+\DoxyCodeLine{00123\ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00124\ \ \ \textcolor{comment}{//\ Internal\ tensors,\ fixed\ (const).\ see\ lstm\_shared.h\ for\ tensor\ names}}
+\DoxyCodeLine{00125\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_tf_lite_eval_tensor}{TfLiteEvalTensor}}*\ \mbox{\hyperlink{structtflite_1_1_l_s_t_m_kernel_contents_a5e27d365bf34987cc50039dd5544caad}{GetInternalTensor}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ tensor\_index)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{00126\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structtflite_1_1_l_s_t_m_kernel_contents_a08fa1b4c2c34404efdeb1d885ad24c2c}{internal\_tensors}}[tensor\_index];}
+\DoxyCodeLine{00127\ \ \ \}}
+\DoxyCodeLine{00128\ \ \ \textcolor{comment}{//\ Variable\ tensors\ (will\ be\ changed,\ can\ not\ be\ const)}}
+\DoxyCodeLine{00129\ \ \ \mbox{\hyperlink{struct_tf_lite_eval_tensor}{TfLiteEvalTensor}}*\ \mbox{\hyperlink{structtflite_1_1_l_s_t_m_kernel_contents_ab949e03ed5b4b581d6dab624cdcc3a3d}{HiddenStateTensor}}()\ \{}
+\DoxyCodeLine{00130\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structtflite_1_1_l_s_t_m_kernel_contents_a08fa1b4c2c34404efdeb1d885ad24c2c}{internal\_tensors}}[\mbox{\hyperlink{namespacetflite_aae0ff0c18408d6ef583741da24e612e4}{kLstmOutputStateTensor}}];}
+\DoxyCodeLine{00131\ \ \ \}}
+\DoxyCodeLine{00132\ \ \ \mbox{\hyperlink{struct_tf_lite_eval_tensor}{TfLiteEvalTensor}}*\ \mbox{\hyperlink{structtflite_1_1_l_s_t_m_kernel_contents_a8deed9ec1f3c5bfd7317dbd3854181fc}{CellStateTensor}}()\ \{}
+\DoxyCodeLine{00133\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structtflite_1_1_l_s_t_m_kernel_contents_a08fa1b4c2c34404efdeb1d885ad24c2c}{internal\_tensors}}[\mbox{\hyperlink{namespacetflite_a7068c4580fa7e971c41c9f1c60b978d5}{kLstmCellStateTensor}}];}
+\DoxyCodeLine{00134\ \ \ \}}
+\DoxyCodeLine{00135\ \ \ \textcolor{comment}{//\ Node\ internal\ tensors\ with\ indexes\ defined\ at\ the\ beginning\ of\ the\ file}}
+\DoxyCodeLine{00136\ \ \ \mbox{\hyperlink{struct_tf_lite_eval_tensor}{TfLiteEvalTensor}}*\ \mbox{\hyperlink{structtflite_1_1_l_s_t_m_kernel_contents_a08fa1b4c2c34404efdeb1d885ad24c2c}{internal\_tensors}}[24];}
+\DoxyCodeLine{00137\ \ \ \mbox{\hyperlink{struct_tf_lite_eval_tensor}{TfLiteEvalTensor}}*\ \mbox{\hyperlink{structtflite_1_1_l_s_t_m_kernel_contents_a11b0adf11bdab5d1598e395574ea9853}{output\_tensor}};}
+\DoxyCodeLine{00138\ \};}
+\DoxyCodeLine{00139\ }
+\DoxyCodeLine{00140\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ CellType>}
+\DoxyCodeLine{00141\ \textcolor{keyword}{struct\ }LSTMBuffers\ \{}
+\DoxyCodeLine{00142\ \ \ \textcolor{comment}{//\ TFLM\ buffers\ requires\ buffer\ index\ from\ LstmOpData.}}
+\DoxyCodeLine{00143\ \ \ CellType*\ \mbox{\hyperlink{structtflite_1_1_l_s_t_m_buffers_a4d9144196d473e154c3f662e038a9dc9}{buffer0}};}
+\DoxyCodeLine{00144\ \ \ CellType*\ \mbox{\hyperlink{structtflite_1_1_l_s_t_m_buffers_a4ba62782cd42abef526312a4f23585bf}{buffer1}};}
+\DoxyCodeLine{00145\ \ \ CellType*\ \mbox{\hyperlink{structtflite_1_1_l_s_t_m_buffers_a5d4eee348dc5cd04c28c62d6fc955e2f}{buffer2}};}
+\DoxyCodeLine{00146\ \ \ CellType*\ \mbox{\hyperlink{structtflite_1_1_l_s_t_m_buffers_a7a80066ceb619414b3c518d45e164b6c}{buffer3}};}
+\DoxyCodeLine{00147\ \};}
+\DoxyCodeLine{00148\ }
+\DoxyCodeLine{00149\ \}\ \ \textcolor{comment}{//\ namespace\ tflite}}
+\DoxyCodeLine{00150\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ TENSORFLOW\_LITE\_MICRO\_KERNELS\_LSTM\_SHARED\_H\_}}
+
+\end{DoxyCode}

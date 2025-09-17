@@ -1,0 +1,347 @@
+\doxysection{kernel\+\_\+util.\+h}
+\hypertarget{tflite-micro-main_2tensorflow_2lite_2kernels_2kernel__util_8h_source}{}\label{tflite-micro-main_2tensorflow_2lite_2kernels_2kernel__util_8h_source}\index{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/main/tensorflow/lite/kernels/kernel\_util.h@{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/main/tensorflow/lite/kernels/kernel\_util.h}}
+\mbox{\hyperlink{tflite-micro-main_2tensorflow_2lite_2kernels_2kernel__util_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{/*\ Copyright\ 2017\ The\ TensorFlow\ Authors.\ All\ Rights\ Reserved.}}
+\DoxyCodeLine{00002\ \textcolor{comment}{}}
+\DoxyCodeLine{00003\ \textcolor{comment}{Licensed\ under\ the\ Apache\ License,\ Version\ 2.0\ (the\ "{}License"{});}}
+\DoxyCodeLine{00004\ \textcolor{comment}{you\ may\ not\ use\ this\ file\ except\ in\ compliance\ with\ the\ License.}}
+\DoxyCodeLine{00005\ \textcolor{comment}{You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{00006\ \textcolor{comment}{}}
+\DoxyCodeLine{00007\ \textcolor{comment}{\ \ \ \ http://www.apache.org/licenses/LICENSE-\/2.0}}
+\DoxyCodeLine{00008\ \textcolor{comment}{}}
+\DoxyCodeLine{00009\ \textcolor{comment}{Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ software}}
+\DoxyCodeLine{00010\ \textcolor{comment}{distributed\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,}}
+\DoxyCodeLine{00011\ \textcolor{comment}{WITHOUT\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,\ either\ express\ or\ implied.}}
+\DoxyCodeLine{00012\ \textcolor{comment}{See\ the\ License\ for\ the\ specific\ language\ governing\ permissions\ and}}
+\DoxyCodeLine{00013\ \textcolor{comment}{limitations\ under\ the\ License.}}
+\DoxyCodeLine{00014\ \textcolor{comment}{==============================================================================*/}}
+\DoxyCodeLine{00015\ \textcolor{preprocessor}{\#ifndef\ TENSORFLOW\_LITE\_KERNELS\_KERNEL\_UTIL\_H\_}}
+\DoxyCodeLine{00016\ \textcolor{preprocessor}{\#define\ TENSORFLOW\_LITE\_KERNELS\_KERNEL\_UTIL\_H\_}}
+\DoxyCodeLine{00017\ }
+\DoxyCodeLine{00018\ \textcolor{preprocessor}{\#include\ <stdint.h>}}
+\DoxyCodeLine{00019\ }
+\DoxyCodeLine{00020\ \textcolor{preprocessor}{\#include\ <limits>}}
+\DoxyCodeLine{00021\ \textcolor{preprocessor}{\#ifndef\ TF\_LITE\_STATIC\_MEMORY}}
+\DoxyCodeLine{00022\ \textcolor{preprocessor}{\#include\ <string>}}
+\DoxyCodeLine{00023\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ TF\_LITE\_STATIC\_MEMORY}}
+\DoxyCodeLine{00024\ }
+\DoxyCodeLine{00025\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/core/c/builtin\_op\_data.h"{}}}
+\DoxyCodeLine{00026\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/core/c/common.h"{}}}
+\DoxyCodeLine{00027\ \textcolor{preprocessor}{\#ifndef\ NDEBUG}}
+\DoxyCodeLine{00028\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/kernels/op\_macros.h"{}}}
+\DoxyCodeLine{00029\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00030\ }
+\DoxyCodeLine{00031\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacetflite}{tflite}}\ \{}
+\DoxyCodeLine{00032\ }
+\DoxyCodeLine{00033\ \textcolor{comment}{//\ A\ fair\ number\ of\ functions\ in\ this\ header\ have\ historically\ been\ inline.}}
+\DoxyCodeLine{00034\ \textcolor{comment}{//\ It\ is\ ok\ to\ change\ functions\ to\ not\ be\ inline\ if\ the\ latency\ with}}
+\DoxyCodeLine{00035\ \textcolor{comment}{//\ benchmark\_model\ for\ MobileNet\ +\ MobileBERT\ is\ unaffected.\ If\ such\ a\ change\ is}}
+\DoxyCodeLine{00036\ \textcolor{comment}{//\ made,\ move\ the\ newly\ non-\/inlined\ function\ declarations\ to\ the\ top\ of\ this}}
+\DoxyCodeLine{00037\ \textcolor{comment}{//\ header\ file.}}
+\DoxyCodeLine{00038\ }
+\DoxyCodeLine{00039\ \textcolor{comment}{//\ Note:\ You\ must\ check\ if\ result\ is\ not\ null:}}
+\DoxyCodeLine{00040\ \textcolor{comment}{//}}
+\DoxyCodeLine{00041\ \textcolor{comment}{//\ \ \ TfLiteTensor*\ my\_tensor\ =\ GetInput(context,\ node,\ kMyTensorIdx);}}
+\DoxyCodeLine{00042\ \textcolor{comment}{//\ \ \ TF\_LITE\_ENSURE(context,\ my\_tensor\ !=\ nullptr);}}
+\DoxyCodeLine{00043\ \textcolor{comment}{//}}
+\DoxyCodeLine{00044\ \textcolor{comment}{//\ This\ is\ because\ the\ index\ might\ point\ to\ the\ optional\ tensor\ constant}}
+\DoxyCodeLine{00045\ \textcolor{comment}{//\ (kTfLiteOptionalTensor)\ in\ which\ case\ there\ is\ no\ tensor\ to\ return.}}
+\DoxyCodeLine{00046\ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_tf_lite_tensor}{TfLiteTensor}}*\ \mbox{\hyperlink{namespacetflite_a641847a1276bc7938266907d40c73ac0}{GetInput}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{struct_tf_lite_context}{TfLiteContext}}*\ context,}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_tf_lite_node}{TfLiteNode}}*\ node,\ \textcolor{keywordtype}{int}\ index);}
+\DoxyCodeLine{00048\ }
+\DoxyCodeLine{00049\ \textcolor{comment}{//\ Same\ as\ \`{}GetInput`\ but\ returns\ boolean\ and\ uses\ output\ argument\ for\ tensor.}}
+\DoxyCodeLine{00050\ \textcolor{comment}{//}}
+\DoxyCodeLine{00051\ \textcolor{comment}{//\ \ \ TfLiteTensor*\ my\_tensor;}}
+\DoxyCodeLine{00052\ \textcolor{comment}{//\ \ \ TF\_LITE\_ENSURE\_OK(context,}}
+\DoxyCodeLine{00053\ \textcolor{comment}{//\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ GetInputSafe(context,\ node,\ kMyTensorIdx,\ \&my\_tensor));}}
+\DoxyCodeLine{00054\ \textcolor{comment}{//\ \ \ //\ can\ use\ my\_tensor\ directly\ from\ here\ onwards,\ it\ is\ not\ nullptr}}
+\DoxyCodeLine{00055\ \textcolor{comment}{//}}
+\DoxyCodeLine{00056\ \textcolor{comment}{//\ Should\ be\ used\ in\ cases\ where\ the\ binary\ size\ is\ too\ large.}}
+\DoxyCodeLine{00057\ \mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2core_2c_2c__api__types_8h_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_a4bfa06d4204d37241c36588a2f8fd316}{GetInputSafe}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{struct_tf_lite_context}{TfLiteContext}}*\ context,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_tf_lite_node}{TfLiteNode}}*\ node,}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ index,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_tf_lite_tensor}{TfLiteTensor}}**\ \mbox{\hyperlink{namespacetensor}{tensor}});}
+\DoxyCodeLine{00059\ }
+\DoxyCodeLine{00060\ \textcolor{comment}{//\ Note:\ You\ must\ check\ if\ result\ is\ not\ null:}}
+\DoxyCodeLine{00061\ \textcolor{comment}{//}}
+\DoxyCodeLine{00062\ \textcolor{comment}{//\ \ \ TfLiteTensor*\ my\_tensor\ =\ GetVariableInput(context,\ node,\ kMyTensorIdx);}}
+\DoxyCodeLine{00063\ \textcolor{comment}{//\ \ \ TF\_LITE\_ENSURE(context,\ my\_tensor\ !=\ nullptr);}}
+\DoxyCodeLine{00064\ \textcolor{comment}{//}}
+\DoxyCodeLine{00065\ \textcolor{comment}{//\ This\ is\ because\ the\ index\ might\ point\ to\ the\ optional\ tensor\ constant}}
+\DoxyCodeLine{00066\ \textcolor{comment}{//\ (kTfLiteOptionalTensor)\ in\ which\ case\ there\ is\ no\ tensor\ to\ return.}}
+\DoxyCodeLine{00067\ \mbox{\hyperlink{struct_tf_lite_tensor}{TfLiteTensor}}*\ \mbox{\hyperlink{namespacetflite_a7e9375e2bdebc8d94bc2e04482c7e850}{GetVariableInput}}(\mbox{\hyperlink{struct_tf_lite_context}{TfLiteContext}}*\ context,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_tf_lite_node}{TfLiteNode}}*\ node,}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ index);}
+\DoxyCodeLine{00069\ }
+\DoxyCodeLine{00070\ \textcolor{comment}{//\ Note:\ You\ must\ check\ if\ result\ is\ not\ null:}}
+\DoxyCodeLine{00071\ \textcolor{comment}{//}}
+\DoxyCodeLine{00072\ \textcolor{comment}{//\ \ \ TfLiteTensor*\ my\_tensor\ =\ GetOutput(context,\ node,\ kMyTensorIdx);}}
+\DoxyCodeLine{00073\ \textcolor{comment}{//\ \ \ TF\_LITE\_ENSURE(context,\ my\_tensor\ !=\ nullptr);}}
+\DoxyCodeLine{00074\ \textcolor{comment}{//}}
+\DoxyCodeLine{00075\ \textcolor{comment}{//\ This\ is\ because\ the\ index\ might\ point\ to\ the\ optional\ tensor\ constant}}
+\DoxyCodeLine{00076\ \textcolor{comment}{//\ (kTfLiteOptionalTensor)\ in\ which\ case\ there\ is\ no\ tensor\ to\ return.}}
+\DoxyCodeLine{00077\ \mbox{\hyperlink{struct_tf_lite_tensor}{TfLiteTensor}}*\ \mbox{\hyperlink{namespacetflite_a36edc65fa92f0acdbddb4c3e11b6fc00}{GetOutput}}(\mbox{\hyperlink{struct_tf_lite_context}{TfLiteContext}}*\ context,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_tf_lite_node}{TfLiteNode}}*\ node,}
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ index);}
+\DoxyCodeLine{00079\ }
+\DoxyCodeLine{00080\ \textcolor{comment}{//\ Same\ as\ \`{}GetOutput`\ but\ returns\ boolean\ and\ uses\ output\ argument\ for\ tensor.}}
+\DoxyCodeLine{00081\ \textcolor{comment}{//}}
+\DoxyCodeLine{00082\ \textcolor{comment}{//\ \ \ TfLiteTensor*\ my\_tensor;}}
+\DoxyCodeLine{00083\ \textcolor{comment}{//\ \ \ TF\_LITE\_ENSURE\_OK(context,}}
+\DoxyCodeLine{00084\ \textcolor{comment}{//\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ GetOutputSafe(context,\ node,\ kMyTensorIdx,\ \&my\_tensor));}}
+\DoxyCodeLine{00085\ \textcolor{comment}{//\ \ \ //\ can\ use\ my\_tensor\ directly\ from\ here\ onwards,\ it\ is\ not\ nullptr}}
+\DoxyCodeLine{00086\ \textcolor{comment}{//}}
+\DoxyCodeLine{00087\ \textcolor{comment}{//\ Should\ be\ used\ in\ cases\ where\ the\ binary\ size\ is\ too\ large.}}
+\DoxyCodeLine{00088\ \mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2core_2c_2c__api__types_8h_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_a3df29dcab70ec652ed69870ff4e0dfdd}{GetOutputSafe}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{struct_tf_lite_context}{TfLiteContext}}*\ context,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_tf_lite_node}{TfLiteNode}}*\ node,}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ index,\ \mbox{\hyperlink{struct_tf_lite_tensor}{TfLiteTensor}}**\ \mbox{\hyperlink{namespacetensor}{tensor}});}
+\DoxyCodeLine{00090\ }
+\DoxyCodeLine{00091\ \textcolor{comment}{//\ Note:\ You\ must\ check\ if\ result\ is\ not\ null:}}
+\DoxyCodeLine{00092\ \textcolor{comment}{//}}
+\DoxyCodeLine{00093\ \textcolor{comment}{//\ \ \ TfLiteTensor*\ my\_tensor\ =\ GetOptionalInputTensor(context,\ node,\ kIdx);}}
+\DoxyCodeLine{00094\ \textcolor{comment}{//\ \ \ TF\_LITE\_ENSURE(context,\ my\_tensor\ !=\ nullptr);}}
+\DoxyCodeLine{00095\ \textcolor{comment}{//}}
+\DoxyCodeLine{00096\ \textcolor{comment}{//\ This\ is\ because\ the\ index\ might\ point\ to\ the\ optional\ tensor\ constant}}
+\DoxyCodeLine{00097\ \textcolor{comment}{//\ (kTfLiteOptionalTensor)\ in\ which\ case\ there\ is\ no\ tensor\ to\ return.}}
+\DoxyCodeLine{00098\ \textcolor{comment}{//}}
+\DoxyCodeLine{00099\ \textcolor{comment}{//\ Deprecated.\ GetInput\ has\ the\ same\ functionality.}}
+\DoxyCodeLine{00100\ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_tf_lite_tensor}{TfLiteTensor}}*\ \mbox{\hyperlink{namespacetflite_a7b14a541aebfc5ee1c6acccbaee4bbf2}{GetOptionalInputTensor}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{struct_tf_lite_context}{TfLiteContext}}*\ context,}
+\DoxyCodeLine{00101\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_tf_lite_node}{TfLiteNode}}*\ node,\ \textcolor{keywordtype}{int}\ index);}
+\DoxyCodeLine{00102\ }
+\DoxyCodeLine{00103\ \textcolor{preprocessor}{\#ifndef\ TF\_LITE\_STATIC\_MEMORY}}
+\DoxyCodeLine{00104\ \textcolor{comment}{//\ Note:\ You\ must\ check\ if\ result\ is\ not\ null:}}
+\DoxyCodeLine{00105\ \textcolor{comment}{//}}
+\DoxyCodeLine{00106\ \textcolor{comment}{//\ \ \ TfLiteTensor*\ my\_tensor\ =\ GetTemporary(context,\ node,\ kMyTensorIdx);}}
+\DoxyCodeLine{00107\ \textcolor{comment}{//\ \ \ TF\_LITE\_ENSURE(context,\ my\_tensor\ !=\ nullptr);}}
+\DoxyCodeLine{00108\ \textcolor{comment}{//}}
+\DoxyCodeLine{00109\ \textcolor{comment}{//\ This\ is\ because\ the\ index\ might\ point\ to\ the\ optional\ tensor\ constant}}
+\DoxyCodeLine{00110\ \textcolor{comment}{//\ (kTfLiteOptionalTensor)\ in\ which\ case\ there\ is\ no\ tensor\ to\ return.}}
+\DoxyCodeLine{00111\ \mbox{\hyperlink{struct_tf_lite_tensor}{TfLiteTensor}}*\ \mbox{\hyperlink{namespacetflite_a6bba1a47c7f417f2c5defb5cccd2d2ae}{GetTemporary}}(\mbox{\hyperlink{struct_tf_lite_context}{TfLiteContext}}*\ context,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_tf_lite_node}{TfLiteNode}}*\ node,}
+\DoxyCodeLine{00112\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ index);}
+\DoxyCodeLine{00113\ }
+\DoxyCodeLine{00114\ \textcolor{comment}{//\ Same\ as\ \`{}GetTemporary`\ but\ returns\ boolean\ and\ uses\ output\ argument\ for}}
+\DoxyCodeLine{00115\ \textcolor{comment}{//\ tensor.}}
+\DoxyCodeLine{00116\ \textcolor{comment}{//}}
+\DoxyCodeLine{00117\ \textcolor{comment}{//\ \ \ TfLiteTensor*\ my\_tensor;}}
+\DoxyCodeLine{00118\ \textcolor{comment}{//\ \ \ TF\_LITE\_ENSURE\_OK(context,}}
+\DoxyCodeLine{00119\ \textcolor{comment}{//\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ GetTemporarySafe(context,\ node,\ kMyTensorIdx,}}
+\DoxyCodeLine{00120\ \textcolor{comment}{//\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&my\_tensor));}}
+\DoxyCodeLine{00121\ \textcolor{comment}{//\ \ \ //\ can\ use\ my\_tensor\ directly\ from\ here\ onwards,\ it\ is\ not\ nullptr}}
+\DoxyCodeLine{00122\ \textcolor{comment}{//}}
+\DoxyCodeLine{00123\ \textcolor{comment}{//\ Should\ be\ used\ in\ cases\ where\ the\ binary\ size\ is\ too\ large.}}
+\DoxyCodeLine{00124\ \mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2core_2c_2c__api__types_8h_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_a6b49515de3ec074c95dddb7cdd4fbf09}{GetTemporarySafe}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{struct_tf_lite_context}{TfLiteContext}}*\ context,}
+\DoxyCodeLine{00125\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_tf_lite_node}{TfLiteNode}}*\ node,\ \textcolor{keywordtype}{int}\ index,}
+\DoxyCodeLine{00126\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_tf_lite_tensor}{TfLiteTensor}}**\ \mbox{\hyperlink{namespacetensor}{tensor}});}
+\DoxyCodeLine{00127\ }
+\DoxyCodeLine{00128\ \textcolor{comment}{//\ Note:\ You\ must\ check\ if\ result\ is\ not\ null:}}
+\DoxyCodeLine{00129\ \textcolor{comment}{//}}
+\DoxyCodeLine{00130\ \textcolor{comment}{//\ \ \ TfLiteTensor*\ my\_tensor\ =\ GetIntermediates(context,\ node,\ kMyTensorIdx);}}
+\DoxyCodeLine{00131\ \textcolor{comment}{//\ \ \ TF\_LITE\_ENSURE(context,\ my\_tensor\ !=\ nullptr);}}
+\DoxyCodeLine{00132\ \textcolor{comment}{//}}
+\DoxyCodeLine{00133\ \textcolor{comment}{//\ This\ is\ because\ the\ index\ might\ point\ to\ the\ optional\ tensor\ constant}}
+\DoxyCodeLine{00134\ \textcolor{comment}{//\ (kTfLiteOptionalTensor)\ in\ which\ case\ there\ is\ no\ tensor\ to\ return.}}
+\DoxyCodeLine{00135\ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_tf_lite_tensor}{TfLiteTensor}}*\ \mbox{\hyperlink{namespacetflite_af9529aa23279ae3a0d698408ac5f9800}{GetIntermediates}}(\mbox{\hyperlink{struct_tf_lite_context}{TfLiteContext}}*\ context,}
+\DoxyCodeLine{00136\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_tf_lite_node}{TfLiteNode}}*\ node,\ \textcolor{keywordtype}{int}\ index);}
+\DoxyCodeLine{00137\ }
+\DoxyCodeLine{00138\ \textcolor{comment}{//\ Same\ as\ \`{}GetIntermediates`\ but\ returns\ boolean\ and\ uses\ output\ argument\ for}}
+\DoxyCodeLine{00139\ \textcolor{comment}{//\ tensor.}}
+\DoxyCodeLine{00140\ \textcolor{comment}{//}}
+\DoxyCodeLine{00141\ \textcolor{comment}{//\ \ \ TfLiteTensor*\ my\_tensor;}}
+\DoxyCodeLine{00142\ \textcolor{comment}{//\ \ \ TF\_LITE\_ENSURE\_OK(context,}}
+\DoxyCodeLine{00143\ \textcolor{comment}{//\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ GetIntermediatesSafe(context,\ node,\ kMyTensorIdx,}}
+\DoxyCodeLine{00144\ \textcolor{comment}{//\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&my\_tensor));}}
+\DoxyCodeLine{00145\ \textcolor{comment}{//\ \ \ //\ can\ use\ my\_tensor\ directly\ from\ here\ onwards,\ it\ is\ not\ nullptr}}
+\DoxyCodeLine{00146\ \textcolor{comment}{//}}
+\DoxyCodeLine{00147\ \textcolor{comment}{//\ Should\ be\ used\ in\ cases\ where\ the\ binary\ size\ is\ too\ large.}}
+\DoxyCodeLine{00148\ \mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2core_2c_2c__api__types_8h_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_a554e13a862f4539f78eb905b27ef1009}{GetIntermediatesSafe}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{struct_tf_lite_context}{TfLiteContext}}*\ context,}
+\DoxyCodeLine{00149\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_tf_lite_node}{TfLiteNode}}*\ node,\ \textcolor{keywordtype}{int}\ index,}
+\DoxyCodeLine{00150\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_tf_lite_tensor}{TfLiteTensor}}**\ \mbox{\hyperlink{namespacetensor}{tensor}});}
+\DoxyCodeLine{00151\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ TF\_LITE\_STATIC\_MEMORY}}
+\DoxyCodeLine{00152\ }
+\DoxyCodeLine{00153\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{namespacetflite_a7d542c68c061da592d8e57167c8a51ba}{NumDimensions}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{struct_tf_lite_tensor}{TfLiteTensor}}*\ t)\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacetflite-camera-button_af482c15a5f43863d4cb2bf18e7ec172b}{t}}-\/>dims-\/>size;\ \}}
+\DoxyCodeLine{00154\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{namespacetflite_a42b4bc91c0704f4ec88f0c72de02ae67}{SizeOfDimension}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{struct_tf_lite_tensor}{TfLiteTensor}}*\ t,\ \textcolor{keywordtype}{int}\ dim)\ \{}
+\DoxyCodeLine{00155\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacetflite-camera-button_af482c15a5f43863d4cb2bf18e7ec172b}{t}}-\/>dims-\/>data[dim];}
+\DoxyCodeLine{00156\ \}}
+\DoxyCodeLine{00157\ }
+\DoxyCodeLine{00158\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{namespacetflite_a0edf3d8c6b32bad8281030900b9bf47e}{NumInputs}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{struct_tf_lite_node}{TfLiteNode}}*\ node)\ \{}
+\DoxyCodeLine{00159\ \ \ \textcolor{keywordflow}{return}\ node-\/>\mbox{\hyperlink{struct_tf_lite_node_a20f0e336c16bc2579a0f398c924095d1}{inputs}}\ ==\ \textcolor{keyword}{nullptr}\ ?\ 0\ :\ node-\/>\mbox{\hyperlink{struct_tf_lite_node_a20f0e336c16bc2579a0f398c924095d1}{inputs}}-\/>\mbox{\hyperlink{struct_tf_lite_int_array_aaaa4554b9c73a68a4d6a99f1285be320}{size}};}
+\DoxyCodeLine{00160\ \}}
+\DoxyCodeLine{00161\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{namespacetflite_ae3ffcf6ddba17155a433a46cf780de21}{NumOutputs}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{struct_tf_lite_node}{TfLiteNode}}*\ node)\ \{}
+\DoxyCodeLine{00162\ \ \ \textcolor{keywordflow}{return}\ node-\/>\mbox{\hyperlink{struct_tf_lite_node_a859f3ce31e4c9298fe89942bd3163885}{outputs}}\ ==\ \textcolor{keyword}{nullptr}\ ?\ 0\ :\ node-\/>\mbox{\hyperlink{struct_tf_lite_node_a859f3ce31e4c9298fe89942bd3163885}{outputs}}-\/>\mbox{\hyperlink{struct_tf_lite_int_array_aaaa4554b9c73a68a4d6a99f1285be320}{size}};}
+\DoxyCodeLine{00163\ \}}
+\DoxyCodeLine{00164\ }
+\DoxyCodeLine{00165\ \textcolor{preprocessor}{\#ifndef\ TF\_LITE\_STATIC\_MEMORY}}
+\DoxyCodeLine{00166\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{namespacetflite_a7a91851e90f79690e2427a66d1e2f607}{NumIntermediates}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{struct_tf_lite_node}{TfLiteNode}}*\ node)\ \{}
+\DoxyCodeLine{00167\ \ \ \textcolor{keywordflow}{return}\ node-\/>\mbox{\hyperlink{struct_tf_lite_node_ac7d81231284b118efa5c5590c70e65ba}{intermediates}}-\/>\mbox{\hyperlink{struct_tf_lite_int_array_aaaa4554b9c73a68a4d6a99f1285be320}{size}};}
+\DoxyCodeLine{00168\ \}}
+\DoxyCodeLine{00169\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ TF\_LITE\_STATIC\_MEMORY}}
+\DoxyCodeLine{00170\ }
+\DoxyCodeLine{00171\ \textcolor{keyword}{inline}\ int64\_t\ \mbox{\hyperlink{namespacetflite_aa64367c87ccbff8096418d9da1b2fc37}{NumElements}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{int}*\ \mbox{\hyperlink{strided__slice_8cpp_aedadeec3ef499c79fc32c00079f7982d}{dims}},\ \textcolor{keywordtype}{int}\ num\_dims)\ \{}
+\DoxyCodeLine{00172\ \ \ int64\_t\ count\ =\ 1;}
+\DoxyCodeLine{00173\ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ num\_dims;\ ++i)\ \{}
+\DoxyCodeLine{00174\ \textcolor{preprocessor}{\#ifndef\ NDEBUG}}
+\DoxyCodeLine{00175\ \ \ \ \ \textcolor{keywordflow}{if}\ (count\ <=\ 0)\ \{}
+\DoxyCodeLine{00176\ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00177\ \ \ \ \ \}}
+\DoxyCodeLine{00178\ \ \ \ \ \textcolor{comment}{//\ Check\ that\ number\ of\ elements\ can\ fit\ in\ 32\ bit\ int.\ Most\ of\ tflite}}
+\DoxyCodeLine{00179\ \ \ \ \ \textcolor{comment}{//\ assumes\ the\ result\ of\ \`{}NumElements`\ is\ <\ MAX\_INT\ and\ static\ or\ implicit}}
+\DoxyCodeLine{00180\ \ \ \ \ \textcolor{comment}{//\ casts\ to\ \`{}int32\_t`\ without\ any\ checks.\ It\ is\ more\ meaningful\ to\ check}}
+\DoxyCodeLine{00181\ \ \ \ \ \textcolor{comment}{//\ that\ the\ result\ fits\ into\ 32\ bits\ than\ for\ standard\ overflow\ on\ 64\ bit}}
+\DoxyCodeLine{00182\ \ \ \ \ \textcolor{comment}{//\ type.}}
+\DoxyCodeLine{00183\ \ \ \ \ \mbox{\hyperlink{tflite-micro-main_2tensorflow_2lite_2kernels_2op__macros_8h_ad70bf54dc1414660df748712fac06353}{TF\_LITE\_ASSERT}}(\mbox{\hyperlink{strided__slice_8cpp_aedadeec3ef499c79fc32c00079f7982d}{dims}}[i]\ <\ std::numeric\_limits<int>::max()\ /\ count);}
+\DoxyCodeLine{00184\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00185\ \ \ \ \ count\ *=\ \mbox{\hyperlink{strided__slice_8cpp_aedadeec3ef499c79fc32c00079f7982d}{dims}}[i];}
+\DoxyCodeLine{00186\ \ \ \}}
+\DoxyCodeLine{00187\ \ \ \textcolor{keywordflow}{return}\ count;}
+\DoxyCodeLine{00188\ \}}
+\DoxyCodeLine{00189\ }
+\DoxyCodeLine{00190\ \textcolor{keyword}{inline}\ int64\_t\ \mbox{\hyperlink{namespacetflite_aa64367c87ccbff8096418d9da1b2fc37}{NumElements}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{struct_tf_lite_int_array}{TfLiteIntArray}}*\ \mbox{\hyperlink{strided__slice_8cpp_aedadeec3ef499c79fc32c00079f7982d}{dims}})\ \{}
+\DoxyCodeLine{00191\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacetflite_aa64367c87ccbff8096418d9da1b2fc37}{NumElements}}(\mbox{\hyperlink{strided__slice_8cpp_aedadeec3ef499c79fc32c00079f7982d}{dims}}-\/>data,\ \mbox{\hyperlink{strided__slice_8cpp_aedadeec3ef499c79fc32c00079f7982d}{dims}}-\/>size);}
+\DoxyCodeLine{00192\ \}}
+\DoxyCodeLine{00193\ }
+\DoxyCodeLine{00194\ \textcolor{keyword}{inline}\ int64\_t\ \mbox{\hyperlink{namespacetflite_aa64367c87ccbff8096418d9da1b2fc37}{NumElements}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{struct_tf_lite_tensor}{TfLiteTensor}}*\ t)\ \{}
+\DoxyCodeLine{00195\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacetflite_aa64367c87ccbff8096418d9da1b2fc37}{NumElements}}(\mbox{\hyperlink{namespacetflite-camera-button_af482c15a5f43863d4cb2bf18e7ec172b}{t}}-\/>dims);}
+\DoxyCodeLine{00196\ \}}
+\DoxyCodeLine{00197\ }
+\DoxyCodeLine{00198\ \textcolor{comment}{//\ Determines\ whether\ tensor\ is\ constant.}}
+\DoxyCodeLine{00199\ \textcolor{comment}{//\ TODO(b/138199592):\ Introduce\ new\ query\ which\ checks\ for\ constant\ OR}}
+\DoxyCodeLine{00200\ \textcolor{comment}{//\ persistent-\/read-\/only,\ which\ would\ be\ useful\ for\ most\ tensor\ kernels\ that}}
+\DoxyCodeLine{00201\ \textcolor{comment}{//\ are\ potentially\ dynamic\ based\ on\ the\ input\ tensor\ value\ availability\ at\ the}}
+\DoxyCodeLine{00202\ \textcolor{comment}{//\ time\ of\ prepare.}}
+\DoxyCodeLine{00203\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespacetflite_a10fd2989d9c861404f3c0fb7564cfa3a}{IsConstantTensor}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{struct_tf_lite_tensor}{TfLiteTensor}}*\ \mbox{\hyperlink{namespacetensor}{tensor}})\ \{}
+\DoxyCodeLine{00204\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacetensor}{tensor}}-\/>allocation\_type\ ==\ \mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2core_2c_2common_8h_ae48332e93fec6c3fe7c4ee4897770d4ba3949bd05fa315b1160563bd8ad24e190}{kTfLiteMmapRo}};}
+\DoxyCodeLine{00205\ \}}
+\DoxyCodeLine{00206\ }
+\DoxyCodeLine{00207\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespacetflite_a2e9f741178cf61c8307c43d3ffeb911b}{IsConstantOrPersistentTensor}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{struct_tf_lite_tensor}{TfLiteTensor}}*\ \mbox{\hyperlink{namespacetensor}{tensor}})\ \{}
+\DoxyCodeLine{00208\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacetflite_a10fd2989d9c861404f3c0fb7564cfa3a}{IsConstantTensor}}(\mbox{\hyperlink{namespacetensor}{tensor}})\ ||}
+\DoxyCodeLine{00209\ \ \ \ \ \ \ \ \ \ (\mbox{\hyperlink{namespacetensor}{tensor}}-\/>allocation\_type\ ==\ \mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2core_2c_2common_8h_ae48332e93fec6c3fe7c4ee4897770d4ba73e83d65d34eb666a2e41dad9441420c}{kTfLitePersistentRo}});}
+\DoxyCodeLine{00210\ \}}
+\DoxyCodeLine{00211\ }
+\DoxyCodeLine{00212\ \textcolor{comment}{//\ Determines\ whether\ tensor\ is\ dynamic.\ Note\ that\ a\ tensor\ can\ be\ non-\/const\ and}}
+\DoxyCodeLine{00213\ \textcolor{comment}{//\ not\ dynamic.\ This\ function\ specifically\ checks\ for\ a\ dynamic\ tensor.}}
+\DoxyCodeLine{00214\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespacetflite_a0f01f01340aa7aa94f874850d8f75407}{IsDynamicTensor}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{struct_tf_lite_tensor}{TfLiteTensor}}*\ \mbox{\hyperlink{namespacetensor}{tensor}})\ \{}
+\DoxyCodeLine{00215\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacetensor}{tensor}}-\/>allocation\_type\ ==\ \mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2core_2c_2common_8h_ae48332e93fec6c3fe7c4ee4897770d4bae3cf7bebc0d4227e33ba15a69dafdb46}{kTfLiteDynamic}};}
+\DoxyCodeLine{00216\ \}}
+\DoxyCodeLine{00217\ \textcolor{preprocessor}{\#ifndef\ TF\_LITE\_STATIC\_MEMORY}}
+\DoxyCodeLine{00218\ \textcolor{comment}{//\ Sets\ tensor\ to\ dynamic.}}
+\DoxyCodeLine{00219\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_abb795c2557212bf67de26251a407d9b7}{SetTensorToDynamic}}(\mbox{\hyperlink{struct_tf_lite_tensor}{TfLiteTensor}}*\ \mbox{\hyperlink{namespacetensor}{tensor}})\ \{}
+\DoxyCodeLine{00220\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{namespacetensor}{tensor}}-\/>allocation\_type\ !=\ \mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2core_2c_2common_8h_ae48332e93fec6c3fe7c4ee4897770d4bae3cf7bebc0d4227e33ba15a69dafdb46}{kTfLiteDynamic}})\ \{}
+\DoxyCodeLine{00221\ \ \ \ \ \mbox{\hyperlink{group__common_ga1970f4c536d8b8a824e429a6d1ba6954}{TfLiteTensorDataFree}}(\mbox{\hyperlink{namespacetensor}{tensor}});}
+\DoxyCodeLine{00222\ \ \ \ \ \mbox{\hyperlink{namespacetensor}{tensor}}-\/>allocation\_type\ =\ \mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2core_2c_2common_8h_ae48332e93fec6c3fe7c4ee4897770d4bae3cf7bebc0d4227e33ba15a69dafdb46}{kTfLiteDynamic}};}
+\DoxyCodeLine{00223\ \ \ \}}
+\DoxyCodeLine{00224\ \}}
+\DoxyCodeLine{00225\ }
+\DoxyCodeLine{00226\ \textcolor{comment}{//\ Sets\ tensor\ to\ persistent\ and\ read-\/only.}}
+\DoxyCodeLine{00227\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_a3d209572c6bc210c4eb4da11bfcded27}{SetTensorToPersistentRo}}(\mbox{\hyperlink{struct_tf_lite_tensor}{TfLiteTensor}}*\ \mbox{\hyperlink{namespacetensor}{tensor}})\ \{}
+\DoxyCodeLine{00228\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{namespacetensor}{tensor}}-\/>allocation\_type\ !=\ \mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2core_2c_2common_8h_ae48332e93fec6c3fe7c4ee4897770d4ba73e83d65d34eb666a2e41dad9441420c}{kTfLitePersistentRo}})\ \{}
+\DoxyCodeLine{00229\ \ \ \ \ \mbox{\hyperlink{group__common_ga1970f4c536d8b8a824e429a6d1ba6954}{TfLiteTensorDataFree}}(\mbox{\hyperlink{namespacetensor}{tensor}});}
+\DoxyCodeLine{00230\ \ \ \ \ \mbox{\hyperlink{namespacetensor}{tensor}}-\/>allocation\_type\ =\ \mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2core_2c_2common_8h_ae48332e93fec6c3fe7c4ee4897770d4ba73e83d65d34eb666a2e41dad9441420c}{kTfLitePersistentRo}};}
+\DoxyCodeLine{00231\ \ \ \}}
+\DoxyCodeLine{00232\ \}}
+\DoxyCodeLine{00233\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ TF\_LITE\_STATIC\_MEMORY}}
+\DoxyCodeLine{00234\ }
+\DoxyCodeLine{00235\ \textcolor{comment}{//\ Determines\ whether\ it\ is\ a\ hybrid\ op\ -\/\ one\ that\ has\ float\ inputs\ and}}
+\DoxyCodeLine{00236\ \textcolor{comment}{//\ quantized\ weights.}}
+\DoxyCodeLine{00237\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespacetflite_a8444f80f43adaf3d5345c34fc7a22466}{IsHybridOp}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{struct_tf_lite_tensor}{TfLiteTensor}}*\ \mbox{\hyperlink{squeeze_8cpp_a9cebfb3d6ddd692fbdd268cf4b9ad024}{input}},\ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_tf_lite_tensor}{TfLiteTensor}}*\ weight)\ \{}
+\DoxyCodeLine{00238\ \ \ \textcolor{keywordflow}{return}\ ((weight-\/>\mbox{\hyperlink{struct_tf_lite_tensor_a24d579d439274a598ce79f0ec6bf6f50}{type}}\ ==\ \mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2core_2c_2c__api__types_8h_a8a47ba81bdef28b5c479ee7928a7d123ace4bd38da5d38da1014190421a4694a7}{kTfLiteUInt8}}\ ||\ weight-\/>\mbox{\hyperlink{struct_tf_lite_tensor_a24d579d439274a598ce79f0ec6bf6f50}{type}}\ ==\ \mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2core_2c_2c__api__types_8h_a8a47ba81bdef28b5c479ee7928a7d123aa5aabb7d65c4d50cda0658c6ecb4851c}{kTfLiteInt8}})\ \&\&}
+\DoxyCodeLine{00239\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{squeeze_8cpp_a9cebfb3d6ddd692fbdd268cf4b9ad024}{input}}-\/>\mbox{\hyperlink{struct_tf_lite_tensor_a24d579d439274a598ce79f0ec6bf6f50}{type}}\ ==\ \mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2core_2c_2c__api__types_8h_a8a47ba81bdef28b5c479ee7928a7d123a0abdf1d6cf1c5907891defe4ce746455}{kTfLiteFloat32}});}
+\DoxyCodeLine{00240\ \}}
+\DoxyCodeLine{00241\ }
+\DoxyCodeLine{00242\ \textcolor{comment}{//\ Check\ dimensionality\ match\ and\ populate\ OpData\ for\ Conv\ and\ DepthwiseConv.}}
+\DoxyCodeLine{00243\ \mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2core_2c_2c__api__types_8h_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_a0e18fe63cd62ede027fd1dc61ff86294}{PopulateConvolutionQuantizationParams}}(}
+\DoxyCodeLine{00244\ \ \ \ \ \mbox{\hyperlink{struct_tf_lite_context}{TfLiteContext}}*\ context,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_tf_lite_tensor}{TfLiteTensor}}*\ \mbox{\hyperlink{squeeze_8cpp_a9cebfb3d6ddd692fbdd268cf4b9ad024}{input}},}
+\DoxyCodeLine{00245\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_tf_lite_tensor}{TfLiteTensor}}*\ filter,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_tf_lite_tensor}{TfLiteTensor}}*\ bias,\ \mbox{\hyperlink{struct_tf_lite_tensor}{TfLiteTensor}}*\ \mbox{\hyperlink{maximum__minimum_8cpp_a7a2a916a8059078c2d7a05f46c7126fd}{output}},}
+\DoxyCodeLine{00246\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2core_2c_2builtin__op__data_8h_acc9e377dbc009d68bbfa5480d2559565}{TfLiteFusedActivation}}\&\ \mbox{\hyperlink{l2__pool__2d__test_8cc_a77ea056afd837c816867a0a9887131b6}{activation}},\ int32\_t*\ \mbox{\hyperlink{elementwise_8cpp_aa48e56822ed6e4a79d6c8c3b688ca8d3}{multiplier}},\ \textcolor{keywordtype}{int}*\ \mbox{\hyperlink{wm8960__regs_8h_ace4e4903c356d90d7a0e7548fc1e8b50}{shift}},}
+\DoxyCodeLine{00247\ \ \ \ \ int32\_t*\ \mbox{\hyperlink{add__n_8cpp_a2e6a27b448848b3057c45363e04b7d0d}{output\_activation\_min}},\ int32\_t*\ \mbox{\hyperlink{add__n_8cpp_aa889d7b51a3f84357d44f05993ac08a1}{output\_activation\_max}},}
+\DoxyCodeLine{00248\ \ \ \ \ int32\_t*\ per\_channel\_multiplier,\ int32\_t*\ per\_channel\_shift);}
+\DoxyCodeLine{00249\ }
+\DoxyCodeLine{00250\ \mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2core_2c_2c__api__types_8h_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_a0e18fe63cd62ede027fd1dc61ff86294}{PopulateConvolutionQuantizationParams}}(}
+\DoxyCodeLine{00251\ \ \ \ \ \mbox{\hyperlink{struct_tf_lite_context}{TfLiteContext}}*\ context,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_tf_lite_tensor}{TfLiteTensor}}*\ \mbox{\hyperlink{squeeze_8cpp_a9cebfb3d6ddd692fbdd268cf4b9ad024}{input}},}
+\DoxyCodeLine{00252\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_tf_lite_tensor}{TfLiteTensor}}*\ filter,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_tf_lite_tensor}{TfLiteTensor}}*\ bias,\ \mbox{\hyperlink{struct_tf_lite_tensor}{TfLiteTensor}}*\ \mbox{\hyperlink{maximum__minimum_8cpp_a7a2a916a8059078c2d7a05f46c7126fd}{output}},}
+\DoxyCodeLine{00253\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2core_2c_2builtin__op__data_8h_acc9e377dbc009d68bbfa5480d2559565}{TfLiteFusedActivation}}\&\ \mbox{\hyperlink{l2__pool__2d__test_8cc_a77ea056afd837c816867a0a9887131b6}{activation}},\ int32\_t*\ \mbox{\hyperlink{elementwise_8cpp_aa48e56822ed6e4a79d6c8c3b688ca8d3}{multiplier}},\ \textcolor{keywordtype}{int}*\ \mbox{\hyperlink{wm8960__regs_8h_ace4e4903c356d90d7a0e7548fc1e8b50}{shift}},}
+\DoxyCodeLine{00254\ \ \ \ \ int32\_t*\ \mbox{\hyperlink{add__n_8cpp_a2e6a27b448848b3057c45363e04b7d0d}{output\_activation\_min}},\ int32\_t*\ \mbox{\hyperlink{add__n_8cpp_aa889d7b51a3f84357d44f05993ac08a1}{output\_activation\_max}},}
+\DoxyCodeLine{00255\ \ \ \ \ int32\_t*\ per\_channel\_multiplier,\ int32\_t*\ per\_channel\_shift,}
+\DoxyCodeLine{00256\ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{stacker_8cc_a345cae2db28059ee72015d7c6acc9dd5}{num\_channels}});}
+\DoxyCodeLine{00257\ }
+\DoxyCodeLine{00258\ \textcolor{comment}{//\ Calculates\ the\ multiplication\ factor\ for\ a\ quantized\ convolution\ (or}}
+\DoxyCodeLine{00259\ \textcolor{comment}{//\ quantized\ depthwise\ convolution)\ involving\ the\ given\ tensors.\ Returns\ an}}
+\DoxyCodeLine{00260\ \textcolor{comment}{//\ error\ if\ the\ scales\ of\ the\ tensors\ are\ not\ compatible.}}
+\DoxyCodeLine{00261\ \mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2core_2c_2c__api__types_8h_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_a9a143fcc51320ca854b378d0b065b005}{GetQuantizedConvolutionMultipler}}(\mbox{\hyperlink{struct_tf_lite_context}{TfLiteContext}}*\ context,}
+\DoxyCodeLine{00262\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_tf_lite_tensor}{TfLiteTensor}}*\ \mbox{\hyperlink{squeeze_8cpp_a9cebfb3d6ddd692fbdd268cf4b9ad024}{input}},}
+\DoxyCodeLine{00263\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_tf_lite_tensor}{TfLiteTensor}}*\ filter,}
+\DoxyCodeLine{00264\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_tf_lite_tensor}{TfLiteTensor}}*\ bias,}
+\DoxyCodeLine{00265\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_tf_lite_tensor}{TfLiteTensor}}*\ \mbox{\hyperlink{maximum__minimum_8cpp_a7a2a916a8059078c2d7a05f46c7126fd}{output}},}
+\DoxyCodeLine{00266\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{double}*\ \mbox{\hyperlink{elementwise_8cpp_aa48e56822ed6e4a79d6c8c3b688ca8d3}{multiplier}});}
+\DoxyCodeLine{00267\ }
+\DoxyCodeLine{00268\ \mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2core_2c_2c__api__types_8h_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_a9a143fcc51320ca854b378d0b065b005}{GetQuantizedConvolutionMultipler}}(\mbox{\hyperlink{struct_tf_lite_context}{TfLiteContext}}*\ context,}
+\DoxyCodeLine{00269\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_tf_lite_tensor}{TfLiteTensor}}*\ \mbox{\hyperlink{squeeze_8cpp_a9cebfb3d6ddd692fbdd268cf4b9ad024}{input}},}
+\DoxyCodeLine{00270\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_tf_lite_tensor}{TfLiteTensor}}*\ filter,}
+\DoxyCodeLine{00271\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_tf_lite_tensor}{TfLiteTensor}}*\ \mbox{\hyperlink{maximum__minimum_8cpp_a7a2a916a8059078c2d7a05f46c7126fd}{output}},}
+\DoxyCodeLine{00272\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{double}*\ \mbox{\hyperlink{elementwise_8cpp_aa48e56822ed6e4a79d6c8c3b688ca8d3}{multiplier}});}
+\DoxyCodeLine{00273\ }
+\DoxyCodeLine{00274\ \textcolor{comment}{//\ Calculates\ the\ useful\ quantized\ range\ of\ an\ activation\ layer\ given\ its}}
+\DoxyCodeLine{00275\ \textcolor{comment}{//\ activation\ tensor.}}
+\DoxyCodeLine{00276\ \mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2core_2c_2c__api__types_8h_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_ad488436178c0ba878abe86843f484dd3}{CalculateActivationRangeQuantized}}(\mbox{\hyperlink{struct_tf_lite_context}{TfLiteContext}}*\ context,}
+\DoxyCodeLine{00277\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2core_2c_2builtin__op__data_8h_acc9e377dbc009d68bbfa5480d2559565}{TfLiteFusedActivation}}\ \mbox{\hyperlink{l2__pool__2d__test_8cc_a77ea056afd837c816867a0a9887131b6}{activation}},}
+\DoxyCodeLine{00278\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_tf_lite_tensor}{TfLiteTensor}}*\ \mbox{\hyperlink{maximum__minimum_8cpp_a7a2a916a8059078c2d7a05f46c7126fd}{output}},}
+\DoxyCodeLine{00279\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ int32\_t*\ act\_min,}
+\DoxyCodeLine{00280\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ int32\_t*\ act\_max);}
+\DoxyCodeLine{00281\ }
+\DoxyCodeLine{00282\ \textcolor{comment}{//\ Calculates\ the\ useful\ range\ of\ an\ activation\ layer\ given\ its\ activation}}
+\DoxyCodeLine{00283\ \textcolor{comment}{//\ tensor.a}}
+\DoxyCodeLine{00284\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{00285\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_ac4904321d40035fb592f53b6245bcc47}{CalculateActivationRange}}(\mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2core_2c_2builtin__op__data_8h_acc9e377dbc009d68bbfa5480d2559565}{TfLiteFusedActivation}}\ \mbox{\hyperlink{l2__pool__2d__test_8cc_a77ea056afd837c816867a0a9887131b6}{activation}},}
+\DoxyCodeLine{00286\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ T*\ \mbox{\hyperlink{arc__mli_2pooling_8cc_a4231278506cefda5f9800a90f517dbf4}{activation\_min}},\ T*\ \mbox{\hyperlink{arc__mli_2pooling_8cc_aa6291ba04e9513eb1e10e224c7faf0db}{activation\_max}})\ \{}
+\DoxyCodeLine{00287\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{l2__pool__2d__test_8cc_a77ea056afd837c816867a0a9887131b6}{activation}}\ ==\ \mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2core_2c_2builtin__op__data_8h_acc9e377dbc009d68bbfa5480d2559565aa8815bb5cba3bda48d71be3f1937b8c6}{kTfLiteActRelu}})\ \{}
+\DoxyCodeLine{00288\ \ \ \ \ *\mbox{\hyperlink{arc__mli_2pooling_8cc_a4231278506cefda5f9800a90f517dbf4}{activation\_min}}\ =\ 0;}
+\DoxyCodeLine{00289\ \ \ \ \ *\mbox{\hyperlink{arc__mli_2pooling_8cc_aa6291ba04e9513eb1e10e224c7faf0db}{activation\_max}}\ =\ std::numeric\_limits<T>::max();}
+\DoxyCodeLine{00290\ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{l2__pool__2d__test_8cc_a77ea056afd837c816867a0a9887131b6}{activation}}\ ==\ \mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2core_2c_2builtin__op__data_8h_acc9e377dbc009d68bbfa5480d2559565a1aed6f8547fd238e52d0d87f633fc371}{kTfLiteActRelu6}})\ \{}
+\DoxyCodeLine{00291\ \ \ \ \ *\mbox{\hyperlink{arc__mli_2pooling_8cc_a4231278506cefda5f9800a90f517dbf4}{activation\_min}}\ =\ 0;}
+\DoxyCodeLine{00292\ \ \ \ \ *\mbox{\hyperlink{arc__mli_2pooling_8cc_aa6291ba04e9513eb1e10e224c7faf0db}{activation\_max}}\ =\ 6;}
+\DoxyCodeLine{00293\ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{l2__pool__2d__test_8cc_a77ea056afd837c816867a0a9887131b6}{activation}}\ ==\ \mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2core_2c_2builtin__op__data_8h_acc9e377dbc009d68bbfa5480d2559565a40a3d22af1e8b06897c7d1dfeef55fa2}{kTfLiteActReluN1To1}})\ \{}
+\DoxyCodeLine{00294\ \ \ \ \ *\mbox{\hyperlink{arc__mli_2pooling_8cc_a4231278506cefda5f9800a90f517dbf4}{activation\_min}}\ =\ -\/1;}
+\DoxyCodeLine{00295\ \ \ \ \ *\mbox{\hyperlink{arc__mli_2pooling_8cc_aa6291ba04e9513eb1e10e224c7faf0db}{activation\_max}}\ =\ 1;}
+\DoxyCodeLine{00296\ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00297\ \ \ \ \ *\mbox{\hyperlink{arc__mli_2pooling_8cc_a4231278506cefda5f9800a90f517dbf4}{activation\_min}}\ =\ std::numeric\_limits<T>::lowest();}
+\DoxyCodeLine{00298\ \ \ \ \ *\mbox{\hyperlink{arc__mli_2pooling_8cc_aa6291ba04e9513eb1e10e224c7faf0db}{activation\_max}}\ =\ std::numeric\_limits<T>::max();}
+\DoxyCodeLine{00299\ \ \ \}}
+\DoxyCodeLine{00300\ \}}
+\DoxyCodeLine{00301\ }
+\DoxyCodeLine{00302\ \textcolor{comment}{//\ Return\ true\ if\ the\ given\ tensors\ have\ the\ same\ shape.}}
+\DoxyCodeLine{00303\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespacetflite_a0fa6bd04f2982a5c69c6e89369fc5251}{HaveSameShapes}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{struct_tf_lite_tensor}{TfLiteTensor}}*\ \mbox{\hyperlink{maximum__minimum_8cpp_a76b5ccc902b14863efcca152ed63734b}{input1}},\ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_tf_lite_tensor}{TfLiteTensor}}*\ \mbox{\hyperlink{maximum__minimum_8cpp_a7c70445c99c57d6a7810481f3f56f0b6}{input2}});}
+\DoxyCodeLine{00304\ }
+\DoxyCodeLine{00305\ \textcolor{preprocessor}{\#if\ !defined(TF\_LITE\_STATIC\_MEMORY)}}
+\DoxyCodeLine{00306\ \textcolor{comment}{//\ Gets\ the\ output\ shape\ from\ the\ input\ tensor.}}
+\DoxyCodeLine{00307\ \mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2core_2c_2c__api__types_8h_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_a3e28ae918a03a431713690a9df56c4da}{GetOutputShapeFromInput}}(\mbox{\hyperlink{struct_tf_lite_context}{TfLiteContext}}*\ context,}
+\DoxyCodeLine{00308\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_tf_lite_tensor}{TfLiteTensor}}*\ \mbox{\hyperlink{squeeze_8cpp_a9cebfb3d6ddd692fbdd268cf4b9ad024}{input}},}
+\DoxyCodeLine{00309\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_tf_lite_int_array}{TfLiteIntArray}}**\ output\_shape);}
+\DoxyCodeLine{00310\ }
+\DoxyCodeLine{00311\ std::string\ \mbox{\hyperlink{namespacetflite_a03c53f7db34aaa884c18e735dd25d00d}{GetShapeDebugString}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{struct_tf_lite_int_array}{TfLiteIntArray}}*\ shape);}
+\DoxyCodeLine{00312\ }
+\DoxyCodeLine{00313\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ !defined(TF\_LITE\_STATIC\_MEMORY)}}
+\DoxyCodeLine{00314\ }
+\DoxyCodeLine{00315\ \textcolor{comment}{//\ Calculates\ the\ output\_shape\ that\ is\ necessary\ for\ element-\/wise\ operations}}
+\DoxyCodeLine{00316\ \textcolor{comment}{//\ with\ broadcasting\ involving\ the\ two\ input\ tensors.}}
+\DoxyCodeLine{00317\ \mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2core_2c_2c__api__types_8h_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_a93b12987b04f4be9fed5ba976bfe5851}{CalculateShapeForBroadcast}}(\mbox{\hyperlink{struct_tf_lite_context}{TfLiteContext}}*\ context,}
+\DoxyCodeLine{00318\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_tf_lite_tensor}{TfLiteTensor}}*\ \mbox{\hyperlink{maximum__minimum_8cpp_a76b5ccc902b14863efcca152ed63734b}{input1}},}
+\DoxyCodeLine{00319\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_tf_lite_tensor}{TfLiteTensor}}*\ \mbox{\hyperlink{maximum__minimum_8cpp_a7c70445c99c57d6a7810481f3f56f0b6}{input2}},}
+\DoxyCodeLine{00320\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_tf_lite_int_array}{TfLiteIntArray}}**\ output\_shape);}
+\DoxyCodeLine{00321\ }
+\DoxyCodeLine{00322\ \textcolor{comment}{//\ Calculates\ the\ output\_shape\ that\ is\ necessary\ for\ element-\/wise\ operations}}
+\DoxyCodeLine{00323\ \textcolor{comment}{//\ with\ broadcasting\ involving\ the\ three\ input\ tensors.}}
+\DoxyCodeLine{00324\ \mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2core_2c_2c__api__types_8h_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_a93b12987b04f4be9fed5ba976bfe5851}{CalculateShapeForBroadcast}}(\mbox{\hyperlink{struct_tf_lite_context}{TfLiteContext}}*\ context,}
+\DoxyCodeLine{00325\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_tf_lite_tensor}{TfLiteTensor}}*\ \mbox{\hyperlink{maximum__minimum_8cpp_a76b5ccc902b14863efcca152ed63734b}{input1}},}
+\DoxyCodeLine{00326\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_tf_lite_tensor}{TfLiteTensor}}*\ \mbox{\hyperlink{maximum__minimum_8cpp_a7c70445c99c57d6a7810481f3f56f0b6}{input2}},}
+\DoxyCodeLine{00327\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_tf_lite_tensor}{TfLiteTensor}}*\ input3,}
+\DoxyCodeLine{00328\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_tf_lite_int_array}{TfLiteIntArray}}**\ output\_shape);}
+\DoxyCodeLine{00329\ }
+\DoxyCodeLine{00330\ \textcolor{comment}{//\ Return\ the\ size\ of\ given\ type\ in\ bytes.\ Return\ 0\ in\ case\ of\ string.}}
+\DoxyCodeLine{00331\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{namespacetflite_a432902fef633459c6289f663710e3ac0}{TfLiteTypeGetSize}}(\mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2core_2c_2c__api__types_8h_a8a47ba81bdef28b5c479ee7928a7d123}{TfLiteType}}\ \mbox{\hyperlink{micro_2kernels_2overlap__add_8cc_a231b67310ea6e901bd0df1bded3963cf}{type}});}
+\DoxyCodeLine{00332\ }
+\DoxyCodeLine{00333\ \textcolor{comment}{//\ Whether\ the\ current\ platform\ is\ mobile\ (Android\ or\ iOS).}}
+\DoxyCodeLine{00334\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespacetflite_ac5b1600e4585e8af16bf448c865f1c22}{IsMobilePlatform}}();}
+\DoxyCodeLine{00335\ }
+\DoxyCodeLine{00336\ \textcolor{comment}{//\ Returns\ whether\ there\ is\ unspecified\ dimension\ in\ the\ tensor's\ dim\ signature.}}
+\DoxyCodeLine{00337\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespacetflite_aa2ede5186c7ab0117cd66bcac21e2915}{HasUnspecifiedDimension}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{struct_tf_lite_tensor}{TfLiteTensor}}*\ \mbox{\hyperlink{namespacetensor}{tensor}});}
+\DoxyCodeLine{00338\ }
+\DoxyCodeLine{00339\ \}\ \ \textcolor{comment}{//\ namespace\ tflite}}
+\DoxyCodeLine{00340\ }
+\DoxyCodeLine{00341\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ TENSORFLOW\_LITE\_KERNELS\_KERNEL\_UTIL\_H\_}}
+
+\end{DoxyCode}

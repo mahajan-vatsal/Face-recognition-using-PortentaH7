@@ -1,0 +1,161 @@
+\doxysection{array.\+h}
+\hypertarget{tflite-micro-main_2tensorflow_2lite_2array_8h_source}{}\label{tflite-micro-main_2tensorflow_2lite_2array_8h_source}\index{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/main/tensorflow/lite/array.h@{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/main/tensorflow/lite/array.h}}
+\mbox{\hyperlink{tflite-micro-main_2tensorflow_2lite_2array_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{/*\ Copyright\ 2023\ The\ TensorFlow\ Authors.\ All\ Rights\ Reserved.}}
+\DoxyCodeLine{00002\ \textcolor{comment}{}}
+\DoxyCodeLine{00003\ \textcolor{comment}{Licensed\ under\ the\ Apache\ License,\ Version\ 2.0\ (the\ "{}License"{});}}
+\DoxyCodeLine{00004\ \textcolor{comment}{you\ may\ not\ use\ this\ file\ except\ in\ compliance\ with\ the\ License.}}
+\DoxyCodeLine{00005\ \textcolor{comment}{You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{00006\ \textcolor{comment}{}}
+\DoxyCodeLine{00007\ \textcolor{comment}{\ \ \ \ http://www.apache.org/licenses/LICENSE-\/2.0}}
+\DoxyCodeLine{00008\ \textcolor{comment}{}}
+\DoxyCodeLine{00009\ \textcolor{comment}{Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ software}}
+\DoxyCodeLine{00010\ \textcolor{comment}{distributed\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,}}
+\DoxyCodeLine{00011\ \textcolor{comment}{WITHOUT\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,\ either\ express\ or\ implied.}}
+\DoxyCodeLine{00012\ \textcolor{comment}{See\ the\ License\ for\ the\ specific\ language\ governing\ permissions\ and}}
+\DoxyCodeLine{00013\ \textcolor{comment}{limitations\ under\ the\ License.}}
+\DoxyCodeLine{00014\ \textcolor{comment}{==============================================================================*/}}
+\DoxyCodeLine{00015\ \textcolor{preprocessor}{\#ifndef\ TENSORFLOW\_LITE\_ARRAY\_H\_}}
+\DoxyCodeLine{00016\ \textcolor{preprocessor}{\#define\ TENSORFLOW\_LITE\_ARRAY\_H\_}}
+\DoxyCodeLine{00017\ }
+\DoxyCodeLine{00018\ \textcolor{preprocessor}{\#include\ <cstring>}}
+\DoxyCodeLine{00019\ \textcolor{preprocessor}{\#include\ <initializer\_list>}}
+\DoxyCodeLine{00020\ \textcolor{preprocessor}{\#include\ <memory>}}
+\DoxyCodeLine{00021\ \textcolor{preprocessor}{\#include\ <type\_traits>}}
+\DoxyCodeLine{00022\ \textcolor{preprocessor}{\#include\ <vector>}}
+\DoxyCodeLine{00023\ }
+\DoxyCodeLine{00024\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/core/c/common.h"{}}}
+\DoxyCodeLine{00025\ }
+\DoxyCodeLine{00026\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacetflite}{tflite}}\ \{}
+\DoxyCodeLine{00027\ }
+\DoxyCodeLine{00029\ }
+\DoxyCodeLine{00030\ \textcolor{keyword}{namespace\ }array\_internal\ \{}
+\DoxyCodeLine{00031\ }
+\DoxyCodeLine{00032\ \textcolor{comment}{//\ Function\ object\ used\ as\ a\ deleter\ for\ unique\_ptr\ holding\ TFLite*Array}}
+\DoxyCodeLine{00033\ \textcolor{comment}{//\ objects.}}
+\DoxyCodeLine{00034\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structtflite_1_1array__internal_1_1_tf_lite_array_deleter}{TfLiteArrayDeleter}}\ \{}
+\DoxyCodeLine{00035\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{structtflite_1_1array__internal_1_1_tf_lite_array_deleter_a3b638011e397a02c8fbbab0df88640be}{operator()}}(\mbox{\hyperlink{struct_tf_lite_int_array}{TfLiteIntArray}}*\ a);}
+\DoxyCodeLine{00036\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{structtflite_1_1array__internal_1_1_tf_lite_array_deleter_a3b638011e397a02c8fbbab0df88640be}{operator()}}(\mbox{\hyperlink{struct_tf_lite_float_array}{TfLiteFloatArray}}*\ a);}
+\DoxyCodeLine{00037\ \};}
+\DoxyCodeLine{00038\ }
+\DoxyCodeLine{00039\ \textcolor{comment}{//\ Maps\ T\ to\ the\ corresponding\ TfLiteArray\ type.}}
+\DoxyCodeLine{00040\ \textcolor{keyword}{template}\ <\textcolor{keyword}{class}\ T>}
+\DoxyCodeLine{00041\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structtflite_1_1array__internal_1_1_tf_lite_array_info}{TfLiteArrayInfo}};}
+\DoxyCodeLine{00042\ }
+\DoxyCodeLine{00043\ \textcolor{keyword}{template}\ <>}
+\DoxyCodeLine{00044\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structtflite_1_1array__internal_1_1_tf_lite_array_info}{TfLiteArrayInfo}}<int>\ \{}
+\DoxyCodeLine{00045\ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{struct_tf_lite_int_array}{Type}}\ =\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src0ad488291f7fc2ff7a022d8a6e141a3e_a350e3ccada7f85e4b4240f39e55890bc}{TfLiteIntArray}};}
+\DoxyCodeLine{00046\ \};}
+\DoxyCodeLine{00047\ }
+\DoxyCodeLine{00048\ \textcolor{keyword}{template}\ <>}
+\DoxyCodeLine{00049\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structtflite_1_1array__internal_1_1_tf_lite_array_info}{TfLiteArrayInfo}}<float>\ \{}
+\DoxyCodeLine{00050\ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{struct_tf_lite_float_array}{Type}}\ =\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src0ad488291f7fc2ff7a022d8a6e141a3e_abfda7e10c63e12b96bbad9a1cbac9cd8}{TfLiteFloatArray}};}
+\DoxyCodeLine{00051\ \};}
+\DoxyCodeLine{00052\ }
+\DoxyCodeLine{00053\ \}\ \ \textcolor{comment}{//\ namespace\ array\_internal}}
+\DoxyCodeLine{00054\ }
+\DoxyCodeLine{00055\ \textcolor{keyword}{template}\ <\textcolor{keyword}{class}\ T>}
+\DoxyCodeLine{00056\ \textcolor{keyword}{using\ }\mbox{\hyperlink{namespacetflite_a9751aa26e76278a1a80b2e400b84c4d8}{TfLiteArrayUniquePtr}}\ =}
+\DoxyCodeLine{00057\ \ \ \ \ std::unique\_ptr<typename\ array\_internal::TfLiteArrayInfo<T>::Type,}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structtflite_1_1array__internal_1_1_tf_lite_array_deleter}{array\_internal::TfLiteArrayDeleter}}>;}
+\DoxyCodeLine{00059\ }
+\DoxyCodeLine{00060\ \textcolor{comment}{//\ \`{}unique\_ptr`\ wrapper\ for\ \`{}TfLiteIntArray`s.}}
+\DoxyCodeLine{00061\ \textcolor{keyword}{using\ }\mbox{\hyperlink{namespacetflite_a35a6ce4d7e5916b64968cb7a67e2bc6c}{IntArrayUniquePtr}}\ =\ \mbox{\hyperlink{namespacetflite_a9751aa26e76278a1a80b2e400b84c4d8}{TfLiteArrayUniquePtr<int>}};}
+\DoxyCodeLine{00062\ }
+\DoxyCodeLine{00063\ \textcolor{comment}{//\ \`{}unique\_ptr`\ wrapper\ for\ \`{}TfLiteFloatArray`s.}}
+\DoxyCodeLine{00064\ \textcolor{keyword}{using\ }\mbox{\hyperlink{namespacetflite_a115bf3e4c41814d3b721bdd83fa9c8ab}{FloatArrayUniquePtr}}\ =\ \mbox{\hyperlink{namespacetflite_a9751aa26e76278a1a80b2e400b84c4d8}{TfLiteArrayUniquePtr<float>}};}
+\DoxyCodeLine{00065\ }
+\DoxyCodeLine{00066\ \textcolor{comment}{//\ Allocates\ a\ TfLiteArray\ of\ given\ size\ using\ malloc.}}
+\DoxyCodeLine{00067\ \textcolor{comment}{//}}
+\DoxyCodeLine{00068\ \textcolor{comment}{//\ This\ builds\ an\ int\ array\ by\ default\ as\ this\ is\ the\ overwhelming\ part\ of\ the}}
+\DoxyCodeLine{00069\ \textcolor{comment}{//\ use\ cases.}}
+\DoxyCodeLine{00070\ \textcolor{keyword}{template}\ <\textcolor{keyword}{class}\ T\ =\ \textcolor{keywordtype}{int}>}
+\DoxyCodeLine{00071\ \mbox{\hyperlink{namespacetflite_a9751aa26e76278a1a80b2e400b84c4d8}{TfLiteArrayUniquePtr<T>}}\ \mbox{\hyperlink{namespacetflite_a1e2bfb93a55e1387c1e75730647baef6}{BuildTfLiteArray}}(\textcolor{keywordtype}{int}\ \mbox{\hyperlink{hello__world__model_8cc_a439227feff9d7f55384e8780cfc2eb82}{size}});}
+\DoxyCodeLine{00072\ }
+\DoxyCodeLine{00073\ \textcolor{comment}{//\ Allocates\ a\ TfLiteIntArray\ of\ given\ size\ using\ malloc.}}
+\DoxyCodeLine{00074\ \textcolor{keyword}{template}\ <>}
+\DoxyCodeLine{00075\ \textcolor{keyword}{inline}\ \mbox{\hyperlink{namespacetflite_a35a6ce4d7e5916b64968cb7a67e2bc6c}{IntArrayUniquePtr}}\ \mbox{\hyperlink{namespacetflite_a61c676abc385927dffb8862ac53194a6}{BuildTfLiteArray<int>}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{hello__world__model_8cc_a439227feff9d7f55384e8780cfc2eb82}{size}})\ \{}
+\DoxyCodeLine{00076\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacetflite_a35a6ce4d7e5916b64968cb7a67e2bc6c}{IntArrayUniquePtr}}(\mbox{\hyperlink{group__common_gad13f404b4142ba527551d6e87ea5db87}{TfLiteIntArrayCreate}}(\mbox{\hyperlink{hello__world__model_8cc_a439227feff9d7f55384e8780cfc2eb82}{size}}));}
+\DoxyCodeLine{00077\ \}}
+\DoxyCodeLine{00078\ }
+\DoxyCodeLine{00079\ \textcolor{comment}{//\ Allocates\ a\ TfLiteFloatArray\ of\ given\ size\ using\ malloc.}}
+\DoxyCodeLine{00080\ \textcolor{keyword}{template}\ <>}
+\DoxyCodeLine{00081\ \textcolor{keyword}{inline}\ \mbox{\hyperlink{namespacetflite_a115bf3e4c41814d3b721bdd83fa9c8ab}{FloatArrayUniquePtr}}\ \mbox{\hyperlink{namespacetflite_aa065701948b208d73b88fc0319b9b379}{BuildTfLiteArray<float>}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{hello__world__model_8cc_a439227feff9d7f55384e8780cfc2eb82}{size}})\ \{}
+\DoxyCodeLine{00082\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacetflite_a115bf3e4c41814d3b721bdd83fa9c8ab}{FloatArrayUniquePtr}}(\mbox{\hyperlink{group__common_gace9a92787fe73c5327f79ed76de92934}{TfLiteFloatArrayCreate}}(\mbox{\hyperlink{hello__world__model_8cc_a439227feff9d7f55384e8780cfc2eb82}{size}}));}
+\DoxyCodeLine{00083\ \}}
+\DoxyCodeLine{00084\ }
+\DoxyCodeLine{00085\ \textcolor{comment}{//\ Allocates\ a\ TFLiteArray\ of\ given\ size\ and\ initializes\ it\ with\ the\ given}}
+\DoxyCodeLine{00086\ \textcolor{comment}{//\ values.}}
+\DoxyCodeLine{00087\ \textcolor{comment}{//}}
+\DoxyCodeLine{00088\ \textcolor{comment}{//\ \`{}values`\ is\ expected\ to\ holds\ \`{}size`\ elements.}}
+\DoxyCodeLine{00089\ \textcolor{comment}{//}}
+\DoxyCodeLine{00090\ \textcolor{comment}{//\ If\ T\ is\ explicitely\ specified\ and\ the\ type\ of\ values\ is\ not\ the\ same\ as\ T,}}
+\DoxyCodeLine{00091\ \textcolor{comment}{//\ then\ a\ static\_cast\ is\ performed.}}
+\DoxyCodeLine{00092\ \textcolor{keyword}{template}\ <\textcolor{keyword}{class\ }T\ =\ void,\ \textcolor{keyword}{class\ }U,}
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{class\ }Type\ =\ std::conditional\_t<std::is\_same<T,\ void>::value,\ U,\ T>>}
+\DoxyCodeLine{00094\ \mbox{\hyperlink{namespacetflite_a9751aa26e76278a1a80b2e400b84c4d8}{TfLiteArrayUniquePtr<Type>}}\ \mbox{\hyperlink{namespacetflite_a1e2bfb93a55e1387c1e75730647baef6}{BuildTfLiteArray}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{hello__world__model_8cc_a439227feff9d7f55384e8780cfc2eb82}{size}},}
+\DoxyCodeLine{00095\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ U*\ \textcolor{keyword}{const}\ values)\ \{}
+\DoxyCodeLine{00096\ \ \ \mbox{\hyperlink{namespacetflite_a9751aa26e76278a1a80b2e400b84c4d8}{TfLiteArrayUniquePtr<Type>}}\ array\ =\ \mbox{\hyperlink{namespacetflite_a1e2bfb93a55e1387c1e75730647baef6}{BuildTfLiteArray<Type>}}(\mbox{\hyperlink{hello__world__model_8cc_a439227feff9d7f55384e8780cfc2eb82}{size}});}
+\DoxyCodeLine{00097\ \ \ \textcolor{comment}{//\ If\ size\ is\ 0,\ the\ array\ pointer\ may\ be\ null.}}
+\DoxyCodeLine{00098\ \ \ \textcolor{keywordflow}{if}\ (array\ \&\&\ values)\ \{}
+\DoxyCodeLine{00099\ \ \ \ \ \textcolor{keywordflow}{if}\ (std::is\_same<Type,\ U>::value)\ \{}
+\DoxyCodeLine{00100\ \ \ \ \ \ \ memcpy(array-\/>data,\ values,\ \mbox{\hyperlink{hello__world__model_8cc_a439227feff9d7f55384e8780cfc2eb82}{size}}\ *\ \textcolor{keyword}{sizeof}(Type));}
+\DoxyCodeLine{00101\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00102\ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ \mbox{\hyperlink{hello__world__model_8cc_a439227feff9d7f55384e8780cfc2eb82}{size}};\ ++i)\ \{}
+\DoxyCodeLine{00103\ \ \ \ \ \ \ \ \ array-\/>data[i]\ =\ \textcolor{keyword}{static\_cast<}Type\textcolor{keyword}{>}(values[i]);}
+\DoxyCodeLine{00104\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00105\ \ \ \ \ \}}
+\DoxyCodeLine{00106\ \ \ \}}
+\DoxyCodeLine{00107\ \ \ \textcolor{keywordflow}{return}\ array;}
+\DoxyCodeLine{00108\ \}}
+\DoxyCodeLine{00109\ }
+\DoxyCodeLine{00110\ \textcolor{comment}{//\ Allocates\ a\ TFLiteArray\ and\ initializes\ it\ with\ the\ given\ array.}}
+\DoxyCodeLine{00111\ \textcolor{comment}{//}}
+\DoxyCodeLine{00112\ \textcolor{comment}{//\ \`{}values`\ is\ expected\ to\ holds\ \`{}size`\ elements.}}
+\DoxyCodeLine{00113\ \textcolor{keyword}{template}\ <\textcolor{keyword}{class}\ T,\ \textcolor{keywordtype}{size\_t}\ N>}
+\DoxyCodeLine{00114\ \mbox{\hyperlink{namespacetflite_a9751aa26e76278a1a80b2e400b84c4d8}{TfLiteArrayUniquePtr<T>}}\ \mbox{\hyperlink{namespacetflite_a1e2bfb93a55e1387c1e75730647baef6}{BuildTfLiteArray}}(\textcolor{keyword}{const}\ T\ (\&values)[N])\ \{}
+\DoxyCodeLine{00115\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacetflite_a1e2bfb93a55e1387c1e75730647baef6}{BuildTfLiteArray<T>}}(\textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{int}\textcolor{keyword}{>}(N),\ values);}
+\DoxyCodeLine{00116\ \}}
+\DoxyCodeLine{00117\ }
+\DoxyCodeLine{00118\ \textcolor{comment}{//\ Allocates\ a\ TFLiteArray\ and\ initializes\ it\ with\ the\ given\ values.}}
+\DoxyCodeLine{00119\ \textcolor{comment}{//}}
+\DoxyCodeLine{00120\ \textcolor{comment}{//\ This\ uses\ SFINAE\ to\ only\ be\ picked\ up\ by\ for\ types\ that\ implement\ \`{}data()`}}
+\DoxyCodeLine{00121\ \textcolor{comment}{//\ and\ \`{}size()`\ member\ functions.\ We\ cannot\ reuse\ detection\ facilities\ provided}}
+\DoxyCodeLine{00122\ \textcolor{comment}{//\ by\ Abseil\ in\ this\ code.}}
+\DoxyCodeLine{00123\ \textcolor{comment}{//}}
+\DoxyCodeLine{00124\ \textcolor{comment}{//\ To\ conform\ with\ the\ other\ overloads,\ we\ allow\ specifying\ the\ type\ of\ the}}
+\DoxyCodeLine{00125\ \textcolor{comment}{//\ array\ as\ well\ as\ deducing\ it\ from\ the\ container.}}
+\DoxyCodeLine{00126\ \textcolor{keyword}{template}\ <}
+\DoxyCodeLine{00127\ \ \ \ \ \textcolor{keyword}{class\ }T\ =\ void,\ \textcolor{keyword}{class\ }Container,}
+\DoxyCodeLine{00128\ \ \ \ \ \textcolor{keyword}{class\ }ElementType\ =}
+\DoxyCodeLine{00129\ \ \ \ \ \ \ \ \ std::decay\_t<decltype(*std::declval<Container>().data())>,}
+\DoxyCodeLine{00130\ \ \ \ \ \textcolor{keyword}{class}\ SizeType\ =\ std::decay\_t<\textcolor{keyword}{decltype}(std::declval<Container>().size())>,}
+\DoxyCodeLine{00131\ \ \ \ \ \textcolor{keyword}{class}\ Type\ =}
+\DoxyCodeLine{00132\ \ \ \ \ \ \ \ \ std::conditional\_t<std::is\_same<T,\ void>::value,\ ElementType,\ T>>}
+\DoxyCodeLine{00133\ \mbox{\hyperlink{namespacetflite_a9751aa26e76278a1a80b2e400b84c4d8}{TfLiteArrayUniquePtr<Type>}}\ \mbox{\hyperlink{namespacetflite_a1e2bfb93a55e1387c1e75730647baef6}{BuildTfLiteArray}}(\textcolor{keyword}{const}\ Container\&\ values)\ \{}
+\DoxyCodeLine{00134\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacetflite_a1e2bfb93a55e1387c1e75730647baef6}{BuildTfLiteArray<Type>}}(\textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{int}\textcolor{keyword}{>}(values.size()),\ values.data());}
+\DoxyCodeLine{00135\ \}}
+\DoxyCodeLine{00136\ }
+\DoxyCodeLine{00137\ \textcolor{comment}{//\ Allocates\ a\ TFLiteArray\ and\ initializes\ it\ with\ the\ given\ values.}}
+\DoxyCodeLine{00138\ \textcolor{keyword}{template}\ <\textcolor{keyword}{class}\ T>}
+\DoxyCodeLine{00139\ \mbox{\hyperlink{namespacetflite_a9751aa26e76278a1a80b2e400b84c4d8}{TfLiteArrayUniquePtr<T>}}\ \mbox{\hyperlink{namespacetflite_a1e2bfb93a55e1387c1e75730647baef6}{BuildTfLiteArray}}(}
+\DoxyCodeLine{00140\ \ \ \ \ \textcolor{keyword}{const}\ std::initializer\_list<T>\&\ values)\ \{}
+\DoxyCodeLine{00141\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacetflite_a1e2bfb93a55e1387c1e75730647baef6}{BuildTfLiteArray}}(\textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{int}\textcolor{keyword}{>}(values.size()),\ values.begin());}
+\DoxyCodeLine{00142\ \}}
+\DoxyCodeLine{00143\ }
+\DoxyCodeLine{00144\ \textcolor{comment}{//\ Allocates\ a\ TFLiteArray\ and\ initializes\ it\ with\ the\ given\ array.}}
+\DoxyCodeLine{00145\ \textcolor{keyword}{inline}\ \mbox{\hyperlink{namespacetflite_a35a6ce4d7e5916b64968cb7a67e2bc6c}{IntArrayUniquePtr}}\ \mbox{\hyperlink{namespacetflite_a1e2bfb93a55e1387c1e75730647baef6}{BuildTfLiteArray}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{struct_tf_lite_int_array}{TfLiteIntArray}}\&\ other)\ \{}
+\DoxyCodeLine{00146\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacetflite_a1e2bfb93a55e1387c1e75730647baef6}{BuildTfLiteArray}}(other.\mbox{\hyperlink{struct_tf_lite_int_array_aaaa4554b9c73a68a4d6a99f1285be320}{size}},\ other.\mbox{\hyperlink{struct_tf_lite_int_array_ab262dcb3609e96a3d8a5e64fccd092d6}{data}});}
+\DoxyCodeLine{00147\ \}}
+\DoxyCodeLine{00148\ }
+\DoxyCodeLine{00149\ \textcolor{comment}{//\ Allocates\ a\ TFLiteArray\ and\ initializes\ it\ with\ the\ given\ array.}}
+\DoxyCodeLine{00150\ \textcolor{keyword}{inline}\ \mbox{\hyperlink{namespacetflite_a115bf3e4c41814d3b721bdd83fa9c8ab}{FloatArrayUniquePtr}}\ \mbox{\hyperlink{namespacetflite_a1e2bfb93a55e1387c1e75730647baef6}{BuildTfLiteArray}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{struct_tf_lite_float_array}{TfLiteFloatArray}}\&\ other)\ \{}
+\DoxyCodeLine{00151\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacetflite_a1e2bfb93a55e1387c1e75730647baef6}{BuildTfLiteArray}}(other.\mbox{\hyperlink{struct_tf_lite_float_array_abaa1355710d1126165a4745bf26ebded}{size}},\ other.\mbox{\hyperlink{struct_tf_lite_float_array_a9f0e5f0566dccbd92ccc0ec6e7ddbad2}{data}});}
+\DoxyCodeLine{00152\ \}}
+\DoxyCodeLine{00153\ }
+\DoxyCodeLine{00154\ \}\ \ \textcolor{comment}{//\ namespace\ tflite}}
+\DoxyCodeLine{00155\ }
+\DoxyCodeLine{00156\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ TENSORFLOW\_LITE\_ARRAY\_H\_}}
+
+\end{DoxyCode}

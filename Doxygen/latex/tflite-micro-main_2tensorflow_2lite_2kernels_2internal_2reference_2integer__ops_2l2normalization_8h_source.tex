@@ -1,0 +1,73 @@
+\doxysection{l2normalization.\+h}
+\hypertarget{tflite-micro-main_2tensorflow_2lite_2kernels_2internal_2reference_2integer__ops_2l2normalization_8h_source}{}\label{tflite-micro-main_2tensorflow_2lite_2kernels_2internal_2reference_2integer__ops_2l2normalization_8h_source}\index{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/main/tensorflow/lite/kernels/internal/reference/integer\_ops/l2normalization.h@{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/main/tensorflow/lite/kernels/internal/reference/integer\_ops/l2normalization.h}}
+\mbox{\hyperlink{tflite-micro-main_2tensorflow_2lite_2kernels_2internal_2reference_2integer__ops_2l2normalization_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{/*\ Copyright\ 2019\ The\ TensorFlow\ Authors.\ All\ Rights\ Reserved.}}
+\DoxyCodeLine{00002\ \textcolor{comment}{}}
+\DoxyCodeLine{00003\ \textcolor{comment}{Licensed\ under\ the\ Apache\ License,\ Version\ 2.0\ (the\ "{}License"{});}}
+\DoxyCodeLine{00004\ \textcolor{comment}{you\ may\ not\ use\ this\ file\ except\ in\ compliance\ with\ the\ License.}}
+\DoxyCodeLine{00005\ \textcolor{comment}{You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{00006\ \textcolor{comment}{}}
+\DoxyCodeLine{00007\ \textcolor{comment}{\ \ \ \ http://www.apache.org/licenses/LICENSE-\/2.0}}
+\DoxyCodeLine{00008\ \textcolor{comment}{}}
+\DoxyCodeLine{00009\ \textcolor{comment}{Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ software}}
+\DoxyCodeLine{00010\ \textcolor{comment}{distributed\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,}}
+\DoxyCodeLine{00011\ \textcolor{comment}{WITHOUT\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,\ either\ express\ or\ implied.}}
+\DoxyCodeLine{00012\ \textcolor{comment}{See\ the\ License\ for\ the\ specific\ language\ governing\ permissions\ and}}
+\DoxyCodeLine{00013\ \textcolor{comment}{limitations\ under\ the\ License.}}
+\DoxyCodeLine{00014\ \textcolor{comment}{==============================================================================*/}}
+\DoxyCodeLine{00015\ \textcolor{preprocessor}{\#ifndef\ TENSORFLOW\_LITE\_KERNELS\_INTERNAL\_REFERENCE\_INTEGER\_OPS\_L2NORMALIZATION\_H\_}}
+\DoxyCodeLine{00016\ \textcolor{preprocessor}{\#define\ TENSORFLOW\_LITE\_KERNELS\_INTERNAL\_REFERENCE\_INTEGER\_OPS\_L2NORMALIZATION\_H\_}}
+\DoxyCodeLine{00017\ }
+\DoxyCodeLine{00018\ \textcolor{preprocessor}{\#include\ <algorithm>}}
+\DoxyCodeLine{00019\ }
+\DoxyCodeLine{00020\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/kernels/internal/common.h"{}}}
+\DoxyCodeLine{00021\ }
+\DoxyCodeLine{00022\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacetflite}{tflite}}\ \{}
+\DoxyCodeLine{00023\ \textcolor{keyword}{namespace\ }reference\_integer\_ops\ \{}
+\DoxyCodeLine{00024\ }
+\DoxyCodeLine{00025\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1reference__integer__ops_a3905d3faad9364fe658d9f3c40b6d24c}{L2Normalization}}(int32\_t\ \mbox{\hyperlink{tanh_8cpp_a3d0e49fe7ae38f6479154745fcddfdd1}{input\_zero\_point}},\ int32\_t\ \mbox{\hyperlink{log__softmax_8cpp_a92e854aebd9d62035d2fd510ab0c4a23}{outer\_size}},}
+\DoxyCodeLine{00026\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ int32\_t\ \mbox{\hyperlink{log__softmax_8cpp_a820c167ceaaa9759b0ca2695d22db55c}{depth}},\ \textcolor{keyword}{const}\ int8\_t*\ \mbox{\hyperlink{add__n__test_8cc_a5612ba79d1f0b544c7aeae4621166fea}{input\_data}},}
+\DoxyCodeLine{00027\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ int8\_t*\ \mbox{\hyperlink{add__n__test_8cc_a3305b43869c4b837b0a33c12cff5069b}{output\_data}})\ \{}
+\DoxyCodeLine{00028\ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ int8\_t\ kMinInt8\ =\ std::numeric\_limits<int8\_t>::min();}
+\DoxyCodeLine{00029\ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ int8\_t\ kMaxInt8\ =\ std::numeric\_limits<int8\_t>::max();}
+\DoxyCodeLine{00030\ \ \ \textcolor{comment}{//\ The\ output\ scale\ must\ be\ in\ sync\ with\ Prepare().}}
+\DoxyCodeLine{00031\ \ \ \textcolor{comment}{//\ Output\ is\ in\ 1/128\ scale\ so\ the\ actual\ output\ range\ is\ nudged\ from\ [-\/1,\ 1]}}
+\DoxyCodeLine{00032\ \ \ \textcolor{comment}{//\ to\ [-\/1,\ 127/128].}}
+\DoxyCodeLine{00033\ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ int32\_t\ kOutputScale\ =\ 7;}
+\DoxyCodeLine{00034\ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ outer\_index\ =\ 0;\ outer\_index\ <\ \mbox{\hyperlink{log__softmax_8cpp_a92e854aebd9d62035d2fd510ab0c4a23}{outer\_size}};\ ++outer\_index)\ \{}
+\DoxyCodeLine{00035\ \ \ \ \ \textcolor{comment}{//\ int32\_t\ =\ (int8\_t\ -\/\ int8\_t)\ \string^\ 2.}}
+\DoxyCodeLine{00036\ \ \ \ \ \textcolor{comment}{//\ ([-\/128,\ 127]\ -\/\ [-\/128,\ 127])\ \string^\ 2\ =\ [0,\ (2\string^8\ -\/\ 1)\string^2]\ so\ the\ accumulator\ is}}
+\DoxyCodeLine{00037\ \ \ \ \ \textcolor{comment}{//\ safe\ from\ overflowing\ in\ at\ least\ 2\string^16\ steps.}}
+\DoxyCodeLine{00038\ \ \ \ \ int32\_t\ acc\ =\ 0;}
+\DoxyCodeLine{00039\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ inner\_index\ =\ 0;\ inner\_index\ <\ \mbox{\hyperlink{log__softmax_8cpp_a820c167ceaaa9759b0ca2695d22db55c}{depth}};\ ++inner\_index)\ \{}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ int32\_t\ \mbox{\hyperlink{squeeze_8cpp_a9cebfb3d6ddd692fbdd268cf4b9ad024}{input}}\ =}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{add__n__test_8cc_a5612ba79d1f0b544c7aeae4621166fea}{input\_data}}[\mbox{\hyperlink{log__softmax_8cpp_a820c167ceaaa9759b0ca2695d22db55c}{depth}}\ *\ outer\_index\ +\ inner\_index]\ -\/\ \mbox{\hyperlink{tanh_8cpp_a3d0e49fe7ae38f6479154745fcddfdd1}{input\_zero\_point}};}
+\DoxyCodeLine{00042\ \ \ \ \ \ \ acc\ +=\ \mbox{\hyperlink{squeeze_8cpp_a9cebfb3d6ddd692fbdd268cf4b9ad024}{input}}\ *\ \mbox{\hyperlink{squeeze_8cpp_a9cebfb3d6ddd692fbdd268cf4b9ad024}{input}};}
+\DoxyCodeLine{00043\ \ \ \ \ \}}
+\DoxyCodeLine{00044\ \ \ \ \ int32\_t\ inv\_l2norm\_multiplier;}
+\DoxyCodeLine{00045\ \ \ \ \ \textcolor{keywordtype}{int}\ inv\_l2norm\_shift;}
+\DoxyCodeLine{00046\ \ \ \ \ \mbox{\hyperlink{namespacetflite_a79c83fc49a70b2327ad7a032aba876f1}{GetInvSqrtQuantizedMultiplierExp}}(acc,\ \mbox{\hyperlink{namespacetflite_a112b78cba61da67cc551da86e41c6761}{kReverseShift}},\ \&inv\_l2norm\_multiplier,}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&inv\_l2norm\_shift);}
+\DoxyCodeLine{00048\ }
+\DoxyCodeLine{00049\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ inner\_index\ =\ 0;\ inner\_index\ <\ \mbox{\hyperlink{log__softmax_8cpp_a820c167ceaaa9759b0ca2695d22db55c}{depth}};\ ++inner\_index)\ \{}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ int32\_t\ \mbox{\hyperlink{squeeze_8cpp_a9cebfb3d6ddd692fbdd268cf4b9ad024}{input}}\ =}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{add__n__test_8cc_a5612ba79d1f0b544c7aeae4621166fea}{input\_data}}[\mbox{\hyperlink{log__softmax_8cpp_a820c167ceaaa9759b0ca2695d22db55c}{depth}}\ *\ outer\_index\ +\ inner\_index]\ -\/\ \mbox{\hyperlink{tanh_8cpp_a3d0e49fe7ae38f6479154745fcddfdd1}{input\_zero\_point}};}
+\DoxyCodeLine{00052\ }
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \textcolor{comment}{//\ Rescale\ and\ downcast.\ Rescale\ is\ folded\ into\ the\ division.}}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ int32\_t\ output\_in\_q24\ =\ \mbox{\hyperlink{namespacetflite_a680551edd476cf4545b014a401a532cb}{MultiplyByQuantizedMultiplier}}(}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{squeeze_8cpp_a9cebfb3d6ddd692fbdd268cf4b9ad024}{input}},\ inv\_l2norm\_multiplier,\ inv\_l2norm\_shift\ +\ kOutputScale);}
+\DoxyCodeLine{00056\ \ \ \ \ \ \ output\_in\_q24\ =}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \ \ \ \ std::min(\textcolor{keyword}{static\_cast<}int32\_t\textcolor{keyword}{>}(kMaxInt8),}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::max(\textcolor{keyword}{static\_cast<}int32\_t\textcolor{keyword}{>}(kMinInt8),\ output\_in\_q24));}
+\DoxyCodeLine{00059\ \ \ \ \ \ \ \mbox{\hyperlink{add__n__test_8cc_a3305b43869c4b837b0a33c12cff5069b}{output\_data}}[\mbox{\hyperlink{log__softmax_8cpp_a820c167ceaaa9759b0ca2695d22db55c}{depth}}\ *\ outer\_index\ +\ inner\_index]\ =}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static\_cast<}int8\_t\textcolor{keyword}{>}(output\_in\_q24);}
+\DoxyCodeLine{00061\ \ \ \ \ \}}
+\DoxyCodeLine{00062\ \ \ \}}
+\DoxyCodeLine{00063\ \}}
+\DoxyCodeLine{00064\ \}\ \ \textcolor{comment}{//\ namespace\ reference\_integer\_ops}}
+\DoxyCodeLine{00065\ \}\ \ \textcolor{comment}{//\ namespace\ tflite}}
+\DoxyCodeLine{00066\ }
+\DoxyCodeLine{00067\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ TENSORFLOW\_LITE\_KERNELS\_INTERNAL\_REFERENCE\_INTEGER\_OPS\_L2NORMALIZATION\_H\_}}
+
+\end{DoxyCode}

@@ -1,0 +1,149 @@
+\doxysection{micro\+\_\+context.\+h}
+\hypertarget{tflite-micro-main_2tensorflow_2lite_2micro_2micro__context_8h_source}{}\label{tflite-micro-main_2tensorflow_2lite_2micro_2micro__context_8h_source}\index{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/main/tensorflow/lite/micro/micro\_context.h@{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/main/tensorflow/lite/micro/micro\_context.h}}
+\mbox{\hyperlink{tflite-micro-main_2tensorflow_2lite_2micro_2micro__context_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{/*\ Copyright\ 2021\ The\ TensorFlow\ Authors.\ All\ Rights\ Reserved.}}
+\DoxyCodeLine{00002\ \textcolor{comment}{}}
+\DoxyCodeLine{00003\ \textcolor{comment}{Licensed\ under\ the\ Apache\ License,\ Version\ 2.0\ (the\ "{}License"{});}}
+\DoxyCodeLine{00004\ \textcolor{comment}{you\ may\ not\ use\ this\ file\ except\ in\ compliance\ with\ the\ License.}}
+\DoxyCodeLine{00005\ \textcolor{comment}{You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{00006\ \textcolor{comment}{}}
+\DoxyCodeLine{00007\ \textcolor{comment}{\ \ \ \ http://www.apache.org/licenses/LICENSE-\/2.0}}
+\DoxyCodeLine{00008\ \textcolor{comment}{}}
+\DoxyCodeLine{00009\ \textcolor{comment}{Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ software}}
+\DoxyCodeLine{00010\ \textcolor{comment}{distributed\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,}}
+\DoxyCodeLine{00011\ \textcolor{comment}{WITHOUT\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,\ either\ express\ or\ implied.}}
+\DoxyCodeLine{00012\ \textcolor{comment}{See\ the\ License\ for\ the\ specific\ language\ governing\ permissions\ and}}
+\DoxyCodeLine{00013\ \textcolor{comment}{limitations\ under\ the\ License.}}
+\DoxyCodeLine{00014\ \textcolor{comment}{==============================================================================*/}}
+\DoxyCodeLine{00015\ }
+\DoxyCodeLine{00016\ \textcolor{preprocessor}{\#ifndef\ TENSORFLOW\_LITE\_MICRO\_MICRO\_CONTEXT\_H\_}}
+\DoxyCodeLine{00017\ \textcolor{preprocessor}{\#define\ TENSORFLOW\_LITE\_MICRO\_MICRO\_CONTEXT\_H\_}}
+\DoxyCodeLine{00018\ }
+\DoxyCodeLine{00019\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/c/common.h"{}}}
+\DoxyCodeLine{00020\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/micro/micro\_graph.h"{}}}
+\DoxyCodeLine{00021\ }
+\DoxyCodeLine{00022\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacetflite}{tflite}}\ \{}
+\DoxyCodeLine{00023\ \textcolor{comment}{//\ TODO(b/149795762):\ kTfLiteAbort\ cannot\ be\ part\ of\ the\ tflite\ TfLiteStatus.}}
+\DoxyCodeLine{00024\ \textcolor{keyword}{const}\ \mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2core_2c_2c__api__types_8h_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_ae45745a6841d6c80f87a64e4e683a8cb}{kTfLiteAbort}}\ =\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2core_2c_2c__api__types_8h_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\textcolor{keyword}{>}(15);}
+\DoxyCodeLine{00025\ }
+\DoxyCodeLine{00026\ \textcolor{comment}{//\ MicroContext\ is\ eventually\ going\ to\ become\ the\ API\ between\ TFLM\ and\ the}}
+\DoxyCodeLine{00027\ \textcolor{comment}{//\ kernels,\ replacing\ all\ the\ functions\ in\ TfLiteContext.\ The\ end\ state\ is\ code}}
+\DoxyCodeLine{00028\ \textcolor{comment}{//\ kernels\ to\ have\ code\ like:}}
+\DoxyCodeLine{00029\ \textcolor{comment}{//}}
+\DoxyCodeLine{00030\ \textcolor{comment}{//\ MicroContext*\ micro\_context\ =\ GetMicroContext(context);}}
+\DoxyCodeLine{00031\ \textcolor{comment}{//\ micro\_context-\/><TFLM\ kernel\ API>}}
+\DoxyCodeLine{00032\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classtflite_1_1_micro_context}{MicroContext}}\ \{}
+\DoxyCodeLine{00033\ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00034\ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{classtflite_1_1_micro_context_a8889ebe4785d5e7db7e62ba0111c3bcd}{\string~MicroContext}}()\ =\ \textcolor{keywordflow}{default};}
+\DoxyCodeLine{00035\ }
+\DoxyCodeLine{00036\ \ \ \textcolor{comment}{//\ Allocate\ persistent\ buffer\ which\ has\ the\ same\ life\ time\ as\ the\ interpreter.}}
+\DoxyCodeLine{00037\ \ \ \textcolor{comment}{//\ Returns\ nullptr\ on\ failure.}}
+\DoxyCodeLine{00038\ \ \ \textcolor{comment}{//\ The\ memory\ is\ allocated\ from\ the\ tail.}}
+\DoxyCodeLine{00039\ \ \ \textcolor{comment}{//\ This\ method\ is\ only\ available\ in\ Init\ or\ Prepare\ stage.}}
+\DoxyCodeLine{00040\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}*\ \mbox{\hyperlink{classtflite_1_1_micro_context_a1e9a9ed30126b2ed95d802b276a6f121}{AllocatePersistentBuffer}}(\textcolor{keywordtype}{size\_t}\ bytes)\ =\ 0;}
+\DoxyCodeLine{00041\ }
+\DoxyCodeLine{00042\ \ \ \textcolor{comment}{//\ Request\ a\ scratch\ buffer\ in\ the\ arena\ through\ static\ memory\ planning.}}
+\DoxyCodeLine{00043\ \ \ \textcolor{comment}{//\ This\ method\ is\ only\ available\ in\ Prepare\ stage\ and\ the\ buffer\ is\ allocated}}
+\DoxyCodeLine{00044\ \ \ \textcolor{comment}{//\ by\ the\ interpreter\ between\ Prepare\ and\ Eval\ stage.\ In\ Eval\ stage,}}
+\DoxyCodeLine{00045\ \ \ \textcolor{comment}{//\ GetScratchBuffer\ API\ can\ be\ used\ to\ fetch\ the\ address.}}
+\DoxyCodeLine{00046\ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2core_2c_2c__api__types_8h_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_context_ab9869b9308721725b0774efdcb4d798a}{RequestScratchBufferInArena}}(\textcolor{keywordtype}{size\_t}\ bytes,}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}*\ \mbox{\hyperlink{conv_8cpp_a82de2679c069b1bce97a7d4aeb83cf60}{buffer\_idx}})\ =\ 0;}
+\DoxyCodeLine{00048\ }
+\DoxyCodeLine{00049\ \ \ \textcolor{comment}{//\ Get\ the\ scratch\ buffer\ pointer.}}
+\DoxyCodeLine{00050\ \ \ \textcolor{comment}{//\ This\ method\ is\ only\ available\ in\ Eval\ stage.}}
+\DoxyCodeLine{00051\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}*\ \mbox{\hyperlink{classtflite_1_1_micro_context_a2592715eac095c9c4e9a59e2e5da8dba}{GetScratchBuffer}}(\textcolor{keywordtype}{int}\ \mbox{\hyperlink{conv_8cpp_a82de2679c069b1bce97a7d4aeb83cf60}{buffer\_idx}})\ =\ 0;}
+\DoxyCodeLine{00052\ }
+\DoxyCodeLine{00053\ \ \ \textcolor{comment}{//\ Returns\ a\ temporary\ TfLiteTensor\ struct\ for\ a\ given\ index.}}
+\DoxyCodeLine{00054\ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{struct_tf_lite_tensor}{TfLiteTensor}}*\ \mbox{\hyperlink{classtflite_1_1_micro_context_a8170a64da7f2c56d2588badddbafaf9f}{AllocateTempTfLiteTensor}}(\textcolor{keywordtype}{int}\ tensor\_idx)\ =\ 0;}
+\DoxyCodeLine{00055\ }
+\DoxyCodeLine{00056\ \ \ \textcolor{comment}{//\ Returns\ a\ temporary\ TfLiteTensor\ struct\ for\ the\ specified\ input\ tensor\ of\ a}}
+\DoxyCodeLine{00057\ \ \ \textcolor{comment}{//\ given\ mode.\ This\ is\ the\ recommended\ API\ over\ the\ deprecated}}
+\DoxyCodeLine{00058\ \ \ \textcolor{comment}{//\ GetInput/GetInputSafe\ to\ get\ a\ temp\ input\ tensor.\ The\ returned\ tensor\ shall}}
+\DoxyCodeLine{00059\ \ \ \textcolor{comment}{//\ be\ freed\ via\ calling\ DeallocateTempTfLiteTensor.}}
+\DoxyCodeLine{00060\ \ \ \mbox{\hyperlink{struct_tf_lite_tensor}{TfLiteTensor}}*\ \mbox{\hyperlink{classtflite_1_1_micro_context_a7980416d6d5aee196ff36a9cf69a96ec}{AllocateTempInputTensor}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{struct_tf_lite_node}{TfLiteNode}}*\ node,\ \textcolor{keywordtype}{int}\ index);}
+\DoxyCodeLine{00061\ }
+\DoxyCodeLine{00062\ \ \ \textcolor{comment}{//\ Returns\ a\ temporary\ TfLiteTensor\ struct\ for\ the\ specified\ output\ tensor\ of}}
+\DoxyCodeLine{00063\ \ \ \textcolor{comment}{//\ a\ given\ mode.\ This\ is\ the\ recommended\ API\ over\ the\ deprecated}}
+\DoxyCodeLine{00064\ \ \ \textcolor{comment}{//\ GetOutput/GetOutputSafe\ to\ get\ a\ temp\ output\ tensor.\ The\ returned\ tensor}}
+\DoxyCodeLine{00065\ \ \ \textcolor{comment}{//\ shall\ be\ freed\ via\ calling\ DeallocateTempTfLiteTensor.}}
+\DoxyCodeLine{00066\ \ \ \mbox{\hyperlink{struct_tf_lite_tensor}{TfLiteTensor}}*\ \mbox{\hyperlink{classtflite_1_1_micro_context_a718de3f707489f882c5f26a230a4948e}{AllocateTempOutputTensor}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{struct_tf_lite_node}{TfLiteNode}}*\ node,\ \textcolor{keywordtype}{int}\ index);}
+\DoxyCodeLine{00067\ }
+\DoxyCodeLine{00068\ \ \ \textcolor{comment}{//\ Returns\ a\ temporary\ TfLiteTensor\ struct\ for\ the\ specified\ intermediate}}
+\DoxyCodeLine{00069\ \ \ \textcolor{comment}{//\ tensor\ of\ a\ given\ mode.\ This\ is\ the\ recommended\ API\ over\ the\ deprecated}}
+\DoxyCodeLine{00070\ \ \ \textcolor{comment}{//\ GetIntermediates/GetIntermediatesSafe\ to\ get\ a\ temp\ intermediate\ tensor.}}
+\DoxyCodeLine{00071\ \ \ \textcolor{comment}{//\ The\ returned\ tensor\ shall\ be\ freed\ via\ calling\ DeallocateTempTfLiteTensor.}}
+\DoxyCodeLine{00072\ \ \ \mbox{\hyperlink{struct_tf_lite_tensor}{TfLiteTensor}}*\ \mbox{\hyperlink{classtflite_1_1_micro_context_abb87768cf27453c2ae13a17d89330c37}{AllocateTempIntermediateTensor}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{struct_tf_lite_node}{TfLiteNode}}*\ node,}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ index);}
+\DoxyCodeLine{00074\ }
+\DoxyCodeLine{00075\ \ \ \textcolor{comment}{//\ Deallocates\ a\ temp\ TfLiteTensor.}}
+\DoxyCodeLine{00076\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classtflite_1_1_micro_context_addf099ace361629f7de6d6b1ab73c763}{DeallocateTempTfLiteTensor}}(\mbox{\hyperlink{struct_tf_lite_tensor}{TfLiteTensor}}*\ \mbox{\hyperlink{namespacetensor}{tensor}})\ =\ 0;}
+\DoxyCodeLine{00077\ }
+\DoxyCodeLine{00078\ \ \ \textcolor{comment}{//\ Returns\ a\ pointer\ to\ a\ temporary\ buffer\ (from\ the\ arena).}}
+\DoxyCodeLine{00079\ \ \ \textcolor{comment}{//\ This\ API\ is\ only\ valid\ from\ the\ kernel's\ Prepare\ function\ and}}
+\DoxyCodeLine{00080\ \ \ \textcolor{comment}{//\ the\ buffer's\ lifetime\ is\ also\ that\ of\ the\ Prepare\ function.}}
+\DoxyCodeLine{00081\ \ \ \textcolor{keyword}{virtual}\ uint8\_t*\ \mbox{\hyperlink{classtflite_1_1_micro_context_a715454b4e0b1def59d4e5332866874d7}{AllocateTempBuffer}}(\textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{hello__world__model_8cc_a439227feff9d7f55384e8780cfc2eb82}{size}},\ \textcolor{keywordtype}{size\_t}\ alignment)\ =\ 0;}
+\DoxyCodeLine{00082\ }
+\DoxyCodeLine{00083\ \ \ \textcolor{comment}{//\ Signals\ that\ the\ temporary\ buffer\ is\ no\ longer\ needed.}}
+\DoxyCodeLine{00084\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classtflite_1_1_micro_context_ac032a4ae32aa8d5341817e266dcc13d0}{DeallocateTempBuffer}}(uint8\_t*\ buffer)\ =\ 0;}
+\DoxyCodeLine{00085\ }
+\DoxyCodeLine{00086\ \ \ \textcolor{comment}{//\ Returns\ a\ TfLiteEvalTensor\ struct\ for\ a\ given\ index.}}
+\DoxyCodeLine{00087\ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{struct_tf_lite_eval_tensor}{TfLiteEvalTensor}}*\ \mbox{\hyperlink{classtflite_1_1_micro_context_a089b0e4409f8902ed43eedf8150d86c2}{GetEvalTensor}}(\textcolor{keywordtype}{int}\ tensor\_idx)\ =\ 0;}
+\DoxyCodeLine{00088\ }
+\DoxyCodeLine{00089\ \ \ \textcolor{comment}{//\ Does\ not\ take\ ownership\ of\ the\ pointer\ and\ the\ pointer\ must\ refer\ to\ valid}}
+\DoxyCodeLine{00090\ \ \ \textcolor{comment}{//\ an\ object\ that\ outlive\ this\ class\ instance.}}
+\DoxyCodeLine{00091\ \ \ \textcolor{comment}{//\ This\ can\ only\ be\ called\ once\ to\ set\ one\ external\ context.}}
+\DoxyCodeLine{00092\ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2core_2c_2c__api__types_8h_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_context_af36cfc00096a8c5fa4bd75a383064518}{set\_external\_context}}(\textcolor{keywordtype}{void}*\ external\_context\_payload)\ =\ 0;}
+\DoxyCodeLine{00093\ }
+\DoxyCodeLine{00094\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}*\ \mbox{\hyperlink{classtflite_1_1_micro_context_a1ad4861a53785baa18765c397f9d5eed}{external\_context}}()\ =\ 0;}
+\DoxyCodeLine{00095\ }
+\DoxyCodeLine{00096\ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{classtflite_1_1_micro_graph}{MicroGraph}}\&\ \mbox{\hyperlink{classtflite_1_1_micro_context_a52b2defa7043493d8308f02ad6263101}{graph}}()\ =\ 0;}
+\DoxyCodeLine{00097\ }
+\DoxyCodeLine{00098\ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{00099\ \ \ \mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2micro_2compatibility_8h_a92a34c72cfcc4f6c5bd49086ba082af4}{TF\_LITE\_REMOVE\_VIRTUAL\_DELETE}}}
+\DoxyCodeLine{00100\ \};}
+\DoxyCodeLine{00101\ }
+\DoxyCodeLine{00102\ \textcolor{keyword}{inline}\ \mbox{\hyperlink{classtflite_1_1_micro_context}{MicroContext}}*\ \mbox{\hyperlink{namespacetflite_a3f7c8c5fa6562d79adb37b82df53afc9}{GetMicroContext}}(\textcolor{keyword}{const}\ \textcolor{keyword}{struct}\ \mbox{\hyperlink{struct_tf_lite_context}{TfLiteContext}}*\ context)\ \{}
+\DoxyCodeLine{00103\ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{reinterpret\_cast<}\mbox{\hyperlink{classtflite_1_1_micro_context}{MicroContext}}*\textcolor{keyword}{>}(context-\/>\mbox{\hyperlink{struct_tf_lite_context_af7d037c4fc03745bffe28e64b00bfe3c}{impl\_}});}
+\DoxyCodeLine{00104\ \}}
+\DoxyCodeLine{00105\ }
+\DoxyCodeLine{00106\ \textcolor{comment}{//\ Deprecated\ API.\ Prefer\ to\ using\ the\ MicroContext\ API\ directly\ from\ the}}
+\DoxyCodeLine{00107\ \textcolor{comment}{//\ kernels.}}
+\DoxyCodeLine{00108\ \textcolor{comment}{//\ TODO(b/213010668):\ migrate\ all\ existing\ kernels\ to\ use\ MicroContext,\ delete}}
+\DoxyCodeLine{00109\ \textcolor{comment}{//\ these\ functions,\ and\ remove\ corresponding\ members\ from\ the\ TfLiteContext}}
+\DoxyCodeLine{00110\ \textcolor{comment}{//\ struct\ for\ TFLM.}}
+\DoxyCodeLine{00111\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}*\ \mbox{\hyperlink{namespacetflite_ad1a54d92127ef698ad7f4c59c554d080}{MicroContextAllocatePersistentBuffer}}(\mbox{\hyperlink{struct_tf_lite_context}{TfLiteContext}}*\ ctx,}
+\DoxyCodeLine{00112\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ bytes)\ \{}
+\DoxyCodeLine{00113\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacetflite_a3f7c8c5fa6562d79adb37b82df53afc9}{GetMicroContext}}(ctx)-\/>\mbox{\hyperlink{classtflite_1_1_micro_context_a549d407f696d2dafb7215e71ddfffa45}{AllocatePersistentBuffer}}(bytes);}
+\DoxyCodeLine{00114\ \}}
+\DoxyCodeLine{00115\ \textcolor{keyword}{inline}\ \mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2core_2c_2c__api__types_8h_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_a5c7db27d4248218ec58cfe447dd49cf1}{MicroContextRequestScratchBufferInArena}}(\mbox{\hyperlink{struct_tf_lite_context}{TfLiteContext}}*\ ctx,}
+\DoxyCodeLine{00116\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ bytes,}
+\DoxyCodeLine{00117\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}*\ \mbox{\hyperlink{conv_8cpp_a82de2679c069b1bce97a7d4aeb83cf60}{buffer\_idx}})\ \{}
+\DoxyCodeLine{00118\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacetflite_a3f7c8c5fa6562d79adb37b82df53afc9}{GetMicroContext}}(ctx)-\/>\mbox{\hyperlink{classtflite_1_1_micro_context_a1c92387c941c59377bda78f58000d207}{RequestScratchBufferInArena}}(bytes,\ \mbox{\hyperlink{conv_8cpp_a82de2679c069b1bce97a7d4aeb83cf60}{buffer\_idx}});}
+\DoxyCodeLine{00119\ \}}
+\DoxyCodeLine{00120\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}*\ \mbox{\hyperlink{namespacetflite_a9688c5538646cdbd1fa6d36999d19434}{MicroContextGetScratchBuffer}}(\mbox{\hyperlink{struct_tf_lite_context}{TfLiteContext}}*\ ctx,\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{conv_8cpp_a82de2679c069b1bce97a7d4aeb83cf60}{buffer\_idx}})\ \{}
+\DoxyCodeLine{00121\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacetflite_a3f7c8c5fa6562d79adb37b82df53afc9}{GetMicroContext}}(ctx)-\/>\mbox{\hyperlink{classtflite_1_1_micro_context_a79954da9a161b3ea60dc5ef71f0c5fdd}{GetScratchBuffer}}(\mbox{\hyperlink{conv_8cpp_a82de2679c069b1bce97a7d4aeb83cf60}{buffer\_idx}});}
+\DoxyCodeLine{00122\ \}}
+\DoxyCodeLine{00123\ \textcolor{keyword}{inline}\ \mbox{\hyperlink{struct_tf_lite_tensor}{TfLiteTensor}}*\ \mbox{\hyperlink{namespacetflite_a4ab5c9315a674805883b066e146e88de}{MicroContextGetTensor}}(\textcolor{keyword}{const}\ \textcolor{keyword}{struct}\ \mbox{\hyperlink{struct_tf_lite_context}{TfLiteContext}}*\ context,}
+\DoxyCodeLine{00124\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ tensor\_idx)\ \{}
+\DoxyCodeLine{00125\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacetflite_a3f7c8c5fa6562d79adb37b82df53afc9}{GetMicroContext}}(context)-\/>\mbox{\hyperlink{classtflite_1_1_micro_context_a3283261b65c62367b38d51f65a0cd399}{AllocateTempTfLiteTensor}}(tensor\_idx);}
+\DoxyCodeLine{00126\ \}}
+\DoxyCodeLine{00127\ \textcolor{keyword}{inline}\ \mbox{\hyperlink{struct_tf_lite_eval_tensor}{TfLiteEvalTensor}}*\ \mbox{\hyperlink{namespacetflite_ac784aa693e12526f205798069f58f65c}{MicroContextGetEvalTensor}}(}
+\DoxyCodeLine{00128\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{struct}\ \mbox{\hyperlink{struct_tf_lite_context}{TfLiteContext}}*\ context,\ \textcolor{keywordtype}{int}\ tensor\_idx)\ \{}
+\DoxyCodeLine{00129\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacetflite_a3f7c8c5fa6562d79adb37b82df53afc9}{GetMicroContext}}(context)-\/>\mbox{\hyperlink{classtflite_1_1_micro_context_ab561603594aa8923b5d3502a58795ada}{GetEvalTensor}}(tensor\_idx);}
+\DoxyCodeLine{00130\ \}}
+\DoxyCodeLine{00131\ \textcolor{keyword}{inline}\ \mbox{\hyperlink{struct_tf_lite_external_context}{TfLiteExternalContext}}*\ \mbox{\hyperlink{namespacetflite_a015288777c2dfdf0ebabb42eb55079ec}{MicroContextGetExternalContext}}(}
+\DoxyCodeLine{00132\ \ \ \ \ \mbox{\hyperlink{struct_tf_lite_context}{TfLiteContext}}*\ context,\ \mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2core_2c_2common_8h_a6d1d3582ab46e837f9f108839232dc03}{TfLiteExternalContextType}}\ unused)\ \{}
+\DoxyCodeLine{00133\ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{reinterpret\_cast<}\mbox{\hyperlink{struct_tf_lite_external_context}{TfLiteExternalContext}}*\textcolor{keyword}{>}(}
+\DoxyCodeLine{00134\ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_a3f7c8c5fa6562d79adb37b82df53afc9}{GetMicroContext}}(context)-\/>\mbox{\hyperlink{classtflite_1_1_micro_context_aef93614ae4e9e6bd49ef0126d9df380c}{external\_context}}());}
+\DoxyCodeLine{00135\ \}}
+\DoxyCodeLine{00136\ }
+\DoxyCodeLine{00137\ \textcolor{comment}{//\ Requests\ that\ an\ error\ be\ reported\ with\ format\ string\ msg.}}
+\DoxyCodeLine{00138\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_a2502d0b00cd2016846e182dcdfaf342e}{MicroContextReportOpError}}(\textcolor{keyword}{struct}\ \mbox{\hyperlink{struct_tf_lite_context}{TfLiteContext}}*\ context,}
+\DoxyCodeLine{00139\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ format,\ ...);}
+\DoxyCodeLine{00140\ }
+\DoxyCodeLine{00141\ \}\ \ \textcolor{comment}{//\ namespace\ tflite}}
+\DoxyCodeLine{00142\ }
+\DoxyCodeLine{00143\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ TENSORFLOW\_LITE\_MICRO\_MICRO\_CONTEXT\_H\_}}
+
+\end{DoxyCode}

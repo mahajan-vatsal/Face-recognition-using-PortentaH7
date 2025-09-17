@@ -1,0 +1,74 @@
+\doxysection{ei\+\_\+utils.\+h}
+\hypertarget{ei__utils_8h_source}{}\label{ei__utils_8h_source}\index{Face\_Access\_inferencing/src/edge-\/impulse-\/sdk/dsp/ei\_utils.h@{Face\_Access\_inferencing/src/edge-\/impulse-\/sdk/dsp/ei\_utils.h}}
+\mbox{\hyperlink{ei__utils_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{00002\ \textcolor{comment}{\ *\ Copyright\ (c)\ 2024\ EdgeImpulse\ Inc.}}
+\DoxyCodeLine{00003\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00004\ \textcolor{comment}{\ *\ Generated\ by\ Edge\ Impulse\ and\ licensed\ under\ the\ applicable\ Edge\ Impulse}}
+\DoxyCodeLine{00005\ \textcolor{comment}{\ *\ Terms\ of\ Service.\ Community\ and\ Professional\ Terms\ of\ Service}}
+\DoxyCodeLine{00006\ \textcolor{comment}{\ *\ (https://docs.edgeimpulse.com/page/terms-\/of-\/service)\ or\ Enterprise\ Terms\ of}}
+\DoxyCodeLine{00007\ \textcolor{comment}{\ *\ Service\ (https://docs.edgeimpulse.com/page/enterprise-\/terms-\/of-\/service),}}
+\DoxyCodeLine{00008\ \textcolor{comment}{\ *\ according\ to\ your\ product\ plan\ subscription\ (the\ “License”).}}
+\DoxyCodeLine{00009\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00010\ \textcolor{comment}{\ *\ This\ software,\ documentation\ and\ other\ associated\ files\ (collectively\ referred}}
+\DoxyCodeLine{00011\ \textcolor{comment}{\ *\ to\ as\ the\ “Software”)\ is\ a\ single\ SDK\ variation\ generated\ by\ the\ Edge\ Impulse}}
+\DoxyCodeLine{00012\ \textcolor{comment}{\ *\ platform\ and\ requires\ an\ active\ paid\ Edge\ Impulse\ subscription\ to\ use\ this}}
+\DoxyCodeLine{00013\ \textcolor{comment}{\ *\ Software\ for\ any\ purpose.}}
+\DoxyCodeLine{00014\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00015\ \textcolor{comment}{\ *\ You\ may\ NOT\ use\ this\ Software\ unless\ you\ have\ an\ active\ Edge\ Impulse\ subscription}}
+\DoxyCodeLine{00016\ \textcolor{comment}{\ *\ that\ meets\ the\ eligibility\ requirements\ for\ the\ applicable\ License,\ subject\ to}}
+\DoxyCodeLine{00017\ \textcolor{comment}{\ *\ your\ full\ and\ continued\ compliance\ with\ the\ terms\ and\ conditions\ of\ the\ License,}}
+\DoxyCodeLine{00018\ \textcolor{comment}{\ *\ including\ without\ limitation\ any\ usage\ restrictions\ under\ the\ applicable\ License.}}
+\DoxyCodeLine{00019\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00020\ \textcolor{comment}{\ *\ If\ you\ do\ not\ have\ an\ active\ Edge\ Impulse\ product\ plan\ subscription,\ or\ if\ use}}
+\DoxyCodeLine{00021\ \textcolor{comment}{\ *\ of\ this\ Software\ exceeds\ the\ usage\ limitations\ of\ your\ Edge\ Impulse\ product\ plan}}
+\DoxyCodeLine{00022\ \textcolor{comment}{\ *\ subscription,\ you\ are\ not\ permitted\ to\ use\ this\ Software\ and\ must\ immediately}}
+\DoxyCodeLine{00023\ \textcolor{comment}{\ *\ delete\ and\ erase\ all\ copies\ of\ this\ Software\ within\ your\ control\ or\ possession.}}
+\DoxyCodeLine{00024\ \textcolor{comment}{\ *\ Edge\ Impulse\ reserves\ all\ rights\ and\ remedies\ available\ to\ enforce\ its\ rights.}}
+\DoxyCodeLine{00025\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00026\ \textcolor{comment}{\ *\ Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ the\ Software\ is}}
+\DoxyCodeLine{00027\ \textcolor{comment}{\ *\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,\ WITHOUT\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,}}
+\DoxyCodeLine{00028\ \textcolor{comment}{\ *\ either\ express\ or\ implied.\ See\ the\ License\ for\ the\ specific\ language\ governing}}
+\DoxyCodeLine{00029\ \textcolor{comment}{\ *\ permissions,\ disclaimers\ and\ limitations\ under\ the\ License.}}
+\DoxyCodeLine{00030\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{00031\ \textcolor{preprocessor}{\#ifndef\ \_\_EI\_UTILS\_\_H\_\_}}
+\DoxyCodeLine{00032\ \textcolor{preprocessor}{\#define\ \_\_EI\_UTILS\_\_H\_\_}}
+\DoxyCodeLine{00033\ }
+\DoxyCodeLine{00034\ \textcolor{preprocessor}{\#define\ ARRAY\_LENGTH(array)\ (sizeof((array))/sizeof((array)[0]))}}
+\DoxyCodeLine{00035\ }
+\DoxyCodeLine{00036\ \textcolor{comment}{//\ Stringify}}
+\DoxyCodeLine{00037\ \textcolor{preprocessor}{\#define\ ei\_xstr(a)\ ei\_str(a)}}
+\DoxyCodeLine{00038\ \textcolor{preprocessor}{\#define\ ei\_str(a)\ \#a}}
+\DoxyCodeLine{00039\ }
+\DoxyCodeLine{00040\ \textcolor{comment}{//\ Bit\ manipulation}}
+\DoxyCodeLine{00041\ }
+\DoxyCodeLine{00042\ \textcolor{comment}{//Set\ bit\ y\ (0-\/indexed)\ of\ x\ to\ '1'\ by\ generating\ a\ a\ mask\ with\ a\ '1'\ in\ the\ proper\ bit\ location\ and\ ORing\ x\ with\ the\ mask.}}
+\DoxyCodeLine{00043\ \textcolor{preprocessor}{\#define\ SET\_BIT\_POS(x,y)\ (x\ |=\ (1\ <<\ y))}}
+\DoxyCodeLine{00044\ }
+\DoxyCodeLine{00045\ \textcolor{comment}{//Set\ bit\ y\ (0-\/indexed)\ of\ x\ to\ '0'\ by\ generating\ a\ mask\ with\ a\ '0'\ in\ the\ y\ position\ and\ 1's\ elsewhere\ then\ ANDing\ the\ mask\ with\ x.}}
+\DoxyCodeLine{00046\ \textcolor{preprocessor}{\#define\ CLEAR\_BIT\_POS(x,y)\ (x\ \&=\ \string~(1<<\ y))}}
+\DoxyCodeLine{00047\ }
+\DoxyCodeLine{00048\ \textcolor{comment}{//Return\ '1'\ if\ the\ bit\ value\ at\ position\ y\ within\ x\ is\ '1'\ and\ '0'\ if\ it's\ 0\ by\ ANDing\ x\ with\ a\ bit\ mask\ where\ the\ bit\ in\ y's\ position\ is\ '1'\ and\ '0'\ elsewhere\ and\ comparing\ it\ to\ all\ 0's.\ \ Returns\ '1'\ in\ least\ significant\ bit\ position\ if\ the\ value\ of\ the\ bit\ is\ '1',\ '0'\ if\ it\ was\ '0'.}}
+\DoxyCodeLine{00049\ \textcolor{preprocessor}{\#define\ TEST\_BIT\_POS(x,y)\ ((0u\ ==\ (x\ \&\ (1<<y)))?0u:1u)}}
+\DoxyCodeLine{00050\ }
+\DoxyCodeLine{00051\ \textcolor{comment}{//Toggle\ bit\ y\ (0-\/index)\ of\ x\ to\ the\ inverse:\ '0'\ becomes\ '1',\ '1'\ becomes\ '0'\ by\ XORing\ x\ with\ a\ bitmask\ where\ the\ bit\ in\ position\ y\ is\ '1'\ and\ all\ others\ are\ '0'.}}
+\DoxyCodeLine{00052\ \textcolor{preprocessor}{\#define\ TOGGLE\_BIT\_POS(x,y)\ (x\ \string^=\ (1<<y))}}
+\DoxyCodeLine{00053\ }
+\DoxyCodeLine{00054\ \textcolor{comment}{//\ Set\ the\ flag\ bits\ in\ word.}}
+\DoxyCodeLine{00055\ \textcolor{preprocessor}{\#define\ \ \ \ \ SET\_BIT\_MASK(y,\ flag)\ \ \ (\ y\ |=\ (flag)\ )}}
+\DoxyCodeLine{00056\ }
+\DoxyCodeLine{00057\ \textcolor{comment}{//\ Clear\ the\ flag\ bits\ in\ word.}}
+\DoxyCodeLine{00058\ \textcolor{preprocessor}{\#define\ \ \ \ \ CLEAR\_BIT\_MASK(y,\ flag)\ \ \ (\ y\ \&=\ \string~(flag)\ )}}
+\DoxyCodeLine{00059\ }
+\DoxyCodeLine{00060\ \textcolor{comment}{//\ Flip\ the\ flag\ bits\ in\ word.}}
+\DoxyCodeLine{00061\ \textcolor{preprocessor}{\#define\ \ \ \ \ TOGGLE\_BIT\_MASK(y,\ flag)\ \ \ (\ y\ \string^=\ (flag)\ )}}
+\DoxyCodeLine{00062\ }
+\DoxyCodeLine{00063\ \textcolor{comment}{//\ Test\ whether\ all\ the\ flag\ bits\ in\ word\ are\ set.}}
+\DoxyCodeLine{00064\ \textcolor{preprocessor}{\#define\ \ \ \ \ TEST\_BIT\_MASK(y,\ flag)\ \ \ (\ ((y)\&(flag))\ ==\ (flag)\ )}}
+\DoxyCodeLine{00065\ }
+\DoxyCodeLine{00066\ \textcolor{preprocessor}{\#define\ EI\_TRY(x)\ \{\ auto\ res\ =\ (x);\ if(res\ !=\ EIDSP\_OK)\ \{\ return\ res;\ \}\ \}}}
+\DoxyCodeLine{00067\ }
+\DoxyCodeLine{00068\ \textcolor{preprocessor}{\#endif\ \ }}
+
+\end{DoxyCode}

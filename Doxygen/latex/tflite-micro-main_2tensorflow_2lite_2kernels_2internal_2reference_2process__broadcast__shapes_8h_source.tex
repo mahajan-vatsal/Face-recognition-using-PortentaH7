@@ -1,0 +1,146 @@
+\doxysection{process\+\_\+broadcast\+\_\+shapes.\+h}
+\hypertarget{tflite-micro-main_2tensorflow_2lite_2kernels_2internal_2reference_2process__broadcast__shapes_8h_source}{}\label{tflite-micro-main_2tensorflow_2lite_2kernels_2internal_2reference_2process__broadcast__shapes_8h_source}\index{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/main/tensorflow/lite/kernels/internal/reference/process\_broadcast\_shapes.h@{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/main/tensorflow/lite/kernels/internal/reference/process\_broadcast\_shapes.h}}
+\mbox{\hyperlink{tflite-micro-main_2tensorflow_2lite_2kernels_2internal_2reference_2process__broadcast__shapes_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{/*\ Copyright\ 2019\ The\ TensorFlow\ Authors.\ All\ Rights\ Reserved.}}
+\DoxyCodeLine{00002\ \textcolor{comment}{}}
+\DoxyCodeLine{00003\ \textcolor{comment}{Licensed\ under\ the\ Apache\ License,\ Version\ 2.0\ (the\ "{}License"{});}}
+\DoxyCodeLine{00004\ \textcolor{comment}{you\ may\ not\ use\ this\ file\ except\ in\ compliance\ with\ the\ License.}}
+\DoxyCodeLine{00005\ \textcolor{comment}{You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{00006\ \textcolor{comment}{}}
+\DoxyCodeLine{00007\ \textcolor{comment}{\ \ \ \ http://www.apache.org/licenses/LICENSE-\/2.0}}
+\DoxyCodeLine{00008\ \textcolor{comment}{}}
+\DoxyCodeLine{00009\ \textcolor{comment}{Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ software}}
+\DoxyCodeLine{00010\ \textcolor{comment}{distributed\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,}}
+\DoxyCodeLine{00011\ \textcolor{comment}{WITHOUT\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,\ either\ express\ or\ implied.}}
+\DoxyCodeLine{00012\ \textcolor{comment}{See\ the\ License\ for\ the\ specific\ language\ governing\ permissions\ and}}
+\DoxyCodeLine{00013\ \textcolor{comment}{limitations\ under\ the\ License.}}
+\DoxyCodeLine{00014\ \textcolor{comment}{==============================================================================*/}}
+\DoxyCodeLine{00015\ \textcolor{preprocessor}{\#ifndef\ TENSORFLOW\_LITE\_KERNELS\_INTERNAL\_REFERENCE\_PROCESS\_BROADCAST\_SHAPES\_H\_}}
+\DoxyCodeLine{00016\ \textcolor{preprocessor}{\#define\ TENSORFLOW\_LITE\_KERNELS\_INTERNAL\_REFERENCE\_PROCESS\_BROADCAST\_SHAPES\_H\_}}
+\DoxyCodeLine{00017\ }
+\DoxyCodeLine{00018\ \textcolor{preprocessor}{\#include\ <algorithm>}}
+\DoxyCodeLine{00019\ }
+\DoxyCodeLine{00020\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/kernels/internal/types.h"{}}}
+\DoxyCodeLine{00021\ }
+\DoxyCodeLine{00022\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacetflite}{tflite}}\ \{}
+\DoxyCodeLine{00023\ }
+\DoxyCodeLine{00024\ \textcolor{keyword}{namespace\ }reference\_ops\ \{}
+\DoxyCodeLine{00025\ }
+\DoxyCodeLine{00026\ \textcolor{comment}{//\ Consolidates\ dimensions\ in\ broadcast\ inputs,\ checks\ for\ five-\/fold\ pattern.}}
+\DoxyCodeLine{00027\ \textcolor{comment}{//}}
+\DoxyCodeLine{00028\ \textcolor{comment}{//\ For\ example,\ if\ sequence\ of\ dimensions\ of\ one\ input\ is}}
+\DoxyCodeLine{00029\ \textcolor{comment}{//\ ...,\ 1,\ 3,\ 1,\ 7,\ 9,\ 5,...\ and\ the\ other\ is\ ...,\ 2,\ 3,\ 1,\ 7,\ 1,\ 1,\ ...}}
+\DoxyCodeLine{00030\ \textcolor{comment}{//\ we\ can\ consolidate\ these\ as}}
+\DoxyCodeLine{00031\ \textcolor{comment}{//\ ...,\ 1,\ 3*7,\ 9*5,\ ...\ and\ 2,\ 3*7,\ 1.}}
+\DoxyCodeLine{00032\ \textcolor{comment}{//}}
+\DoxyCodeLine{00033\ \textcolor{comment}{//\ The\ category\ is\ updated\ in\ the\ less-\/frequent\ case\ of\ shapes\ that\ are}}
+\DoxyCodeLine{00034\ \textcolor{comment}{//\ not\ suited\ to\ a\ fivefold-\/loop\ broadcast.}}
+\DoxyCodeLine{00035\ \textcolor{comment}{//}}
+\DoxyCodeLine{00036\ \textcolor{comment}{//\ Falls\ back\ to\ generic\ pattern\ when\ it\ does\ not\ know\ how\ to\ process\ properly.}}
+\DoxyCodeLine{00037\ \textcolor{comment}{//}}
+\DoxyCodeLine{00038\ \textcolor{comment}{//\ Returns\ true\ iff\ there\ is\ some\ sort\ of\ broadcast,\ which\ includes\ five-\/fold}}
+\DoxyCodeLine{00039\ \textcolor{comment}{//\ patterns\ and\ falling\ back\ to\ generic\ broadcast.}}
+\DoxyCodeLine{00040\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespacetflite_1_1reference__ops_aad9bb265bf749be7c60ec9f2c596f2bd}{ProcessBroadcastShapes}}(\textcolor{keyword}{const}\ RuntimeShape\&\ shape0,}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ RuntimeShape\&\ shape1,}
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structtflite_1_1_arithmetic_params}{tflite::ArithmeticParams}}*\ \mbox{\hyperlink{comparisons_8cpp_a434686eb00eea897154eb5c3f9364ef7}{params}})\ \{}
+\DoxyCodeLine{00043\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ dims\_count\ =}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ std::max(shape0.DimensionsCount(),\ shape1.DimensionsCount());}
+\DoxyCodeLine{00045\ }
+\DoxyCodeLine{00046\ \ \ \mbox{\hyperlink{comparisons_8cpp_a434686eb00eea897154eb5c3f9364ef7}{params}}-\/>broadcast\_category\ =\ \mbox{\hyperlink{namespacetflite_ac451e8b3c0d5139ab3404eecfc87992ea2b25dfc070122a240f4d1155b9cc6d55}{BroadcastableOpCategory::kGenericBroadcast}};}
+\DoxyCodeLine{00047\ \ \ RuntimeShape\ scalar\_shape(dims\_count,\ 1);}
+\DoxyCodeLine{00048\ }
+\DoxyCodeLine{00049\ \ \ \textcolor{keyword}{auto}\ extended\_shape0\ =\ \mbox{\hyperlink{classtflite_1_1_runtime_shape_a647264349b0f266c94102a8b3dda22cf}{RuntimeShape::ExtendedShape}}(dims\_count,\ shape0);}
+\DoxyCodeLine{00050\ \ \ \textcolor{keyword}{auto}\ extended\_shape1\ =\ \mbox{\hyperlink{classtflite_1_1_runtime_shape_a647264349b0f266c94102a8b3dda22cf}{RuntimeShape::ExtendedShape}}(dims\_count,\ shape1);}
+\DoxyCodeLine{00051\ }
+\DoxyCodeLine{00052\ \ \ \textcolor{comment}{//\ Check\ for\ "{}exact"{}\ match,\ implicitly\ accepting\ any\ scalar\ shapes.}}
+\DoxyCodeLine{00053\ \ \ \textcolor{keywordflow}{if}\ (extended\_shape0\ ==\ extended\_shape1)\ \{}
+\DoxyCodeLine{00054\ \ \ \ \ \mbox{\hyperlink{comparisons_8cpp_a434686eb00eea897154eb5c3f9364ef7}{params}}-\/>broadcast\_category\ =\ \mbox{\hyperlink{namespacetflite_ac451e8b3c0d5139ab3404eecfc87992ea474311140849eefcabdcbb172ad82866}{BroadcastableOpCategory::kNonBroadcast}};}
+\DoxyCodeLine{00055\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00056\ \ \ \}}
+\DoxyCodeLine{00057\ }
+\DoxyCodeLine{00058\ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ dims\_count\ -\/\ 1;\ i\ >=\ 0;\ -\/-\/i)\ \{}
+\DoxyCodeLine{00059\ \ \ \ \ \textcolor{keywordflow}{if}\ (extended\_shape0.Dims(i)\ ==\ extended\_shape1.Dims(i))\ \{}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \textcolor{keywordflow}{continue};}
+\DoxyCodeLine{00061\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (extended\_shape0.Dims(i)\ ==\ 1)\ \{}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \mbox{\hyperlink{comparisons_8cpp_a434686eb00eea897154eb5c3f9364ef7}{params}}-\/>broadcast\_category\ =}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_ac451e8b3c0d5139ab3404eecfc87992eacbb6717a21700840a8cc79eb660284d5}{BroadcastableOpCategory::kFirstInputBroadcastsFast}};}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00065\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (extended\_shape1.Dims(i)\ ==\ 1)\ \{}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \mbox{\hyperlink{comparisons_8cpp_a434686eb00eea897154eb5c3f9364ef7}{params}}-\/>broadcast\_category\ =}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_ac451e8b3c0d5139ab3404eecfc87992ea617cfcafa34e51f4c5f637e365f400c3}{BroadcastableOpCategory::kSecondInputBroadcastsFast}};}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00069\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \textcolor{comment}{//\ This\ case\ is\ erroneous:\ there\ is\ a\ dimension\ that\ does\ not\ match\ and}}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \textcolor{comment}{//\ is\ not\ a\ broadcast\ from\ one\ shape\ to\ the\ other.}}
+\DoxyCodeLine{00072\ \ \ \ \ \ \ \mbox{\hyperlink{comparisons_8cpp_a434686eb00eea897154eb5c3f9364ef7}{params}}-\/>broadcast\_category\ =\ \mbox{\hyperlink{namespacetflite_ac451e8b3c0d5139ab3404eecfc87992ea2b25dfc070122a240f4d1155b9cc6d55}{BroadcastableOpCategory::kGenericBroadcast}};}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00074\ \ \ \ \ \}}
+\DoxyCodeLine{00075\ \ \ \}}
+\DoxyCodeLine{00076\ }
+\DoxyCodeLine{00077\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{comparisons_8cpp_a434686eb00eea897154eb5c3f9364ef7}{params}}-\/>broadcast\_category\ !=}
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_ac451e8b3c0d5139ab3404eecfc87992eacbb6717a21700840a8cc79eb660284d5}{BroadcastableOpCategory::kFirstInputBroadcastsFast}}\ \&\&}
+\DoxyCodeLine{00079\ \ \ \ \ \ \ \mbox{\hyperlink{comparisons_8cpp_a434686eb00eea897154eb5c3f9364ef7}{params}}-\/>broadcast\_category\ !=}
+\DoxyCodeLine{00080\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_ac451e8b3c0d5139ab3404eecfc87992ea617cfcafa34e51f4c5f637e365f400c3}{BroadcastableOpCategory::kSecondInputBroadcastsFast}})\ \{}
+\DoxyCodeLine{00081\ \ \ \ \ \textcolor{comment}{//\ This\ is\ unreachable\ because\ at\ least\ one\ else\ clause\ in\ the\ above\ loop}}
+\DoxyCodeLine{00082\ \ \ \ \ \textcolor{comment}{//\ must\ be\ reached.}}
+\DoxyCodeLine{00083\ \ \ \ \ \mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2kernels_2internal_2compatibility_8h_aae1ef2f661f926fac4c1555e46d4c704}{TFLITE\_DCHECK}}(\textcolor{keyword}{false});}
+\DoxyCodeLine{00084\ \ \ \ \ \mbox{\hyperlink{comparisons_8cpp_a434686eb00eea897154eb5c3f9364ef7}{params}}-\/>broadcast\_category\ =\ \mbox{\hyperlink{namespacetflite_ac451e8b3c0d5139ab3404eecfc87992ea474311140849eefcabdcbb172ad82866}{BroadcastableOpCategory::kNonBroadcast}};}
+\DoxyCodeLine{00085\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00086\ \ \ \}}
+\DoxyCodeLine{00087\ }
+\DoxyCodeLine{00088\ \ \ \textcolor{comment}{//\ From\ this\ point\ it\ is\ assumed\ contractually\ that\ corresponding\ dimensions}}
+\DoxyCodeLine{00089\ \ \ \textcolor{comment}{//\ in\ shape0\ and\ shape1\ are\ either\ (a)\ equal\ or\ (b)\ one\ or\ other\ equals\ 1.}}
+\DoxyCodeLine{00090\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{bool}\ swap\_inputs\ =\ \mbox{\hyperlink{comparisons_8cpp_a434686eb00eea897154eb5c3f9364ef7}{params}}-\/>broadcast\_category\ ==}
+\DoxyCodeLine{00091\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_ac451e8b3c0d5139ab3404eecfc87992ea617cfcafa34e51f4c5f637e365f400c3}{BroadcastableOpCategory::kSecondInputBroadcastsFast}};}
+\DoxyCodeLine{00092\ \ \ \textcolor{keyword}{const}\ RuntimeShape*\ shape\_a\ =}
+\DoxyCodeLine{00093\ \ \ \ \ \ \ swap\_inputs\ ?\ \&extended\_shape1\ :\ \&extended\_shape0;}
+\DoxyCodeLine{00094\ \ \ \textcolor{keyword}{const}\ RuntimeShape*\ shape\_b\ =}
+\DoxyCodeLine{00095\ \ \ \ \ \ \ swap\_inputs\ ?\ \&extended\_shape0\ :\ \&extended\_shape1;}
+\DoxyCodeLine{00096\ }
+\DoxyCodeLine{00097\ \ \ \textcolor{keywordtype}{int}\ i\ =\ dims\_count\ -\/\ 1;}
+\DoxyCodeLine{00098\ \ \ \mbox{\hyperlink{comparisons_8cpp_a434686eb00eea897154eb5c3f9364ef7}{params}}-\/>broadcast\_shape[0]\ =\ 1;}
+\DoxyCodeLine{00099\ \ \ \mbox{\hyperlink{comparisons_8cpp_a434686eb00eea897154eb5c3f9364ef7}{params}}-\/>broadcast\_shape[1]\ =\ 1;}
+\DoxyCodeLine{00100\ \ \ \mbox{\hyperlink{comparisons_8cpp_a434686eb00eea897154eb5c3f9364ef7}{params}}-\/>broadcast\_shape[2]\ =\ 1;}
+\DoxyCodeLine{00101\ \ \ \mbox{\hyperlink{comparisons_8cpp_a434686eb00eea897154eb5c3f9364ef7}{params}}-\/>broadcast\_shape[3]\ =\ 1;}
+\DoxyCodeLine{00102\ \ \ \mbox{\hyperlink{comparisons_8cpp_a434686eb00eea897154eb5c3f9364ef7}{params}}-\/>broadcast\_shape[4]\ =\ 1;}
+\DoxyCodeLine{00103\ \ \ \textcolor{comment}{//\ y\_0\ is\ greedy:\ include\ dims\ if\ both\ or\ neither\ equal\ 1:\ in\ other\ words,}}
+\DoxyCodeLine{00104\ \ \ \textcolor{comment}{//\ test\ for\ equality\ rather\ than\ (shape\_a-\/>Dims(i)\ !=\ 1).}}
+\DoxyCodeLine{00105\ \ \ \textcolor{keywordflow}{while}\ (i\ >=\ 0\ \&\&\ shape\_a-\/>Dims(i)\ ==\ shape\_b-\/>Dims(i))\ \{}
+\DoxyCodeLine{00106\ \ \ \ \ \mbox{\hyperlink{comparisons_8cpp_a434686eb00eea897154eb5c3f9364ef7}{params}}-\/>broadcast\_shape[4]\ *=\ shape\_b-\/>Dims(i);}
+\DoxyCodeLine{00107\ \ \ \ \ -\/-\/i;}
+\DoxyCodeLine{00108\ \ \ \}}
+\DoxyCodeLine{00109\ \ \ \textcolor{comment}{//\ Here\ either\ input\_a\ or\ input\_b\ has\ dim\ of\ 1\ (if\ i\ >=\ 0).\ \ If\ it\ is\ input\_b}}
+\DoxyCodeLine{00110\ \ \ \textcolor{comment}{//\ that\ has\ the\ unit\ dimension,\ the\ next\ two\ loops\ are\ not\ entered.}}
+\DoxyCodeLine{00111\ \ \ \textcolor{keywordflow}{while}\ (i\ >=\ 0\ \&\&\ shape\_a-\/>Dims(i)\ ==\ 1)\ \{}
+\DoxyCodeLine{00112\ \ \ \ \ \mbox{\hyperlink{comparisons_8cpp_a434686eb00eea897154eb5c3f9364ef7}{params}}-\/>broadcast\_shape[3]\ *=\ shape\_b-\/>Dims(i);}
+\DoxyCodeLine{00113\ \ \ \ \ -\/-\/i;}
+\DoxyCodeLine{00114\ \ \ \}}
+\DoxyCodeLine{00115\ \ \ \textcolor{keywordflow}{while}\ (i\ >=\ 0\ \&\&\ shape\_a-\/>Dims(i)\ ==\ shape\_b-\/>Dims(i))\ \{}
+\DoxyCodeLine{00116\ \ \ \ \ \mbox{\hyperlink{comparisons_8cpp_a434686eb00eea897154eb5c3f9364ef7}{params}}-\/>broadcast\_shape[2]\ *=\ shape\_a-\/>Dims(i);}
+\DoxyCodeLine{00117\ \ \ \ \ -\/-\/i;}
+\DoxyCodeLine{00118\ \ \ \}}
+\DoxyCodeLine{00119\ \ \ \textcolor{comment}{//\ Here\ either\ input\_a\ or\ input\_b\ has\ dim\ of\ 1\ (if\ i\ >=\ 0).}}
+\DoxyCodeLine{00120\ \ \ \textcolor{keywordflow}{while}\ (i\ >=\ 0\ \&\&\ shape\_b-\/>Dims(i)\ ==\ 1)\ \{}
+\DoxyCodeLine{00121\ \ \ \ \ \mbox{\hyperlink{comparisons_8cpp_a434686eb00eea897154eb5c3f9364ef7}{params}}-\/>broadcast\_shape[1]\ *=\ shape\_a-\/>Dims(i);}
+\DoxyCodeLine{00122\ \ \ \ \ -\/-\/i;}
+\DoxyCodeLine{00123\ \ \ \}}
+\DoxyCodeLine{00124\ \ \ \textcolor{keywordflow}{while}\ (i\ >=\ 0\ \&\&\ shape\_a-\/>Dims(i)\ ==\ shape\_b-\/>Dims(i))\ \{}
+\DoxyCodeLine{00125\ \ \ \ \ \mbox{\hyperlink{comparisons_8cpp_a434686eb00eea897154eb5c3f9364ef7}{params}}-\/>broadcast\_shape[0]\ *=\ shape\_b-\/>Dims(i);}
+\DoxyCodeLine{00126\ \ \ \ \ -\/-\/i;}
+\DoxyCodeLine{00127\ \ \ \}}
+\DoxyCodeLine{00128\ }
+\DoxyCodeLine{00129\ \ \ \textcolor{comment}{//\ Rarer\ case\ is\ when\ the\ broadcast\ dimensions\ cannot\ be\ handled\ by\ a\ fivefold}}
+\DoxyCodeLine{00130\ \ \ \textcolor{comment}{//\ loop.}}
+\DoxyCodeLine{00131\ \ \ \textcolor{keywordflow}{if}\ (i\ >=\ 0)\ \{}
+\DoxyCodeLine{00132\ \ \ \ \ \mbox{\hyperlink{comparisons_8cpp_a434686eb00eea897154eb5c3f9364ef7}{params}}-\/>broadcast\_category\ =\ \mbox{\hyperlink{namespacetflite_ac451e8b3c0d5139ab3404eecfc87992ea2b25dfc070122a240f4d1155b9cc6d55}{BroadcastableOpCategory::kGenericBroadcast}};}
+\DoxyCodeLine{00133\ \ \ \}}
+\DoxyCodeLine{00134\ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00135\ \}}
+\DoxyCodeLine{00136\ }
+\DoxyCodeLine{00137\ \}\ \ \textcolor{comment}{//\ namespace\ reference\_ops}}
+\DoxyCodeLine{00138\ \}\ \ \textcolor{comment}{//\ namespace\ tflite}}
+\DoxyCodeLine{00139\ }
+\DoxyCodeLine{00140\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ TENSORFLOW\_LITE\_KERNELS\_INTERNAL\_REFERENCE\_PROCESS\_BROADCAST\_SHAPES\_H\_}}
+
+\end{DoxyCode}

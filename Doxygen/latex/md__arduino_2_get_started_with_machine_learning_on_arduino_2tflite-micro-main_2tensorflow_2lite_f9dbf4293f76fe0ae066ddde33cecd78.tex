@@ -1,0 +1,90 @@
+\chapter{README}
+\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_f9dbf4293f76fe0ae066ddde33cecd78}{}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_f9dbf4293f76fe0ae066ddde33cecd78}\index{README@{README}}
+
+\begin{DoxyItemize}
+\item TFLM Code Size FAQ
+\begin{DoxyItemize}
+\item Methodology to estimate code size of TFLM
+\item Sample code size of the TFLM Framework
+\item Tips to improve code size
+\begin{DoxyItemize}
+\item Only register kernels that a model needs
+\end{DoxyItemize}
+\end{DoxyItemize}
+\end{DoxyItemize}\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_f9dbf4293f76fe0ae066ddde33cecd78_autotoc_md265}{}\doxysection{\texorpdfstring{TFLM Code Size FAQ}{TFLM Code Size FAQ}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_f9dbf4293f76fe0ae066ddde33cecd78_autotoc_md265}
+This document outlines basic steps to measure the code size of TFLM. On a platform based on ELF file format, the code size refers to the text section size of an ELF file. Additionally, this document outlines some common tips to keep the code size small.
+
+Note that a complete application that depends on the TFLM typically would also include a TFLite model in flatbuffer and a memory arena, which are in data sections of an ELF file. Their size is an important aspect to the overall memory footprint, but not discussed in this document.\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_f9dbf4293f76fe0ae066ddde33cecd78_autotoc_md266}{}\doxysubsection{\texorpdfstring{Methodology to estimate code size of TFLM}{Methodology to estimate code size of TFLM}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_f9dbf4293f76fe0ae066ddde33cecd78_autotoc_md266}
+Based on the \href{https://arxiv.org/pdf/2010.08678.pdf}{\texttt{ architecture description}}, we further classify the source code into two categories\+: TFLM framework and kernels as illustrated in the below diagram\+:
+
+
+
+TFLM Framework includes infrastructure such as interpreter, memory planner etc. The size of TFLM Framework is a fixed cost of using TFLM and primarily includes codes under tensorflow/lite/micro, but excludes those in tensorflow/lite/micro/kernels.
+
+On the other hand, the code size contribution from the kernels depends on and scales with the model that an application uses. This contribution from the kernels mostly includes the codes in tensorflow/lite/micro/kernels as well as third party libraries.
+
+To measure the size of the TFLM Framework that is independent of a model, the methodology that is adopted in this document is as follows\+:
+
+
+\begin{DoxyEnumerate}
+\item Build the {\ttfamily baseline\+\_\+memory\+\_\+footprint} target in {\ttfamily tensorflow/lite/micro/examples/memory\+\_\+footprint/}. Estimate its code size via a {\ttfamily size} command.
+\end{DoxyEnumerate}
+\begin{DoxyEnumerate}
+\item Build the {\ttfamily interpreter\+\_\+memory\+\_\+footprint} target in {\ttfamily tensorflow/lite/micro/examples/memory\+\_\+footprint/}. Estimate its code size via a {\ttfamily size} command.
+\end{DoxyEnumerate}
+\begin{DoxyEnumerate}
+\item Subtract the two sizes from the above two steps provides the code size estimation of the TFLM Framework.
+\end{DoxyEnumerate}
+
+Step 1 gives the code size for a "{}no-\/op application"{} that would typically include platform-\/specific initialization. We assume that this is a fixed size that is independent of TFLM.
+
+Step 2 produces a binary that includes the code needed to create an interpreter instance (i.\+e. the TFLM framework). It explicitly avoids pulling in any kernel code such that the increase between step 2 and step 1 is a reasonable estimate of the footprint of the TFLM framework. Note that since we do not register any kernel code, the binary from step 2 can not run any actual inference.
+
+The code size estimation via the above steps also include additional system libraries that need to be pulled in due the use of the TFLM.
+
+A similar process can be adopted to further estimate the size of kernels. For example, the size of kernels used in keyword detection can be estimated by the following steps
+
+
+\begin{DoxyEnumerate}
+\item Build the {\ttfamily keyword\+\_\+benchmark} target in {\ttfamily tensorflow/lite/micro/benchmarks}. Estimate its code size via a {\ttfamily size} command.
+\end{DoxyEnumerate}
+\begin{DoxyEnumerate}
+\item Subtract to get the code size difference between the {\ttfamily keyword\+\_\+benchmark} and {\ttfamily interpreter\+\_\+memory\+\_\+footprint}
+\end{DoxyEnumerate}
+
+It may be worth noting that the above methodology will attribute the code size from {\ttfamily Micro\+Mutable\+Op\+Resolver} towards the code size of kernels, instead of counting them in the code size estimation of the TFLM Framework. We adopt this methodology due to its simplicity, robustness and the ability to include the contribution of system libraries.\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_f9dbf4293f76fe0ae066ddde33cecd78_autotoc_md267}{}\doxysubsection{\texorpdfstring{Sample code size of the TFLM Framework}{Sample code size of the TFLM Framework}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_f9dbf4293f76fe0ae066ddde33cecd78_autotoc_md267}
+The below code size number of the TFLM Framework is shown as references only.
+
+For a 64 bit x86 platform, the TFLM code size obtained through the above method is 20411 bytes.
+
+For an embedded bluepill ARM platform, the TFLM code size obtained through the above method is 9732 bytes.\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_f9dbf4293f76fe0ae066ddde33cecd78_autotoc_md268}{}\doxysubsection{\texorpdfstring{Tips to improve code size}{Tips to improve code size}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_f9dbf4293f76fe0ae066ddde33cecd78_autotoc_md268}
+\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_f9dbf4293f76fe0ae066ddde33cecd78_autotoc_md269}{}\doxysubsubsection{\texorpdfstring{Only register kernels that a model needs}{Only register kernels that a model needs}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_f9dbf4293f76fe0ae066ddde33cecd78_autotoc_md269}
+One common issue that leads to unnecessary large code size is forgetting to only register only kernels that a model needs and ending up registering all kernels.
+
+Therefore, when moving off the exploration stage, it is better to only register for kernels that the model needs to have a smaller footprint. The following code snipet shows how to do so using the keyword detection as an example\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{comment}{//\ Create\ OpResolver\ class\ with\ up\ to\ 6\ kernel\ support.}}
+\DoxyCodeLine{\textcolor{keyword}{using\ }\mbox{\hyperlink{namespacetflite_a2d154b7054b05851332aa1fede4e96c6}{KeywordOpResolver}}\ =\ MicroMutableOpResolver<6>;}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//\ Avoid\ the\ usage\ of\ new\ by\ placement\ new}}
+\DoxyCodeLine{uint8\_t\ \mbox{\hyperlink{namespacetflite_a76e2517d963a0fb8e87e049c43632c35}{op\_resolver\_buffer}}[\textcolor{keyword}{sizeof}(\mbox{\hyperlink{namespacetflite_a2d154b7054b05851332aa1fede4e96c6}{KeywordOpResolver}})];}
+\DoxyCodeLine{\mbox{\hyperlink{namespacetflite_a2d154b7054b05851332aa1fede4e96c6}{KeywordOpResolver}}*\ op\_resolver\ =\ \textcolor{keyword}{new}\ (\mbox{\hyperlink{namespacetflite_a76e2517d963a0fb8e87e049c43632c35}{op\_resolver\_buffer}})\ \mbox{\hyperlink{namespacetflite_a2d154b7054b05851332aa1fede4e96c6}{KeywordOpResolver}}();}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//\ Only\ add\ the\ required\ kernel}}
+\DoxyCodeLine{op\_resolver-\/>AddFullyConnected(\mbox{\hyperlink{namespacetflite_aad4964712f02a4d3458b72d83fcdc1fe}{tflite::Register\_FULLY\_CONNECTED\_INT8}}());}
+\DoxyCodeLine{op\_resolver-\/>AddQuantize();}
+\DoxyCodeLine{op\_resolver-\/>AddSoftmax(\mbox{\hyperlink{namespacetflite_afd21a15543134fd670b983bb8ca83ad1}{tflite::Register\_SOFTMAX\_INT8\_INT16}}());}
+\DoxyCodeLine{op\_resolver-\/>AddSvdf(\mbox{\hyperlink{namespacetflite_a0d50d889baf2a178979bcc38e36f7dc0}{tflite::Register\_SVDF\_INT8}}());}
+\DoxyCodeLine{}
+\DoxyCodeLine{...}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//\ Pass\ the\ OpResolver\ to\ the\ interpreter}}
+\DoxyCodeLine{tflite::MicroInterpreter\ *\ \mbox{\hyperlink{_inference_allocate_tensor_8cpp_a0d8f3bb5211083760f7c593d57adb17d}{interpreter}}\ =\ tflite::MicroInterpeter::Create(}
+\DoxyCodeLine{\ \ \ \ g\_keyword\_scrambled\_model\_data,\ op\_resolver,\ \mbox{\hyperlink{network__tester__test_8cc_abf99e32bec994276b2bcf77385c93365}{tensor\_arena}},\ \mbox{\hyperlink{add_2integration__tests_8cc_a2a246bf52e36e3cc606daab4dcea6781}{kTensorArenaSize}},\ profiler);}
+
+\end{DoxyCode}
+
+
+TODO(b/201351077)\+: add more tips to improve code size. 

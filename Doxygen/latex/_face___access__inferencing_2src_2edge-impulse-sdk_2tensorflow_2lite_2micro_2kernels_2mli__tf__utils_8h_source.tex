@@ -1,0 +1,321 @@
+\doxysection{mli\+\_\+tf\+\_\+utils.\+h}
+\hypertarget{_face___access__inferencing_2src_2edge-impulse-sdk_2tensorflow_2lite_2micro_2kernels_2mli__tf__utils_8h_source}{}\label{_face___access__inferencing_2src_2edge-impulse-sdk_2tensorflow_2lite_2micro_2kernels_2mli__tf__utils_8h_source}\index{Face\_Access\_inferencing/src/edge-\/impulse-\/sdk/tensorflow/lite/micro/kernels/mli\_tf\_utils.h@{Face\_Access\_inferencing/src/edge-\/impulse-\/sdk/tensorflow/lite/micro/kernels/mli\_tf\_utils.h}}
+\mbox{\hyperlink{_face___access__inferencing_2src_2edge-impulse-sdk_2tensorflow_2lite_2micro_2kernels_2mli__tf__utils_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{//\ Patched\ by\ Edge\ Impulse\ to\ include\ reference\ and\ hardware-\/accelerated\ kernels}}
+\DoxyCodeLine{00002\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{ei__classifier__config_8h}{../../../../classifier/ei\_classifier\_config.h}}"{}}}
+\DoxyCodeLine{00003\ \textcolor{preprocessor}{\#if\ EI\_CLASSIFIER\_TFLITE\_ENABLE\_ARC\ ==\ 1}}
+\DoxyCodeLine{00004\ \textcolor{comment}{/*\ Copyright\ 2021\ The\ TensorFlow\ Authors.\ All\ Rights\ Reserved.}}
+\DoxyCodeLine{00005\ \textcolor{comment}{}}
+\DoxyCodeLine{00006\ \textcolor{comment}{Licensed\ under\ the\ Apache\ License,\ Version\ 2.0\ (the\ "{}License"{});}}
+\DoxyCodeLine{00007\ \textcolor{comment}{you\ may\ not\ use\ this\ file\ except\ in\ compliance\ with\ the\ License.}}
+\DoxyCodeLine{00008\ \textcolor{comment}{You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{00009\ \textcolor{comment}{}}
+\DoxyCodeLine{00010\ \textcolor{comment}{\ \ \ \ http://www.apache.org/licenses/LICENSE-\/2.0}}
+\DoxyCodeLine{00011\ \textcolor{comment}{}}
+\DoxyCodeLine{00012\ \textcolor{comment}{Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ software}}
+\DoxyCodeLine{00013\ \textcolor{comment}{distributed\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,}}
+\DoxyCodeLine{00014\ \textcolor{comment}{WITHOUT\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,\ either\ express\ or\ implied.}}
+\DoxyCodeLine{00015\ \textcolor{comment}{See\ the\ License\ for\ the\ specific\ language\ governing\ permissions\ and}}
+\DoxyCodeLine{00016\ \textcolor{comment}{limitations\ under\ the\ License.}}
+\DoxyCodeLine{00017\ \textcolor{comment}{==============================================================================*/}}
+\DoxyCodeLine{00018\ }
+\DoxyCodeLine{00019\ \textcolor{preprocessor}{\#ifndef\ TENSORFLOW\_LITE\_MICRO\_KERNELS\_ARC\_MLI\_TF\_UTILS\_H\_}}
+\DoxyCodeLine{00020\ \textcolor{preprocessor}{\#define\ TENSORFLOW\_LITE\_MICRO\_KERNELS\_ARC\_MLI\_TF\_UTILS\_H\_}}
+\DoxyCodeLine{00021\ }
+\DoxyCodeLine{00022\ \textcolor{preprocessor}{\#include\ "{}mli\_api.h"{}}\ \ \textcolor{comment}{//\ NOLINT}}
+\DoxyCodeLine{00023\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{_face___access__inferencing_2src_2edge-impulse-sdk_2tensorflow_2lite_2micro_2kernels_2mli__interface_8h}{mli\_interface.h}}"{}}}
+\DoxyCodeLine{00024\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{_face___access__inferencing_2src_2edge-impulse-sdk_2tensorflow_2lite_2kernels_2internal_2common_8h}{edge-\/impulse-\/sdk/tensorflow/lite/kernels/internal/common.h}}"{}}}
+\DoxyCodeLine{00025\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{_face___access__inferencing_2src_2edge-impulse-sdk_2tensorflow_2lite_2kernels_2internal_2tensor__ctypes_8h}{edge-\/impulse-\/sdk/tensorflow/lite/kernels/internal/tensor\_ctypes.h}}"{}}}
+\DoxyCodeLine{00026\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{_face___access__inferencing_2src_2edge-impulse-sdk_2tensorflow_2lite_2micro_2kernels_2kernel__util_8h}{edge-\/impulse-\/sdk/tensorflow/lite/micro/kernels/kernel\_util.h}}"{}}}
+\DoxyCodeLine{00027\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{_face___access__inferencing_2src_2edge-impulse-sdk_2tensorflow_2lite_2micro_2micro__log_8h}{edge-\/impulse-\/sdk/tensorflow/lite/micro/micro\_log.h}}"{}}}
+\DoxyCodeLine{00028\ }
+\DoxyCodeLine{00029\ \textcolor{preprocessor}{\#define\ KRNL\_C\_DIM\_NHWC\ 0\ \ }\textcolor{comment}{//\ output\ channels}}
+\DoxyCodeLine{00030\ }
+\DoxyCodeLine{00031\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacetflite}{tflite}}\ \{}
+\DoxyCodeLine{00032\ \textcolor{keyword}{namespace\ }ops\ \{}
+\DoxyCodeLine{00033\ \textcolor{keyword}{namespace\ }micro\ \{}
+\DoxyCodeLine{00034\ }
+\DoxyCodeLine{00035\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1ops_1_1micro_ad3445cf3ec51447164e596ab9592103a}{ConvertToMliTensorData}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{struct_tf_lite_tensor}{TfLiteTensor}}*\ tfT,}
+\DoxyCodeLine{00036\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ MliTensorInterface*\ mliT,}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ is\_bias\_tensor)\ \{}
+\DoxyCodeLine{00038\ \ \ \textcolor{comment}{//\ Data\ is\ NULL\ until\ MliTensorAttachBuffer\ is\ called.}}
+\DoxyCodeLine{00039\ \ \ mliT-\/>SetElType(tfT-\/>\mbox{\hyperlink{struct_tf_lite_tensor_a24d579d439274a598ce79f0ec6bf6f50}{type}});}
+\DoxyCodeLine{00040\ \ \ \textcolor{keywordflow}{if}\ (tfT-\/>\mbox{\hyperlink{struct_tf_lite_tensor_a24d579d439274a598ce79f0ec6bf6f50}{type}}\ ==\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_a8a47ba81bdef28b5c479ee7928a7d123aa5aabb7d65c4d50cda0658c6ecb4851c}{kTfLiteInt8}})\ \{}
+\DoxyCodeLine{00041\ \ \ \ \ mliT-\/>SetData<int8\_t>(\textcolor{keyword}{nullptr},\ tfT-\/>\mbox{\hyperlink{struct_tf_lite_tensor_a65082739eecbd6d52d7d339d43b87606}{bytes}});}
+\DoxyCodeLine{00042\ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (tfT-\/>\mbox{\hyperlink{struct_tf_lite_tensor_a24d579d439274a598ce79f0ec6bf6f50}{type}}\ ==\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_a8a47ba81bdef28b5c479ee7928a7d123a3be7bb6b2164f8d28936ed3c3649182a}{kTfLiteInt32}})\ \{}
+\DoxyCodeLine{00043\ \ \ \ \ mliT-\/>SetData<int32\_t>(\textcolor{keyword}{nullptr},\ tfT-\/>\mbox{\hyperlink{struct_tf_lite_tensor_a65082739eecbd6d52d7d339d43b87606}{bytes}});}
+\DoxyCodeLine{00044\ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00045\ \ \ \ \ \mbox{\hyperlink{_face___access__inferencing_2src_2edge-impulse-sdk_2tensorflow_2lite_2micro_2micro__log_8h_ab9bf491b4a37b06ba732fd7de6b04cb2}{MicroPrintf}}(\textcolor{stringliteral}{"{}Wrong\ data\ type.\ Expected\ int8\_t\ or\ int32\_t."{}});}
+\DoxyCodeLine{00046\ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src42c086e4473e7d05e4bf9eb4ee8591b1_a4bcc2836b3aadc325710951434580109}{TFLITE\_ABORT}};}
+\DoxyCodeLine{00047\ \ \ \}}
+\DoxyCodeLine{00048\ \ \ \textcolor{keyword}{const}\ int32\_t\ dims\_count\ =\ \mbox{\hyperlink{namespacetflite_a575226cacf2453458286f00dd4bed1b3}{GetTensorShape}}(tfT).\mbox{\hyperlink{classtflite_1_1_runtime_shape_a9de8e21fa79a2a74e69578f0240f4ebe}{DimensionsCount}}();}
+\DoxyCodeLine{00049\ \ \ *mliT-\/>Rank()\ =\ is\_bias\_tensor\ ?\ 1\ :\ dims\_count;}
+\DoxyCodeLine{00050\ }
+\DoxyCodeLine{00051\ \ \ \textcolor{keywordtype}{int}\ mli\_tensor\_memstride\ =\ 1;}
+\DoxyCodeLine{00052\ \ \ \textcolor{keywordflow}{if}\ (is\_bias\_tensor)\ \{}
+\DoxyCodeLine{00053\ \ \ \ \ mliT-\/>Shape()[0]\ =\ \mbox{\hyperlink{namespacetflite_a575226cacf2453458286f00dd4bed1b3}{GetTensorShape}}(tfT).\mbox{\hyperlink{classtflite_1_1_runtime_shape_a2039ed030a02c05b73a0ea723339a808}{Dims}}(dims\_count\ -\/\ 1);}
+\DoxyCodeLine{00054\ \ \ \ \ mliT-\/>MemStride()[0]\ =\ mli\_tensor\_memstride;}
+\DoxyCodeLine{00055\ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00056\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ dims\_count\ -\/\ 1;\ i\ >=\ 0;\ -\/-\/i)\ \{}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ mliT-\/>Shape()[i]\ =\ \mbox{\hyperlink{namespacetflite_a575226cacf2453458286f00dd4bed1b3}{GetTensorShape}}(tfT).\mbox{\hyperlink{classtflite_1_1_runtime_shape_a2039ed030a02c05b73a0ea723339a808}{Dims}}(i);}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ mliT-\/>MemStride()[i]\ =\ mli\_tensor\_memstride;}
+\DoxyCodeLine{00059\ \ \ \ \ \ \ mli\_tensor\_memstride\ *=\ \mbox{\hyperlink{namespacetflite_a575226cacf2453458286f00dd4bed1b3}{GetTensorShape}}(tfT).\mbox{\hyperlink{classtflite_1_1_runtime_shape_a2039ed030a02c05b73a0ea723339a808}{Dims}}(i);}
+\DoxyCodeLine{00060\ \ \ \ \ \}}
+\DoxyCodeLine{00061\ \ \ \}}
+\DoxyCodeLine{00062\ \}}
+\DoxyCodeLine{00063\ }
+\DoxyCodeLine{00064\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1ops_1_1micro_acc9bb99724724839f127eef50f447218}{ConvertToMliQuantParams}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{struct_tf_lite_tensor}{TfLiteTensor}}*\ tfT,}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ MliTensorInterface*\ mliT)\ \{}
+\DoxyCodeLine{00066\ \ \ *mliT-\/>Dim()\ =\ -\/1;}
+\DoxyCodeLine{00067\ \textcolor{preprocessor}{\#ifdef\ MLI\_2\_0}}
+\DoxyCodeLine{00068\ \ \ *mliT-\/>ZeroPointCapacity()\ =\ 0;}
+\DoxyCodeLine{00069\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00070\ \ \ *mliT-\/>ZeroPoint<int16\_t*>()\ =\ tfT-\/>\mbox{\hyperlink{struct_tf_lite_tensor_ad0fbad4e97f0be0a6e4bfa1b2be0e3fe}{params}}.\mbox{\hyperlink{struct_tf_lite_quantization_params_a7bfb85a682ab431a6c0c609d3938ab6e}{zero\_point}};}
+\DoxyCodeLine{00071\ \ \ \textcolor{keywordtype}{float}\ fscale\ =\ tfT-\/>\mbox{\hyperlink{struct_tf_lite_tensor_ad0fbad4e97f0be0a6e4bfa1b2be0e3fe}{params}}.\mbox{\hyperlink{struct_tf_lite_quantization_params_aedc85f69317ce1c27e6e88f886ea8af8}{scale}};}
+\DoxyCodeLine{00072\ \ \ mliT-\/>SetScale(fscale);}
+\DoxyCodeLine{00073\ \}}
+\DoxyCodeLine{00074\ }
+\DoxyCodeLine{00075\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1ops_1_1micro_a45ea380e22bb7ace8e209945f28bd6ec}{ConvertToMliQuantParamsPerChannel}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{struct_tf_lite_tensor}{TfLiteTensor}}*\ tfT,}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ MliTensorInterface*\ mliT,}
+\DoxyCodeLine{00077\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ is\_bias\_tensor)\ \{}
+\DoxyCodeLine{00078\ \ \ \textcolor{comment}{//\ mli\ tensor\ scale\ and\ zero\_point\ arrays\ should\ be\ allocated\ at\ this\ point}}
+\DoxyCodeLine{00079\ \textcolor{preprocessor}{\#ifdef\ MLI\_2\_0}}
+\DoxyCodeLine{00080\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src82599f02174ce2f1c2fd003f3eee8b73_a21ca1982910062a76721e3b80fd4275e}{TFLITE\_DCHECK\_NE}}(*mliT-\/>Scale<int16\_t**>(),\ 0);}
+\DoxyCodeLine{00081\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src82599f02174ce2f1c2fd003f3eee8b73_a21ca1982910062a76721e3b80fd4275e}{TFLITE\_DCHECK\_NE}}(*mliT-\/>ZeroPoint<int16\_t**>(),\ 0);}
+\DoxyCodeLine{00082\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00083\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src82599f02174ce2f1c2fd003f3eee8b73_a21ca1982910062a76721e3b80fd4275e}{TFLITE\_DCHECK\_NE}}(*mliT-\/>Scale<int32\_t**>(),\ 0);}
+\DoxyCodeLine{00084\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src82599f02174ce2f1c2fd003f3eee8b73_a21ca1982910062a76721e3b80fd4275e}{TFLITE\_DCHECK\_NE}}(*mliT-\/>ZeroPoint<int16\_t**>(),\ 0);}
+\DoxyCodeLine{00085\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00086\ }
+\DoxyCodeLine{00087\ \ \ \textcolor{comment}{//\ get\ per\ channel\ quantization\ parameters}}
+\DoxyCodeLine{00088\ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}*\ affine\_quantization\ =}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \textcolor{keyword}{reinterpret\_cast<}\mbox{\hyperlink{struct_tf_lite_affine_quantization}{TfLiteAffineQuantization}}*\textcolor{keyword}{>}(tfT-\/>\mbox{\hyperlink{struct_tf_lite_tensor_aa4efa609d9ad9c78c5f53a592020de9e}{quantization}}.\mbox{\hyperlink{struct_tf_lite_quantization_ad9fa8b753fc13a8328697b7538ad8580}{params}});}
+\DoxyCodeLine{00090\ \ \ int32\_t\ quantized\_dimension\ =}
+\DoxyCodeLine{00091\ \ \ \ \ \ \ is\_bias\_tensor\ ?\ 0\ :\ affine\_quantization-\/>\mbox{\hyperlink{struct_tf_lite_affine_quantization_ab59ebe2c790ca6067e9792f2c7eb3a19}{quantized\_dimension}};}
+\DoxyCodeLine{00092\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{stacker_8cc_a345cae2db28059ee72015d7c6acc9dd5}{num\_channels}}\ =\ mliT-\/>Shape()[quantized\_dimension];}
+\DoxyCodeLine{00093\ }
+\DoxyCodeLine{00094\ \ \ *mliT-\/>Dim()\ =\ quantized\_dimension;}
+\DoxyCodeLine{00095\ }
+\DoxyCodeLine{00096\ \ \ \textcolor{comment}{//\ set\ capacities}}
+\DoxyCodeLine{00097\ \textcolor{preprocessor}{\#ifdef\ MLI\_2\_0}}
+\DoxyCodeLine{00098\ \ \ *mliT-\/>ScaleFracBitsCapacity()\ =\ \mbox{\hyperlink{stacker_8cc_a345cae2db28059ee72015d7c6acc9dd5}{num\_channels}}\ *\ \textcolor{keyword}{sizeof}(int8\_t);}
+\DoxyCodeLine{00099\ \ \ *mliT-\/>ScaleCapacity()\ =\ \mbox{\hyperlink{stacker_8cc_a345cae2db28059ee72015d7c6acc9dd5}{num\_channels}}\ *\ \textcolor{keyword}{sizeof}(int16\_t);}
+\DoxyCodeLine{00100\ \ \ *mliT-\/>ZeroPointCapacity()\ =\ \mbox{\hyperlink{stacker_8cc_a345cae2db28059ee72015d7c6acc9dd5}{num\_channels}}\ *\ \textcolor{keyword}{sizeof}(int16\_t);}
+\DoxyCodeLine{00101\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00102\ \ \ \textcolor{keywordtype}{float}*\ fscale\ =\ affine\_quantization-\/>scale-\/>data;}
+\DoxyCodeLine{00103\ \ \ mliT-\/>SetScalePerChannel(fscale,\ \mbox{\hyperlink{stacker_8cc_a345cae2db28059ee72015d7c6acc9dd5}{num\_channels}});}
+\DoxyCodeLine{00104\ }
+\DoxyCodeLine{00105\ \textcolor{preprocessor}{\#ifdef\ MLI\_2\_0}}
+\DoxyCodeLine{00106\ \ \ int16\_t*\ \mbox{\hyperlink{batch__matmul__test_8cc_a26c07acd3fa6a6da13ddae2bc5c64b55}{zero\_point}}\ =\ *mliT-\/>ZeroPoint<int16\_t**>();}
+\DoxyCodeLine{00107\ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ \mbox{\hyperlink{stacker_8cc_a345cae2db28059ee72015d7c6acc9dd5}{num\_channels}};\ i++)\ \{}
+\DoxyCodeLine{00108\ \ \ \ \ \mbox{\hyperlink{batch__matmul__test_8cc_a26c07acd3fa6a6da13ddae2bc5c64b55}{zero\_point}}[i]\ =\ tfT-\/>\mbox{\hyperlink{struct_tf_lite_tensor_ad0fbad4e97f0be0a6e4bfa1b2be0e3fe}{params}}.\mbox{\hyperlink{struct_tf_lite_quantization_params_a7bfb85a682ab431a6c0c609d3938ab6e}{zero\_point}};}
+\DoxyCodeLine{00109\ \ \ \}}
+\DoxyCodeLine{00110\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00111\ \}}
+\DoxyCodeLine{00112\ }
+\DoxyCodeLine{00113\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ datatype>}
+\DoxyCodeLine{00114\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1ops_1_1micro_a76406fe47978c773a72df74146718223}{MliTensorAttachBuffer}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{struct_tf_lite_eval_tensor}{TfLiteEvalTensor}}*,}
+\DoxyCodeLine{00115\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ MliTensorInterface*);}
+\DoxyCodeLine{00116\ }
+\DoxyCodeLine{00117\ \textcolor{keyword}{template}\ <>}
+\DoxyCodeLine{00118\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1ops_1_1micro_a10e348a9b3aab2a3396f63b63e308e9a}{MliTensorAttachBuffer<int8\_t>}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{struct_tf_lite_eval_tensor}{TfLiteEvalTensor}}*\ tfT,}
+\DoxyCodeLine{00119\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ MliTensorInterface*\ mliT)\ \{}
+\DoxyCodeLine{00120\ \ \ \textcolor{comment}{//\ "{}const\_cast"{}\ here\ used\ to\ attach\ const\ data\ buffer\ to\ the\ initially}}
+\DoxyCodeLine{00121\ \ \ \textcolor{comment}{//\ non-\/const\ mli\_tensor.\ This\ is\ required\ by\ current\ implementation\ of\ MLI}}
+\DoxyCodeLine{00122\ \ \ \textcolor{comment}{//\ backend\ and\ planned\ for\ redesign\ due\ to\ this\ and\ some\ other\ aspects.}}
+\DoxyCodeLine{00123\ \ \ mliT-\/>SetData<int8\_t>(}
+\DoxyCodeLine{00124\ \ \ \ \ \ \ \textcolor{keyword}{const\_cast<}int8\_t*\textcolor{keyword}{>}(\mbox{\hyperlink{namespacetflite_1_1micro_a0e66bf95a19a5f5522df24cc23afc68f}{tflite::micro::GetTensorData<int8\_t>}}(tfT)),}
+\DoxyCodeLine{00125\ \ \ \ \ \ \ *mliT-\/>DataCapacity());}
+\DoxyCodeLine{00126\ \}}
+\DoxyCodeLine{00127\ }
+\DoxyCodeLine{00128\ \textcolor{keyword}{template}\ <>}
+\DoxyCodeLine{00129\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1ops_1_1micro_a9082c498139da6a519107e4c1138ff95}{MliTensorAttachBuffer<int32\_t>}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{struct_tf_lite_eval_tensor}{TfLiteEvalTensor}}*\ tfT,}
+\DoxyCodeLine{00130\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ MliTensorInterface*\ mliT)\ \{}
+\DoxyCodeLine{00131\ \ \ \textcolor{comment}{//\ "{}const\_cast"{}\ here\ used\ to\ attach\ const\ data\ buffer\ to\ the\ initially}}
+\DoxyCodeLine{00132\ \ \ \textcolor{comment}{//\ non-\/const\ mli\_tensor.\ This\ is\ required\ by\ current\ implementation\ of\ MLI}}
+\DoxyCodeLine{00133\ \ \ \textcolor{comment}{//\ backend\ and\ planned\ for\ redesign\ due\ to\ this\ and\ some\ other\ aspects.}}
+\DoxyCodeLine{00134\ \ \ mliT-\/>SetData<int32\_t>(}
+\DoxyCodeLine{00135\ \ \ \ \ \ \ \textcolor{keyword}{const\_cast<}int32\_t*\textcolor{keyword}{>}(\mbox{\hyperlink{namespacetflite_1_1micro_a0e66bf95a19a5f5522df24cc23afc68f}{tflite::micro::GetTensorData<int32\_t>}}(tfT)),}
+\DoxyCodeLine{00136\ \ \ \ \ \ \ *mliT-\/>DataCapacity());}
+\DoxyCodeLine{00137\ \}}
+\DoxyCodeLine{00138\ }
+\DoxyCodeLine{00139\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1ops_1_1micro_a8e001c152a65812e9946f04acff4e8d4}{ConvertToMliTensor}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{struct_tf_lite_tensor}{TfLiteTensor}}*\ tfT,}
+\DoxyCodeLine{00140\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ MliTensorInterface*\ mliT)\ \{}
+\DoxyCodeLine{00141\ \ \ \mbox{\hyperlink{namespacetflite_1_1ops_1_1micro_ad3445cf3ec51447164e596ab9592103a}{ConvertToMliTensorData}}(tfT,\ mliT,\ \textcolor{keyword}{false});}
+\DoxyCodeLine{00142\ \ \ \mbox{\hyperlink{namespacetflite_1_1ops_1_1micro_acc9bb99724724839f127eef50f447218}{ConvertToMliQuantParams}}(tfT,\ mliT);}
+\DoxyCodeLine{00143\ \}}
+\DoxyCodeLine{00144\ }
+\DoxyCodeLine{00145\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1ops_1_1micro_a0d444b338c9de1ad5ad0a7b9356bfae9}{ConvertToMliTensorPerChannel}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{struct_tf_lite_tensor}{TfLiteTensor}}*\ tfT,}
+\DoxyCodeLine{00146\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ MliTensorInterface*\ mliT,}
+\DoxyCodeLine{00147\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ is\_bias\_tensor)\ \{}
+\DoxyCodeLine{00148\ \ \ \mbox{\hyperlink{namespacetflite_1_1ops_1_1micro_ad3445cf3ec51447164e596ab9592103a}{ConvertToMliTensorData}}(tfT,\ mliT,\ is\_bias\_tensor);}
+\DoxyCodeLine{00149\ \ \ \mbox{\hyperlink{namespacetflite_1_1ops_1_1micro_a45ea380e22bb7ace8e209945f28bd6ec}{ConvertToMliQuantParamsPerChannel}}(tfT,\ mliT,\ is\_bias\_tensor);}
+\DoxyCodeLine{00150\ \}}
+\DoxyCodeLine{00151\ }
+\DoxyCodeLine{00152\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1ops_1_1micro_a09b969857ea67e31f8fe0b4543fddc5a}{PrepareLocalTensor}}(mli\_tensor*\ \mbox{\hyperlink{namespacetensor}{tensor}},\ mli\_tensor*\ tensor\_local)\ \{}
+\DoxyCodeLine{00153\ \textcolor{preprocessor}{\#ifdef\ MLI\_2\_0}}
+\DoxyCodeLine{00154\ \ \ int8\_t*\ local\_data\ =\ tensor\_local-\/>data.mem.pi8;}
+\DoxyCodeLine{00155\ \ \ *tensor\_local\ =\ *\mbox{\hyperlink{namespacetensor}{tensor}};}
+\DoxyCodeLine{00156\ \ \ tensor\_local-\/>data.mem.pi8\ =\ local\_data;}
+\DoxyCodeLine{00157\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00158\ \ \ int8\_t*\ local\_data\ =\ \textcolor{keyword}{static\_cast<}int8\_t*\textcolor{keyword}{>}(tensor\_local-\/>data);}
+\DoxyCodeLine{00159\ \ \ *tensor\_local\ =\ *\mbox{\hyperlink{namespacetensor}{tensor}};}
+\DoxyCodeLine{00160\ \ \ tensor\_local-\/>data\ =\ local\_data;}
+\DoxyCodeLine{00161\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00162\ \}}
+\DoxyCodeLine{00163\ }
+\DoxyCodeLine{00164\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1ops_1_1micro_aa76bc1398d0979344a8e13cd95d28b1d}{AdjustBiasTensor}}(MliTensorInterface*\ bias,\ MliTensorInterface*\ in,}
+\DoxyCodeLine{00165\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ MliTensorInterface*\ weights)\ \{}
+\DoxyCodeLine{00166\ \ \ int32\_t\ quantized\_dimension\ =\ *bias-\/>Dim();}
+\DoxyCodeLine{00167\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{stacker_8cc_a345cae2db28059ee72015d7c6acc9dd5}{num\_channels}}\ =}
+\DoxyCodeLine{00168\ \ \ \ \ \ \ quantized\_dimension\ <\ 0\ ?\ 1\ :\ bias-\/>Shape()[quantized\_dimension];}
+\DoxyCodeLine{00169\ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ \mbox{\hyperlink{stacker_8cc_a345cae2db28059ee72015d7c6acc9dd5}{num\_channels}};\ i++)\ \{}
+\DoxyCodeLine{00170\ \ \ \ \ int32\_t\ adjusted\_bias\_scale\ =}
+\DoxyCodeLine{00171\ \ \ \ \ \ \ \ \ (*in-\/>Scale<int16\_t*>())\ *\ (*weights-\/>Scale<int16\_t**>())[i];}
+\DoxyCodeLine{00172\ \ \ \ \ \textcolor{keywordtype}{int}\ in\_shift\ =\ *in-\/>ScaleFracBits<int8\_t*>();}
+\DoxyCodeLine{00173\ \ \ \ \ \textcolor{keywordtype}{int}\ w\_shift\ =\ (*weights-\/>ScaleFracBits<int8\_t**>())[i];}
+\DoxyCodeLine{00174\ \ \ \ \ \textcolor{keywordtype}{int}\ b\_shift\ =\ (*bias-\/>ScaleFracBits<int8\_t**>())[i];}
+\DoxyCodeLine{00175\ \ \ \ \ \textcolor{keywordtype}{int}\ bias\_shift\ =\ in\_shift\ +\ w\_shift\ -\/\ b\_shift;}
+\DoxyCodeLine{00176\ \ \ \ \ (*bias-\/>Scale<int16\_t**>())[i]\ =}
+\DoxyCodeLine{00177\ \ \ \ \ \ \ \ \ (int16\_t)(adjusted\_bias\_scale\ >>\ bias\_shift);}
+\DoxyCodeLine{00178\ \ \ \}}
+\DoxyCodeLine{00179\ \}}
+\DoxyCodeLine{00180\ }
+\DoxyCodeLine{00181\ \textcolor{preprocessor}{\#ifdef\ MLI\_2\_0\_KRNL\_TEST}}
+\DoxyCodeLine{00182\ \textcolor{comment}{//\ Reorder\ an\ array\ according\ to\ given\ indexes.\ If\ backward\ is\ true,\ order\ of}}
+\DoxyCodeLine{00183\ \textcolor{comment}{//\ index\ array\ must\ be\ reversed.}}
+\DoxyCodeLine{00184\ \textcolor{keyword}{inline}\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ reorder(uint32\_t*\ arr,\ \textcolor{keyword}{const}\ uint8\_t\ index[],}
+\DoxyCodeLine{00185\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ backward)\ \{}
+\DoxyCodeLine{00186\ \ \ uint32\_t\ \mbox{\hyperlink{nicla__sense__fusion_8ino_ae6219c1117781a1dbbb7839946bca32c}{temp}}[MLI\_MAX\_RANK];}
+\DoxyCodeLine{00187\ \ \ \textcolor{keywordflow}{for}\ (int8\_t\ i\ =\ 0;\ i\ <\ MLI\_MAX\_RANK;\ i++)\ \{}
+\DoxyCodeLine{00188\ \ \ \ \ \textcolor{keywordflow}{if}\ (backward)}
+\DoxyCodeLine{00189\ \ \ \ \ \ \ \mbox{\hyperlink{nicla__sense__fusion_8ino_ae6219c1117781a1dbbb7839946bca32c}{temp}}[\mbox{\hyperlink{namespace_arduino_tinyml_workshop_a230c8eac09a3338f6adcc073d97bc4a1}{index}}[i]]\ =\ arr[i];}
+\DoxyCodeLine{00190\ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00191\ \ \ \ \ \ \ \mbox{\hyperlink{nicla__sense__fusion_8ino_ae6219c1117781a1dbbb7839946bca32c}{temp}}[i]\ =\ arr[\mbox{\hyperlink{namespace_arduino_tinyml_workshop_a230c8eac09a3338f6adcc073d97bc4a1}{index}}[i]];}
+\DoxyCodeLine{00192\ \ \ \}}
+\DoxyCodeLine{00193\ \ \ \textcolor{keywordflow}{for}\ (int8\_t\ i\ =\ 0;\ i\ <\ MLI\_MAX\_RANK;\ i++)\ \{}
+\DoxyCodeLine{00194\ \ \ \ \ arr[i]\ =\ \mbox{\hyperlink{nicla__sense__fusion_8ino_ae6219c1117781a1dbbb7839946bca32c}{temp}}[i];}
+\DoxyCodeLine{00195\ \ \ \}}
+\DoxyCodeLine{00196\ \}}
+\DoxyCodeLine{00197\ }
+\DoxyCodeLine{00198\ \textcolor{comment}{//\ Change\ shape\ of\ mli\ tensor\ and\ recalculate\ mem\ strides.}}
+\DoxyCodeLine{00199\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ change\_shape(mli\_tensor*\ mliT,\ \textcolor{keyword}{const}\ uint8\_t\ dim\_order[])\ \{}
+\DoxyCodeLine{00200\ \ \ reorder(mliT-\/>shape,\ dim\_order,\ \textcolor{keyword}{false});}
+\DoxyCodeLine{00201\ }
+\DoxyCodeLine{00202\ \ \ \textcolor{comment}{//\ Calculate\ strides\ for\ new\ layout}}
+\DoxyCodeLine{00203\ \ \ \textcolor{keywordtype}{int}\ mli\_tensor\_memstride\ =\ 1;}
+\DoxyCodeLine{00204\ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ shape\_idx\ =\ mliT-\/>rank\ -\/\ 1;\ shape\_idx\ >=\ 0;\ -\/-\/shape\_idx)\ \{}
+\DoxyCodeLine{00205\ \ \ \ \ mliT-\/>mem\_stride[shape\_idx]\ =\ mli\_tensor\_memstride;}
+\DoxyCodeLine{00206\ \ \ \ \ mli\_tensor\_memstride\ *=\ mliT-\/>shape[shape\_idx];}
+\DoxyCodeLine{00207\ \ \ \}}
+\DoxyCodeLine{00208\ \}}
+\DoxyCodeLine{00209\ }
+\DoxyCodeLine{00210\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ permute\_weights(\textcolor{keyword}{const}\ mli\_tensor*\ weights\_src,}
+\DoxyCodeLine{00211\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ mli\_permute\_cfg*\ permute\_cfg,}
+\DoxyCodeLine{00212\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ mli\_tensor*\ weights\_dst,}
+\DoxyCodeLine{00213\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ mli\_data\_container*\ buffer\_data)\ \{}
+\DoxyCodeLine{00214\ \ \ mli\_tensor\ \mbox{\hyperlink{nano__ble33__sense__accelerometer__continuous_8ino_a221f01f29c6cba77d9479aba615283f5}{buffer}}\ =\ \{\};}
+\DoxyCodeLine{00215\ \ \ \mbox{\hyperlink{nano__ble33__sense__accelerometer__continuous_8ino_a221f01f29c6cba77d9479aba615283f5}{buffer}}.el\_params\ =\ weights\_dst-\/>el\_params;}
+\DoxyCodeLine{00216\ \ \ \mbox{\hyperlink{nano__ble33__sense__accelerometer__continuous_8ino_a221f01f29c6cba77d9479aba615283f5}{buffer}}.data\ =\ *buffer\_data;}
+\DoxyCodeLine{00217\ \ \ \textcolor{comment}{//\ Compare\ weights\ tensor\ size\ and\ avaliable\ buffer\ capacity.}}
+\DoxyCodeLine{00218\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{stacker_8cc_a799a743b3abd553a37fc01ad3097df08}{buffer\_size}}\ =\ buffer\_data-\/>capacity;}
+\DoxyCodeLine{00219\ \ \ \textcolor{keywordtype}{int}\ weights\_size\ =\ mli\_hlp\_count\_elem\_num(weights\_src,\ 0)\ *}
+\DoxyCodeLine{00220\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ mli\_hlp\_tensor\_element\_size(weights\_src);}
+\DoxyCodeLine{00221\ }
+\DoxyCodeLine{00222\ \ \ \textcolor{comment}{//\ Need\ to\ change\ shape\ of\ distanation\ weights\ buffer\ according\ to\ permute}}
+\DoxyCodeLine{00223\ \ \ \textcolor{comment}{//\ dimensions\ order\ to\ calculate\ slice\ sizes}}
+\DoxyCodeLine{00224\ \ \ change\_shape(weights\_dst,\ permute\_cfg-\/>perm\_dim);}
+\DoxyCodeLine{00225\ }
+\DoxyCodeLine{00226\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{stacker_8cc_a799a743b3abd553a37fc01ad3097df08}{buffer\_size}}\ >=\ weights\_size)\ \{}
+\DoxyCodeLine{00227\ \ \ \ \ mli\_mov\_cfg\_t\ copy\_config;}
+\DoxyCodeLine{00228\ \ \ \ \ mli\_mov\_cfg\_for\_copy(\&copy\_config);}
+\DoxyCodeLine{00229\ \ \ \ \ mli\_mov\_tensor\_sync(weights\_src,\ \&copy\_config,\ \&\mbox{\hyperlink{nano__ble33__sense__accelerometer__continuous_8ino_a221f01f29c6cba77d9479aba615283f5}{buffer}});}
+\DoxyCodeLine{00230\ \ \ \ \ mli\_krn\_permute\_sa8(\&\mbox{\hyperlink{nano__ble33__sense__accelerometer__continuous_8ino_a221f01f29c6cba77d9479aba615283f5}{buffer}},\ permute\_cfg,\ weights\_dst);}
+\DoxyCodeLine{00231\ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00232\ \ \ \ \ \textcolor{comment}{//\ Weights\ shape\ is\ NHWC\ and\ output\ (buffer)\ shape\ is\ HWC\ where\ N\_w\ =\ C\_o.}}
+\DoxyCodeLine{00233\ \ \ \ \ \textcolor{comment}{//\ Buffer\ size\ (H\_o\ *\ W\_o)\ must\ be\ more\ or\ equal\ then\ the\ weights\ size\ (H\_w}}
+\DoxyCodeLine{00234\ \ \ \ \ \textcolor{comment}{//\ *\ W\_w\ *\ C\_w).\ So,\ this\ is\ the\ reason,\ why\ buffer\ size\ (output\ tensor)\ is}}
+\DoxyCodeLine{00235\ \ \ \ \ \textcolor{comment}{//\ divided\ by\ channel\ shape.}}
+\DoxyCodeLine{00236\ \ \ \ \ uint32\_t\ slice\_size\ =\ \mbox{\hyperlink{stacker_8cc_a799a743b3abd553a37fc01ad3097df08}{buffer\_size}}\ /\ weights\_src-\/>shape[\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_2mida7bb510aa51b58806c263868b8d78de_ac7b3bc07ef263d2f12d88fc3e87dd0d2}{KRNL\_C\_DIM\_NHWC}}];}
+\DoxyCodeLine{00237\ }
+\DoxyCodeLine{00238\ \ \ \ \ mli\_mov\_cfg\_t\ copy\_config\ =\ \{\};}
+\DoxyCodeLine{00239\ \ \ \ \ uint32\_t\ src\_offsets[]\ =\ \{0,\ 0,\ 0,\ 0\};}
+\DoxyCodeLine{00240\ \ \ \ \ uint32\_t\ src\_sizes[]\ =\ \{0,\ 0,\ 0,\ 0\};}
+\DoxyCodeLine{00241\ \ \ \ \ \textcolor{keywordtype}{int}\ dst\_mem\_stride[]\ =\ \{0,\ 0,\ 0,\ 0\};}
+\DoxyCodeLine{00242\ }
+\DoxyCodeLine{00243\ \ \ \ \ mli\_tensor\ weights\_dst\_sub\_tensor;}
+\DoxyCodeLine{00244\ \ \ \ \ mli\_sub\_tensor\_cfg\ sub\_tensor\_cfg\ =\ \{\};}
+\DoxyCodeLine{00245\ \ \ \ \ sub\_tensor\_cfg.sub\_tensor\_rank\ =\ weights\_src-\/>rank;}
+\DoxyCodeLine{00246\ }
+\DoxyCodeLine{00247\ \ \ \ \ \textcolor{comment}{//\ Calculate\ dimensions\ for\ slice\ accroding\ to\ buffer\ capacity.}}
+\DoxyCodeLine{00248\ \ \ \ \ \textcolor{comment}{//\ Now,\ after\ calling\ change\_shape()\ function,\ dst\ weights\ buffer\ has\ the}}
+\DoxyCodeLine{00249\ \ \ \ \ \textcolor{comment}{//\ MLI\ layout\ (HWCN).\ This\ means,\ the\ innermost\ dimension\ (N)\ of\ dst\ weights}}
+\DoxyCodeLine{00250\ \ \ \ \ \textcolor{comment}{//\ tensor\ is\ equal\ to\ the\ innermost\ dimension\ of\ output\ tensor\ (N).}}
+\DoxyCodeLine{00251\ \ \ \ \ sub\_tensor\_cfg.size[weights\_dst-\/>rank\ -\/\ 1]\ =}
+\DoxyCodeLine{00252\ \ \ \ \ \ \ \ \ src\_sizes[weights\_dst-\/>rank\ -\/\ 1]\ =\ weights\_src-\/>shape[\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_2mida7bb510aa51b58806c263868b8d78de_ac7b3bc07ef263d2f12d88fc3e87dd0d2}{KRNL\_C\_DIM\_NHWC}}];}
+\DoxyCodeLine{00253\ \ \ \ \ \textcolor{comment}{//\ Now\ need\ to\ calculate\ other\ shapes\ for\ weights\ slice.\ Total\ slice\ size\ is}}
+\DoxyCodeLine{00254\ \ \ \ \ \textcolor{comment}{//\ H*W*C*N,\ so\ to\ calculate\ sizes\ for\ each\ axis,\ avaliable\ slice\ size\ is}}
+\DoxyCodeLine{00255\ \ \ \ \ \textcolor{comment}{//\ divided\ by\ shape\ for\ each\ axis.}}
+\DoxyCodeLine{00256\ \ \ \ \ uint32\_t\ slice\_size\_left\ =\ slice\_size;}
+\DoxyCodeLine{00257\ \ \ \ \ \textcolor{keywordflow}{for}\ (uint32\_t\ i\ =\ 0;\ i\ <\ weights\_dst-\/>rank\ -\/\ 1;\ i++)\ \{}
+\DoxyCodeLine{00258\ \ \ \ \ \ \ sub\_tensor\_cfg.size[i]\ =\ src\_sizes[i]\ =}
+\DoxyCodeLine{00259\ \ \ \ \ \ \ \ \ \ \ slice\_size\_left\ /\ weights\_dst-\/>shape[i]\ >\ 0\ ?\ weights\_dst-\/>shape[i]}
+\DoxyCodeLine{00260\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ slice\_size\_left;}
+\DoxyCodeLine{00261\ \ \ \ \ \ \ slice\_size\_left\ /=\ weights\_dst-\/>shape[i];}
+\DoxyCodeLine{00262\ \ \ \ \ \ \ slice\_size\_left\ =\ slice\_size\_left\ >\ 0\ ?\ slice\_size\_left\ :\ 1;}
+\DoxyCodeLine{00263\ \ \ \ \ \}}
+\DoxyCodeLine{00264\ \ \ \ \ \textcolor{comment}{//\ Need\ to\ reorder\ src\ tensor\ sizes\ because\ it\ is\ still\ in\ TFLM\ format}}
+\DoxyCodeLine{00265\ \ \ \ \ \textcolor{comment}{//\ (NHWC)\ and\ src\_sizes\ array\ calculated\ as\ (HWCN).}}
+\DoxyCodeLine{00266\ \ \ \ \ reorder(src\_sizes,\ permute\_cfg-\/>perm\_dim,\ \textcolor{keyword}{true});}
+\DoxyCodeLine{00267\ }
+\DoxyCodeLine{00268\ \ \ \ \ sub\_tensor\_cfg.offset[KRNL\_C\_DIM\_HWCN]\ =\ src\_offsets[KRNL\_H\_DIM\_HWCN]\ =\ 0;}
+\DoxyCodeLine{00269\ \ \ \ \ sub\_tensor\_cfg.offset[KRNL\_H\_DIM\_HWCN]\ =\ src\_offsets[KRNL\_W\_DIM\_HWCN]\ =\ 0;}
+\DoxyCodeLine{00270\ \ \ \ \ sub\_tensor\_cfg.offset[KRNL\_W\_DIM\_HWCN]\ =\ src\_offsets[KRNL\_D\_DIM\_HWCN]\ =\ 0;}
+\DoxyCodeLine{00271\ \ \ \ \ sub\_tensor\_cfg.offset[KRNL\_D\_DIM\_HWCN]\ =\ src\_offsets[KRNL\_C\_DIM\_HWCN]\ =\ 0;}
+\DoxyCodeLine{00272\ \ \ \ \ \textcolor{keywordflow}{do}\ \{}
+\DoxyCodeLine{00273\ \ \ \ \ \ \ \textcolor{keywordflow}{do}\ \{}
+\DoxyCodeLine{00274\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{do}\ \{}
+\DoxyCodeLine{00275\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{do}\ \{}
+\DoxyCodeLine{00276\ \ \ \ \ \ \ \ \ \ \ \ \ mli\_mov\_cfg\_for\_slice(\&copy\_config,\ (\textcolor{keywordtype}{int}*)src\_offsets,}
+\DoxyCodeLine{00277\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{keywordtype}{int}*)src\_sizes,\ dst\_mem\_stride);}
+\DoxyCodeLine{00278\ \ \ \ \ \ \ \ \ \ \ \ \ mli\_mov\_tensor\_sync(weights\_src,\ \&copy\_config,\ \&\mbox{\hyperlink{nano__ble33__sense__accelerometer__continuous_8ino_a221f01f29c6cba77d9479aba615283f5}{buffer}});}
+\DoxyCodeLine{00279\ }
+\DoxyCodeLine{00280\ \ \ \ \ \ \ \ \ \ \ \ \ mli\_hlp\_create\_subtensor(weights\_dst,\ \&sub\_tensor\_cfg,}
+\DoxyCodeLine{00281\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&weights\_dst\_sub\_tensor);}
+\DoxyCodeLine{00282\ \ \ \ \ \ \ \ \ \ \ \ \ mli\_krn\_permute\_sa8(\&\mbox{\hyperlink{nano__ble33__sense__accelerometer__continuous_8ino_a221f01f29c6cba77d9479aba615283f5}{buffer}},\ permute\_cfg,\ \&weights\_dst\_sub\_tensor);}
+\DoxyCodeLine{00283\ }
+\DoxyCodeLine{00284\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ For\ each\ axis,\ it\ is\ necessary\ to\ recalculate\ the\ offsets\ and}}
+\DoxyCodeLine{00285\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ slice\ sizes.}}
+\DoxyCodeLine{00286\ \ \ \ \ \ \ \ \ \ \ \ \ sub\_tensor\_cfg.offset[2]\ =\ src\_offsets[3]\ +=\ src\_sizes[3];}
+\DoxyCodeLine{00287\ \ \ \ \ \ \ \ \ \ \ \ \ src\_sizes[3]\ =}
+\DoxyCodeLine{00288\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::min(src\_sizes[3],\ weights\_src-\/>shape[3]\ -\/\ src\_offsets[3]);}
+\DoxyCodeLine{00289\ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{while}\ (src\_offsets[3]\ <\ weights\_src-\/>shape[3]);}
+\DoxyCodeLine{00290\ }
+\DoxyCodeLine{00291\ \ \ \ \ \ \ \ \ \ \ sub\_tensor\_cfg.offset[1]\ =\ src\_offsets[2]\ +=\ src\_sizes[2];}
+\DoxyCodeLine{00292\ \ \ \ \ \ \ \ \ \ \ src\_sizes[2]\ =}
+\DoxyCodeLine{00293\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::min(src\_sizes[2],\ weights\_src-\/>shape[2]\ -\/\ src\_offsets[2]);}
+\DoxyCodeLine{00294\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{while}\ (src\_offsets[2]\ <\ weights\_src-\/>shape[2]);}
+\DoxyCodeLine{00295\ }
+\DoxyCodeLine{00296\ \ \ \ \ \ \ \ \ sub\_tensor\_cfg.offset[0]\ =\ src\_offsets[1]\ +=\ src\_sizes[1];}
+\DoxyCodeLine{00297\ \ \ \ \ \ \ \ \ src\_sizes[1]\ =}
+\DoxyCodeLine{00298\ \ \ \ \ \ \ \ \ \ \ \ \ std::min(src\_sizes[1],\ weights\_src-\/>shape[1]\ -\/\ src\_offsets[1]);}
+\DoxyCodeLine{00299\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{while}\ (src\_offsets[1]\ <\ weights\_src-\/>shape[1]);}
+\DoxyCodeLine{00300\ }
+\DoxyCodeLine{00301\ \ \ \ \ \ \ sub\_tensor\_cfg.offset[3]\ =\ src\_offsets[0]\ +=\ src\_sizes[0];}
+\DoxyCodeLine{00302\ \ \ \ \ \ \ src\_sizes[0]\ =}
+\DoxyCodeLine{00303\ \ \ \ \ \ \ \ \ \ \ std::min(src\_sizes[0],\ weights\_src-\/>shape[0]\ -\/\ src\_offsets[0]);}
+\DoxyCodeLine{00304\ \ \ \ \ \}\ \textcolor{keywordflow}{while}\ (src\_offsets[0]\ <\ weights\_src-\/>shape[0]);}
+\DoxyCodeLine{00305\ \ \ \}}
+\DoxyCodeLine{00306\ \}}
+\DoxyCodeLine{00307\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00308\ }
+\DoxyCodeLine{00309\ \}\ \ \textcolor{comment}{//\ namespace\ micro}}
+\DoxyCodeLine{00310\ \}\ \ \textcolor{comment}{//\ namespace\ ops}}
+\DoxyCodeLine{00311\ \}\ \ \textcolor{comment}{//\ namespace\ tflite}}
+\DoxyCodeLine{00312\ }
+\DoxyCodeLine{00313\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ TENSORFLOW\_LITE\_MICRO\_KERNELS\_ARC\_MLI\_TF\_UTILS\_H\_}}
+\DoxyCodeLine{00314\ }
+\DoxyCodeLine{00315\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ EI\_CLASSIFIER\_TFLITE\_ENABLE\_ARC\ ==\ 1}}
+
+\end{DoxyCode}

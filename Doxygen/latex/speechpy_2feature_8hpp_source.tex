@@ -1,0 +1,711 @@
+\doxysection{feature.\+hpp}
+\hypertarget{speechpy_2feature_8hpp_source}{}\label{speechpy_2feature_8hpp_source}\index{Face\_Access\_inferencing/src/edge-\/impulse-\/sdk/dsp/speechpy/feature.hpp@{Face\_Access\_inferencing/src/edge-\/impulse-\/sdk/dsp/speechpy/feature.hpp}}
+\mbox{\hyperlink{speechpy_2feature_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{00002\ \textcolor{comment}{\ *\ Copyright\ (c)\ 2024\ EdgeImpulse\ Inc.}}
+\DoxyCodeLine{00003\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00004\ \textcolor{comment}{\ *\ Generated\ by\ Edge\ Impulse\ and\ licensed\ under\ the\ applicable\ Edge\ Impulse}}
+\DoxyCodeLine{00005\ \textcolor{comment}{\ *\ Terms\ of\ Service.\ Community\ and\ Professional\ Terms\ of\ Service}}
+\DoxyCodeLine{00006\ \textcolor{comment}{\ *\ (https://docs.edgeimpulse.com/page/terms-\/of-\/service)\ or\ Enterprise\ Terms\ of}}
+\DoxyCodeLine{00007\ \textcolor{comment}{\ *\ Service\ (https://docs.edgeimpulse.com/page/enterprise-\/terms-\/of-\/service),}}
+\DoxyCodeLine{00008\ \textcolor{comment}{\ *\ according\ to\ your\ product\ plan\ subscription\ (the\ “License”).}}
+\DoxyCodeLine{00009\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00010\ \textcolor{comment}{\ *\ This\ software,\ documentation\ and\ other\ associated\ files\ (collectively\ referred}}
+\DoxyCodeLine{00011\ \textcolor{comment}{\ *\ to\ as\ the\ “Software”)\ is\ a\ single\ SDK\ variation\ generated\ by\ the\ Edge\ Impulse}}
+\DoxyCodeLine{00012\ \textcolor{comment}{\ *\ platform\ and\ requires\ an\ active\ paid\ Edge\ Impulse\ subscription\ to\ use\ this}}
+\DoxyCodeLine{00013\ \textcolor{comment}{\ *\ Software\ for\ any\ purpose.}}
+\DoxyCodeLine{00014\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00015\ \textcolor{comment}{\ *\ You\ may\ NOT\ use\ this\ Software\ unless\ you\ have\ an\ active\ Edge\ Impulse\ subscription}}
+\DoxyCodeLine{00016\ \textcolor{comment}{\ *\ that\ meets\ the\ eligibility\ requirements\ for\ the\ applicable\ License,\ subject\ to}}
+\DoxyCodeLine{00017\ \textcolor{comment}{\ *\ your\ full\ and\ continued\ compliance\ with\ the\ terms\ and\ conditions\ of\ the\ License,}}
+\DoxyCodeLine{00018\ \textcolor{comment}{\ *\ including\ without\ limitation\ any\ usage\ restrictions\ under\ the\ applicable\ License.}}
+\DoxyCodeLine{00019\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00020\ \textcolor{comment}{\ *\ If\ you\ do\ not\ have\ an\ active\ Edge\ Impulse\ product\ plan\ subscription,\ or\ if\ use}}
+\DoxyCodeLine{00021\ \textcolor{comment}{\ *\ of\ this\ Software\ exceeds\ the\ usage\ limitations\ of\ your\ Edge\ Impulse\ product\ plan}}
+\DoxyCodeLine{00022\ \textcolor{comment}{\ *\ subscription,\ you\ are\ not\ permitted\ to\ use\ this\ Software\ and\ must\ immediately}}
+\DoxyCodeLine{00023\ \textcolor{comment}{\ *\ delete\ and\ erase\ all\ copies\ of\ this\ Software\ within\ your\ control\ or\ possession.}}
+\DoxyCodeLine{00024\ \textcolor{comment}{\ *\ Edge\ Impulse\ reserves\ all\ rights\ and\ remedies\ available\ to\ enforce\ its\ rights.}}
+\DoxyCodeLine{00025\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00026\ \textcolor{comment}{\ *\ Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ the\ Software\ is}}
+\DoxyCodeLine{00027\ \textcolor{comment}{\ *\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,\ WITHOUT\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,}}
+\DoxyCodeLine{00028\ \textcolor{comment}{\ *\ either\ express\ or\ implied.\ See\ the\ License\ for\ the\ specific\ language\ governing}}
+\DoxyCodeLine{00029\ \textcolor{comment}{\ *\ permissions,\ disclaimers\ and\ limitations\ under\ the\ License.}}
+\DoxyCodeLine{00030\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{00031\ \textcolor{preprocessor}{\#ifndef\ \_EIDSP\_SPEECHPY\_FEATURE\_H\_}}
+\DoxyCodeLine{00032\ \textcolor{preprocessor}{\#define\ \_EIDSP\_SPEECHPY\_FEATURE\_H\_}}
+\DoxyCodeLine{00033\ }
+\DoxyCodeLine{00034\ \textcolor{preprocessor}{\#include\ <stdint.h>}}
+\DoxyCodeLine{00035\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{ei__classifier__porting_8h}{../../porting/ei\_classifier\_porting.h}}"{}}}
+\DoxyCodeLine{00036\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{ei__utils_8h}{../ei\_utils.h}}"{}}}
+\DoxyCodeLine{00037\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{functions_8hpp}{functions.hpp}}"{}}}
+\DoxyCodeLine{00038\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{speechpy_2processing_8hpp}{processing.hpp}}"{}}}
+\DoxyCodeLine{00039\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{memory_8hpp}{../memory.hpp}}"{}}}
+\DoxyCodeLine{00040\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{returntypes_8hpp}{../returntypes.hpp}}"{}}}
+\DoxyCodeLine{00041\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{ei__vector_8h}{../ei\_vector.h}}"{}}}
+\DoxyCodeLine{00042\ }
+\DoxyCodeLine{00043\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespaceei}{ei}}\ \{}
+\DoxyCodeLine{00044\ \textcolor{keyword}{namespace\ }speechpy\ \{}
+\DoxyCodeLine{00045\ }
+\DoxyCodeLine{00046\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classei_1_1speechpy_1_1feature}{feature}}\ \{}
+\DoxyCodeLine{00047\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00064\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{classei_1_1speechpy_1_1feature_a3578ccfcef367157c572027df52e9605}{filterbanks}}(}
+\DoxyCodeLine{00065\ \#\textcolor{keywordflow}{if}\ \mbox{\hyperlink{esp32__microphone_8ino_a84f0987db19e2d3300d7c63929613f66}{EIDSP\_QUANTIZE\_FILTERBANK}}}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structei__quantized__matrix}{quantized\_matrix\_t}}\ *\mbox{\hyperlink{classei_1_1speechpy_1_1feature_a3578ccfcef367157c572027df52e9605}{filterbanks}},}
+\DoxyCodeLine{00067\ \#\textcolor{keywordflow}{else}}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structei__matrix}{matrix\_t}}\ *\mbox{\hyperlink{classei_1_1speechpy_1_1feature_a3578ccfcef367157c572027df52e9605}{filterbanks}},}
+\DoxyCodeLine{00069\ \#endif}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \ \ uint16\_t\ num\_filter,\ \textcolor{keywordtype}{int}\ coefficients,\ uint32\_t\ sampling\_freq,}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \ \ uint32\_t\ low\_freq,\ uint32\_t\ high\_freq,}
+\DoxyCodeLine{00072\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ output\_transposed\ =\ \textcolor{keyword}{false}}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \ \ )}
+\DoxyCodeLine{00074\ \ \ \ \ \{}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ mels\_mem\_size\ =\ (num\_filter\ +\ 2)\ *\ \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{float});}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ hertz\_mem\_size\ =\ (num\_filter\ +\ 2)\ *\ \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{float});}
+\DoxyCodeLine{00077\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ freq\_index\_mem\_size\ =\ (num\_filter\ +\ 2)\ *\ \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{int});}
+\DoxyCodeLine{00078\ }
+\DoxyCodeLine{00079\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}\ *mels\ =\ (\textcolor{keywordtype}{float}*)\mbox{\hyperlink{memory_8hpp_add3a2359309e81b290c825661abc2d71}{ei\_dsp\_malloc}}(mels\_mem\_size);}
+\DoxyCodeLine{00080\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!mels)\ \{}
+\DoxyCodeLine{00081\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{config_8hpp_a6a2e91879ad7a904747f26b218ada23a}{EIDSP\_ERR}}(\mbox{\hyperlink{namespaceei_a35329cd4e57031263ba0a94c8d3959baa8340d6c1221f3cd7e0055ef8df56df32}{EIDSP\_OUT\_OF\_MEM}});}
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00083\ }
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{classei_1_1speechpy_1_1feature_a3578ccfcef367157c572027df52e9605}{filterbanks}}-\/>rows\ !=\ num\_filter\ ||\ \mbox{\hyperlink{classei_1_1speechpy_1_1feature_a3578ccfcef367157c572027df52e9605}{filterbanks}}-\/>cols\ !=\ \textcolor{keyword}{static\_cast<}uint32\_t\textcolor{keyword}{>}(coefficients))\ \{}
+\DoxyCodeLine{00085\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{config_8hpp_a6a2e91879ad7a904747f26b218ada23a}{EIDSP\_ERR}}(\mbox{\hyperlink{namespaceei_a35329cd4e57031263ba0a94c8d3959baa38ee0f868403ad45472a6e330d9af02f}{EIDSP\_MATRIX\_SIZE\_MISMATCH}});}
+\DoxyCodeLine{00086\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00087\ }
+\DoxyCodeLine{00088\ \textcolor{preprocessor}{\#if\ EIDSP\_QUANTIZE\_FILTERBANK}}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \ \ memset(\mbox{\hyperlink{classei_1_1speechpy_1_1feature_a3578ccfcef367157c572027df52e9605}{filterbanks}}-\/>buffer,\ 0,\ \mbox{\hyperlink{classei_1_1speechpy_1_1feature_a3578ccfcef367157c572027df52e9605}{filterbanks}}-\/>rows\ *\ \mbox{\hyperlink{classei_1_1speechpy_1_1feature_a3578ccfcef367157c572027df52e9605}{filterbanks}}-\/>cols\ *\ \textcolor{keyword}{sizeof}(uint8\_t));}
+\DoxyCodeLine{00090\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00091\ \ \ \ \ \ \ \ \ memset(\mbox{\hyperlink{classei_1_1speechpy_1_1feature_a3578ccfcef367157c572027df52e9605}{filterbanks}}-\/>buffer,\ 0,\ \mbox{\hyperlink{classei_1_1speechpy_1_1feature_a3578ccfcef367157c572027df52e9605}{filterbanks}}-\/>rows\ *\ \mbox{\hyperlink{classei_1_1speechpy_1_1feature_a3578ccfcef367157c572027df52e9605}{filterbanks}}-\/>cols\ *\ \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{float}));}
+\DoxyCodeLine{00092\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00093\ }
+\DoxyCodeLine{00094\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Computing\ the\ Mel\ filterbank}}
+\DoxyCodeLine{00095\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ converting\ the\ upper\ and\ lower\ frequencies\ to\ Mels.}}
+\DoxyCodeLine{00096\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ num\_filter\ +\ 2\ is\ because\ for\ num\_filter\ filterbanks\ we\ need}}
+\DoxyCodeLine{00097\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ num\_filter+2\ point.}}
+\DoxyCodeLine{00098\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classei_1_1numpy_a53d5dae11b3b26d3d5a013012cbbf0a6}{numpy::linspace}}(}
+\DoxyCodeLine{00099\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classei_1_1speechpy_1_1functions_a1aca989f2005a22635104f3966f678d8}{functions::frequency\_to\_mel}}(\textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{float}\textcolor{keyword}{>}(low\_freq)),}
+\DoxyCodeLine{00100\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classei_1_1speechpy_1_1functions_a1aca989f2005a22635104f3966f678d8}{functions::frequency\_to\_mel}}(\textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{float}\textcolor{keyword}{>}(high\_freq)),}
+\DoxyCodeLine{00101\ \ \ \ \ \ \ \ \ \ \ \ \ num\_filter\ +\ 2,}
+\DoxyCodeLine{00102\ \ \ \ \ \ \ \ \ \ \ \ \ mels);}
+\DoxyCodeLine{00103\ }
+\DoxyCodeLine{00104\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ we\ should\ convert\ Mels\ back\ to\ Hertz\ because\ the\ start\ and\ end-\/points}}
+\DoxyCodeLine{00105\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ should\ be\ at\ the\ desired\ frequencies.}}
+\DoxyCodeLine{00106\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}\ *hertz\ =\ (\textcolor{keywordtype}{float}*)\mbox{\hyperlink{memory_8hpp_add3a2359309e81b290c825661abc2d71}{ei\_dsp\_malloc}}(hertz\_mem\_size);}
+\DoxyCodeLine{00107\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!hertz)\ \{}
+\DoxyCodeLine{00108\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{memory_8hpp_a728a1c89209caadbb6cd4229f375adb3}{ei\_dsp\_free}}(mels,\ mels\_mem\_size);}
+\DoxyCodeLine{00109\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{config_8hpp_a6a2e91879ad7a904747f26b218ada23a}{EIDSP\_ERR}}(\mbox{\hyperlink{namespaceei_a35329cd4e57031263ba0a94c8d3959baa8340d6c1221f3cd7e0055ef8df56df32}{EIDSP\_OUT\_OF\_MEM}});}
+\DoxyCodeLine{00110\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00111\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (uint16\_t\ ix\ =\ 0;\ ix\ <\ num\_filter\ +\ 2;\ ix++)\ \{}
+\DoxyCodeLine{00112\ \ \ \ \ \ \ \ \ \ \ \ \ hertz[ix]\ =\ \mbox{\hyperlink{classei_1_1speechpy_1_1functions_a4a915ee8322794a277502b0539a28258}{functions::mel\_to\_frequency}}(mels[ix]);}
+\DoxyCodeLine{00113\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (hertz[ix]\ <\ low\_freq)\ \{}
+\DoxyCodeLine{00114\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ hertz[ix]\ =\ low\_freq;}
+\DoxyCodeLine{00115\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00116\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (hertz[ix]\ >\ high\_freq)\ \{}
+\DoxyCodeLine{00117\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ hertz[ix]\ =\ high\_freq;}
+\DoxyCodeLine{00118\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00119\ }
+\DoxyCodeLine{00120\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ here\ is\ a\ really\ annoying\ bug\ in\ Speechpy\ which\ calculates\ the\ frequency\ index\ wrong\ for\ the\ last\ bucket}}
+\DoxyCodeLine{00121\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ the\ last\ 'hertz'\ value\ is\ not\ 8,000\ (with\ sampling\ rate\ 16,000)\ but\ 7,999.999999}}
+\DoxyCodeLine{00122\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ thus\ calculating\ the\ bucket\ to\ 64,\ not\ 65.}}
+\DoxyCodeLine{00123\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ we're\ adjusting\ this\ here\ a\ tiny\ bit\ to\ ensure\ we\ have\ the\ same\ result}}
+\DoxyCodeLine{00124\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (ix\ ==\ num\_filter\ +\ 2\ -\/\ 1)\ \{}
+\DoxyCodeLine{00125\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ hertz[ix]\ -\/=\ 0.001;}
+\DoxyCodeLine{00126\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00127\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00128\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{memory_8hpp_a728a1c89209caadbb6cd4229f375adb3}{ei\_dsp\_free}}(mels,\ mels\_mem\_size);}
+\DoxyCodeLine{00129\ }
+\DoxyCodeLine{00130\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ The\ frequency\ resolution\ required\ to\ put\ filters\ at\ the}}
+\DoxyCodeLine{00131\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ exact\ points\ calculated\ above\ should\ be\ extracted.}}
+\DoxyCodeLine{00132\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ \ So\ we\ should\ round\ those\ frequencies\ to\ the\ closest\ FFT\ bin.}}
+\DoxyCodeLine{00133\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ *freq\_index\ =\ (\textcolor{keywordtype}{int}*)\mbox{\hyperlink{memory_8hpp_add3a2359309e81b290c825661abc2d71}{ei\_dsp\_malloc}}(freq\_index\_mem\_size);}
+\DoxyCodeLine{00134\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!freq\_index)\ \{}
+\DoxyCodeLine{00135\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{memory_8hpp_a728a1c89209caadbb6cd4229f375adb3}{ei\_dsp\_free}}(hertz,\ hertz\_mem\_size);}
+\DoxyCodeLine{00136\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{config_8hpp_a6a2e91879ad7a904747f26b218ada23a}{EIDSP\_ERR}}(\mbox{\hyperlink{namespaceei_a35329cd4e57031263ba0a94c8d3959baa8340d6c1221f3cd7e0055ef8df56df32}{EIDSP\_OUT\_OF\_MEM}});}
+\DoxyCodeLine{00137\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00138\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (uint16\_t\ ix\ =\ 0;\ ix\ <\ num\_filter\ +\ 2;\ ix++)\ \{}
+\DoxyCodeLine{00139\ \ \ \ \ \ \ \ \ \ \ \ \ freq\_index[ix]\ =\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{int}\textcolor{keyword}{>}(floor((coefficients\ +\ 1)\ *\ hertz[ix]\ /\ sampling\_freq));}
+\DoxyCodeLine{00140\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00141\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{memory_8hpp_a728a1c89209caadbb6cd4229f375adb3}{ei\_dsp\_free}}(hertz,\ hertz\_mem\_size);}
+\DoxyCodeLine{00142\ }
+\DoxyCodeLine{00143\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ num\_filter;\ i++)\ \{}
+\DoxyCodeLine{00144\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ left\ =\ freq\_index[i];}
+\DoxyCodeLine{00145\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ middle\ =\ freq\_index[i\ +\ 1];}
+\DoxyCodeLine{00146\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ right\ =\ freq\_index[i\ +\ 2];}
+\DoxyCodeLine{00147\ }
+\DoxyCodeLine{00148\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{memory_8hpp_a605d3e24f2bb57fb1133dd21553727d2}{EI\_DSP\_MATRIX}}(z,\ 1,\ (right\ -\/\ left\ +\ 1));}
+\DoxyCodeLine{00149\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!z.buffer)\ \{}
+\DoxyCodeLine{00150\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{memory_8hpp_a728a1c89209caadbb6cd4229f375adb3}{ei\_dsp\_free}}(freq\_index,\ freq\_index\_mem\_size);}
+\DoxyCodeLine{00151\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{config_8hpp_a6a2e91879ad7a904747f26b218ada23a}{EIDSP\_ERR}}(\mbox{\hyperlink{namespaceei_a35329cd4e57031263ba0a94c8d3959baa8340d6c1221f3cd7e0055ef8df56df32}{EIDSP\_OUT\_OF\_MEM}});}
+\DoxyCodeLine{00152\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00153\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classei_1_1numpy_a53d5dae11b3b26d3d5a013012cbbf0a6}{numpy::linspace}}(left,\ right,\ (right\ -\/\ left\ +\ 1),\ z.buffer);}
+\DoxyCodeLine{00154\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classei_1_1speechpy_1_1functions_a8edd996687d5e6e1d3a932aa83f10dda}{functions::triangle}}(z.buffer,\ (right\ -\/\ left\ +\ 1),\ left,\ middle,\ right);}
+\DoxyCodeLine{00155\ }
+\DoxyCodeLine{00156\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ so...\ z\ now\ contains\ some\ values\ that\ we\ need\ to\ overwrite\ in\ the\ filterbank}}
+\DoxyCodeLine{00157\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ zx\ =\ 0;\ zx\ <\ (right\ -\/\ left\ +\ 1);\ zx++)\ \{}
+\DoxyCodeLine{00158\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ index\ =\ (i\ *\ \mbox{\hyperlink{classei_1_1speechpy_1_1feature_a3578ccfcef367157c572027df52e9605}{filterbanks}}-\/>cols)\ +\ (left\ +\ zx);}
+\DoxyCodeLine{00159\ }
+\DoxyCodeLine{00160\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (output\_transposed)\ \{}
+\DoxyCodeLine{00161\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ index\ =\ ((left\ +\ zx)\ *\ \mbox{\hyperlink{classei_1_1speechpy_1_1feature_a3578ccfcef367157c572027df52e9605}{filterbanks}}-\/>rows)\ +\ i;}
+\DoxyCodeLine{00162\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00163\ }
+\DoxyCodeLine{00164\ \textcolor{preprocessor}{\#if\ EIDSP\_QUANTIZE\_FILTERBANK}}
+\DoxyCodeLine{00165\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classei_1_1speechpy_1_1feature_a3578ccfcef367157c572027df52e9605}{filterbanks}}-\/>buffer[index]\ =\ \mbox{\hyperlink{classei_1_1numpy_a93b7d75163d0628dfb61b721cf9507a3}{numpy::quantize\_zero\_one}}(z.buffer[zx]);}
+\DoxyCodeLine{00166\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00167\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classei_1_1speechpy_1_1feature_a3578ccfcef367157c572027df52e9605}{filterbanks}}-\/>buffer[index]\ =\ z.buffer[zx];}
+\DoxyCodeLine{00168\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00169\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00170\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00171\ }
+\DoxyCodeLine{00172\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (output\_transposed)\ \{}
+\DoxyCodeLine{00173\ \ \ \ \ \ \ \ \ \ \ \ \ uint16\_t\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_acab531abaa74a7e664e3986f2522b33a}{r}}\ =\ \mbox{\hyperlink{classei_1_1speechpy_1_1feature_a3578ccfcef367157c572027df52e9605}{filterbanks}}-\/>rows;}
+\DoxyCodeLine{00174\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classei_1_1speechpy_1_1feature_a3578ccfcef367157c572027df52e9605}{filterbanks}}-\/>rows\ =\ \mbox{\hyperlink{classei_1_1speechpy_1_1feature_a3578ccfcef367157c572027df52e9605}{filterbanks}}-\/>cols;}
+\DoxyCodeLine{00175\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classei_1_1speechpy_1_1feature_a3578ccfcef367157c572027df52e9605}{filterbanks}}-\/>cols\ =\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_acab531abaa74a7e664e3986f2522b33a}{r}};}
+\DoxyCodeLine{00176\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00177\ }
+\DoxyCodeLine{00178\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{memory_8hpp_a728a1c89209caadbb6cd4229f375adb3}{ei\_dsp\_free}}(freq\_index,\ freq\_index\_mem\_size);}
+\DoxyCodeLine{00179\ }
+\DoxyCodeLine{00180\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespaceei_a35329cd4e57031263ba0a94c8d3959baa58f9da92fe1aff29466bdd4aa2a7b361}{EIDSP\_OK}};}
+\DoxyCodeLine{00181\ \ \ \ \ \}}
+\DoxyCodeLine{00182\ }
+\DoxyCodeLine{00191\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{classei_1_1speechpy_1_1feature_af6efe2df8d1db0a8511956d742ac6a85}{get\_fft\_bin\_from\_hertz}}(uint16\_t\ fft\_size,\ \textcolor{keywordtype}{float}\ hertz,\ uint32\_t\ sampling\_freq)}
+\DoxyCodeLine{00192\ \ \ \ \ \{}
+\DoxyCodeLine{00193\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{int}\textcolor{keyword}{>}(floor((fft\_size\ +\ 1)\ *\ hertz\ /\ sampling\_freq));}
+\DoxyCodeLine{00194\ \ \ \ \ \}}
+\DoxyCodeLine{00195\ }
+\DoxyCodeLine{00216\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{classei_1_1speechpy_1_1feature_ac898f0c6f387012fd2ea79f75fc667ee}{mfe}}(\mbox{\hyperlink{structei__matrix}{matrix\_t}}\ *out\_features,\ \mbox{\hyperlink{structei__matrix}{matrix\_t}}\ *out\_energies,}
+\DoxyCodeLine{00217\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structei__signal__t}{signal\_t}}\ *\mbox{\hyperlink{classei_1_1signal}{signal}},}
+\DoxyCodeLine{00218\ \ \ \ \ \ \ \ \ uint32\_t\ \mbox{\hyperlink{ei__run__dsp_8h_a7b1ec6eee81fba90db3db34bdb8bcd91}{sampling\_frequency}},}
+\DoxyCodeLine{00219\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}\ frame\_length,\ \textcolor{keywordtype}{float}\ frame\_stride,\ uint16\_t\ num\_filters,}
+\DoxyCodeLine{00220\ \ \ \ \ \ \ \ \ uint16\_t\ \mbox{\hyperlink{irfft_8cc_abe2bad6726f6194f0b5165fe4b37a65f}{fft\_length}},\ uint32\_t\ low\_frequency,\ uint32\_t\ high\_frequency,}
+\DoxyCodeLine{00221\ \ \ \ \ \ \ \ \ uint16\_t\ \mbox{\hyperlink{ei__fill__result__struct_8h_a1e2c5d39b6cd3ec0513b894664d20e17}{version}}}
+\DoxyCodeLine{00222\ \ \ \ \ \ \ \ \ )}
+\DoxyCodeLine{00223\ \ \ \ \ \{}
+\DoxyCodeLine{00224\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{ei__run__dsp_8h_a6baa346e44f4c2158d2be4f9b77b8203}{ret}}\ =\ 0;}
+\DoxyCodeLine{00225\ }
+\DoxyCodeLine{00226\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (high\_frequency\ ==\ 0)\ \{}
+\DoxyCodeLine{00227\ \ \ \ \ \ \ \ \ \ \ \ \ high\_frequency\ =\ \mbox{\hyperlink{ei__run__dsp_8h_a7b1ec6eee81fba90db3db34bdb8bcd91}{sampling\_frequency}}\ /\ 2;}
+\DoxyCodeLine{00228\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00229\ }
+\DoxyCodeLine{00230\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{ei__fill__result__struct_8h_a1e2c5d39b6cd3ec0513b894664d20e17}{version}}<4)\ \{}
+\DoxyCodeLine{00231\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (low\_frequency\ ==\ 0)\ \{}
+\DoxyCodeLine{00232\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ low\_frequency\ =\ 300;}
+\DoxyCodeLine{00233\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00234\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00235\ }
+\DoxyCodeLine{00236\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structei_1_1speechpy_1_1ei__stack__frames__info}{stack\_frames\_info\_t}}\ stack\_frame\_info\ =\ \{\ 0\ \};}
+\DoxyCodeLine{00237\ \ \ \ \ \ \ \ \ stack\_frame\_info.\mbox{\hyperlink{structei_1_1speechpy_1_1ei__stack__frames__info_ad87db5457d7f5913af1cb4c67b3714ef}{signal}}\ =\ \mbox{\hyperlink{group__ei__functions_ga46d130150ef0ce589284705bdc4c8b69}{signal}};}
+\DoxyCodeLine{00238\ }
+\DoxyCodeLine{00239\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__dsp_8h_a6baa346e44f4c2158d2be4f9b77b8203}{ret}}\ =\ processing::stack\_frames(}
+\DoxyCodeLine{00240\ \ \ \ \ \ \ \ \ \ \ \ \ \&stack\_frame\_info,}
+\DoxyCodeLine{00241\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__dsp_8h_a7b1ec6eee81fba90db3db34bdb8bcd91}{sampling\_frequency}},}
+\DoxyCodeLine{00242\ \ \ \ \ \ \ \ \ \ \ \ \ frame\_length,}
+\DoxyCodeLine{00243\ \ \ \ \ \ \ \ \ \ \ \ \ frame\_stride,}
+\DoxyCodeLine{00244\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{false},}
+\DoxyCodeLine{00245\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__fill__result__struct_8h_a1e2c5d39b6cd3ec0513b894664d20e17}{version}}}
+\DoxyCodeLine{00246\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{00247\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{ei__run__dsp_8h_a6baa346e44f4c2158d2be4f9b77b8203}{ret}}\ !=\ 0)\ \{}
+\DoxyCodeLine{00248\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{config_8hpp_a6a2e91879ad7a904747f26b218ada23a}{EIDSP\_ERR}}(\mbox{\hyperlink{ei__run__dsp_8h_a6baa346e44f4c2158d2be4f9b77b8203}{ret}});}
+\DoxyCodeLine{00249\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00250\ }
+\DoxyCodeLine{00251\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (stack\_frame\_info.\mbox{\hyperlink{structei_1_1speechpy_1_1ei__stack__frames__info_a954c3886d0c0fc1fe4f65d991ee9d547}{frame\_ixs}}.size()\ !=\ out\_features-\/>\mbox{\hyperlink{structei__matrix_a263c997028804ca14b749f64eeb3fe84}{rows}})\ \{}
+\DoxyCodeLine{00252\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{config_8hpp_a6a2e91879ad7a904747f26b218ada23a}{EIDSP\_ERR}}(\mbox{\hyperlink{namespaceei_a35329cd4e57031263ba0a94c8d3959baa38ee0f868403ad45472a6e330d9af02f}{EIDSP\_MATRIX\_SIZE\_MISMATCH}});}
+\DoxyCodeLine{00253\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00254\ }
+\DoxyCodeLine{00255\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (num\_filters\ !=\ out\_features-\/>\mbox{\hyperlink{structei__matrix_a71fe3190b5ec3ab128461bd7903d3221}{cols}})\ \{}
+\DoxyCodeLine{00256\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{config_8hpp_a6a2e91879ad7a904747f26b218ada23a}{EIDSP\_ERR}}(\mbox{\hyperlink{namespaceei_a35329cd4e57031263ba0a94c8d3959baa38ee0f868403ad45472a6e330d9af02f}{EIDSP\_MATRIX\_SIZE\_MISMATCH}});}
+\DoxyCodeLine{00257\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00258\ }
+\DoxyCodeLine{00259\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (out\_energies)\ \{}
+\DoxyCodeLine{00260\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (stack\_frame\_info.\mbox{\hyperlink{structei_1_1speechpy_1_1ei__stack__frames__info_a954c3886d0c0fc1fe4f65d991ee9d547}{frame\_ixs}}.size()\ !=\ out\_energies-\/>\mbox{\hyperlink{structei__matrix_a263c997028804ca14b749f64eeb3fe84}{rows}}\ ||\ out\_energies-\/>\mbox{\hyperlink{structei__matrix_a71fe3190b5ec3ab128461bd7903d3221}{cols}}\ !=\ 1)\ \{}
+\DoxyCodeLine{00261\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{config_8hpp_a6a2e91879ad7a904747f26b218ada23a}{EIDSP\_ERR}}(\mbox{\hyperlink{namespaceei_a35329cd4e57031263ba0a94c8d3959baa38ee0f868403ad45472a6e330d9af02f}{EIDSP\_MATRIX\_SIZE\_MISMATCH}});}
+\DoxyCodeLine{00262\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00263\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00264\ }
+\DoxyCodeLine{00265\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (uint32\_t\ i\ =\ 0;\ i\ <\ out\_features-\/>\mbox{\hyperlink{structei__matrix_a263c997028804ca14b749f64eeb3fe84}{rows}}\ *\ out\_features-\/>\mbox{\hyperlink{structei__matrix_a71fe3190b5ec3ab128461bd7903d3221}{cols}};\ i++)\ \{}
+\DoxyCodeLine{00266\ \ \ \ \ \ \ \ \ \ \ \ \ *(out\_features-\/>\mbox{\hyperlink{structei__matrix_a5412b64a3551881269b8c1493f0da17a}{buffer}}\ +\ i)\ =\ 0;}
+\DoxyCodeLine{00267\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00268\ }
+\DoxyCodeLine{00269\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ power\_spectrum\_frame\_size\ =\ (\mbox{\hyperlink{irfft_8cc_abe2bad6726f6194f0b5165fe4b37a65f}{fft\_length}}\ /\ 2\ +\ 1);}
+\DoxyCodeLine{00270\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Computing\ the\ Mel\ filterbank}}
+\DoxyCodeLine{00271\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ converting\ the\ upper\ and\ lower\ frequencies\ to\ Mels.}}
+\DoxyCodeLine{00272\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ num\_filter\ +\ 2\ is\ because\ for\ num\_filter\ filterbanks\ we\ need}}
+\DoxyCodeLine{00273\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ num\_filter+2\ point.}}
+\DoxyCodeLine{00274\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}\ *mels;}
+\DoxyCodeLine{00275\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ MELS\_SIZE\ =\ num\_filters\ +\ 2;}
+\DoxyCodeLine{00276\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ mem\_size\ =\ MELS\_SIZE\ *\ \textcolor{keyword}{sizeof}(float);}
+\DoxyCodeLine{00277\ \ \ \ \ \ \ \ \ mels\ =\ (\textcolor{keywordtype}{float}*)\mbox{\hyperlink{memory_8hpp_acb99ad7939b0a5a3ef1f623ffc8f96a2}{ei\_dsp\_calloc}}(MELS\_SIZE,\ \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{float}));}
+\DoxyCodeLine{00278\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{memory_8hpp_a2dc8370f84968c0d5865b3cbab3a9ca5}{EI\_ERR\_AND\_RETURN\_ON\_NULL}}(mels,\ \mbox{\hyperlink{namespaceei_a35329cd4e57031263ba0a94c8d3959baa8340d6c1221f3cd7e0055ef8df56df32}{EIDSP\_OUT\_OF\_MEM}});}
+\DoxyCodeLine{00279\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{memory_8hpp_ae493c2ffb918aeef416159a5249c8e4a}{ei\_unique\_ptr\_t}}\ \_\_ptr\_\_(mels,[mem\_size](\textcolor{keywordtype}{void}*\ \mbox{\hyperlink{namespaceei_a593af57fa44116ca69a3e62d0fd75adc}{ptr}})\{ei::ei\_dsp\_free\_func(\mbox{\hyperlink{namespaceei_a593af57fa44116ca69a3e62d0fd75adc}{ptr}},\ mem\_size);\});}
+\DoxyCodeLine{00280\ \ \ \ \ \ \ \ \ uint16\_t*\ bins\ =\ \textcolor{keyword}{reinterpret\_cast<}uint16\_t*\textcolor{keyword}{>}(mels);\ \textcolor{comment}{//\ alias\ the\ mels\ array\ so\ we\ can\ reuse\ the\ space}}
+\DoxyCodeLine{00281\ }
+\DoxyCodeLine{00282\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classei_1_1numpy_a53d5dae11b3b26d3d5a013012cbbf0a6}{numpy::linspace}}(}
+\DoxyCodeLine{00283\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classei_1_1speechpy_1_1functions_a1aca989f2005a22635104f3966f678d8}{functions::frequency\_to\_mel}}(\textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{float}\textcolor{keyword}{>}(low\_frequency)),}
+\DoxyCodeLine{00284\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classei_1_1speechpy_1_1functions_a1aca989f2005a22635104f3966f678d8}{functions::frequency\_to\_mel}}(\textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{float}\textcolor{keyword}{>}(high\_frequency)),}
+\DoxyCodeLine{00285\ \ \ \ \ \ \ \ \ \ \ \ \ num\_filters\ +\ 2,}
+\DoxyCodeLine{00286\ \ \ \ \ \ \ \ \ \ \ \ \ mels);}
+\DoxyCodeLine{00287\ }
+\DoxyCodeLine{00288\ \ \ \ \ \ \ \ \ uint16\_t\ max\_bin\ =\ \mbox{\hyperlink{ei__fill__result__struct_8h_a1e2c5d39b6cd3ec0513b894664d20e17}{version}}\ >=\ 4\ ?\ \mbox{\hyperlink{irfft_8cc_abe2bad6726f6194f0b5165fe4b37a65f}{fft\_length}}\ :\ power\_spectrum\_frame\_size;\ \textcolor{comment}{//\ preserve\ a\ bug\ in\ v<4}}
+\DoxyCodeLine{00289\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ go\ to\ -\/1\ size\ b/c\ special\ handling,\ see\ after}}
+\DoxyCodeLine{00290\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (uint16\_t\ ix\ =\ 0;\ ix\ <\ MELS\_SIZE-\/1;\ ix++)\ \{}
+\DoxyCodeLine{00291\ \ \ \ \ \ \ \ \ \ \ \ \ mels[ix]\ =\ \mbox{\hyperlink{classei_1_1speechpy_1_1functions_a4a915ee8322794a277502b0539a28258}{functions::mel\_to\_frequency}}(mels[ix]);}
+\DoxyCodeLine{00292\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (mels[ix]\ <\ low\_frequency)\ \{}
+\DoxyCodeLine{00293\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ mels[ix]\ =\ low\_frequency;}
+\DoxyCodeLine{00294\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00295\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (mels[ix]\ >\ high\_frequency)\ \{}
+\DoxyCodeLine{00296\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ mels[ix]\ =\ high\_frequency;}
+\DoxyCodeLine{00297\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00298\ \ \ \ \ \ \ \ \ \ \ \ \ bins[ix]\ =\ \mbox{\hyperlink{classei_1_1speechpy_1_1feature_af6efe2df8d1db0a8511956d742ac6a85}{get\_fft\_bin\_from\_hertz}}(max\_bin,\ mels[ix],\ \mbox{\hyperlink{ei__run__dsp_8h_a7b1ec6eee81fba90db3db34bdb8bcd91}{sampling\_frequency}});}
+\DoxyCodeLine{00299\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00300\ }
+\DoxyCodeLine{00301\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ here\ is\ a\ really\ annoying\ bug\ in\ Speechpy\ which\ calculates\ the\ frequency\ index\ wrong\ for\ the\ last\ bucket}}
+\DoxyCodeLine{00302\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ the\ last\ 'hertz'\ value\ is\ not\ 8,000\ (with\ sampling\ rate\ 16,000)\ but\ 7,999.999999}}
+\DoxyCodeLine{00303\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ thus\ calculating\ the\ bucket\ to\ 64,\ not\ 65.}}
+\DoxyCodeLine{00304\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ we're\ adjusting\ this\ here\ a\ tiny\ bit\ to\ ensure\ we\ have\ the\ same\ result}}
+\DoxyCodeLine{00305\ \ \ \ \ \ \ \ \ mels[MELS\_SIZE-\/1]\ =\ \mbox{\hyperlink{classei_1_1speechpy_1_1functions_a4a915ee8322794a277502b0539a28258}{functions::mel\_to\_frequency}}(mels[MELS\_SIZE-\/1]);}
+\DoxyCodeLine{00306\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (mels[MELS\_SIZE-\/1]\ >\ high\_frequency)\ \{}
+\DoxyCodeLine{00307\ \ \ \ \ \ \ \ \ \ \ \ \ mels[MELS\_SIZE-\/1]\ =\ high\_frequency;}
+\DoxyCodeLine{00308\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00309\ \ \ \ \ \ \ \ \ mels[MELS\_SIZE-\/1]\ -\/=\ 0.001;}
+\DoxyCodeLine{00310\ \ \ \ \ \ \ \ \ bins[MELS\_SIZE-\/1]\ =\ \mbox{\hyperlink{classei_1_1speechpy_1_1feature_af6efe2df8d1db0a8511956d742ac6a85}{get\_fft\_bin\_from\_hertz}}(max\_bin,\ mels[MELS\_SIZE-\/1],\ \mbox{\hyperlink{ei__run__dsp_8h_a7b1ec6eee81fba90db3db34bdb8bcd91}{sampling\_frequency}});}
+\DoxyCodeLine{00311\ }
+\DoxyCodeLine{00312\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{memory_8hpp_a605d3e24f2bb57fb1133dd21553727d2}{EI\_DSP\_MATRIX}}(power\_spectrum\_frame,\ 1,\ power\_spectrum\_frame\_size);}
+\DoxyCodeLine{00313\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!power\_spectrum\_frame.buffer)\ \{}
+\DoxyCodeLine{00314\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{config_8hpp_a6a2e91879ad7a904747f26b218ada23a}{EIDSP\_ERR}}(\mbox{\hyperlink{namespaceei_a35329cd4e57031263ba0a94c8d3959baa8340d6c1221f3cd7e0055ef8df56df32}{EIDSP\_OUT\_OF\_MEM}});}
+\DoxyCodeLine{00315\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00316\ }
+\DoxyCodeLine{00317\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ get\ signal\ data\ from\ the\ audio\ file}}
+\DoxyCodeLine{00318\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{memory_8hpp_a605d3e24f2bb57fb1133dd21553727d2}{EI\_DSP\_MATRIX}}(signal\_frame,\ 1,\ stack\_frame\_info.\mbox{\hyperlink{structei_1_1speechpy_1_1ei__stack__frames__info_af6bfbba32975d2679b6cd143cc823099}{frame\_length}});}
+\DoxyCodeLine{00319\ }
+\DoxyCodeLine{00320\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ ix\ =\ 0;\ ix\ <\ stack\_frame\_info.\mbox{\hyperlink{structei_1_1speechpy_1_1ei__stack__frames__info_a954c3886d0c0fc1fe4f65d991ee9d547}{frame\_ixs}}.size();\ ix++)\ \{}
+\DoxyCodeLine{00321\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ don't\ read\ outside\ of\ the\ audio\ buffer...\ we'll\ automatically\ zero\ pad\ then}}
+\DoxyCodeLine{00322\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ signal\_offset\ =\ stack\_frame\_info.\mbox{\hyperlink{structei_1_1speechpy_1_1ei__stack__frames__info_a954c3886d0c0fc1fe4f65d991ee9d547}{frame\_ixs}}.at(ix);}
+\DoxyCodeLine{00323\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ signal\_length\ =\ stack\_frame\_info.\mbox{\hyperlink{structei_1_1speechpy_1_1ei__stack__frames__info_af6bfbba32975d2679b6cd143cc823099}{frame\_length}};}
+\DoxyCodeLine{00324\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (signal\_offset\ +\ signal\_length\ >\ stack\_frame\_info.\mbox{\hyperlink{structei_1_1speechpy_1_1ei__stack__frames__info_ad87db5457d7f5913af1cb4c67b3714ef}{signal}}-\/>\mbox{\hyperlink{structei__signal__t_a1c8c22d02be8f3b6a66d24819f98d9b3}{total\_length}})\ \{}
+\DoxyCodeLine{00325\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ signal\_length\ =\ signal\_length\ -\/}
+\DoxyCodeLine{00326\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (stack\_frame\_info.\mbox{\hyperlink{structei_1_1speechpy_1_1ei__stack__frames__info_ad87db5457d7f5913af1cb4c67b3714ef}{signal}}-\/>\mbox{\hyperlink{structei__signal__t_a1c8c22d02be8f3b6a66d24819f98d9b3}{total\_length}}\ -\/\ (signal\_offset\ +\ signal\_length));}
+\DoxyCodeLine{00327\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00328\ }
+\DoxyCodeLine{00329\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__dsp_8h_a6baa346e44f4c2158d2be4f9b77b8203}{ret}}\ =\ stack\_frame\_info.\mbox{\hyperlink{structei_1_1speechpy_1_1ei__stack__frames__info_ad87db5457d7f5913af1cb4c67b3714ef}{signal}}-\/>\mbox{\hyperlink{structei__signal__t_a4d633ae46b8e54d485687b5860a85311}{get\_data}}(}
+\DoxyCodeLine{00330\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ signal\_offset,}
+\DoxyCodeLine{00331\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ signal\_length,}
+\DoxyCodeLine{00332\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ signal\_frame.buffer}
+\DoxyCodeLine{00333\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{00334\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{ei__run__dsp_8h_a6baa346e44f4c2158d2be4f9b77b8203}{ret}}\ !=\ 0)\ \{}
+\DoxyCodeLine{00335\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{config_8hpp_a6a2e91879ad7a904747f26b218ada23a}{EIDSP\_ERR}}(\mbox{\hyperlink{ei__run__dsp_8h_a6baa346e44f4c2158d2be4f9b77b8203}{ret}});}
+\DoxyCodeLine{00336\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00337\ }
+\DoxyCodeLine{00338\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__dsp_8h_a6baa346e44f4c2158d2be4f9b77b8203}{ret}}\ =\ \mbox{\hyperlink{classei_1_1numpy_a30b249320c274c7b083ca708cd8dee19}{numpy::power\_spectrum}}(}
+\DoxyCodeLine{00339\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ signal\_frame.buffer,}
+\DoxyCodeLine{00340\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ stack\_frame\_info.\mbox{\hyperlink{structei_1_1speechpy_1_1ei__stack__frames__info_af6bfbba32975d2679b6cd143cc823099}{frame\_length}},}
+\DoxyCodeLine{00341\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ power\_spectrum\_frame.buffer,}
+\DoxyCodeLine{00342\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ power\_spectrum\_frame\_size,}
+\DoxyCodeLine{00343\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{irfft_8cc_abe2bad6726f6194f0b5165fe4b37a65f}{fft\_length}}}
+\DoxyCodeLine{00344\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{00345\ }
+\DoxyCodeLine{00346\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{ei__run__dsp_8h_a6baa346e44f4c2158d2be4f9b77b8203}{ret}}\ !=\ 0)\ \{}
+\DoxyCodeLine{00347\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{config_8hpp_a6a2e91879ad7a904747f26b218ada23a}{EIDSP\_ERR}}(\mbox{\hyperlink{ei__run__dsp_8h_a6baa346e44f4c2158d2be4f9b77b8203}{ret}});}
+\DoxyCodeLine{00348\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00349\ }
+\DoxyCodeLine{00350\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}\ energy\ =\ \mbox{\hyperlink{classei_1_1numpy_aa7ebbbaff90b8c2954ac74a5e623441e}{numpy::sum}}(power\_spectrum\_frame.buffer,\ power\_spectrum\_frame\_size);}
+\DoxyCodeLine{00351\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (energy\ ==\ 0)\ \{}
+\DoxyCodeLine{00352\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ energy\ =\ 1e-\/10;}
+\DoxyCodeLine{00353\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00354\ }
+\DoxyCodeLine{00355\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (out\_energies)\ \{}
+\DoxyCodeLine{00356\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ out\_energies-\/>\mbox{\hyperlink{structei__matrix_a5412b64a3551881269b8c1493f0da17a}{buffer}}[ix]\ =\ energy;}
+\DoxyCodeLine{00357\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00358\ }
+\DoxyCodeLine{00359\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ row\_ptr\ =\ out\_features-\/>get\_row\_ptr(ix);}
+\DoxyCodeLine{00360\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ num\_filters;\ i++)\ \{}
+\DoxyCodeLine{00361\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ left\ =\ bins[i];}
+\DoxyCodeLine{00362\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ middle\ =\ bins[i+1];}
+\DoxyCodeLine{00363\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ right\ =\ bins[i+2];}
+\DoxyCodeLine{00364\ }
+\DoxyCodeLine{00365\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__aligned__malloc_8h_a95cd4fa643ce672b347744b35c5b7056}{assert}}(right\ <\ power\_spectrum\_frame\_size);}
+\DoxyCodeLine{00366\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ now\ we\ have\ weights\ and\ locations\ to\ move\ from\ fft\ to\ mel\ sgram}}
+\DoxyCodeLine{00367\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ both\ left\ and\ right\ become\ zero\ weights,\ so\ skip\ them}}
+\DoxyCodeLine{00368\ }
+\DoxyCodeLine{00369\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ middle\ always\ has\ weight\ of\ 1.0}}
+\DoxyCodeLine{00370\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ since\ we\ skip\ left\ and\ right,\ if\ left\ =\ middle\ we\ need\ to\ handle\ that}}
+\DoxyCodeLine{00371\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ row\_ptr[i]\ =\ power\_spectrum\_frame.buffer[middle];}
+\DoxyCodeLine{00372\ }
+\DoxyCodeLine{00373\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ bin\ =\ left+1;\ bin\ <\ right;\ bin++)\ \{}
+\DoxyCodeLine{00374\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (bin\ <\ middle)\ \{}
+\DoxyCodeLine{00375\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ row\_ptr[i]\ +=}
+\DoxyCodeLine{00376\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ((\textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{float}\textcolor{keyword}{>}(bin)\ -\/\ left)\ /\ (middle\ -\/\ left))\ *\ \textcolor{comment}{//\ weight\ *}}
+\DoxyCodeLine{00377\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ power\_spectrum\_frame.buffer[bin];}
+\DoxyCodeLine{00378\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00379\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ intentionally\ skip\ middle,\ handled\ above}}
+\DoxyCodeLine{00380\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (bin\ >\ middle)\ \{}
+\DoxyCodeLine{00381\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ row\_ptr[i]\ +=}
+\DoxyCodeLine{00382\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ((right\ -\/\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{float}\textcolor{keyword}{>}(bin))\ /\ (right\ -\/\ middle))\ *\ \textcolor{comment}{//\ weight\ *}}
+\DoxyCodeLine{00383\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ power\_spectrum\_frame.buffer[bin];}
+\DoxyCodeLine{00384\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00385\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00386\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00387\ }
+\DoxyCodeLine{00388\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{ei__run__dsp_8h_a6baa346e44f4c2158d2be4f9b77b8203}{ret}}\ !=\ 0)\ \{}
+\DoxyCodeLine{00389\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{config_8hpp_a6a2e91879ad7a904747f26b218ada23a}{EIDSP\_ERR}}(\mbox{\hyperlink{ei__run__dsp_8h_a6baa346e44f4c2158d2be4f9b77b8203}{ret}});}
+\DoxyCodeLine{00390\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00391\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00392\ }
+\DoxyCodeLine{00393\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classei_1_1numpy_a47aada25724b4d407b8ac3b75496f0c3}{numpy::zero\_handling}}(out\_features);}
+\DoxyCodeLine{00394\ }
+\DoxyCodeLine{00395\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespaceei_a35329cd4e57031263ba0a94c8d3959baa58f9da92fe1aff29466bdd4aa2a7b361}{EIDSP\_OK}};}
+\DoxyCodeLine{00396\ \ \ \ \ \}}
+\DoxyCodeLine{00397\ }
+\DoxyCodeLine{00418\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{classei_1_1speechpy_1_1feature_a3aa09d81e66e3ca40a4ad4c7629b12a6}{mfe\_v3}}(\mbox{\hyperlink{structei__matrix}{matrix\_t}}\ *out\_features,\ \mbox{\hyperlink{structei__matrix}{matrix\_t}}\ *out\_energies,}
+\DoxyCodeLine{00419\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structei__signal__t}{signal\_t}}\ *\mbox{\hyperlink{classei_1_1signal}{signal}},}
+\DoxyCodeLine{00420\ \ \ \ \ \ \ \ \ uint32\_t\ \mbox{\hyperlink{ei__run__dsp_8h_a7b1ec6eee81fba90db3db34bdb8bcd91}{sampling\_frequency}},}
+\DoxyCodeLine{00421\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}\ frame\_length,\ \textcolor{keywordtype}{float}\ frame\_stride,\ uint16\_t\ num\_filters,}
+\DoxyCodeLine{00422\ \ \ \ \ \ \ \ \ uint16\_t\ \mbox{\hyperlink{irfft_8cc_abe2bad6726f6194f0b5165fe4b37a65f}{fft\_length}},\ uint32\_t\ low\_frequency,\ uint32\_t\ high\_frequency,}
+\DoxyCodeLine{00423\ \ \ \ \ \ \ \ \ uint16\_t\ \mbox{\hyperlink{ei__fill__result__struct_8h_a1e2c5d39b6cd3ec0513b894664d20e17}{version}}}
+\DoxyCodeLine{00424\ \ \ \ \ \ \ \ \ )}
+\DoxyCodeLine{00425\ \ \ \ \ \{}
+\DoxyCodeLine{00426\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{ei__run__dsp_8h_a6baa346e44f4c2158d2be4f9b77b8203}{ret}}\ =\ 0;}
+\DoxyCodeLine{00427\ }
+\DoxyCodeLine{00428\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (high\_frequency\ ==\ 0)\ \{}
+\DoxyCodeLine{00429\ \ \ \ \ \ \ \ \ \ \ \ \ high\_frequency\ =\ \mbox{\hyperlink{ei__run__dsp_8h_a7b1ec6eee81fba90db3db34bdb8bcd91}{sampling\_frequency}}\ /\ 2;}
+\DoxyCodeLine{00430\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00431\ }
+\DoxyCodeLine{00432\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (low\_frequency\ ==\ 0)\ \{}
+\DoxyCodeLine{00433\ \ \ \ \ \ \ \ \ \ \ \ \ low\_frequency\ =\ 300;}
+\DoxyCodeLine{00434\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00435\ }
+\DoxyCodeLine{00436\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structei_1_1speechpy_1_1ei__stack__frames__info}{stack\_frames\_info\_t}}\ stack\_frame\_info\ =\ \{\ 0\ \};}
+\DoxyCodeLine{00437\ \ \ \ \ \ \ \ \ stack\_frame\_info.\mbox{\hyperlink{structei_1_1speechpy_1_1ei__stack__frames__info_ad87db5457d7f5913af1cb4c67b3714ef}{signal}}\ =\ \mbox{\hyperlink{group__ei__functions_ga46d130150ef0ce589284705bdc4c8b69}{signal}};}
+\DoxyCodeLine{00438\ }
+\DoxyCodeLine{00439\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__dsp_8h_a6baa346e44f4c2158d2be4f9b77b8203}{ret}}\ =\ processing::stack\_frames(}
+\DoxyCodeLine{00440\ \ \ \ \ \ \ \ \ \ \ \ \ \&stack\_frame\_info,}
+\DoxyCodeLine{00441\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__dsp_8h_a7b1ec6eee81fba90db3db34bdb8bcd91}{sampling\_frequency}},}
+\DoxyCodeLine{00442\ \ \ \ \ \ \ \ \ \ \ \ \ frame\_length,}
+\DoxyCodeLine{00443\ \ \ \ \ \ \ \ \ \ \ \ \ frame\_stride,}
+\DoxyCodeLine{00444\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{false},}
+\DoxyCodeLine{00445\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__fill__result__struct_8h_a1e2c5d39b6cd3ec0513b894664d20e17}{version}}}
+\DoxyCodeLine{00446\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{00447\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{ei__run__dsp_8h_a6baa346e44f4c2158d2be4f9b77b8203}{ret}}\ !=\ 0)\ \{}
+\DoxyCodeLine{00448\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{config_8hpp_a6a2e91879ad7a904747f26b218ada23a}{EIDSP\_ERR}}(\mbox{\hyperlink{ei__run__dsp_8h_a6baa346e44f4c2158d2be4f9b77b8203}{ret}});}
+\DoxyCodeLine{00449\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00450\ }
+\DoxyCodeLine{00451\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (stack\_frame\_info.\mbox{\hyperlink{structei_1_1speechpy_1_1ei__stack__frames__info_a954c3886d0c0fc1fe4f65d991ee9d547}{frame\_ixs}}.size()\ !=\ out\_features-\/>\mbox{\hyperlink{structei__matrix_a263c997028804ca14b749f64eeb3fe84}{rows}})\ \{}
+\DoxyCodeLine{00452\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{config_8hpp_a6a2e91879ad7a904747f26b218ada23a}{EIDSP\_ERR}}(\mbox{\hyperlink{namespaceei_a35329cd4e57031263ba0a94c8d3959baa38ee0f868403ad45472a6e330d9af02f}{EIDSP\_MATRIX\_SIZE\_MISMATCH}});}
+\DoxyCodeLine{00453\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00454\ }
+\DoxyCodeLine{00455\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (num\_filters\ !=\ out\_features-\/>\mbox{\hyperlink{structei__matrix_a71fe3190b5ec3ab128461bd7903d3221}{cols}})\ \{}
+\DoxyCodeLine{00456\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{config_8hpp_a6a2e91879ad7a904747f26b218ada23a}{EIDSP\_ERR}}(\mbox{\hyperlink{namespaceei_a35329cd4e57031263ba0a94c8d3959baa38ee0f868403ad45472a6e330d9af02f}{EIDSP\_MATRIX\_SIZE\_MISMATCH}});}
+\DoxyCodeLine{00457\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00458\ }
+\DoxyCodeLine{00459\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (out\_energies)\ \{}
+\DoxyCodeLine{00460\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (stack\_frame\_info.\mbox{\hyperlink{structei_1_1speechpy_1_1ei__stack__frames__info_a954c3886d0c0fc1fe4f65d991ee9d547}{frame\_ixs}}.size()\ !=\ out\_energies-\/>\mbox{\hyperlink{structei__matrix_a263c997028804ca14b749f64eeb3fe84}{rows}}\ ||\ out\_energies-\/>\mbox{\hyperlink{structei__matrix_a71fe3190b5ec3ab128461bd7903d3221}{cols}}\ !=\ 1)\ \{}
+\DoxyCodeLine{00461\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{config_8hpp_a6a2e91879ad7a904747f26b218ada23a}{EIDSP\_ERR}}(\mbox{\hyperlink{namespaceei_a35329cd4e57031263ba0a94c8d3959baa38ee0f868403ad45472a6e330d9af02f}{EIDSP\_MATRIX\_SIZE\_MISMATCH}});}
+\DoxyCodeLine{00462\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00463\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00464\ }
+\DoxyCodeLine{00465\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (uint32\_t\ i\ =\ 0;\ i\ <\ out\_features-\/>\mbox{\hyperlink{structei__matrix_a263c997028804ca14b749f64eeb3fe84}{rows}}\ *\ out\_features-\/>\mbox{\hyperlink{structei__matrix_a71fe3190b5ec3ab128461bd7903d3221}{cols}};\ i++)\ \{}
+\DoxyCodeLine{00466\ \ \ \ \ \ \ \ \ \ \ \ \ *(out\_features-\/>\mbox{\hyperlink{structei__matrix_a5412b64a3551881269b8c1493f0da17a}{buffer}}\ +\ i)\ =\ 0;}
+\DoxyCodeLine{00467\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00468\ }
+\DoxyCodeLine{00469\ \ \ \ \ \ \ \ \ uint16\_t\ coefficients\ =\ \mbox{\hyperlink{irfft_8cc_abe2bad6726f6194f0b5165fe4b37a65f}{fft\_length}}\ /\ 2\ +\ 1;}
+\DoxyCodeLine{00470\ }
+\DoxyCodeLine{00471\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ calculate\ the\ filterbanks\ first...\ preferably\ I\ would\ want\ to\ do\ the\ matrix\ multiplications}}
+\DoxyCodeLine{00472\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ whenever\ they\ happen,\ but\ OK...}}
+\DoxyCodeLine{00473\ \textcolor{preprocessor}{\#if\ EIDSP\_QUANTIZE\_FILTERBANK}}
+\DoxyCodeLine{00474\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{memory_8hpp_ad7fc48d20863f3b1cc66d87f57a39cc0}{EI\_DSP\_QUANTIZED\_MATRIX}}(\mbox{\hyperlink{classei_1_1speechpy_1_1feature_a3578ccfcef367157c572027df52e9605}{filterbanks}},\ num\_filters,\ coefficients,\ \&\mbox{\hyperlink{classei_1_1numpy_a26b8319b9c61759aedfe8a2b015ce6a5}{numpy::dequantize\_zero\_one}});}
+\DoxyCodeLine{00475\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00476\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{memory_8hpp_a605d3e24f2bb57fb1133dd21553727d2}{EI\_DSP\_MATRIX}}(\mbox{\hyperlink{classei_1_1speechpy_1_1feature_a3578ccfcef367157c572027df52e9605}{filterbanks}},\ num\_filters,\ coefficients);}
+\DoxyCodeLine{00477\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00478\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{classei_1_1speechpy_1_1feature_a3578ccfcef367157c572027df52e9605}{filterbanks}}.buffer)\ \{}
+\DoxyCodeLine{00479\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{config_8hpp_a6a2e91879ad7a904747f26b218ada23a}{EIDSP\_ERR}}(\mbox{\hyperlink{namespaceei_a35329cd4e57031263ba0a94c8d3959baa8340d6c1221f3cd7e0055ef8df56df32}{EIDSP\_OUT\_OF\_MEM}});}
+\DoxyCodeLine{00480\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00481\ }
+\DoxyCodeLine{00482\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__dsp_8h_a6baa346e44f4c2158d2be4f9b77b8203}{ret}}\ =\ \mbox{\hyperlink{classei_1_1speechpy_1_1feature_a3578ccfcef367157c572027df52e9605}{feature::filterbanks}}(}
+\DoxyCodeLine{00483\ \ \ \ \ \ \ \ \ \ \ \ \ \&\mbox{\hyperlink{classei_1_1speechpy_1_1feature_a3578ccfcef367157c572027df52e9605}{filterbanks}},\ num\_filters,\ coefficients,\ \mbox{\hyperlink{ei__run__dsp_8h_a7b1ec6eee81fba90db3db34bdb8bcd91}{sampling\_frequency}},\ low\_frequency,\ high\_frequency,\ \textcolor{keyword}{true});}
+\DoxyCodeLine{00484\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{ei__run__dsp_8h_a6baa346e44f4c2158d2be4f9b77b8203}{ret}}\ !=\ 0)\ \{}
+\DoxyCodeLine{00485\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{config_8hpp_a6a2e91879ad7a904747f26b218ada23a}{EIDSP\_ERR}}(\mbox{\hyperlink{ei__run__dsp_8h_a6baa346e44f4c2158d2be4f9b77b8203}{ret}});}
+\DoxyCodeLine{00486\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00487\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ ix\ =\ 0;\ ix\ <\ stack\_frame\_info.\mbox{\hyperlink{structei_1_1speechpy_1_1ei__stack__frames__info_a954c3886d0c0fc1fe4f65d991ee9d547}{frame\_ixs}}.size();\ ix++)\ \{}
+\DoxyCodeLine{00488\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ power\_spectrum\_frame\_size\ =\ (\mbox{\hyperlink{irfft_8cc_abe2bad6726f6194f0b5165fe4b37a65f}{fft\_length}}\ /\ 2\ +\ 1);}
+\DoxyCodeLine{00489\ }
+\DoxyCodeLine{00490\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{memory_8hpp_a605d3e24f2bb57fb1133dd21553727d2}{EI\_DSP\_MATRIX}}(power\_spectrum\_frame,\ 1,\ power\_spectrum\_frame\_size);}
+\DoxyCodeLine{00491\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!power\_spectrum\_frame.buffer)\ \{}
+\DoxyCodeLine{00492\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{config_8hpp_a6a2e91879ad7a904747f26b218ada23a}{EIDSP\_ERR}}(\mbox{\hyperlink{namespaceei_a35329cd4e57031263ba0a94c8d3959baa8340d6c1221f3cd7e0055ef8df56df32}{EIDSP\_OUT\_OF\_MEM}});}
+\DoxyCodeLine{00493\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00494\ }
+\DoxyCodeLine{00495\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ get\ signal\ data\ from\ the\ audio\ file}}
+\DoxyCodeLine{00496\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{memory_8hpp_a605d3e24f2bb57fb1133dd21553727d2}{EI\_DSP\_MATRIX}}(signal\_frame,\ 1,\ stack\_frame\_info.\mbox{\hyperlink{structei_1_1speechpy_1_1ei__stack__frames__info_af6bfbba32975d2679b6cd143cc823099}{frame\_length}});}
+\DoxyCodeLine{00497\ }
+\DoxyCodeLine{00498\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ don't\ read\ outside\ of\ the\ audio\ buffer...\ we'll\ automatically\ zero\ pad\ then}}
+\DoxyCodeLine{00499\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ signal\_offset\ =\ stack\_frame\_info.\mbox{\hyperlink{structei_1_1speechpy_1_1ei__stack__frames__info_a954c3886d0c0fc1fe4f65d991ee9d547}{frame\_ixs}}.at(ix);}
+\DoxyCodeLine{00500\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ signal\_length\ =\ stack\_frame\_info.\mbox{\hyperlink{structei_1_1speechpy_1_1ei__stack__frames__info_af6bfbba32975d2679b6cd143cc823099}{frame\_length}};}
+\DoxyCodeLine{00501\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (signal\_offset\ +\ signal\_length\ >\ stack\_frame\_info.\mbox{\hyperlink{structei_1_1speechpy_1_1ei__stack__frames__info_ad87db5457d7f5913af1cb4c67b3714ef}{signal}}-\/>\mbox{\hyperlink{structei__signal__t_a1c8c22d02be8f3b6a66d24819f98d9b3}{total\_length}})\ \{}
+\DoxyCodeLine{00502\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ signal\_length\ =\ signal\_length\ -\/}
+\DoxyCodeLine{00503\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (stack\_frame\_info.\mbox{\hyperlink{structei_1_1speechpy_1_1ei__stack__frames__info_ad87db5457d7f5913af1cb4c67b3714ef}{signal}}-\/>\mbox{\hyperlink{structei__signal__t_a1c8c22d02be8f3b6a66d24819f98d9b3}{total\_length}}\ -\/\ (signal\_offset\ +\ signal\_length));}
+\DoxyCodeLine{00504\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00505\ }
+\DoxyCodeLine{00506\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__dsp_8h_a6baa346e44f4c2158d2be4f9b77b8203}{ret}}\ =\ stack\_frame\_info.\mbox{\hyperlink{structei_1_1speechpy_1_1ei__stack__frames__info_ad87db5457d7f5913af1cb4c67b3714ef}{signal}}-\/>\mbox{\hyperlink{structei__signal__t_a4d633ae46b8e54d485687b5860a85311}{get\_data}}(}
+\DoxyCodeLine{00507\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ signal\_offset,}
+\DoxyCodeLine{00508\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ signal\_length,}
+\DoxyCodeLine{00509\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ signal\_frame.buffer}
+\DoxyCodeLine{00510\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{00511\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{ei__run__dsp_8h_a6baa346e44f4c2158d2be4f9b77b8203}{ret}}\ !=\ 0)\ \{}
+\DoxyCodeLine{00512\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{config_8hpp_a6a2e91879ad7a904747f26b218ada23a}{EIDSP\_ERR}}(\mbox{\hyperlink{ei__run__dsp_8h_a6baa346e44f4c2158d2be4f9b77b8203}{ret}});}
+\DoxyCodeLine{00513\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00514\ }
+\DoxyCodeLine{00515\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__dsp_8h_a6baa346e44f4c2158d2be4f9b77b8203}{ret}}\ =\ \mbox{\hyperlink{classei_1_1numpy_a30b249320c274c7b083ca708cd8dee19}{numpy::power\_spectrum}}(}
+\DoxyCodeLine{00516\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ signal\_frame.buffer,}
+\DoxyCodeLine{00517\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ stack\_frame\_info.\mbox{\hyperlink{structei_1_1speechpy_1_1ei__stack__frames__info_af6bfbba32975d2679b6cd143cc823099}{frame\_length}},}
+\DoxyCodeLine{00518\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ power\_spectrum\_frame.buffer,}
+\DoxyCodeLine{00519\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ power\_spectrum\_frame\_size,}
+\DoxyCodeLine{00520\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{irfft_8cc_abe2bad6726f6194f0b5165fe4b37a65f}{fft\_length}}}
+\DoxyCodeLine{00521\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{00522\ }
+\DoxyCodeLine{00523\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{ei__run__dsp_8h_a6baa346e44f4c2158d2be4f9b77b8203}{ret}}\ !=\ 0)\ \{}
+\DoxyCodeLine{00524\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{config_8hpp_a6a2e91879ad7a904747f26b218ada23a}{EIDSP\_ERR}}(\mbox{\hyperlink{ei__run__dsp_8h_a6baa346e44f4c2158d2be4f9b77b8203}{ret}});}
+\DoxyCodeLine{00525\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00526\ }
+\DoxyCodeLine{00527\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}\ energy\ =\ \mbox{\hyperlink{classei_1_1numpy_aa7ebbbaff90b8c2954ac74a5e623441e}{numpy::sum}}(power\_spectrum\_frame.buffer,\ power\_spectrum\_frame\_size);}
+\DoxyCodeLine{00528\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (energy\ ==\ 0)\ \{}
+\DoxyCodeLine{00529\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ energy\ =\ 1e-\/10;}
+\DoxyCodeLine{00530\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00531\ }
+\DoxyCodeLine{00532\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (out\_energies)\ \{}
+\DoxyCodeLine{00533\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ out\_energies-\/>\mbox{\hyperlink{structei__matrix_a5412b64a3551881269b8c1493f0da17a}{buffer}}[ix]\ =\ energy;}
+\DoxyCodeLine{00534\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00535\ }
+\DoxyCodeLine{00536\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ calculate\ the\ out\_features\ directly\ here}}
+\DoxyCodeLine{00537\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__dsp_8h_a6baa346e44f4c2158d2be4f9b77b8203}{ret}}\ =\ \mbox{\hyperlink{classei_1_1numpy_ad6b3f03a4d7bebe2df2a87a4dbb4edc8}{numpy::dot\_by\_row}}(}
+\DoxyCodeLine{00538\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ix,}
+\DoxyCodeLine{00539\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ power\_spectrum\_frame.buffer,}
+\DoxyCodeLine{00540\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ power\_spectrum\_frame\_size,}
+\DoxyCodeLine{00541\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&\mbox{\hyperlink{classei_1_1speechpy_1_1feature_a3578ccfcef367157c572027df52e9605}{filterbanks}},}
+\DoxyCodeLine{00542\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ out\_features}
+\DoxyCodeLine{00543\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{00544\ }
+\DoxyCodeLine{00545\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{ei__run__dsp_8h_a6baa346e44f4c2158d2be4f9b77b8203}{ret}}\ !=\ 0)\ \{}
+\DoxyCodeLine{00546\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{config_8hpp_a6a2e91879ad7a904747f26b218ada23a}{EIDSP\_ERR}}(\mbox{\hyperlink{ei__run__dsp_8h_a6baa346e44f4c2158d2be4f9b77b8203}{ret}});}
+\DoxyCodeLine{00547\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00548\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00549\ }
+\DoxyCodeLine{00550\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classei_1_1numpy_a47aada25724b4d407b8ac3b75496f0c3}{numpy::zero\_handling}}(out\_features);}
+\DoxyCodeLine{00551\ }
+\DoxyCodeLine{00552\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespaceei_a35329cd4e57031263ba0a94c8d3959baa58f9da92fe1aff29466bdd4aa2a7b361}{EIDSP\_OK}};}
+\DoxyCodeLine{00553\ \ \ \ \ \}}
+\DoxyCodeLine{00554\ }
+\DoxyCodeLine{00568\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{classei_1_1speechpy_1_1feature_ab3fda6a199849abbcaed7d16dd35a966}{spectrogram}}(\mbox{\hyperlink{structei__matrix}{matrix\_t}}\ *out\_features,}
+\DoxyCodeLine{00569\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structei__signal__t}{signal\_t}}\ *\mbox{\hyperlink{classei_1_1signal}{signal}},\ \textcolor{keywordtype}{float}\ \mbox{\hyperlink{ei__run__dsp_8h_a7b1ec6eee81fba90db3db34bdb8bcd91}{sampling\_frequency}},}
+\DoxyCodeLine{00570\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}\ frame\_length,\ \textcolor{keywordtype}{float}\ frame\_stride,\ uint16\_t\ \mbox{\hyperlink{irfft_8cc_abe2bad6726f6194f0b5165fe4b37a65f}{fft\_length}},}
+\DoxyCodeLine{00571\ \ \ \ \ \ \ \ \ uint16\_t\ \mbox{\hyperlink{ei__fill__result__struct_8h_a1e2c5d39b6cd3ec0513b894664d20e17}{version}}}
+\DoxyCodeLine{00572\ \ \ \ \ \ \ \ \ )}
+\DoxyCodeLine{00573\ \ \ \ \ \{}
+\DoxyCodeLine{00574\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{ei__run__dsp_8h_a6baa346e44f4c2158d2be4f9b77b8203}{ret}}\ =\ 0;}
+\DoxyCodeLine{00575\ }
+\DoxyCodeLine{00576\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structei_1_1speechpy_1_1ei__stack__frames__info}{stack\_frames\_info\_t}}\ stack\_frame\_info\ =\ \{\ 0\ \};}
+\DoxyCodeLine{00577\ \ \ \ \ \ \ \ \ stack\_frame\_info.\mbox{\hyperlink{structei_1_1speechpy_1_1ei__stack__frames__info_ad87db5457d7f5913af1cb4c67b3714ef}{signal}}\ =\ \mbox{\hyperlink{group__ei__functions_ga46d130150ef0ce589284705bdc4c8b69}{signal}};}
+\DoxyCodeLine{00578\ }
+\DoxyCodeLine{00579\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__dsp_8h_a6baa346e44f4c2158d2be4f9b77b8203}{ret}}\ =\ processing::stack\_frames(}
+\DoxyCodeLine{00580\ \ \ \ \ \ \ \ \ \ \ \ \ \&stack\_frame\_info,}
+\DoxyCodeLine{00581\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__dsp_8h_a7b1ec6eee81fba90db3db34bdb8bcd91}{sampling\_frequency}},}
+\DoxyCodeLine{00582\ \ \ \ \ \ \ \ \ \ \ \ \ frame\_length,}
+\DoxyCodeLine{00583\ \ \ \ \ \ \ \ \ \ \ \ \ frame\_stride,}
+\DoxyCodeLine{00584\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{false},}
+\DoxyCodeLine{00585\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__fill__result__struct_8h_a1e2c5d39b6cd3ec0513b894664d20e17}{version}}}
+\DoxyCodeLine{00586\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{00587\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{ei__run__dsp_8h_a6baa346e44f4c2158d2be4f9b77b8203}{ret}}\ !=\ 0)\ \{}
+\DoxyCodeLine{00588\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{config_8hpp_a6a2e91879ad7a904747f26b218ada23a}{EIDSP\_ERR}}(\mbox{\hyperlink{ei__run__dsp_8h_a6baa346e44f4c2158d2be4f9b77b8203}{ret}});}
+\DoxyCodeLine{00589\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00590\ }
+\DoxyCodeLine{00591\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (stack\_frame\_info.\mbox{\hyperlink{structei_1_1speechpy_1_1ei__stack__frames__info_a954c3886d0c0fc1fe4f65d991ee9d547}{frame\_ixs}}.size()\ !=\ out\_features-\/>\mbox{\hyperlink{structei__matrix_a263c997028804ca14b749f64eeb3fe84}{rows}})\ \{}
+\DoxyCodeLine{00592\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{config_8hpp_a6a2e91879ad7a904747f26b218ada23a}{EIDSP\_ERR}}(\mbox{\hyperlink{namespaceei_a35329cd4e57031263ba0a94c8d3959baa38ee0f868403ad45472a6e330d9af02f}{EIDSP\_MATRIX\_SIZE\_MISMATCH}});}
+\DoxyCodeLine{00593\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00594\ }
+\DoxyCodeLine{00595\ \ \ \ \ \ \ \ \ uint16\_t\ coefficients\ =\ \mbox{\hyperlink{irfft_8cc_abe2bad6726f6194f0b5165fe4b37a65f}{fft\_length}}\ /\ 2\ +\ 1;}
+\DoxyCodeLine{00596\ }
+\DoxyCodeLine{00597\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (coefficients\ !=\ out\_features-\/>\mbox{\hyperlink{structei__matrix_a71fe3190b5ec3ab128461bd7903d3221}{cols}})\ \{}
+\DoxyCodeLine{00598\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{config_8hpp_a6a2e91879ad7a904747f26b218ada23a}{EIDSP\_ERR}}(\mbox{\hyperlink{namespaceei_a35329cd4e57031263ba0a94c8d3959baa38ee0f868403ad45472a6e330d9af02f}{EIDSP\_MATRIX\_SIZE\_MISMATCH}});}
+\DoxyCodeLine{00599\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00600\ }
+\DoxyCodeLine{00601\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (uint32\_t\ i\ =\ 0;\ i\ <\ out\_features-\/>\mbox{\hyperlink{structei__matrix_a263c997028804ca14b749f64eeb3fe84}{rows}}\ *\ out\_features-\/>\mbox{\hyperlink{structei__matrix_a71fe3190b5ec3ab128461bd7903d3221}{cols}};\ i++)\ \{}
+\DoxyCodeLine{00602\ \ \ \ \ \ \ \ \ \ \ \ \ *(out\_features-\/>\mbox{\hyperlink{structei__matrix_a5412b64a3551881269b8c1493f0da17a}{buffer}}\ +\ i)\ =\ 0;}
+\DoxyCodeLine{00603\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00604\ }
+\DoxyCodeLine{00605\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ ix\ =\ 0;\ ix\ <\ stack\_frame\_info.\mbox{\hyperlink{structei_1_1speechpy_1_1ei__stack__frames__info_a954c3886d0c0fc1fe4f65d991ee9d547}{frame\_ixs}}.size();\ ix++)\ \{}
+\DoxyCodeLine{00606\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ get\ signal\ data\ from\ the\ audio\ file}}
+\DoxyCodeLine{00607\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{memory_8hpp_a605d3e24f2bb57fb1133dd21553727d2}{EI\_DSP\_MATRIX}}(signal\_frame,\ 1,\ stack\_frame\_info.\mbox{\hyperlink{structei_1_1speechpy_1_1ei__stack__frames__info_af6bfbba32975d2679b6cd143cc823099}{frame\_length}});}
+\DoxyCodeLine{00608\ }
+\DoxyCodeLine{00609\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ don't\ read\ outside\ of\ the\ audio\ buffer...\ we'll\ automatically\ zero\ pad\ then}}
+\DoxyCodeLine{00610\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ signal\_offset\ =\ stack\_frame\_info.\mbox{\hyperlink{structei_1_1speechpy_1_1ei__stack__frames__info_a954c3886d0c0fc1fe4f65d991ee9d547}{frame\_ixs}}.at(ix);}
+\DoxyCodeLine{00611\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ signal\_length\ =\ stack\_frame\_info.\mbox{\hyperlink{structei_1_1speechpy_1_1ei__stack__frames__info_af6bfbba32975d2679b6cd143cc823099}{frame\_length}};}
+\DoxyCodeLine{00612\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (signal\_offset\ +\ signal\_length\ >\ stack\_frame\_info.\mbox{\hyperlink{structei_1_1speechpy_1_1ei__stack__frames__info_ad87db5457d7f5913af1cb4c67b3714ef}{signal}}-\/>\mbox{\hyperlink{structei__signal__t_a1c8c22d02be8f3b6a66d24819f98d9b3}{total\_length}})\ \{}
+\DoxyCodeLine{00613\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ signal\_length\ =\ signal\_length\ -\/}
+\DoxyCodeLine{00614\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (stack\_frame\_info.\mbox{\hyperlink{structei_1_1speechpy_1_1ei__stack__frames__info_ad87db5457d7f5913af1cb4c67b3714ef}{signal}}-\/>\mbox{\hyperlink{structei__signal__t_a1c8c22d02be8f3b6a66d24819f98d9b3}{total\_length}}\ -\/\ (signal\_offset\ +\ signal\_length));}
+\DoxyCodeLine{00615\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00616\ }
+\DoxyCodeLine{00617\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__dsp_8h_a6baa346e44f4c2158d2be4f9b77b8203}{ret}}\ =\ stack\_frame\_info.\mbox{\hyperlink{structei_1_1speechpy_1_1ei__stack__frames__info_ad87db5457d7f5913af1cb4c67b3714ef}{signal}}-\/>\mbox{\hyperlink{structei__signal__t_a4d633ae46b8e54d485687b5860a85311}{get\_data}}(}
+\DoxyCodeLine{00618\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ signal\_offset,}
+\DoxyCodeLine{00619\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ signal\_length,}
+\DoxyCodeLine{00620\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ signal\_frame.buffer}
+\DoxyCodeLine{00621\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{00622\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{ei__run__dsp_8h_a6baa346e44f4c2158d2be4f9b77b8203}{ret}}\ !=\ 0)\ \{}
+\DoxyCodeLine{00623\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{config_8hpp_a6a2e91879ad7a904747f26b218ada23a}{EIDSP\_ERR}}(\mbox{\hyperlink{ei__run__dsp_8h_a6baa346e44f4c2158d2be4f9b77b8203}{ret}});}
+\DoxyCodeLine{00624\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00625\ }
+\DoxyCodeLine{00626\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ normalize\ data\ (only\ when\ version\ is\ 3)}}
+\DoxyCodeLine{00627\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{ei__fill__result__struct_8h_a1e2c5d39b6cd3ec0513b894664d20e17}{version}}\ ==\ 3)\ \{}
+\DoxyCodeLine{00628\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ it\ might\ be\ that\ everything\ is\ already\ normalized\ here...}}
+\DoxyCodeLine{00629\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ all\_between\_min\_1\_and\_1\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00630\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ ix\ =\ 0;\ ix\ <\ signal\_frame.rows\ *\ signal\_frame.cols;\ ix++)\ \{}
+\DoxyCodeLine{00631\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (signal\_frame.buffer[ix]\ <\ -\/1.0f\ ||\ signal\_frame.buffer[ix]\ >\ 1.0f)\ \{}
+\DoxyCodeLine{00632\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ all\_between\_min\_1\_and\_1\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00633\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00634\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00635\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00636\ }
+\DoxyCodeLine{00637\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!all\_between\_min\_1\_and\_1)\ \{}
+\DoxyCodeLine{00638\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__dsp_8h_a6baa346e44f4c2158d2be4f9b77b8203}{ret}}\ =\ \mbox{\hyperlink{classei_1_1numpy_a780e556d0c5dc4948320ad0ab1630666}{numpy::scale}}(\&signal\_frame,\ 1.0f\ /\ 32768.0f);}
+\DoxyCodeLine{00639\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{ei__run__dsp_8h_a6baa346e44f4c2158d2be4f9b77b8203}{ret}}\ !=\ 0)\ \{}
+\DoxyCodeLine{00640\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{config_8hpp_a6a2e91879ad7a904747f26b218ada23a}{EIDSP\_ERR}}(\mbox{\hyperlink{ei__run__dsp_8h_a6baa346e44f4c2158d2be4f9b77b8203}{ret}});}
+\DoxyCodeLine{00641\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00642\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00643\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00644\ }
+\DoxyCodeLine{00645\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__dsp_8h_a6baa346e44f4c2158d2be4f9b77b8203}{ret}}\ =\ \mbox{\hyperlink{classei_1_1numpy_a30b249320c274c7b083ca708cd8dee19}{numpy::power\_spectrum}}(}
+\DoxyCodeLine{00646\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ signal\_frame.buffer,}
+\DoxyCodeLine{00647\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ stack\_frame\_info.\mbox{\hyperlink{structei_1_1speechpy_1_1ei__stack__frames__info_af6bfbba32975d2679b6cd143cc823099}{frame\_length}},}
+\DoxyCodeLine{00648\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ out\_features-\/>\mbox{\hyperlink{structei__matrix_a5412b64a3551881269b8c1493f0da17a}{buffer}}\ +\ (ix\ *\ coefficients),}
+\DoxyCodeLine{00649\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ coefficients,}
+\DoxyCodeLine{00650\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{irfft_8cc_abe2bad6726f6194f0b5165fe4b37a65f}{fft\_length}}}
+\DoxyCodeLine{00651\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{00652\ }
+\DoxyCodeLine{00653\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{ei__run__dsp_8h_a6baa346e44f4c2158d2be4f9b77b8203}{ret}}\ !=\ 0)\ \{}
+\DoxyCodeLine{00654\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{config_8hpp_a6a2e91879ad7a904747f26b218ada23a}{EIDSP\_ERR}}(\mbox{\hyperlink{ei__run__dsp_8h_a6baa346e44f4c2158d2be4f9b77b8203}{ret}});}
+\DoxyCodeLine{00655\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00656\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00657\ }
+\DoxyCodeLine{00658\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classei_1_1numpy_a47aada25724b4d407b8ac3b75496f0c3}{numpy::zero\_handling}}(out\_features);}
+\DoxyCodeLine{00659\ }
+\DoxyCodeLine{00660\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespaceei_a35329cd4e57031263ba0a94c8d3959baa58f9da92fe1aff29466bdd4aa2a7b361}{EIDSP\_OK}};}
+\DoxyCodeLine{00661\ \ \ \ \ \}}
+\DoxyCodeLine{00662\ }
+\DoxyCodeLine{00671\ \ \ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{structmatrix__size__t}{matrix\_size\_t}}\ \mbox{\hyperlink{classei_1_1speechpy_1_1feature_a850b1f7d405da05ad3ba7b230a6ea7e5}{calculate\_mfe\_buffer\_size}}(}
+\DoxyCodeLine{00672\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ signal\_length,}
+\DoxyCodeLine{00673\ \ \ \ \ \ \ \ \ uint32\_t\ \mbox{\hyperlink{ei__run__dsp_8h_a7b1ec6eee81fba90db3db34bdb8bcd91}{sampling\_frequency}},}
+\DoxyCodeLine{00674\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}\ frame\_length,\ \textcolor{keywordtype}{float}\ frame\_stride,\ uint16\_t\ num\_filters,}
+\DoxyCodeLine{00675\ \ \ \ \ \ \ \ \ uint16\_t\ \mbox{\hyperlink{ei__fill__result__struct_8h_a1e2c5d39b6cd3ec0513b894664d20e17}{version}})}
+\DoxyCodeLine{00676\ \ \ \ \ \{}
+\DoxyCodeLine{00677\ \ \ \ \ \ \ \ \ int32\_t\ \mbox{\hyperlink{ei__run__dsp_8h_ad2900253d2779d0db156053c95c88b24}{rows}}\ =\ processing::calculate\_no\_of\_stack\_frames(}
+\DoxyCodeLine{00678\ \ \ \ \ \ \ \ \ \ \ \ \ signal\_length,}
+\DoxyCodeLine{00679\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__dsp_8h_a7b1ec6eee81fba90db3db34bdb8bcd91}{sampling\_frequency}},}
+\DoxyCodeLine{00680\ \ \ \ \ \ \ \ \ \ \ \ \ frame\_length,}
+\DoxyCodeLine{00681\ \ \ \ \ \ \ \ \ \ \ \ \ frame\_stride,}
+\DoxyCodeLine{00682\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{false},}
+\DoxyCodeLine{00683\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__fill__result__struct_8h_a1e2c5d39b6cd3ec0513b894664d20e17}{version}});}
+\DoxyCodeLine{00684\ \ \ \ \ \ \ \ \ int32\_t\ \mbox{\hyperlink{ei__run__dsp_8h_af2c814313b7abeea412ee58a5c687dc3}{cols}}\ =\ num\_filters;}
+\DoxyCodeLine{00685\ }
+\DoxyCodeLine{00686\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structmatrix__size__t}{matrix\_size\_t}}\ size\_matrix;}
+\DoxyCodeLine{00687\ \ \ \ \ \ \ \ \ size\_matrix.\mbox{\hyperlink{structmatrix__size__t_ab75209d4f69eb9536b2efa20fa31bcb2}{rows}}\ =\ (uint32\_t)\mbox{\hyperlink{ei__run__dsp_8h_ad2900253d2779d0db156053c95c88b24}{rows}};}
+\DoxyCodeLine{00688\ \ \ \ \ \ \ \ \ size\_matrix.\mbox{\hyperlink{structmatrix__size__t_a59c311df7a325b0f55a08a6843704f3a}{cols}}\ =\ (uint32\_t)\mbox{\hyperlink{ei__run__dsp_8h_af2c814313b7abeea412ee58a5c687dc3}{cols}};}
+\DoxyCodeLine{00689\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ size\_matrix;}
+\DoxyCodeLine{00690\ \ \ \ \ \}}
+\DoxyCodeLine{00691\ }
+\DoxyCodeLine{00715\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{classei_1_1speechpy_1_1feature_a6829d6ef7312b024070c3cc3b5ee229f}{mfcc}}(\mbox{\hyperlink{structei__matrix}{matrix\_t}}\ *out\_features,\ \mbox{\hyperlink{structei__signal__t}{signal\_t}}\ *\mbox{\hyperlink{classei_1_1signal}{signal}},}
+\DoxyCodeLine{00716\ \ \ \ \ \ \ \ \ uint32\_t\ \mbox{\hyperlink{ei__run__dsp_8h_a7b1ec6eee81fba90db3db34bdb8bcd91}{sampling\_frequency}},\ \textcolor{keywordtype}{float}\ frame\_length,\ \textcolor{keywordtype}{float}\ frame\_stride,}
+\DoxyCodeLine{00717\ \ \ \ \ \ \ \ \ uint8\_t\ num\_cepstral,\ uint16\_t\ num\_filters,\ uint16\_t\ \mbox{\hyperlink{irfft_8cc_abe2bad6726f6194f0b5165fe4b37a65f}{fft\_length}},}
+\DoxyCodeLine{00718\ \ \ \ \ \ \ \ \ uint32\_t\ low\_frequency,\ uint32\_t\ high\_frequency,\ \textcolor{keywordtype}{bool}\ dc\_elimination,}
+\DoxyCodeLine{00719\ \ \ \ \ \ \ \ \ uint16\_t\ \mbox{\hyperlink{ei__fill__result__struct_8h_a1e2c5d39b6cd3ec0513b894664d20e17}{version}})}
+\DoxyCodeLine{00720\ \ \ \ \ \{}
+\DoxyCodeLine{00721\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (out\_features-\/>\mbox{\hyperlink{structei__matrix_a71fe3190b5ec3ab128461bd7903d3221}{cols}}\ !=\ num\_cepstral)\ \{}
+\DoxyCodeLine{00722\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{config_8hpp_a6a2e91879ad7a904747f26b218ada23a}{EIDSP\_ERR}}(\mbox{\hyperlink{namespaceei_a35329cd4e57031263ba0a94c8d3959baa38ee0f868403ad45472a6e330d9af02f}{EIDSP\_MATRIX\_SIZE\_MISMATCH}});}
+\DoxyCodeLine{00723\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00724\ }
+\DoxyCodeLine{00725\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structmatrix__size__t}{matrix\_size\_t}}\ mfe\_matrix\_size\ =}
+\DoxyCodeLine{00726\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classei_1_1speechpy_1_1feature_a850b1f7d405da05ad3ba7b230a6ea7e5}{calculate\_mfe\_buffer\_size}}(}
+\DoxyCodeLine{00727\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classei_1_1signal}{signal}}-\/>total\_length,}
+\DoxyCodeLine{00728\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__dsp_8h_a7b1ec6eee81fba90db3db34bdb8bcd91}{sampling\_frequency}},}
+\DoxyCodeLine{00729\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ frame\_length,}
+\DoxyCodeLine{00730\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ frame\_stride,}
+\DoxyCodeLine{00731\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ num\_filters,}
+\DoxyCodeLine{00732\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__fill__result__struct_8h_a1e2c5d39b6cd3ec0513b894664d20e17}{version}});}
+\DoxyCodeLine{00733\ }
+\DoxyCodeLine{00734\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (out\_features-\/>\mbox{\hyperlink{structei__matrix_a263c997028804ca14b749f64eeb3fe84}{rows}}\ !=\ mfe\_matrix\_size.\mbox{\hyperlink{structmatrix__size__t_ab75209d4f69eb9536b2efa20fa31bcb2}{rows}})\ \{}
+\DoxyCodeLine{00735\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{config_8hpp_a6a2e91879ad7a904747f26b218ada23a}{EIDSP\_ERR}}(\mbox{\hyperlink{namespaceei_a35329cd4e57031263ba0a94c8d3959baa38ee0f868403ad45472a6e330d9af02f}{EIDSP\_MATRIX\_SIZE\_MISMATCH}});}
+\DoxyCodeLine{00736\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00737\ }
+\DoxyCodeLine{00738\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{ei__run__dsp_8h_a6baa346e44f4c2158d2be4f9b77b8203}{ret}}\ =\ \mbox{\hyperlink{namespaceei_a35329cd4e57031263ba0a94c8d3959baa58f9da92fe1aff29466bdd4aa2a7b361}{EIDSP\_OK}};}
+\DoxyCodeLine{00739\ }
+\DoxyCodeLine{00740\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ allocate\ some\ memory\ for\ the\ MFE\ result}}
+\DoxyCodeLine{00741\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{memory_8hpp_a605d3e24f2bb57fb1133dd21553727d2}{EI\_DSP\_MATRIX}}(features\_matrix,\ mfe\_matrix\_size.\mbox{\hyperlink{structmatrix__size__t_ab75209d4f69eb9536b2efa20fa31bcb2}{rows}},\ mfe\_matrix\_size.\mbox{\hyperlink{structmatrix__size__t_a59c311df7a325b0f55a08a6843704f3a}{cols}});}
+\DoxyCodeLine{00742\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!features\_matrix.buffer)\ \{}
+\DoxyCodeLine{00743\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{config_8hpp_a6a2e91879ad7a904747f26b218ada23a}{EIDSP\_ERR}}(\mbox{\hyperlink{namespaceei_a35329cd4e57031263ba0a94c8d3959baa8340d6c1221f3cd7e0055ef8df56df32}{EIDSP\_OUT\_OF\_MEM}});}
+\DoxyCodeLine{00744\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00745\ }
+\DoxyCodeLine{00746\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{memory_8hpp_a605d3e24f2bb57fb1133dd21553727d2}{EI\_DSP\_MATRIX}}(energy\_matrix,\ mfe\_matrix\_size.\mbox{\hyperlink{structmatrix__size__t_ab75209d4f69eb9536b2efa20fa31bcb2}{rows}},\ 1);}
+\DoxyCodeLine{00747\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!energy\_matrix.buffer)\ \{}
+\DoxyCodeLine{00748\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{config_8hpp_a6a2e91879ad7a904747f26b218ada23a}{EIDSP\_ERR}}(\mbox{\hyperlink{namespaceei_a35329cd4e57031263ba0a94c8d3959baa8340d6c1221f3cd7e0055ef8df56df32}{EIDSP\_OUT\_OF\_MEM}});}
+\DoxyCodeLine{00749\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00750\ }
+\DoxyCodeLine{00751\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__dsp_8h_a6baa346e44f4c2158d2be4f9b77b8203}{ret}}\ =\ \mbox{\hyperlink{classei_1_1speechpy_1_1feature_ac898f0c6f387012fd2ea79f75fc667ee}{mfe}}(\&features\_matrix,\ \&energy\_matrix,\ \mbox{\hyperlink{classei_1_1signal}{signal}},}
+\DoxyCodeLine{00752\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__dsp_8h_a7b1ec6eee81fba90db3db34bdb8bcd91}{sampling\_frequency}},\ frame\_length,\ frame\_stride,\ num\_filters,\ \mbox{\hyperlink{irfft_8cc_abe2bad6726f6194f0b5165fe4b37a65f}{fft\_length}},}
+\DoxyCodeLine{00753\ \ \ \ \ \ \ \ \ \ \ \ \ low\_frequency,\ high\_frequency,\ \mbox{\hyperlink{ei__fill__result__struct_8h_a1e2c5d39b6cd3ec0513b894664d20e17}{version}});}
+\DoxyCodeLine{00754\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{ei__run__dsp_8h_a6baa346e44f4c2158d2be4f9b77b8203}{ret}}\ !=\ \mbox{\hyperlink{namespaceei_a35329cd4e57031263ba0a94c8d3959baa58f9da92fe1aff29466bdd4aa2a7b361}{EIDSP\_OK}})\ \{}
+\DoxyCodeLine{00755\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{config_8hpp_a6a2e91879ad7a904747f26b218ada23a}{EIDSP\_ERR}}(\mbox{\hyperlink{ei__run__dsp_8h_a6baa346e44f4c2158d2be4f9b77b8203}{ret}});}
+\DoxyCodeLine{00756\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00757\ }
+\DoxyCodeLine{00758\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ ok...\ now\ we\ need\ to\ calculate\ the\ MFCC\ from\ this...}}
+\DoxyCodeLine{00759\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ first\ do\ log()\ over\ all\ features...}}
+\DoxyCodeLine{00760\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__dsp_8h_a6baa346e44f4c2158d2be4f9b77b8203}{ret}}\ =\ \mbox{\hyperlink{classei_1_1numpy_a049e9e2d710c874e040768f1864268c5}{numpy::log}}(\&features\_matrix);}
+\DoxyCodeLine{00761\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{ei__run__dsp_8h_a6baa346e44f4c2158d2be4f9b77b8203}{ret}}\ !=\ \mbox{\hyperlink{namespaceei_a35329cd4e57031263ba0a94c8d3959baa58f9da92fe1aff29466bdd4aa2a7b361}{EIDSP\_OK}})\ \{}
+\DoxyCodeLine{00762\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{config_8hpp_a6a2e91879ad7a904747f26b218ada23a}{EIDSP\_ERR}}(\mbox{\hyperlink{ei__run__dsp_8h_a6baa346e44f4c2158d2be4f9b77b8203}{ret}});}
+\DoxyCodeLine{00763\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00764\ }
+\DoxyCodeLine{00765\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ now\ do\ DST\ type\ 2}}
+\DoxyCodeLine{00766\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__dsp_8h_a6baa346e44f4c2158d2be4f9b77b8203}{ret}}\ =\ \mbox{\hyperlink{classei_1_1numpy_aadddfe071bb27c883a6ab26cd6de9d22}{numpy::dct2}}(\&features\_matrix,\ \mbox{\hyperlink{numpy__types_8h_a40701d30aad9350e66c0e10c9b167ab8a18511e97663ebace8d24ce58f08f8b71}{DCT\_NORMALIZATION\_ORTHO}});}
+\DoxyCodeLine{00767\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{ei__run__dsp_8h_a6baa346e44f4c2158d2be4f9b77b8203}{ret}}\ !=\ \mbox{\hyperlink{namespaceei_a35329cd4e57031263ba0a94c8d3959baa58f9da92fe1aff29466bdd4aa2a7b361}{EIDSP\_OK}})\ \{}
+\DoxyCodeLine{00768\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{config_8hpp_a6a2e91879ad7a904747f26b218ada23a}{EIDSP\_ERR}}(\mbox{\hyperlink{ei__run__dsp_8h_a6baa346e44f4c2158d2be4f9b77b8203}{ret}});}
+\DoxyCodeLine{00769\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00770\ }
+\DoxyCodeLine{00771\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ replace\ first\ cepstral\ coefficient\ with\ log\ of\ frame\ energy\ for\ DC\ elimination}}
+\DoxyCodeLine{00772\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (dc\_elimination)\ \{}
+\DoxyCodeLine{00773\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ row\ =\ 0;\ row\ <\ features\_matrix.rows;\ row++)\ \{}
+\DoxyCodeLine{00774\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ features\_matrix.buffer[row\ *\ features\_matrix.cols]\ =\ \mbox{\hyperlink{classei_1_1numpy_a049e9e2d710c874e040768f1864268c5}{numpy::log}}(energy\_matrix.buffer[row]);}
+\DoxyCodeLine{00775\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00776\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00777\ }
+\DoxyCodeLine{00778\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ copy\ to\ the\ output...}}
+\DoxyCodeLine{00779\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ row\ =\ 0;\ row\ <\ features\_matrix.rows;\ row++)\ \{}
+\DoxyCodeLine{00780\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ num\_cepstral;\ i++)\ \{}
+\DoxyCodeLine{00781\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ *(out\_features-\/>\mbox{\hyperlink{structei__matrix_a5412b64a3551881269b8c1493f0da17a}{buffer}}\ +\ (num\_cepstral\ *\ row)\ +\ i)\ =\ *(features\_matrix.buffer\ +\ (features\_matrix.cols\ *\ row)\ +\ i);}
+\DoxyCodeLine{00782\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00783\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00784\ }
+\DoxyCodeLine{00785\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespaceei_a35329cd4e57031263ba0a94c8d3959baa58f9da92fe1aff29466bdd4aa2a7b361}{EIDSP\_OK}};}
+\DoxyCodeLine{00786\ \ \ \ \ \}}
+\DoxyCodeLine{00787\ }
+\DoxyCodeLine{00796\ \ \ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{structmatrix__size__t}{matrix\_size\_t}}\ \mbox{\hyperlink{classei_1_1speechpy_1_1feature_a86fd715eebf4d9ce74cd8996e7c43ae7}{calculate\_mfcc\_buffer\_size}}(}
+\DoxyCodeLine{00797\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ signal\_length,}
+\DoxyCodeLine{00798\ \ \ \ \ \ \ \ \ uint32\_t\ \mbox{\hyperlink{ei__run__dsp_8h_a7b1ec6eee81fba90db3db34bdb8bcd91}{sampling\_frequency}},}
+\DoxyCodeLine{00799\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}\ frame\_length,\ \textcolor{keywordtype}{float}\ frame\_stride,\ uint16\_t\ num\_cepstral,}
+\DoxyCodeLine{00800\ \ \ \ \ \ \ \ \ uint16\_t\ \mbox{\hyperlink{ei__fill__result__struct_8h_a1e2c5d39b6cd3ec0513b894664d20e17}{version}})}
+\DoxyCodeLine{00801\ \ \ \ \ \{}
+\DoxyCodeLine{00802\ \ \ \ \ \ \ \ \ int32\_t\ \mbox{\hyperlink{ei__run__dsp_8h_ad2900253d2779d0db156053c95c88b24}{rows}}\ =\ processing::calculate\_no\_of\_stack\_frames(}
+\DoxyCodeLine{00803\ \ \ \ \ \ \ \ \ \ \ \ \ signal\_length,}
+\DoxyCodeLine{00804\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__dsp_8h_a7b1ec6eee81fba90db3db34bdb8bcd91}{sampling\_frequency}},}
+\DoxyCodeLine{00805\ \ \ \ \ \ \ \ \ \ \ \ \ frame\_length,}
+\DoxyCodeLine{00806\ \ \ \ \ \ \ \ \ \ \ \ \ frame\_stride,}
+\DoxyCodeLine{00807\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{false},}
+\DoxyCodeLine{00808\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__fill__result__struct_8h_a1e2c5d39b6cd3ec0513b894664d20e17}{version}});}
+\DoxyCodeLine{00809\ \ \ \ \ \ \ \ \ int32\_t\ \mbox{\hyperlink{ei__run__dsp_8h_af2c814313b7abeea412ee58a5c687dc3}{cols}}\ =\ num\_cepstral;}
+\DoxyCodeLine{00810\ }
+\DoxyCodeLine{00811\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structmatrix__size__t}{matrix\_size\_t}}\ size\_matrix;}
+\DoxyCodeLine{00812\ \ \ \ \ \ \ \ \ size\_matrix.\mbox{\hyperlink{structmatrix__size__t_ab75209d4f69eb9536b2efa20fa31bcb2}{rows}}\ =\ (uint32\_t)\mbox{\hyperlink{ei__run__dsp_8h_ad2900253d2779d0db156053c95c88b24}{rows}};}
+\DoxyCodeLine{00813\ \ \ \ \ \ \ \ \ size\_matrix.\mbox{\hyperlink{structmatrix__size__t_a59c311df7a325b0f55a08a6843704f3a}{cols}}\ =\ (uint32\_t)\mbox{\hyperlink{ei__run__dsp_8h_af2c814313b7abeea412ee58a5c687dc3}{cols}};}
+\DoxyCodeLine{00814\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ size\_matrix;}
+\DoxyCodeLine{00815\ \ \ \ \ \}}
+\DoxyCodeLine{00816\ \};}
+\DoxyCodeLine{00817\ }
+\DoxyCodeLine{00818\ \}\ \textcolor{comment}{//\ namespace\ speechpy}}
+\DoxyCodeLine{00819\ \}\ \textcolor{comment}{//\ namespace\ ei}}
+\DoxyCodeLine{00820\ }
+\DoxyCodeLine{00821\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ \_EIDSP\_SPEECHPY\_FEATURE\_H\_}}
+
+\end{DoxyCode}

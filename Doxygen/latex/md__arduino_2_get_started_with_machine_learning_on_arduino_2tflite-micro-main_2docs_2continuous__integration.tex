@@ -1,0 +1,52 @@
+\chapter{Continuous Integration Docs Contents}
+\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2docs_2continuous__integration}{}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2docs_2continuous__integration}\index{Continuous Integration Docs Contents@{Continuous Integration Docs Contents}}
+\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2docs_2continuous__integration_autotoc_md101}%
+\Hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2docs_2continuous__integration_autotoc_md101}%
+
+
+
+\begin{DoxyItemize}
+\item User Facing CI
+\begin{DoxyItemize}
+\item \`{}ci\+:run\`{} -\/ Run Tests
+\item \`{}ci\+:ready\+\_\+to\+\_\+merge\`{} -\/ Send To Merge Queue
+\end{DoxyItemize}
+\item Manually Running Tests
+\item Sync From Tensorflow Repository
+\item Merge Queue Details
+\end{DoxyItemize}\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2docs_2continuous__integration_autotoc_md102}{}\doxysection{\texorpdfstring{User Facing CI}{User Facing CI}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2docs_2continuous__integration_autotoc_md102}
+The continuous integration system is controlled by applying labels to PRs. There are only two important labels\+: {\ttfamily ci\+:run} runs the testing suite, and {\ttfamily ci\+:ready\+\_\+to\+\_\+merge} places a PR in the merge queue. \hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2docs_2continuous__integration_autotoc_md103}{}\doxysubsection{\texorpdfstring{{\ttfamily ci\+:run}}{{\ttfamily ci\+:run}}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2docs_2continuous__integration_autotoc_md103}
+The {\ttfamily ci\+:run} label runs the \href{../.github/workflows/ci.yml}{\texttt{ main testing suite}} against the PR. For details of the tests involved, examine the linked file. The {\ttfamily ci\+:run} tag is self-\/removing. \hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2docs_2continuous__integration_autotoc_md104}{}\doxysubsection{\texorpdfstring{{\ttfamily ci\+:ready\+\_\+to\+\_\+merge}}{{\ttfamily ci\+:ready\+\_\+to\+\_\+merge}}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2docs_2continuous__integration_autotoc_md104}
+After all tests from {\ttfamily ci\+:run} have passed, the Google CLA has been agreed to, and a reviewer has approved the PR, applying the {\ttfamily ci\+:ready\+\_\+to\+\_\+merge} label will enter the PR into the merge queue. Unless there is a conflict with other PR\textquotesingle{}s in the queue, this should be a fire and forget operation. In the case of a conflict due to code that is merged before a given PR, you will need to troubleshoot your code manually. \hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2docs_2continuous__integration_autotoc_md105}{}\doxysection{\texorpdfstring{Manually Running Tests}{Manually Running Tests}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2docs_2continuous__integration_autotoc_md105}
+Tests can also be run manually on the command line within a docker container, which can be built with\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{docker\ build\ -\/t\ tflm-\/ci\ -\/f\ ci/Dockerfile.micro\ .}
+
+\end{DoxyCode}
+
+
+or use the tflm-\/ci docker image from \href{https://github.com/users/TFLM-bot/packages/container/package/tflm-ci}{\texttt{ here}}.
+
+You will still need to copy or mount your fork of tflite-\/micro on to this docker container prior to running any tests. To run the built Docker image interactively and mount your local copy of tflite-\/micro on the container, run\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{docker\ run\ -\/v\ /path/to/local/tflite-\/micro:/path/to/docker/tflite-\/micro\ -\/it\ tflm-\/ci\ /bin/bash}
+
+\end{DoxyCode}
+ This way changes from your local fork will be reflected in the Docker container.
+
+You can also view or remove your instantiated containers by doing\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{docker\ ps\ -\/-\/all}
+\DoxyCodeLine{docker\ rm\ <docker\ image\ ID>}
+
+\end{DoxyCode}
+ \hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2docs_2continuous__integration_autotoc_md106}{}\doxysection{\texorpdfstring{Sync From The Tensorflow Repository}{Sync From The Tensorflow Repository}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2docs_2continuous__integration_autotoc_md106}
+While Tf\+Lite Micro and Tf\+Lite are in separate Git\+Hub repositories, the two projects continue to share common code.
+
+The \href{https://github.com/tensorflow/tensorflow}{\texttt{ Tensor\+Flow repo}} is the single source of truth for this shared code. As a result, any changes to this shared code must be made in the \href{https://github.com/tensorflow/tensorflow}{\texttt{ Tensor\+Flow repo}} which will then automatically sync\textquotesingle{}d via a scheduled \href{../.github/workflows/sync.yml}{\texttt{ Git\+Hub workflow}}. \hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2docs_2continuous__integration_autotoc_md107}{}\doxysection{\texorpdfstring{Merge Queue Details}{Merge Queue Details}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2docs_2continuous__integration_autotoc_md107}
+This section is probably only of interest if you plan to be doing surgery on the CI system. \hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2docs_2continuous__integration_autotoc_md108}{}\doxysubsection{\texorpdfstring{Mergify}{Mergify}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2docs_2continuous__integration_autotoc_md108}
+We use \href{https://mergify.com/}{\texttt{ Mergify}} for our merge queue. \href{https://docs.mergify.com/}{\texttt{ The documentation}} is reasonably straight forward. \hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2docs_2continuous__integration_autotoc_md109}{}\doxysubsection{\texorpdfstring{Config File}{Config File}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2docs_2continuous__integration_autotoc_md109}
+Our \href{../.github/mergify.yml}{\texttt{ mergify.\+yml}} is fairly standard. It triggers on {\ttfamily ci\+:ready\+\_\+to\+\_\+merge} label and requires all branch protection checks to pass before a PR can be added to the queue. When the PR is merged it removes the label. \hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2docs_2continuous__integration_autotoc_md110}{}\doxysubsection{\texorpdfstring{{\ttfamily ci\+:run} In Queue}{{\ttfamily ci\+:run} In Queue}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2docs_2continuous__integration_autotoc_md110}
+The one slightly complicated wrinkle in our system is the test suite being run only when the {\ttfamily ci\+:run} label is applied. As soon as the tests are run, the label is \href{../.github/workflows/remove-labels.yml}{\texttt{ removed}}.
+
+As the queue processes each PR, it creates a temporary branch and merges in the results of the previous passing PRs my merging main. This merge resets all the test results, so the {\ttfamily ci\+:run} tag must be \href{../.github/workflows/apply_cirun.yml}{\texttt{ reapplied}} in queue. 

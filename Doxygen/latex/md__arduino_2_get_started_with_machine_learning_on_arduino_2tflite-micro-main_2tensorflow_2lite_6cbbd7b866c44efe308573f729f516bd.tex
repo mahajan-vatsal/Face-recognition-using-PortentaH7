@@ -1,0 +1,113 @@
+\chapter{new\+\_\+platform\+\_\+support}
+\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_6cbbd7b866c44efe308573f729f516bd}{}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_6cbbd7b866c44efe308573f729f516bd}\index{new\_platform\_support@{new\_platform\_support}}
+
+\begin{DoxyItemize}
+\item Porting to a new platform
+\begin{DoxyItemize}
+\item Step 1\+: Build TFLM Static Library with Reference Kernels
+\item Step 2\+: Customize Logging and Timing Function for your Platform
+\item Step 3\+: Running the hello\+\_\+world Example
+\item Step 4\+: Building and Customizing Additional Examples
+\item Step 5\+: Integrating Optimized Kernel Implementations
+\end{DoxyItemize}
+\item Advanced Integration Topics
+\item Getting Help
+\end{DoxyItemize}\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_6cbbd7b866c44efe308573f729f516bd_autotoc_md170}{}\doxysection{\texorpdfstring{Porting to a new platform}{Porting to a new platform}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_6cbbd7b866c44efe308573f729f516bd_autotoc_md170}
+At its core, TFLM is a portable library that can be used on a variety of target hardware to run inference on Tf\+Lite models.
+
+Prior to integrating TFLM with a specific hardware involves tasks that is outside the scope of the TFLM project, including\+:
+
+
+\begin{DoxyItemize}
+\item Toolchain setup -\/ TFLM requires support for C++11
+\item Set up and installation of board-\/specific SDKs and IDEs
+\item Compiler flags and Linker setup
+\item Integrating peripherals such as cameras, microphones and accelerometers to provide the sensor inputs for the ML models.
+\end{DoxyItemize}
+
+In this guide we outline our recommended approach for integrating TFLM with a new target hardware assuming that you have already set up a development and debugging environment for you board independent of TLFLM.\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_6cbbd7b866c44efe308573f729f516bd_autotoc_md171}{}\doxysubsection{\texorpdfstring{Step 1\+: Build TFLM Static Library with Reference Kernels}{Step 1\+: Build TFLM Static Library with Reference Kernels}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_6cbbd7b866c44efe308573f729f516bd_autotoc_md171}
+Use the TFLM project generation script to create a directory tree containing only the sources that are necessary to build the code TFLM library.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{python3\ tensorflow/lite/micro/tools/project\_generation/create\_tflm\_tree.py\ \(\backslash\)}
+\DoxyCodeLine{\ \ -\/e\ hello\_world\ \(\backslash\)}
+\DoxyCodeLine{\ \ -\/e\ micro\_speech\ \(\backslash\)}
+\DoxyCodeLine{\ \ -\/e\ person\_detection\ \(\backslash\)}
+\DoxyCodeLine{\ \ /tmp/tflm-\/tree}
+
+\end{DoxyCode}
+
+
+This will create a folder that looks like the following at the top-\/level\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{examples\ \ LICENSE\ \ tensorflow\ \ third\_party}
+
+\end{DoxyCode}
+
+
+All the code in the {\ttfamily tensorflow} and {\ttfamily third\+\_\+party} folders can be compiled into a single static library (for example {\ttfamily libtflm.\+a}) using your platform-\/specific build system.
+
+TFLM\textquotesingle{}s third party dependencies are spearated out in case there is a need to have shared libraries for the third party code to avoid symbol collisions.
+
+Note that for IDEs, it might be sufficient to simply include the folder created by the TFLM project generation script into the overall IDE tree.\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_6cbbd7b866c44efe308573f729f516bd_autotoc_md172}{}\doxysubsection{\texorpdfstring{Step 2\+: Customize Logging and Timing Function for your Platform}{Step 2\+: Customize Logging and Timing Function for your Platform}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_6cbbd7b866c44efe308573f729f516bd_autotoc_md172}
+Replace the following files with a version that is specific to your target platform\+:
+
+
+\begin{DoxyItemize}
+\item \href{https://github.com/tensorflow/tflite-micro/blob/main/tensorflow/lite/micro/debug_log.cc}{\texttt{ debug\+\_\+log.\+cc}}
+\item \href{https://github.com/tensorflow/tflite-micro/blob/main/tensorflow/lite/micro/micro_time.cc}{\texttt{ micro\+\_\+time.\+cc}}
+\item \href{https://github.com/tensorflow/tflite-micro/blob/main/tensorflow/lite/micro/system_setup.cc}{\texttt{ system\+\_\+setup.\+cc}}
+\end{DoxyItemize}
+
+These can be placed anywhere in your directory tree. The only requirement is that when linking TFLM into a binary, the implementations of the functions in \href{https://github.com/tensorflow/tflite-micro/blob/main/tensorflow/lite/micro/debug_log.h}{\texttt{ debug\+\_\+log.\+h}}, \href{https://github.com/tensorflow/tflite-micro/blob/main/tensorflow/lite/micro/micro_time.h}{\texttt{ micro\+\_\+time.\+h}} and \href{https://github.com/tensorflow/tflite-micro/blob/main/tensorflow/lite/micro/debug_log.h}{\texttt{ system\+\_\+setup.\+h}} can be found.
+
+For example, the implementations of these functions for\+:
+\begin{DoxyItemize}
+\item \href{https://github.com/advaitjain/tflite-micro-sparkfun-edge-examples/tree/120f68ace95ae3d66963977ac7754acd0c86540d/tensorflow/lite/micro/sparkfun_edge}{\texttt{ Sparkfun Edge}} is the implementation of these functions for the Sparkfun Edge.
+\end{DoxyItemize}\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_6cbbd7b866c44efe308573f729f516bd_autotoc_md173}{}\doxysubsection{\texorpdfstring{Step 3\+: Running the hello\+\_\+world Example}{Step 3\+: Running the hello\+\_\+world Example}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_6cbbd7b866c44efe308573f729f516bd_autotoc_md173}
+Once you have completed step 2, you should be set up to run the {\ttfamily hello\+\_\+world} example and see the output over the UART.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{cp\ -\/r\ /tmp/tflm-\/tree/examples/hello\_world\ <path-\/to-\/platform-\/specific-\/hello-\/world>}
+
+\end{DoxyCode}
+ The {\ttfamily hello\+\_\+world} example should not need any customization and you should be able to directly build and run it.\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_6cbbd7b866c44efe308573f729f516bd_autotoc_md174}{}\doxysubsection{\texorpdfstring{Step 4\+: Building and Customizing Additional Examples}{Step 4\+: Building and Customizing Additional Examples}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_6cbbd7b866c44efe308573f729f516bd_autotoc_md174}
+We recommend that you fork the \href{https://github.com/tensorflow/tflite-micro/tree/main/tensorflow/lite/micro/examples}{\texttt{ TFLM examples}} and then modify them as needed (to add support for peripherals etc.) to run on your target platform.\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_6cbbd7b866c44efe308573f729f516bd_autotoc_md175}{}\doxysubsection{\texorpdfstring{Step 5\+: Integrating Optimized Kernel Implementations}{Step 5\+: Integrating Optimized Kernel Implementations}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_6cbbd7b866c44efe308573f729f516bd_autotoc_md175}
+TFLM has optimized kernel implementations for a variety of targets that are in sub-\/folders of the \href{https://github.com/tensorflow/tflite-micro/tree/main/tensorflow/lite/micro/kernels}{\texttt{ kernels directory}}.
+
+It is possible to use the project generation script to create a tree with these optimized kernel implementations (and associated third party dependencies).
+
+For example\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{python3\ tensorflow/lite/micro/tools/project\_generation/create\_tflm\_tree.py\ \(\backslash\)}
+\DoxyCodeLine{\ \ -\/e\ hello\_world\ -\/e\ micro\_speech\ -\/e\ person\_detection\ \(\backslash\)}
+\DoxyCodeLine{\ \ -\/-\/makefile\_options="{}TARGET=cortex\_m\_generic\ OPTIMIZED\_KERNEL\_DIR=cmsis\_nn\ TARGET\_ARCH=project\_generation"{}\ \(\backslash\)}
+\DoxyCodeLine{\ \ /tmp/tflm-\/cmsis}
+
+\end{DoxyCode}
+
+
+will create an output tree with all the sources and headers needed to use the optimized \href{https://github.com/tensorflow/tflite-micro/tree/main/tensorflow/lite/micro/kernels/cmsis_nn}{\texttt{ cmsis\+\_\+nn kernels}} for Cortex-\/M platforms.\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_6cbbd7b866c44efe308573f729f516bd_autotoc_md176}{}\doxysection{\texorpdfstring{Advanced Integration Topics}{Advanced Integration Topics}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_6cbbd7b866c44efe308573f729f516bd_autotoc_md176}
+In order to have tighter coupling between your platform-\/specific TFLM integration and the upstream TFLM repository, you might want to consider the following\+:
+
+
+\begin{DoxyEnumerate}
+\item Set up a Git\+Hub repository for your platform
+\end{DoxyEnumerate}
+\begin{DoxyEnumerate}
+\item Nightly sync between TFLM and your platform-\/specific Git\+Hub repository
+\end{DoxyEnumerate}
+\begin{DoxyEnumerate}
+\item Using Git\+Hub actions for CI
+\end{DoxyEnumerate}
+
+For some pointers on how to set this up, we refer you to the Git\+Hub repositories that integrated TFLM for the\+:
+\begin{DoxyItemize}
+\item \href{https://github.com/tensorflow/tflite-micro-arduino-examples}{\texttt{ Arduino}}\+: supported by the TFLM team
+\item \href{https://github.com/advaitjain/tflite-micro-sparkfun-edge-examples}{\texttt{ Sparkfun Edge}}\+: for demonstration purposes only, not officially supported.
+\end{DoxyItemize}
+
+Once you are set up with continuous integration and the ability to integrate newer versions of TFLM with your platform, feel free to add a build badge to TFLM\textquotesingle{}s \href{https://github.com/tensorflow/tflite-micro\#community-supported-tflm-examples}{\texttt{ Community Supported TFLM Examples}}.\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_6cbbd7b866c44efe308573f729f516bd_autotoc_md177}{}\doxysection{\texorpdfstring{Getting Help}{Getting Help}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_6cbbd7b866c44efe308573f729f516bd_autotoc_md177}
+\href{https://github.com/tensorflow/tflite-micro\#getting-help}{\texttt{ Here are some ways}} that you can reach out to get help. 

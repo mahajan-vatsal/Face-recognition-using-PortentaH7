@@ -1,0 +1,21 @@
+\chapter{resource\+\_\+variables}
+\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_52857b6fa7c4bac44dcf1687217300f5}{}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_52857b6fa7c4bac44dcf1687217300f5}\index{resource\_variables@{resource\_variables}}
+
+\begin{DoxyItemize}
+\item Resource Variables
+\begin{DoxyItemize}
+\item API
+\item Lifecycle
+\end{DoxyItemize}
+\end{DoxyItemize}\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_52857b6fa7c4bac44dcf1687217300f5_autotoc_md231}{}\doxysection{\texorpdfstring{Resource Variables}{Resource Variables}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_52857b6fa7c4bac44dcf1687217300f5_autotoc_md231}
+This doc outlines how to use the TFLite Micro Resource Variables class to use the VAR\+\_\+\+HANDLE, ASSIGN\+\_\+\+RESOURCE and READ\+\_\+\+RESOURCE operators. This feature is optional in order to prevent binary bloat on resource constrained systems.\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_52857b6fa7c4bac44dcf1687217300f5_autotoc_md232}{}\doxysubsection{\texorpdfstring{API}{API}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_52857b6fa7c4bac44dcf1687217300f5_autotoc_md232}
+The Micro\+Resource\+Variables factory method takes a Micro\+Allocator and an int indicating the number of resource varibles to support. This allows the application to choose the correct number of variables based on the model.\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_52857b6fa7c4bac44dcf1687217300f5_autotoc_md233}{}\doxysubsection{\texorpdfstring{Lifecycle}{Lifecycle}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_52857b6fa7c4bac44dcf1687217300f5_autotoc_md233}
+When the Resource\+Variables class is created in the application, it contains an array of N Resource\+Variable handles. The index into this array is the Resource ID.
+
+On the first call to Prepare in the VAR\+\_\+\+HANDLE op, a new resource ID is reserved and the resource ID value is referenced from within the output tensor of VAR\+\_\+\+HANDLE. On the first call to Prepare in ASSIGN\+\_\+\+VARIABLE, the specified ID found in the input index tensor is updated based on the size of the input value tensor, and its resource buffer is allocated.
+
+Future invocations of READ\+\_\+\+VARIABLE and ASSIGN\+\_\+\+VARIABLE read and write to and from the allocated resource buffer.
+
+The lifecycle must follow the pattern\+: VAR\+\_\+\+HANDLE Prepare() -\/\texorpdfstring{$>$}{>} ASSIGN\+\_\+\+VARIABLE Prepare() -\/\texorpdfstring{$>$}{>} Other calls
+
+Note that VAR\+\_\+\+HANDLE Prepare() and ASSIGN\+\_\+\+VARIABLE Prepare() may be called more that once, across multiple subgraphs. Only the first call to each will generate a new resource ID or allocate a resource buffer. 

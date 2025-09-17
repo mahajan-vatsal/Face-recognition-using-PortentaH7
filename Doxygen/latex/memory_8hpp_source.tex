@@ -1,0 +1,194 @@
+\doxysection{memory.\+hpp}
+\hypertarget{memory_8hpp_source}{}\label{memory_8hpp_source}\index{Face\_Access\_inferencing/src/edge-\/impulse-\/sdk/dsp/memory.hpp@{Face\_Access\_inferencing/src/edge-\/impulse-\/sdk/dsp/memory.hpp}}
+\mbox{\hyperlink{memory_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{00002\ \textcolor{comment}{\ *\ Copyright\ (c)\ 2024\ EdgeImpulse\ Inc.}}
+\DoxyCodeLine{00003\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00004\ \textcolor{comment}{\ *\ Generated\ by\ Edge\ Impulse\ and\ licensed\ under\ the\ applicable\ Edge\ Impulse}}
+\DoxyCodeLine{00005\ \textcolor{comment}{\ *\ Terms\ of\ Service.\ Community\ and\ Professional\ Terms\ of\ Service}}
+\DoxyCodeLine{00006\ \textcolor{comment}{\ *\ (https://docs.edgeimpulse.com/page/terms-\/of-\/service)\ or\ Enterprise\ Terms\ of}}
+\DoxyCodeLine{00007\ \textcolor{comment}{\ *\ Service\ (https://docs.edgeimpulse.com/page/enterprise-\/terms-\/of-\/service),}}
+\DoxyCodeLine{00008\ \textcolor{comment}{\ *\ according\ to\ your\ product\ plan\ subscription\ (the\ “License”).}}
+\DoxyCodeLine{00009\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00010\ \textcolor{comment}{\ *\ This\ software,\ documentation\ and\ other\ associated\ files\ (collectively\ referred}}
+\DoxyCodeLine{00011\ \textcolor{comment}{\ *\ to\ as\ the\ “Software”)\ is\ a\ single\ SDK\ variation\ generated\ by\ the\ Edge\ Impulse}}
+\DoxyCodeLine{00012\ \textcolor{comment}{\ *\ platform\ and\ requires\ an\ active\ paid\ Edge\ Impulse\ subscription\ to\ use\ this}}
+\DoxyCodeLine{00013\ \textcolor{comment}{\ *\ Software\ for\ any\ purpose.}}
+\DoxyCodeLine{00014\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00015\ \textcolor{comment}{\ *\ You\ may\ NOT\ use\ this\ Software\ unless\ you\ have\ an\ active\ Edge\ Impulse\ subscription}}
+\DoxyCodeLine{00016\ \textcolor{comment}{\ *\ that\ meets\ the\ eligibility\ requirements\ for\ the\ applicable\ License,\ subject\ to}}
+\DoxyCodeLine{00017\ \textcolor{comment}{\ *\ your\ full\ and\ continued\ compliance\ with\ the\ terms\ and\ conditions\ of\ the\ License,}}
+\DoxyCodeLine{00018\ \textcolor{comment}{\ *\ including\ without\ limitation\ any\ usage\ restrictions\ under\ the\ applicable\ License.}}
+\DoxyCodeLine{00019\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00020\ \textcolor{comment}{\ *\ If\ you\ do\ not\ have\ an\ active\ Edge\ Impulse\ product\ plan\ subscription,\ or\ if\ use}}
+\DoxyCodeLine{00021\ \textcolor{comment}{\ *\ of\ this\ Software\ exceeds\ the\ usage\ limitations\ of\ your\ Edge\ Impulse\ product\ plan}}
+\DoxyCodeLine{00022\ \textcolor{comment}{\ *\ subscription,\ you\ are\ not\ permitted\ to\ use\ this\ Software\ and\ must\ immediately}}
+\DoxyCodeLine{00023\ \textcolor{comment}{\ *\ delete\ and\ erase\ all\ copies\ of\ this\ Software\ within\ your\ control\ or\ possession.}}
+\DoxyCodeLine{00024\ \textcolor{comment}{\ *\ Edge\ Impulse\ reserves\ all\ rights\ and\ remedies\ available\ to\ enforce\ its\ rights.}}
+\DoxyCodeLine{00025\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00026\ \textcolor{comment}{\ *\ Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ the\ Software\ is}}
+\DoxyCodeLine{00027\ \textcolor{comment}{\ *\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,\ WITHOUT\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,}}
+\DoxyCodeLine{00028\ \textcolor{comment}{\ *\ either\ express\ or\ implied.\ See\ the\ License\ for\ the\ specific\ language\ governing}}
+\DoxyCodeLine{00029\ \textcolor{comment}{\ *\ permissions,\ disclaimers\ and\ limitations\ under\ the\ License.}}
+\DoxyCodeLine{00030\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{00031\ \textcolor{preprocessor}{\#ifndef\ \_EIDSP\_MEMORY\_H\_}}
+\DoxyCodeLine{00032\ \textcolor{preprocessor}{\#define\ \_EIDSP\_MEMORY\_H\_}}
+\DoxyCodeLine{00033\ }
+\DoxyCodeLine{00034\ \textcolor{comment}{//\ clang-\/format\ off}}
+\DoxyCodeLine{00035\ \textcolor{preprocessor}{\#include\ <functional>}}
+\DoxyCodeLine{00036\ \textcolor{preprocessor}{\#include\ <stdio.h>}}
+\DoxyCodeLine{00037\ \textcolor{preprocessor}{\#include\ <memory>}}
+\DoxyCodeLine{00038\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{ei__classifier__porting_8h}{../porting/ei\_classifier\_porting.h}}"{}}}
+\DoxyCodeLine{00039\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{ei__aligned__malloc_8h}{edge-\/impulse-\/sdk/classifier/ei\_aligned\_malloc.h}}"{}}}
+\DoxyCodeLine{00040\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{config_8hpp}{config.hpp}}"{}}}
+\DoxyCodeLine{00041\ }
+\DoxyCodeLine{00042\ \textcolor{keyword}{extern}\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{memory_8hpp_af8e153ee00db91cec77f0c93eb7b5995}{ei\_memory\_in\_use}};}
+\DoxyCodeLine{00043\ \textcolor{keyword}{extern}\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{memory_8hpp_ae2c2b96aaed434d58d3fb90105afc809}{ei\_memory\_peak\_use}};}
+\DoxyCodeLine{00044\ }
+\DoxyCodeLine{00045\ \textcolor{preprocessor}{\#if\ EIDSP\_PRINT\_ALLOCATIONS\ ==\ 1}}
+\DoxyCodeLine{00046\ \textcolor{preprocessor}{\#define\ ei\_dsp\_printf\ \ \ \ \ \ \ \ \ \ \ printf}}
+\DoxyCodeLine{00047\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00048\ \textcolor{preprocessor}{\#define\ ei\_dsp\_printf\ \ \ \ \ \ \ \ \ \ \ (void)}}
+\DoxyCodeLine{00049\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00050\ }
+\DoxyCodeLine{00051\ \textcolor{keyword}{typedef}\ std::unique\_ptr<void,\ std::function<void(\textcolor{keywordtype}{void}*)>>\ \mbox{\hyperlink{memory_8hpp_ae493c2ffb918aeef416159a5249c8e4a}{ei\_unique\_ptr\_t}};}
+\DoxyCodeLine{00052\ }
+\DoxyCodeLine{00053\ \textcolor{comment}{//\ deprecated,\ use\ the\ class\ ei\_tracked\_unique\_ptr\ below\ instead}}
+\DoxyCodeLine{00054\ \textcolor{comment}{//\ this\ version\ will\ NOT\ track\ memory\ usage}}
+\DoxyCodeLine{00055\ \textcolor{preprocessor}{\#define\ EI\_ALLOCATE\_AUTO\_POINTER(ptr,\ size)\ \(\backslash\)}}
+\DoxyCodeLine{00056\ \textcolor{preprocessor}{\ \ \ \ ptr\ =\ static\_cast<decltype(ptr)>(ei\_calloc(size,sizeof(*ptr)));\ \(\backslash\)}}
+\DoxyCodeLine{00057\ \textcolor{preprocessor}{\ \ \ \ ei\_unique\_ptr\_t\ \_\_ptr\_\_(ptr,ei\_free);}}
+\DoxyCodeLine{00058\ }
+\DoxyCodeLine{00059\ \textcolor{preprocessor}{\#define\ EI\_ERR\_AND\_RETURN\_ON\_NULL(ptr,code)\ \(\backslash\)}}
+\DoxyCodeLine{00060\ \textcolor{preprocessor}{\ \ \ \ if(\ !\ (ptr)\ )\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00061\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ ei\_printf("{}Null\ check\ failed\(\backslash\)n"{});\ \(\backslash\)}}
+\DoxyCodeLine{00062\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ return\ code;\ \(\backslash\)}}
+\DoxyCodeLine{00063\ \textcolor{preprocessor}{\ \ \ \ \}}}
+\DoxyCodeLine{00064\ }
+\DoxyCodeLine{00065\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespaceei}{ei}}\ \{}
+\DoxyCodeLine{00066\ }
+\DoxyCodeLine{00072\ \textcolor{preprocessor}{\#if\ EIDSP\_TRACK\_ALLOCATIONS}}
+\DoxyCodeLine{00078\ \textcolor{preprocessor}{\ \ \ \ \#define\ ei\_dsp\_register\_alloc\_internal(fn,\ file,\ line,\ bytes,\ ptr)\ \(\backslash\)}}
+\DoxyCodeLine{00079\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ ei\_memory\_in\_use\ +=\ bytes;\ \(\backslash\)}}
+\DoxyCodeLine{00080\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ if\ (ei\_memory\_in\_use\ >\ ei\_memory\_peak\_use)\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00081\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ ei\_memory\_peak\_use\ =\ ei\_memory\_in\_use;\ \(\backslash\)}}
+\DoxyCodeLine{00082\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{00083\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ ei\_dsp\_printf("{}alloc\ \%lu\ bytes\ (in\_use=\%lu,\ peak=\%lu)\ (\%s@\ \%s:\%d)\ \%p\(\backslash\)n"{},\ \(\backslash\)}}
+\DoxyCodeLine{00084\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ (unsigned\ long)bytes,\ (unsigned\ long)ei\_memory\_in\_use,\ (unsigned\ long)ei\_memory\_peak\_use,\ fn,\ file,\ line,\ ptr);}}
+\DoxyCodeLine{00085\ }
+\DoxyCodeLine{00093\ \textcolor{preprocessor}{\ \ \ \ \#define\ ei\_dsp\_register\_matrix\_alloc\_internal(fn,\ file,\ line,\ rows,\ cols,\ type\_size,\ ptr)\ \(\backslash\)}}
+\DoxyCodeLine{00094\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ ei\_memory\_in\_use\ +=\ (rows\ *\ cols\ *\ type\_size);\ \(\backslash\)}}
+\DoxyCodeLine{00095\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ if\ (ei\_memory\_in\_use\ >\ ei\_memory\_peak\_use)\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00096\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ ei\_memory\_peak\_use\ =\ ei\_memory\_in\_use;\ \(\backslash\)}}
+\DoxyCodeLine{00097\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{00098\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ ei\_dsp\_printf("{}alloc\ matrix\ \%lu\ x\ \%lu\ =\ \%lu\ bytes\ (in\_use=\%lu,\ peak=\%lu)\ (\%s@\ \%s:\%d)\ \%p\(\backslash\)n"{},\ \(\backslash\)}}
+\DoxyCodeLine{00099\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ (unsigned\ long)rows,\ (unsigned\ long)cols,\ (unsigned\ long)(rows\ *\ cols\ *\ type\_size),\ (unsigned\ long)ei\_memory\_in\_use,\ \(\backslash\)}}
+\DoxyCodeLine{00100\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (unsigned\ long)ei\_memory\_peak\_use,\ fn,\ file,\ line,\ ptr);}}
+\DoxyCodeLine{00101\ }
+\DoxyCodeLine{00106\ \textcolor{preprocessor}{\ \ \ \ \#define\ ei\_dsp\_register\_free\_internal(fn,\ file,\ line,\ bytes,\ ptr)\ \(\backslash\)}}
+\DoxyCodeLine{00107\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ ei\_memory\_in\_use\ -\/=\ bytes;\ \(\backslash\)}}
+\DoxyCodeLine{00108\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ ei\_dsp\_printf("{}free\ \%lu\ bytes\ (in\_use=\%lu,\ peak=\%lu)\ (\%s@\ \%s:\%d)\ \%p\(\backslash\)n"{},\ \(\backslash\)}}
+\DoxyCodeLine{00109\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ (unsigned\ long)bytes,\ (unsigned\ long)ei\_memory\_in\_use,\ (unsigned\ long)ei\_memory\_peak\_use,\ fn,\ file,\ line,\ ptr);}}
+\DoxyCodeLine{00110\ }
+\DoxyCodeLine{00118\ \textcolor{preprocessor}{\ \ \ \ \#define\ ei\_dsp\_register\_matrix\_free\_internal(fn,\ file,\ line,\ rows,\ cols,\ type\_size,\ ptr)\ \(\backslash\)}}
+\DoxyCodeLine{00119\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ ei\_memory\_in\_use\ -\/=\ (rows\ *\ cols\ *\ type\_size);\ \(\backslash\)}}
+\DoxyCodeLine{00120\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ ei\_dsp\_printf("{}free\ matrix\ \%lu\ x\ \%lu\ =\ \%lu\ bytes\ (in\_use=\%lu,\ peak=\%lu)\ (\%s@\ \%s:\%d)\ \%p\(\backslash\)n"{},\ \(\backslash\)}}
+\DoxyCodeLine{00121\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ (unsigned\ long)rows,\ (unsigned\ long)cols,\ (unsigned\ long)(rows\ *\ cols\ *\ type\_size),\ \(\backslash\)}}
+\DoxyCodeLine{00122\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (unsigned\ long)ei\_memory\_in\_use,\ (unsigned\ long)ei\_memory\_peak\_use,\ fn,\ file,\ line,\ ptr);}}
+\DoxyCodeLine{00123\ }
+\DoxyCodeLine{00124\ \textcolor{preprocessor}{\ \ \ \ \#define\ ei\_dsp\_register\_alloc(...)\ ei\_dsp\_register\_alloc\_internal(\_\_func\_\_,\ \_\_FILE\_\_,\ \_\_LINE\_\_,\ \_\_VA\_ARGS\_\_)}}
+\DoxyCodeLine{00125\ \textcolor{preprocessor}{\ \ \ \ \#define\ ei\_dsp\_register\_matrix\_alloc(...)\ ei\_dsp\_register\_matrix\_alloc\_internal(\_\_func\_\_,\ \_\_FILE\_\_,\ \_\_LINE\_\_,\ \_\_VA\_ARGS\_\_)}}
+\DoxyCodeLine{00126\ \textcolor{preprocessor}{\ \ \ \ \#define\ ei\_dsp\_register\_free(...)\ ei\_dsp\_register\_free\_internal(\_\_func\_\_,\ \_\_FILE\_\_,\ \_\_LINE\_\_,\ \_\_VA\_ARGS\_\_)}}
+\DoxyCodeLine{00127\ \textcolor{preprocessor}{\ \ \ \ \#define\ ei\_dsp\_register\_matrix\_free(...)\ ei\_dsp\_register\_matrix\_free\_internal(\_\_func\_\_,\ \_\_FILE\_\_,\ \_\_LINE\_\_,\ \_\_VA\_ARGS\_\_)}}
+\DoxyCodeLine{00128\ \textcolor{preprocessor}{\ \ \ \ \#define\ ei\_dsp\_malloc(...)\ memory::ei\_wrapped\_malloc(\_\_func\_\_,\ \_\_FILE\_\_,\ \_\_LINE\_\_,\ \_\_VA\_ARGS\_\_)}}
+\DoxyCodeLine{00129\ \textcolor{preprocessor}{\ \ \ \ \#define\ ei\_dsp\_calloc(...)\ memory::ei\_wrapped\_calloc(\_\_func\_\_,\ \_\_FILE\_\_,\ \_\_LINE\_\_,\ \_\_VA\_ARGS\_\_)}}
+\DoxyCodeLine{00130\ \textcolor{preprocessor}{\ \ \ \ \#define\ ei\_dsp\_free(...)\ memory::ei\_wrapped\_free(\_\_func\_\_,\ \_\_FILE\_\_,\ \_\_LINE\_\_,\ \_\_VA\_ARGS\_\_)}}
+\DoxyCodeLine{00131\ }
+\DoxyCodeLine{00132\ \textcolor{preprocessor}{\ \ \ \ \#define\ EI\_DSP\_MATRIX(name,\ ...)\ matrix\_t\ name(\_\_VA\_ARGS\_\_,\ NULL,\ \_\_func\_\_,\ \_\_FILE\_\_,\ \_\_LINE\_\_);\ if\ (!name.buffer)\ \{\ EIDSP\_ERR(EIDSP\_OUT\_OF\_MEM);\ \}}}
+\DoxyCodeLine{00133\ \textcolor{preprocessor}{\ \ \ \ \#define\ EI\_DSP\_MATRIX\_B(name,\ ...)\ matrix\_t\ name(\_\_VA\_ARGS\_\_,\ \_\_func\_\_,\ \_\_FILE\_\_,\ \_\_LINE\_\_);\ if\ (!name.buffer)\ \{\ EIDSP\_ERR(EIDSP\_OUT\_OF\_MEM);\ \}}}
+\DoxyCodeLine{00134\ \textcolor{preprocessor}{\ \ \ \ \#define\ EI\_DSP\_QUANTIZED\_MATRIX(name,\ ...)\ quantized\_matrix\_t\ name(\_\_VA\_ARGS\_\_,\ NULL,\ \_\_func\_\_,\ \_\_FILE\_\_,\ \_\_LINE\_\_);\ if\ (!name.buffer)\ \{\ EIDSP\_ERR(EIDSP\_OUT\_OF\_MEM);\ \}}}
+\DoxyCodeLine{00135\ \textcolor{preprocessor}{\ \ \ \ \#define\ EI\_DSP\_QUANTIZED\_MATRIX\_B(name,\ ...)\ quantized\_matrix\_t\ name(\_\_VA\_ARGS\_\_,\ \_\_func\_\_,\ \_\_FILE\_\_,\ \_\_LINE\_\_);\ if\ (!name.buffer)\ \{\ EIDSP\_ERR(EIDSP\_OUT\_OF\_MEM);\ \}}}
+\DoxyCodeLine{00136\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00137\ \textcolor{preprocessor}{\ \ \ \ \#define\ ei\_dsp\_register\_alloc(...)\ (void)0}}
+\DoxyCodeLine{00138\ \textcolor{preprocessor}{\ \ \ \ \#define\ ei\_dsp\_register\_matrix\_alloc(...)\ (void)0}}
+\DoxyCodeLine{00139\ \textcolor{preprocessor}{\ \ \ \ \#define\ ei\_dsp\_register\_free(...)\ (void)0}}
+\DoxyCodeLine{00140\ \textcolor{preprocessor}{\ \ \ \ \#define\ ei\_dsp\_register\_matrix\_free(...)\ (void)0}}
+\DoxyCodeLine{00141\ \textcolor{preprocessor}{\ \ \ \ \#define\ ei\_dsp\_malloc\ ei\_malloc}}
+\DoxyCodeLine{00142\ \textcolor{preprocessor}{\ \ \ \ \#define\ ei\_dsp\_calloc\ ei\_calloc}}
+\DoxyCodeLine{00143\ \textcolor{preprocessor}{\ \ \ \ \#define\ ei\_dsp\_free(ptr,\ size)\ ei\_free(ptr)}}
+\DoxyCodeLine{00144\ \textcolor{preprocessor}{\ \ \ \ \#define\ EI\_DSP\_MATRIX(name,\ ...)\ matrix\_t\ name(\_\_VA\_ARGS\_\_);\ if\ (!name.buffer)\ \{\ EIDSP\_ERR(EIDSP\_OUT\_OF\_MEM);\ \}}}
+\DoxyCodeLine{00145\ \textcolor{preprocessor}{\ \ \ \ \#define\ EI\_DSP\_MATRIX\_B(name,\ ...)\ matrix\_t\ name(\_\_VA\_ARGS\_\_);\ if\ (!name.buffer)\ \{\ EIDSP\_ERR(EIDSP\_OUT\_OF\_MEM);\ \}}}
+\DoxyCodeLine{00146\ \textcolor{preprocessor}{\ \ \ \ \#define\ EI\_DSP\_QUANTIZED\_MATRIX(name,\ ...)\ quantized\_matrix\_t\ name(\_\_VA\_ARGS\_\_);\ if\ (!name.buffer)\ \{\ EIDSP\_ERR(EIDSP\_OUT\_OF\_MEM);\ \}}}
+\DoxyCodeLine{00147\ \textcolor{preprocessor}{\ \ \ \ \#define\ EI\_DSP\_QUANTIZED\_MATRIX\_B(name,\ ...)\ quantized\_matrix\_t\ name(\_\_VA\_ARGS\_\_);\ if\ (!name.buffer)\ \{\ EIDSP\_ERR(EIDSP\_OUT\_OF\_MEM);\ \}}}
+\DoxyCodeLine{00148\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00149\ }
+\DoxyCodeLine{00150\ \textcolor{preprocessor}{\#if\ EIDSP\_TRACK\_ALLOCATIONS}}
+\DoxyCodeLine{00151\ \textcolor{keyword}{class\ }memory\ \{}
+\DoxyCodeLine{00152\ }
+\DoxyCodeLine{00153\ }
+\DoxyCodeLine{00154\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00159\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ *ei\_wrapped\_malloc(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *fn,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *file,\ \textcolor{keywordtype}{int}\ line,\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{hello__world__model_8cc_a439227feff9d7f55384e8780cfc2eb82}{size}})\ \{}
+\DoxyCodeLine{00160\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ *\mbox{\hyperlink{ei__aligned__malloc_8h_a0619a76ea2d4e6cce18b93ddf5082a36}{ptr}}\ =\ \mbox{\hyperlink{group__ei__user__functions_ga71ecca5661ac4434a709c88e4c39b4aa}{ei\_malloc}}(\mbox{\hyperlink{hello__world__model_8cc_a439227feff9d7f55384e8780cfc2eb82}{size}});}
+\DoxyCodeLine{00161\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{ei__aligned__malloc_8h_a0619a76ea2d4e6cce18b93ddf5082a36}{ptr}})\ \{}
+\DoxyCodeLine{00162\ \ \ \ \ \ \ \ \ \ \ \ \ ei\_dsp\_register\_alloc\_internal(fn,\ file,\ line,\ \mbox{\hyperlink{hello__world__model_8cc_a439227feff9d7f55384e8780cfc2eb82}{size}},\ \mbox{\hyperlink{ei__aligned__malloc_8h_a0619a76ea2d4e6cce18b93ddf5082a36}{ptr}});}
+\DoxyCodeLine{00163\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00164\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{ei__aligned__malloc_8h_a0619a76ea2d4e6cce18b93ddf5082a36}{ptr}};}
+\DoxyCodeLine{00165\ \ \ \ \ \}}
+\DoxyCodeLine{00166\ }
+\DoxyCodeLine{00173\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ *ei\_wrapped\_calloc(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *fn,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *file,\ \textcolor{keywordtype}{int}\ line,\ \textcolor{keywordtype}{size\_t}\ num,\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{hello__world__model_8cc_a439227feff9d7f55384e8780cfc2eb82}{size}})\ \{}
+\DoxyCodeLine{00174\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ *\mbox{\hyperlink{ei__aligned__malloc_8h_a0619a76ea2d4e6cce18b93ddf5082a36}{ptr}}\ =\ \mbox{\hyperlink{group__ei__user__functions_gac69361ca85cf888be2ad7a700d5ff9cb}{ei\_calloc}}(num,\ \mbox{\hyperlink{hello__world__model_8cc_a439227feff9d7f55384e8780cfc2eb82}{size}});}
+\DoxyCodeLine{00175\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{ei__aligned__malloc_8h_a0619a76ea2d4e6cce18b93ddf5082a36}{ptr}})\ \{}
+\DoxyCodeLine{00176\ \ \ \ \ \ \ \ \ \ \ \ \ ei\_dsp\_register\_alloc\_internal(fn,\ file,\ line,\ num\ *\ \mbox{\hyperlink{hello__world__model_8cc_a439227feff9d7f55384e8780cfc2eb82}{size}},\ \mbox{\hyperlink{ei__aligned__malloc_8h_a0619a76ea2d4e6cce18b93ddf5082a36}{ptr}});}
+\DoxyCodeLine{00177\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00178\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{ei__aligned__malloc_8h_a0619a76ea2d4e6cce18b93ddf5082a36}{ptr}};}
+\DoxyCodeLine{00179\ \ \ \ \ \}}
+\DoxyCodeLine{00180\ }
+\DoxyCodeLine{00186\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ ei\_wrapped\_free(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *fn,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *file,\ \textcolor{keywordtype}{int}\ line,\ \textcolor{keywordtype}{void}\ *\mbox{\hyperlink{ei__aligned__malloc_8h_a0619a76ea2d4e6cce18b93ddf5082a36}{ptr}},\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{hello__world__model_8cc_a439227feff9d7f55384e8780cfc2eb82}{size}})\ \{}
+\DoxyCodeLine{00187\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group__ei__user__functions_ga7a6a70833407ff1870c12396ce2c4aa3}{ei\_free}}(\mbox{\hyperlink{ei__aligned__malloc_8h_a0619a76ea2d4e6cce18b93ddf5082a36}{ptr}});}
+\DoxyCodeLine{00188\ \ \ \ \ \ \ \ \ ei\_dsp\_register\_free\_internal(fn,\ file,\ line,\ \mbox{\hyperlink{hello__world__model_8cc_a439227feff9d7f55384e8780cfc2eb82}{size}},\ \mbox{\hyperlink{ei__aligned__malloc_8h_a0619a76ea2d4e6cce18b93ddf5082a36}{ptr}});}
+\DoxyCodeLine{00189\ \ \ \ \ \}}
+\DoxyCodeLine{00190\ \};}
+\DoxyCodeLine{00191\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ \#if\ EIDSP\_TRACK\_ALLOCATIONS}}
+\DoxyCodeLine{00192\ }
+\DoxyCodeLine{00193\ \textcolor{comment}{//\ This\ needs\ to\ be\ a\ real\ function\ so\ I\ can\ bind\ with\ a\ lambda}}
+\DoxyCodeLine{00194\ \mbox{\hyperlink{namespaceei_a56ccace881c159ff67fa07ffcf4092e6}{\_\_attribute\_\_}}((unused))\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ ei\_dsp\_free\_func(\textcolor{keywordtype}{void}\ *\mbox{\hyperlink{namespaceei_a593af57fa44116ca69a3e62d0fd75adc}{ptr}},\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{namespaceei_a000f348b45d99db3a9dd6a9991ef667a}{size}})\ \{}
+\DoxyCodeLine{00195\ \ \ \ \ \mbox{\hyperlink{group__ei__user__functions_ga7a6a70833407ff1870c12396ce2c4aa3}{ei\_free}}(\mbox{\hyperlink{namespaceei_a593af57fa44116ca69a3e62d0fd75adc}{ptr}});}
+\DoxyCodeLine{00196\ \textcolor{preprocessor}{\#if\ EIDSP\_TRACK\_ALLOCATIONS}}
+\DoxyCodeLine{00197\ \ \ \ \ ei\_dsp\_register\_free\_internal(\textcolor{stringliteral}{"{}unique\_ptr\ free"{}},\ \textcolor{stringliteral}{"{}"{}},\ 0,\ \mbox{\hyperlink{namespaceei_a000f348b45d99db3a9dd6a9991ef667a}{size}},\ \mbox{\hyperlink{namespaceei_a593af57fa44116ca69a3e62d0fd75adc}{ptr}});}
+\DoxyCodeLine{00198\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00199\ \}}
+\DoxyCodeLine{00200\ }
+\DoxyCodeLine{00201\ \textcolor{preprocessor}{\#if\ EIDSP\_TRACK\_ALLOCATIONS}}
+\DoxyCodeLine{00211\ \textcolor{keyword}{static}\ \mbox{\hyperlink{memory_8hpp_ae493c2ffb918aeef416159a5249c8e4a}{ei\_unique\_ptr\_t}}\ make\_tracked\_unique\_ptr(\textcolor{keywordtype}{void}*\ ptr\_in,\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{namespaceei_a000f348b45d99db3a9dd6a9991ef667a}{size}})\ \{}
+\DoxyCodeLine{00212\ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespaceei_a593af57fa44116ca69a3e62d0fd75adc}{ptr}}\ =\ \textcolor{keyword}{reinterpret\_cast<}\textcolor{keywordtype}{void}**\textcolor{keyword}{>}(ptr\_in);}
+\DoxyCodeLine{00213\ \ \ \ \ *\mbox{\hyperlink{namespaceei_a593af57fa44116ca69a3e62d0fd75adc}{ptr}}\ =\ \mbox{\hyperlink{memory_8hpp_add3a2359309e81b290c825661abc2d71}{ei\_dsp\_malloc}}(\mbox{\hyperlink{namespaceei_a000f348b45d99db3a9dd6a9991ef667a}{size}});}
+\DoxyCodeLine{00214\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{memory_8hpp_ae493c2ffb918aeef416159a5249c8e4a}{ei\_unique\_ptr\_t}}(*\mbox{\hyperlink{namespaceei_a593af57fa44116ca69a3e62d0fd75adc}{ptr}},\ [\mbox{\hyperlink{namespaceei_a000f348b45d99db3a9dd6a9991ef667a}{size}}](\textcolor{keywordtype}{void}\ *\mbox{\hyperlink{namespaceei_a593af57fa44116ca69a3e62d0fd75adc}{ptr}})\ \{}
+\DoxyCodeLine{00215\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group__ei__user__functions_ga7a6a70833407ff1870c12396ce2c4aa3}{ei\_free}}(\mbox{\hyperlink{namespaceei_a593af57fa44116ca69a3e62d0fd75adc}{ptr}});}
+\DoxyCodeLine{00216\ \ \ \ \ \ \ \ \ ei\_dsp\_register\_free\_internal(\textcolor{stringliteral}{"{}unique\_ptr"{}},\ \textcolor{stringliteral}{"{}"{}},\ 0,\ \mbox{\hyperlink{namespaceei_a000f348b45d99db3a9dd6a9991ef667a}{size}},\ \mbox{\hyperlink{namespaceei_a593af57fa44116ca69a3e62d0fd75adc}{ptr}});}
+\DoxyCodeLine{00217\ \ \ \ \ \});}
+\DoxyCodeLine{00218\ \}}
+\DoxyCodeLine{00219\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00220\ }
+\DoxyCodeLine{00230\ \mbox{\hyperlink{namespaceei_a56ccace881c159ff67fa07ffcf4092e6}{\_\_attribute\_\_}}((warn\_unused\_result))\ \mbox{\hyperlink{namespaceei_a56ccace881c159ff67fa07ffcf4092e6}{\_\_attribute\_\_}}((unused))}
+\DoxyCodeLine{00231\ \textcolor{keyword}{static}\ \mbox{\hyperlink{memory_8hpp_ae493c2ffb918aeef416159a5249c8e4a}{ei\_unique\_ptr\_t}}\ make\_tracked\_unique\_ptr(\textcolor{keywordtype}{void}*\ ptr\_in,\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{namespaceei_a000f348b45d99db3a9dd6a9991ef667a}{size}})}
+\DoxyCodeLine{00232\ \{}
+\DoxyCodeLine{00233\ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespaceei_a593af57fa44116ca69a3e62d0fd75adc}{ptr}}\ =\ \textcolor{keyword}{reinterpret\_cast<}\textcolor{keywordtype}{void}**\textcolor{keyword}{>}(ptr\_in);}
+\DoxyCodeLine{00234\ \ \ \ \ *\mbox{\hyperlink{namespaceei_a593af57fa44116ca69a3e62d0fd75adc}{ptr}}\ =\ \mbox{\hyperlink{group__ei__user__functions_ga71ecca5661ac4434a709c88e4c39b4aa}{ei\_malloc}}(\mbox{\hyperlink{namespaceei_a000f348b45d99db3a9dd6a9991ef667a}{size}});}
+\DoxyCodeLine{00235\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{memory_8hpp_ae493c2ffb918aeef416159a5249c8e4a}{ei\_unique\_ptr\_t}}(*\mbox{\hyperlink{namespaceei_a593af57fa44116ca69a3e62d0fd75adc}{ptr}},\ \mbox{\hyperlink{group__ei__user__functions_ga7a6a70833407ff1870c12396ce2c4aa3}{ei\_free}});}
+\DoxyCodeLine{00236\ \}}
+\DoxyCodeLine{00237\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00238\ }
+\DoxyCodeLine{00239\ \textcolor{comment}{/*}}
+\DoxyCodeLine{00240\ \textcolor{comment}{\ *\ @brief\ Make\ a\ unique\ ptr\ that\ supports\ memory\ tracking}}
+\DoxyCodeLine{00241\ \textcolor{comment}{\ *\ @param\ ptr\ A\ pointer\ that\ will\ be\ written\ with\ the\ malloc'd\ address}}
+\DoxyCodeLine{00242\ \textcolor{comment}{\ *\ @param\ size\ Desired\ size\ of\ the\ memory\ block,\ in\ ITEMS.}}
+\DoxyCodeLine{00243\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{00244\ \textcolor{preprocessor}{\#define\ EI\_MAKE\_TRACKED\_POINTER(ptr,\ size)\ ei::make\_tracked\_unique\_ptr(\&ptr,\ sizeof(*ptr)*size);}}
+\DoxyCodeLine{00245\ }
+\DoxyCodeLine{00246\ \}\ \textcolor{comment}{//\ namespace\ ei}}
+\DoxyCodeLine{00247\ }
+\DoxyCodeLine{00248\ \textcolor{comment}{//\ clang-\/format\ on}}
+\DoxyCodeLine{00249\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ \_EIDSP\_MEMORY\_H\_}}
+
+\end{DoxyCode}

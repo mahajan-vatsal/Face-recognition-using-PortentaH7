@@ -1,0 +1,175 @@
+\doxysection{pad.\+h}
+\hypertarget{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2kernels_2internal_2reference_2pad_8h_source}{}\label{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2kernels_2internal_2reference_2pad_8h_source}\index{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/arduino-\/examples-\/main/src/tensorflow/lite/kernels/internal/reference/pad.h@{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/arduino-\/examples-\/main/src/tensorflow/lite/kernels/internal/reference/pad.h}}
+\mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2kernels_2internal_2reference_2pad_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{/*\ Copyright\ 2019\ The\ TensorFlow\ Authors.\ All\ Rights\ Reserved.}}
+\DoxyCodeLine{00002\ \textcolor{comment}{}}
+\DoxyCodeLine{00003\ \textcolor{comment}{Licensed\ under\ the\ Apache\ License,\ Version\ 2.0\ (the\ "{}License"{});}}
+\DoxyCodeLine{00004\ \textcolor{comment}{you\ may\ not\ use\ this\ file\ except\ in\ compliance\ with\ the\ License.}}
+\DoxyCodeLine{00005\ \textcolor{comment}{You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{00006\ \textcolor{comment}{}}
+\DoxyCodeLine{00007\ \textcolor{comment}{\ \ \ \ http://www.apache.org/licenses/LICENSE-\/2.0}}
+\DoxyCodeLine{00008\ \textcolor{comment}{}}
+\DoxyCodeLine{00009\ \textcolor{comment}{Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ software}}
+\DoxyCodeLine{00010\ \textcolor{comment}{distributed\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,}}
+\DoxyCodeLine{00011\ \textcolor{comment}{WITHOUT\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,\ either\ express\ or\ implied.}}
+\DoxyCodeLine{00012\ \textcolor{comment}{See\ the\ License\ for\ the\ specific\ language\ governing\ permissions\ and}}
+\DoxyCodeLine{00013\ \textcolor{comment}{limitations\ under\ the\ License.}}
+\DoxyCodeLine{00014\ \textcolor{comment}{==============================================================================*/}}
+\DoxyCodeLine{00015\ }
+\DoxyCodeLine{00016\ \textcolor{preprocessor}{\#ifndef\ TENSORFLOW\_LITE\_KERNELS\_INTERNAL\_REFERENCE\_PAD\_H\_}}
+\DoxyCodeLine{00017\ \textcolor{preprocessor}{\#define\ TENSORFLOW\_LITE\_KERNELS\_INTERNAL\_REFERENCE\_PAD\_H\_}}
+\DoxyCodeLine{00018\ }
+\DoxyCodeLine{00019\ \textcolor{preprocessor}{\#include\ <vector>}}
+\DoxyCodeLine{00020\ }
+\DoxyCodeLine{00021\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/kernels/internal/types.h"{}}}
+\DoxyCodeLine{00022\ }
+\DoxyCodeLine{00023\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacetflite}{tflite}}\ \{}
+\DoxyCodeLine{00024\ }
+\DoxyCodeLine{00025\ \textcolor{keyword}{namespace\ }reference\_ops\ \{}
+\DoxyCodeLine{00026\ }
+\DoxyCodeLine{00027\ \textcolor{comment}{//\ TFLite\ Pad\ supports\ activation\ tensors\ with\ up\ to\ 5\ dimensions.}}
+\DoxyCodeLine{00028\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{namespacetflite_1_1reference__ops_a8a6b7596809179f843d5741308d1afe5}{PadKernelMaxDimensionCount}}()\ \{\ \textcolor{keywordflow}{return}\ 5;\ \}}
+\DoxyCodeLine{00029\ }
+\DoxyCodeLine{00030\ \textcolor{comment}{//\ There\ are\ two\ versions\ of\ pad:\ Pad\ and\ PadV2.\ \ In\ PadV2\ there\ is\ a\ second}}
+\DoxyCodeLine{00031\ \textcolor{comment}{//\ scalar\ input\ that\ provides\ the\ padding\ value.\ \ Therefore\ pad\_value\_ptr\ can\ be}}
+\DoxyCodeLine{00032\ \textcolor{comment}{//\ equivalent\ to\ a\ simple\ input1\_data.\ \ For\ Pad,\ it\ should\ point\ to\ a\ zero}}
+\DoxyCodeLine{00033\ \textcolor{comment}{//\ value.}}
+\DoxyCodeLine{00034\ \textcolor{comment}{//}}
+\DoxyCodeLine{00035\ \textcolor{comment}{//\ Note\ that\ two\ typenames\ are\ required,\ so\ that\ T=P=int32\_t\ is\ considered\ a}}
+\DoxyCodeLine{00036\ \textcolor{comment}{//\ specialization\ distinct\ from\ P=int32\_t.}}
+\DoxyCodeLine{00037\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T,\ \textcolor{keyword}{typename}\ P>}
+\DoxyCodeLine{00038\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1reference__ops_a948065f3c0345240db043d86029fd6d1}{PadImpl}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structtflite_1_1_pad_params}{tflite::PadParams}}\&\ op\_params,}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classtflite_1_1_runtime_shape}{RuntimeShape}}\&\ input\_shape,\ \textcolor{keyword}{const}\ T*\ \mbox{\hyperlink{add__n__test_8cc_a5612ba79d1f0b544c7aeae4621166fea}{input\_data}},}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ P*\ pad\_value\_ptr,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classtflite_1_1_runtime_shape}{RuntimeShape}}\&\ output\_shape,}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ T*\ \mbox{\hyperlink{add__n__test_8cc_a3305b43869c4b837b0a33c12cff5069b}{output\_data}})\ \{}
+\DoxyCodeLine{00042\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classtflite_1_1_runtime_shape}{RuntimeShape}}\ ext\_input\_shape\ =}
+\DoxyCodeLine{00043\ \ \ \ \ \ \ \mbox{\hyperlink{classtflite_1_1_runtime_shape_a647264349b0f266c94102a8b3dda22cf}{RuntimeShape::ExtendedShape}}(\mbox{\hyperlink{namespacetflite_1_1reference__ops_a8a6b7596809179f843d5741308d1afe5}{PadKernelMaxDimensionCount}}(),\ input\_shape);}
+\DoxyCodeLine{00044\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classtflite_1_1_runtime_shape}{RuntimeShape}}\ ext\_output\_shape\ =}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \mbox{\hyperlink{classtflite_1_1_runtime_shape_a647264349b0f266c94102a8b3dda22cf}{RuntimeShape::ExtendedShape}}(\mbox{\hyperlink{namespacetflite_1_1reference__ops_a8a6b7596809179f843d5741308d1afe5}{PadKernelMaxDimensionCount}}(),\ output\_shape);}
+\DoxyCodeLine{00046\ \ \ \mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2kernels_2internal_2compatibility_8h_a153a4c7bc866139ad88ebf7cb7f4c400}{TFLITE\_DCHECK\_LE}}(op\_params.\mbox{\hyperlink{structtflite_1_1_pad_params_a9f057c3bf31e86ec85373721ef56def0}{left\_padding\_count}},\ \mbox{\hyperlink{namespacetflite_1_1reference__ops_a8a6b7596809179f843d5741308d1afe5}{PadKernelMaxDimensionCount}}());}
+\DoxyCodeLine{00047\ \ \ \mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2kernels_2internal_2compatibility_8h_a153a4c7bc866139ad88ebf7cb7f4c400}{TFLITE\_DCHECK\_LE}}(op\_params.\mbox{\hyperlink{structtflite_1_1_pad_params_a34138da96dffa38b896f72ea93f180aa}{right\_padding\_count}},\ \mbox{\hyperlink{namespacetflite_1_1reference__ops_a8a6b7596809179f843d5741308d1afe5}{PadKernelMaxDimensionCount}}());}
+\DoxyCodeLine{00048\ }
+\DoxyCodeLine{00049\ \ \ \textcolor{comment}{//\ Runtime\ calls\ are\ currently\ fixed\ at\ 5\ dimensions.\ Copy\ inputs\ so\ we\ can}}
+\DoxyCodeLine{00050\ \ \ \textcolor{comment}{//\ pad\ them\ to\ 5\ dims\ (yes,\ we\ are\ "{}padding\ the\ padding"{}).}}
+\DoxyCodeLine{00051\ \ \ \textcolor{keywordtype}{int}\ left\_padding\_copy[\mbox{\hyperlink{namespacetflite_1_1reference__ops_a8a6b7596809179f843d5741308d1afe5}{PadKernelMaxDimensionCount}}()];}
+\DoxyCodeLine{00052\ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ \mbox{\hyperlink{namespacetflite_1_1reference__ops_a8a6b7596809179f843d5741308d1afe5}{PadKernelMaxDimensionCount}}();\ i++)\ \{}
+\DoxyCodeLine{00053\ \ \ \ \ left\_padding\_copy[i]\ =\ 0;}
+\DoxyCodeLine{00054\ \ \ \}}
+\DoxyCodeLine{00055\ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ op\_params.\mbox{\hyperlink{structtflite_1_1_pad_params_a9f057c3bf31e86ec85373721ef56def0}{left\_padding\_count}};\ ++i)\ \{}
+\DoxyCodeLine{00056\ \ \ \ \ left\_padding\_copy[i\ +\ \mbox{\hyperlink{namespacetflite_1_1reference__ops_a8a6b7596809179f843d5741308d1afe5}{PadKernelMaxDimensionCount}}()\ -\/}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ op\_params.\mbox{\hyperlink{structtflite_1_1_pad_params_a9f057c3bf31e86ec85373721ef56def0}{left\_padding\_count}}]\ =\ op\_params.\mbox{\hyperlink{structtflite_1_1_pad_params_a67f2cd78c66b99b92a6d032b9ab11e60}{left\_padding}}[i];}
+\DoxyCodeLine{00058\ \ \ \}}
+\DoxyCodeLine{00059\ \ \ \textcolor{keywordtype}{int}\ right\_padding\_copy[\mbox{\hyperlink{namespacetflite_1_1reference__ops_a8a6b7596809179f843d5741308d1afe5}{PadKernelMaxDimensionCount}}()];}
+\DoxyCodeLine{00060\ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ \mbox{\hyperlink{namespacetflite_1_1reference__ops_a8a6b7596809179f843d5741308d1afe5}{PadKernelMaxDimensionCount}}();\ i++)\ \{}
+\DoxyCodeLine{00061\ \ \ \ \ right\_padding\_copy[i]\ =\ 0;}
+\DoxyCodeLine{00062\ \ \ \}}
+\DoxyCodeLine{00063\ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ op\_params.\mbox{\hyperlink{structtflite_1_1_pad_params_a34138da96dffa38b896f72ea93f180aa}{right\_padding\_count}};\ ++i)\ \{}
+\DoxyCodeLine{00064\ \ \ \ \ right\_padding\_copy[i\ +\ \mbox{\hyperlink{namespacetflite_1_1reference__ops_a8a6b7596809179f843d5741308d1afe5}{PadKernelMaxDimensionCount}}()\ -\/}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ op\_params.\mbox{\hyperlink{structtflite_1_1_pad_params_a34138da96dffa38b896f72ea93f180aa}{right\_padding\_count}}]\ =}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ op\_params.\mbox{\hyperlink{structtflite_1_1_pad_params_a944c3ce34a362af1bcbe1b8abc25ce4e}{right\_padding}}[i];}
+\DoxyCodeLine{00067\ \ \ \}}
+\DoxyCodeLine{00068\ }
+\DoxyCodeLine{00069\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ output\_batch\ =\ ext\_output\_shape.\mbox{\hyperlink{classtflite_1_1_runtime_shape_a2039ed030a02c05b73a0ea723339a808}{Dims}}(0);}
+\DoxyCodeLine{00070\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ output\_plane\ =\ ext\_output\_shape.\mbox{\hyperlink{classtflite_1_1_runtime_shape_a2039ed030a02c05b73a0ea723339a808}{Dims}}(1);}
+\DoxyCodeLine{00071\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ output\_height\ =\ ext\_output\_shape.\mbox{\hyperlink{classtflite_1_1_runtime_shape_a2039ed030a02c05b73a0ea723339a808}{Dims}}(2);}
+\DoxyCodeLine{00072\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ output\_width\ =\ ext\_output\_shape.\mbox{\hyperlink{classtflite_1_1_runtime_shape_a2039ed030a02c05b73a0ea723339a808}{Dims}}(3);}
+\DoxyCodeLine{00073\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{fully__connected_8cpp_a3146ba32fa984df809a56706955d753a}{output\_depth}}\ =\ ext\_output\_shape.\mbox{\hyperlink{classtflite_1_1_runtime_shape_a2039ed030a02c05b73a0ea723339a808}{Dims}}(4);}
+\DoxyCodeLine{00074\ }
+\DoxyCodeLine{00075\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ left\_b\_padding\ =\ left\_padding\_copy[0];}
+\DoxyCodeLine{00076\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ left\_p\_padding\ =\ left\_padding\_copy[1];}
+\DoxyCodeLine{00077\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ left\_h\_padding\ =\ left\_padding\_copy[2];}
+\DoxyCodeLine{00078\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ left\_w\_padding\ =\ left\_padding\_copy[3];}
+\DoxyCodeLine{00079\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ left\_d\_padding\ =\ left\_padding\_copy[4];}
+\DoxyCodeLine{00080\ }
+\DoxyCodeLine{00081\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ right\_b\_padding\ =\ right\_padding\_copy[0];}
+\DoxyCodeLine{00082\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ right\_p\_padding\ =\ right\_padding\_copy[1];}
+\DoxyCodeLine{00083\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ right\_h\_padding\ =\ right\_padding\_copy[2];}
+\DoxyCodeLine{00084\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ right\_w\_padding\ =\ right\_padding\_copy[3];}
+\DoxyCodeLine{00085\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ right\_d\_padding\ =\ right\_padding\_copy[4];}
+\DoxyCodeLine{00086\ }
+\DoxyCodeLine{00087\ \ \ \textcolor{keyword}{const}\ T\ pad\_value\ =\ *pad\_value\_ptr;}
+\DoxyCodeLine{00088\ }
+\DoxyCodeLine{00089\ \ \ \textcolor{keyword}{const}\ T*\ in\_ptr\ =\ \mbox{\hyperlink{add__n__test_8cc_a5612ba79d1f0b544c7aeae4621166fea}{input\_data}};}
+\DoxyCodeLine{00090\ \ \ T*\ out\_ptr\ =\ \mbox{\hyperlink{add__n__test_8cc_a3305b43869c4b837b0a33c12cff5069b}{output\_data}};}
+\DoxyCodeLine{00091\ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ out\_b\ =\ 0;\ out\_b\ <\ output\_batch;\ ++out\_b)\ \{}
+\DoxyCodeLine{00092\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ out\_p\ =\ 0;\ out\_p\ <\ output\_plane;\ ++out\_p)\ \{}
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ out\_h\ =\ 0;\ out\_h\ <\ output\_height;\ ++out\_h)\ \{}
+\DoxyCodeLine{00094\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ out\_w\ =\ 0;\ out\_w\ <\ output\_width;\ ++out\_w)\ \{}
+\DoxyCodeLine{00095\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ out\_d\ =\ 0;\ out\_d\ <\ \mbox{\hyperlink{fully__connected_8cpp_a3146ba32fa984df809a56706955d753a}{output\_depth}};\ ++out\_d)\ \{}
+\DoxyCodeLine{00096\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (out\_b\ <\ left\_b\_padding\ ||}
+\DoxyCodeLine{00097\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ out\_b\ >=\ output\_batch\ -\/\ right\_b\_padding\ ||}
+\DoxyCodeLine{00098\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ out\_p\ <\ left\_p\_padding\ ||}
+\DoxyCodeLine{00099\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ out\_p\ >=\ output\_plane\ -\/\ right\_p\_padding\ ||}
+\DoxyCodeLine{00100\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ out\_h\ <\ left\_h\_padding\ ||}
+\DoxyCodeLine{00101\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ out\_h\ >=\ output\_height\ -\/\ right\_h\_padding\ ||}
+\DoxyCodeLine{00102\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ out\_w\ <\ left\_w\_padding\ ||}
+\DoxyCodeLine{00103\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ out\_w\ >=\ output\_width\ -\/\ right\_w\_padding\ ||}
+\DoxyCodeLine{00104\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ out\_d\ <\ left\_d\_padding\ ||}
+\DoxyCodeLine{00105\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ out\_d\ >=\ \mbox{\hyperlink{fully__connected_8cpp_a3146ba32fa984df809a56706955d753a}{output\_depth}}\ -\/\ right\_d\_padding)\ \{}
+\DoxyCodeLine{00106\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ *out\_ptr++\ =\ pad\_value;}
+\DoxyCodeLine{00107\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00108\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ *out\_ptr++\ =\ *in\_ptr++;}
+\DoxyCodeLine{00109\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00110\ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00111\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00112\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00113\ \ \ \ \ \}}
+\DoxyCodeLine{00114\ \ \ \}}
+\DoxyCodeLine{00115\ \}}
+\DoxyCodeLine{00116\ }
+\DoxyCodeLine{00117\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T,\ \textcolor{keyword}{typename}\ P>}
+\DoxyCodeLine{00118\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1reference__ops_a63f8ab7fe244343db50bd1405109c9af}{Pad}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structtflite_1_1_pad_params}{tflite::PadParams}}\&\ op\_params,}
+\DoxyCodeLine{00119\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classtflite_1_1_runtime_shape}{RuntimeShape}}\&\ input\_shape,\ \textcolor{keyword}{const}\ T*\ \mbox{\hyperlink{add__n__test_8cc_a5612ba79d1f0b544c7aeae4621166fea}{input\_data}},}
+\DoxyCodeLine{00120\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ P*\ pad\_value\_ptr,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classtflite_1_1_runtime_shape}{RuntimeShape}}\&\ output\_shape,}
+\DoxyCodeLine{00121\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ T*\ \mbox{\hyperlink{add__n__test_8cc_a3305b43869c4b837b0a33c12cff5069b}{output\_data}})\ \{}
+\DoxyCodeLine{00122\ \ \ \mbox{\hyperlink{namespacetflite_1_1reference__ops_a948065f3c0345240db043d86029fd6d1}{PadImpl}}(op\_params,\ input\_shape,\ \mbox{\hyperlink{add__n__test_8cc_a5612ba79d1f0b544c7aeae4621166fea}{input\_data}},\ pad\_value\_ptr,\ output\_shape,}
+\DoxyCodeLine{00123\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{add__n__test_8cc_a3305b43869c4b837b0a33c12cff5069b}{output\_data}});}
+\DoxyCodeLine{00124\ \}}
+\DoxyCodeLine{00125\ }
+\DoxyCodeLine{00126\ \textcolor{comment}{//\ The\ second\ (pad-\/value)\ input\ can\ be\ int32\_t\ when,\ say,\ the\ first\ is\ uint8\_t.}}
+\DoxyCodeLine{00127\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{00128\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1reference__ops_a63f8ab7fe244343db50bd1405109c9af}{Pad}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structtflite_1_1_pad_params}{tflite::PadParams}}\&\ op\_params,}
+\DoxyCodeLine{00129\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classtflite_1_1_runtime_shape}{RuntimeShape}}\&\ input\_shape,\ \textcolor{keyword}{const}\ T*\ \mbox{\hyperlink{add__n__test_8cc_a5612ba79d1f0b544c7aeae4621166fea}{input\_data}},}
+\DoxyCodeLine{00130\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ int32\_t*\ pad\_value\_ptr,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classtflite_1_1_runtime_shape}{RuntimeShape}}\&\ output\_shape,}
+\DoxyCodeLine{00131\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ T*\ \mbox{\hyperlink{add__n__test_8cc_a3305b43869c4b837b0a33c12cff5069b}{output\_data}})\ \{}
+\DoxyCodeLine{00132\ \ \ \textcolor{keyword}{const}\ T\ converted\_pad\_value\ =\ \textcolor{keyword}{static\_cast<}T\textcolor{keyword}{>}(*pad\_value\_ptr);}
+\DoxyCodeLine{00133\ \ \ \mbox{\hyperlink{namespacetflite_1_1reference__ops_a948065f3c0345240db043d86029fd6d1}{PadImpl}}(op\_params,\ input\_shape,\ \mbox{\hyperlink{add__n__test_8cc_a5612ba79d1f0b544c7aeae4621166fea}{input\_data}},\ \&converted\_pad\_value,}
+\DoxyCodeLine{00134\ \ \ \ \ \ \ \ \ \ \ output\_shape,\ \mbox{\hyperlink{add__n__test_8cc_a3305b43869c4b837b0a33c12cff5069b}{output\_data}});}
+\DoxyCodeLine{00135\ \}}
+\DoxyCodeLine{00136\ }
+\DoxyCodeLine{00137\ \textcolor{comment}{//\ This\ version\ avoids\ conflicting\ template\ matching.}}
+\DoxyCodeLine{00138\ \textcolor{keyword}{template}\ <>}
+\DoxyCodeLine{00139\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1reference__ops_a63f8ab7fe244343db50bd1405109c9af}{Pad}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structtflite_1_1_pad_params}{tflite::PadParams}}\&\ op\_params,}
+\DoxyCodeLine{00140\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classtflite_1_1_runtime_shape}{RuntimeShape}}\&\ input\_shape,\ \textcolor{keyword}{const}\ int32\_t*\ \mbox{\hyperlink{add__n__test_8cc_a5612ba79d1f0b544c7aeae4621166fea}{input\_data}},}
+\DoxyCodeLine{00141\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ int32\_t*\ pad\_value\_ptr,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classtflite_1_1_runtime_shape}{RuntimeShape}}\&\ output\_shape,}
+\DoxyCodeLine{00142\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ int32\_t*\ \mbox{\hyperlink{add__n__test_8cc_a3305b43869c4b837b0a33c12cff5069b}{output\_data}})\ \{}
+\DoxyCodeLine{00143\ \ \ \mbox{\hyperlink{namespacetflite_1_1reference__ops_a948065f3c0345240db043d86029fd6d1}{PadImpl}}(op\_params,\ input\_shape,\ \mbox{\hyperlink{add__n__test_8cc_a5612ba79d1f0b544c7aeae4621166fea}{input\_data}},\ pad\_value\_ptr,\ output\_shape,}
+\DoxyCodeLine{00144\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{add__n__test_8cc_a3305b43869c4b837b0a33c12cff5069b}{output\_data}});}
+\DoxyCodeLine{00145\ \}}
+\DoxyCodeLine{00146\ }
+\DoxyCodeLine{00147\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T,\ \textcolor{keyword}{typename}\ P>}
+\DoxyCodeLine{00148\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1reference__ops_a9101f66952cba078c8462143de92270e}{PadImageStyle}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structtflite_1_1_pad_params}{tflite::PadParams}}\&\ op\_params,}
+\DoxyCodeLine{00149\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classtflite_1_1_runtime_shape}{RuntimeShape}}\&\ input\_shape,\ \textcolor{keyword}{const}\ T*\ \mbox{\hyperlink{add__n__test_8cc_a5612ba79d1f0b544c7aeae4621166fea}{input\_data}},}
+\DoxyCodeLine{00150\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ P*\ pad\_value\_ptr,}
+\DoxyCodeLine{00151\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classtflite_1_1_runtime_shape}{RuntimeShape}}\&\ output\_shape,\ T*\ \mbox{\hyperlink{add__n__test_8cc_a3305b43869c4b837b0a33c12cff5069b}{output\_data}})\ \{}
+\DoxyCodeLine{00152\ \ \ \mbox{\hyperlink{namespacetflite_1_1reference__ops_a63f8ab7fe244343db50bd1405109c9af}{Pad}}(op\_params,\ input\_shape,\ \mbox{\hyperlink{add__n__test_8cc_a5612ba79d1f0b544c7aeae4621166fea}{input\_data}},\ pad\_value\_ptr,\ output\_shape,}
+\DoxyCodeLine{00153\ \ \ \ \ \ \ \mbox{\hyperlink{add__n__test_8cc_a3305b43869c4b837b0a33c12cff5069b}{output\_data}});}
+\DoxyCodeLine{00154\ \}}
+\DoxyCodeLine{00155\ }
+\DoxyCodeLine{00156\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ P>}
+\DoxyCodeLine{00157\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1reference__ops_a9101f66952cba078c8462143de92270e}{PadImageStyle}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structtflite_1_1_pad_params}{tflite::PadParams}}\&\ op\_params,}
+\DoxyCodeLine{00158\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classtflite_1_1_runtime_shape}{RuntimeShape}}\&\ input\_shape,}
+\DoxyCodeLine{00159\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{float}*\ \mbox{\hyperlink{add__n__test_8cc_a5612ba79d1f0b544c7aeae4621166fea}{input\_data}},\ \textcolor{keyword}{const}\ P*\ pad\_value\_ptr,}
+\DoxyCodeLine{00160\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classtflite_1_1_runtime_shape}{RuntimeShape}}\&\ output\_shape,}
+\DoxyCodeLine{00161\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}*\ \mbox{\hyperlink{add__n__test_8cc_a3305b43869c4b837b0a33c12cff5069b}{output\_data}})\ \{}
+\DoxyCodeLine{00162\ \ \ \mbox{\hyperlink{namespacetflite_1_1reference__ops_a63f8ab7fe244343db50bd1405109c9af}{Pad}}(op\_params,\ input\_shape,\ \mbox{\hyperlink{add__n__test_8cc_a5612ba79d1f0b544c7aeae4621166fea}{input\_data}},\ pad\_value\_ptr,\ output\_shape,}
+\DoxyCodeLine{00163\ \ \ \ \ \ \ \mbox{\hyperlink{add__n__test_8cc_a3305b43869c4b837b0a33c12cff5069b}{output\_data}});}
+\DoxyCodeLine{00164\ \}}
+\DoxyCodeLine{00165\ }
+\DoxyCodeLine{00166\ \}\ \ \textcolor{comment}{//\ namespace\ reference\_ops}}
+\DoxyCodeLine{00167\ \}\ \ \textcolor{comment}{//\ namespace\ tflite}}
+\DoxyCodeLine{00168\ }
+\DoxyCodeLine{00169\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ TENSORFLOW\_LITE\_KERNELS\_INTERNAL\_REFERENCE\_PAD\_H\_}}
+
+\end{DoxyCode}

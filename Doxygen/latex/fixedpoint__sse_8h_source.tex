@@ -1,0 +1,390 @@
+\doxysection{fixedpoint\+\_\+sse.\+h}
+\hypertarget{fixedpoint__sse_8h_source}{}\label{fixedpoint__sse_8h_source}\index{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/arduino-\/examples-\/main/src/third\_party/gemmlowp/fixedpoint/fixedpoint\_sse.h@{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/arduino-\/examples-\/main/src/third\_party/gemmlowp/fixedpoint/fixedpoint\_sse.h}}
+\mbox{\hyperlink{fixedpoint__sse_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{//\ Copyright\ 2015\ Google\ Inc.\ All\ Rights\ Reserved.}}
+\DoxyCodeLine{00002\ \textcolor{comment}{//}}
+\DoxyCodeLine{00003\ \textcolor{comment}{//\ Licensed\ under\ the\ Apache\ License,\ Version\ 2.0\ (the\ "{}License"{});}}
+\DoxyCodeLine{00004\ \textcolor{comment}{//\ you\ may\ not\ use\ this\ file\ except\ in\ compliance\ with\ the\ License.}}
+\DoxyCodeLine{00005\ \textcolor{comment}{//\ You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{00006\ \textcolor{comment}{//}}
+\DoxyCodeLine{00007\ \textcolor{comment}{//\ \ \ \ \ http://www.apache.org/licenses/LICENSE-\/2.0}}
+\DoxyCodeLine{00008\ \textcolor{comment}{//}}
+\DoxyCodeLine{00009\ \textcolor{comment}{//\ Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ software}}
+\DoxyCodeLine{00010\ \textcolor{comment}{//\ distributed\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,}}
+\DoxyCodeLine{00011\ \textcolor{comment}{//\ WITHOUT\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,\ either\ express\ or\ implied.}}
+\DoxyCodeLine{00012\ \textcolor{comment}{//\ See\ the\ License\ for\ the\ specific\ language\ governing\ permissions\ and}}
+\DoxyCodeLine{00013\ \textcolor{comment}{//\ limitations\ under\ the\ License.}}
+\DoxyCodeLine{00014\ }
+\DoxyCodeLine{00015\ \textcolor{comment}{//\ fixedpoint\_SSE.h:\ optimized\ SSE\ specializations\ of\ the\ templates}}
+\DoxyCodeLine{00016\ \textcolor{comment}{//\ in\ fixedpoint.h.}}
+\DoxyCodeLine{00017\ }
+\DoxyCodeLine{00018\ \textcolor{preprocessor}{\#ifndef\ GEMMLOWP\_INTERNAL\_FIXEDPOINT\_SSE\_H\_}}
+\DoxyCodeLine{00019\ \textcolor{preprocessor}{\#define\ GEMMLOWP\_INTERNAL\_FIXEDPOINT\_SSE\_H\_}}
+\DoxyCodeLine{00020\ }
+\DoxyCodeLine{00021\ \textcolor{preprocessor}{\#include\ <smmintrin.h>}}
+\DoxyCodeLine{00022\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{fixedpoint_8h}{third\_party/gemmlowp/fixedpoint/fixedpoint.h}}"{}}}
+\DoxyCodeLine{00023\ }
+\DoxyCodeLine{00024\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacegemmlowp}{gemmlowp}}\ \{}
+\DoxyCodeLine{00025\ }
+\DoxyCodeLine{00026\ \textcolor{comment}{//\ SSE\ intrinsics\ are\ not\ finely\ typed:\ there\ is\ a\ single\ \_\_m128i\ vector}}
+\DoxyCodeLine{00027\ \textcolor{comment}{//\ type\ that\ does\ not\ distinguish\ between\ "{}int32x4"{}\ and\ "{}int16x8"{}\ use}}
+\DoxyCodeLine{00028\ \textcolor{comment}{//\ cases,\ unlike\ the\ NEON\ equivalents.\ Because\ we\ had\ initially\ focused}}
+\DoxyCodeLine{00029\ \textcolor{comment}{//\ on\ int32x4,\ we\ did\ not\ pay\ attention\ and\ specialized\ these\ fixedpoint}}
+\DoxyCodeLine{00030\ \textcolor{comment}{//\ templates\ directly\ for\ \_\_m128i\ hardcoding\ the\ int32x4\ semantics,}}
+\DoxyCodeLine{00031\ \textcolor{comment}{//\ not\ leaving\ room\ for\ int16x8\ semantics.\ Amending\ that\ by\ adding\ a\ separate}}
+\DoxyCodeLine{00032\ \textcolor{comment}{//\ data\ type,\ int16x8\_m128i,\ that\ wraps\ \_\_m128i\ while\ being\ a\ separate}}
+\DoxyCodeLine{00033\ \textcolor{comment}{//\ type.}}
+\DoxyCodeLine{00034\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structgemmlowp_1_1int16x8__m128i}{int16x8\_m128i}}\ \{}
+\DoxyCodeLine{00035\ \ \ \mbox{\hyperlink{structgemmlowp_1_1int16x8__m128i_aa44144cfb35853f63df91c06a7f21d5f}{int16x8\_m128i}}()\ \{\}}
+\DoxyCodeLine{00036\ \ \ \textcolor{keyword}{explicit}\ \mbox{\hyperlink{structgemmlowp_1_1int16x8__m128i_a41af2e7af7f50b1c21597a7bb77896bb}{int16x8\_m128i}}(\_\_m128i\ \mbox{\hyperlink{detection__postprocess_8cpp_a56eca241e2896b9f57a79589e76fd24b}{w}})\ :\ \mbox{\hyperlink{structgemmlowp_1_1int16x8__m128i_a274ae51dd411312c9bf362bf278e3c83}{v}}(\mbox{\hyperlink{detection__postprocess_8cpp_a56eca241e2896b9f57a79589e76fd24b}{w}})\ \{\}}
+\DoxyCodeLine{00037\ \ \ \mbox{\hyperlink{structgemmlowp_1_1int16x8__m128i_ae5c863e4d4c85515dd5b4c4092707bb3}{\string~int16x8\_m128i}}()\ \{\}}
+\DoxyCodeLine{00038\ }
+\DoxyCodeLine{00039\ \ \ \_\_m128i\ \mbox{\hyperlink{structgemmlowp_1_1int16x8__m128i_a274ae51dd411312c9bf362bf278e3c83}{v}};}
+\DoxyCodeLine{00040\ \};}
+\DoxyCodeLine{00041\ }
+\DoxyCodeLine{00042\ \textcolor{keyword}{template}\ <>}
+\DoxyCodeLine{00043\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structgemmlowp_1_1_fixed_point_raw_type_traits}{FixedPointRawTypeTraits}}<\_\_m128i>\ \{}
+\DoxyCodeLine{00044\ \ \ \textcolor{keyword}{typedef}\ std::int32\_t\ \mbox{\hyperlink{structgemmlowp_1_1_fixed_point_raw_type_traits_3_01____m128i_01_4_ae9c877aa43a17a6a1beac828f6eb1d6c}{ScalarRawType}};}
+\DoxyCodeLine{00045\ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{int}\ kLanes\ =\ 4;}
+\DoxyCodeLine{00046\ \};}
+\DoxyCodeLine{00047\ }
+\DoxyCodeLine{00048\ \textcolor{keyword}{template}\ <>}
+\DoxyCodeLine{00049\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structgemmlowp_1_1_fixed_point_raw_type_traits}{FixedPointRawTypeTraits}}<\mbox{\hyperlink{structgemmlowp_1_1int16x8__m128i}{int16x8\_m128i}}>\ \{}
+\DoxyCodeLine{00050\ \ \ \textcolor{keyword}{typedef}\ std::int16\_t\ \mbox{\hyperlink{structgemmlowp_1_1_fixed_point_raw_type_traits_3_01int16x8__m128i_01_4_a99b8b40233902569f67854f94f0c0284}{ScalarRawType}};}
+\DoxyCodeLine{00051\ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{int}\ kLanes\ =\ 8;}
+\DoxyCodeLine{00052\ \};}
+\DoxyCodeLine{00053\ }
+\DoxyCodeLine{00054\ \textcolor{keyword}{template}\ <>}
+\DoxyCodeLine{00055\ \textcolor{keyword}{inline}\ \_\_m128i\ \mbox{\hyperlink{namespacegemmlowp_ac30d505e781fb7914208c2430df65e3a}{BitAnd}}(\_\_m128i\ a,\ \_\_m128i\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}})\ \{}
+\DoxyCodeLine{00056\ \ \ \textcolor{keywordflow}{return}\ \_mm\_and\_si128(a,\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}});}
+\DoxyCodeLine{00057\ \}}
+\DoxyCodeLine{00058\ }
+\DoxyCodeLine{00059\ \textcolor{keyword}{template}\ <>}
+\DoxyCodeLine{00060\ \textcolor{keyword}{inline}\ \mbox{\hyperlink{structgemmlowp_1_1int16x8__m128i}{int16x8\_m128i}}\ \mbox{\hyperlink{namespacegemmlowp_ac30d505e781fb7914208c2430df65e3a}{BitAnd}}(\mbox{\hyperlink{structgemmlowp_1_1int16x8__m128i}{int16x8\_m128i}}\ a,\ \mbox{\hyperlink{structgemmlowp_1_1int16x8__m128i}{int16x8\_m128i}}\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}})\ \{}
+\DoxyCodeLine{00061\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structgemmlowp_1_1int16x8__m128i}{int16x8\_m128i}}(\_mm\_and\_si128(a.v,\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}}.v));}
+\DoxyCodeLine{00062\ \}}
+\DoxyCodeLine{00063\ }
+\DoxyCodeLine{00064\ \textcolor{keyword}{template}\ <>}
+\DoxyCodeLine{00065\ \textcolor{keyword}{inline}\ \_\_m128i\ \mbox{\hyperlink{namespacegemmlowp_ae92b62afd3351e776f9aa10121ed211b}{BitOr}}(\_\_m128i\ a,\ \_\_m128i\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}})\ \{}
+\DoxyCodeLine{00066\ \ \ \textcolor{keywordflow}{return}\ \_mm\_or\_si128(a,\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}});}
+\DoxyCodeLine{00067\ \}}
+\DoxyCodeLine{00068\ }
+\DoxyCodeLine{00069\ \textcolor{keyword}{template}\ <>}
+\DoxyCodeLine{00070\ \textcolor{keyword}{inline}\ \mbox{\hyperlink{structgemmlowp_1_1int16x8__m128i}{int16x8\_m128i}}\ \mbox{\hyperlink{namespacegemmlowp_ae92b62afd3351e776f9aa10121ed211b}{BitOr}}(\mbox{\hyperlink{structgemmlowp_1_1int16x8__m128i}{int16x8\_m128i}}\ a,\ \mbox{\hyperlink{structgemmlowp_1_1int16x8__m128i}{int16x8\_m128i}}\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}})\ \{}
+\DoxyCodeLine{00071\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structgemmlowp_1_1int16x8__m128i}{int16x8\_m128i}}(\_mm\_or\_si128(a.v,\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}}.v));}
+\DoxyCodeLine{00072\ \}}
+\DoxyCodeLine{00073\ }
+\DoxyCodeLine{00074\ \textcolor{keyword}{template}\ <>}
+\DoxyCodeLine{00075\ \textcolor{keyword}{inline}\ \_\_m128i\ \mbox{\hyperlink{namespacegemmlowp_acddfe6d594b0034b193a09e6d3e55241}{BitXor}}(\_\_m128i\ a,\ \_\_m128i\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}})\ \{}
+\DoxyCodeLine{00076\ \ \ \textcolor{keywordflow}{return}\ \_mm\_xor\_si128(a,\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}});}
+\DoxyCodeLine{00077\ \}}
+\DoxyCodeLine{00078\ }
+\DoxyCodeLine{00079\ \textcolor{keyword}{template}\ <>}
+\DoxyCodeLine{00080\ \textcolor{keyword}{inline}\ \mbox{\hyperlink{structgemmlowp_1_1int16x8__m128i}{int16x8\_m128i}}\ \mbox{\hyperlink{namespacegemmlowp_acddfe6d594b0034b193a09e6d3e55241}{BitXor}}(\mbox{\hyperlink{structgemmlowp_1_1int16x8__m128i}{int16x8\_m128i}}\ a,\ \mbox{\hyperlink{structgemmlowp_1_1int16x8__m128i}{int16x8\_m128i}}\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}})\ \{}
+\DoxyCodeLine{00081\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structgemmlowp_1_1int16x8__m128i}{int16x8\_m128i}}(\_mm\_xor\_si128(a.v,\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}}.v));}
+\DoxyCodeLine{00082\ \}}
+\DoxyCodeLine{00083\ }
+\DoxyCodeLine{00084\ \textcolor{keyword}{template}\ <>}
+\DoxyCodeLine{00085\ \textcolor{keyword}{inline}\ \_\_m128i\ \mbox{\hyperlink{namespacegemmlowp_a5e1591034bb01e6f23e8b7e7aeb17600}{BitNot}}(\_\_m128i\ a)\ \{}
+\DoxyCodeLine{00086\ \ \ \textcolor{keywordflow}{return}\ \_mm\_andnot\_si128(a,\ \_mm\_set1\_epi32(-\/1));}
+\DoxyCodeLine{00087\ \}}
+\DoxyCodeLine{00088\ }
+\DoxyCodeLine{00089\ \textcolor{keyword}{template}\ <>}
+\DoxyCodeLine{00090\ \textcolor{keyword}{inline}\ \mbox{\hyperlink{structgemmlowp_1_1int16x8__m128i}{int16x8\_m128i}}\ \mbox{\hyperlink{namespacegemmlowp_a5e1591034bb01e6f23e8b7e7aeb17600}{BitNot}}(\mbox{\hyperlink{structgemmlowp_1_1int16x8__m128i}{int16x8\_m128i}}\ a)\ \{}
+\DoxyCodeLine{00091\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structgemmlowp_1_1int16x8__m128i}{int16x8\_m128i}}(\_mm\_andnot\_si128(a.v,\ \_mm\_set1\_epi16(-\/1)));}
+\DoxyCodeLine{00092\ \}}
+\DoxyCodeLine{00093\ }
+\DoxyCodeLine{00094\ \textcolor{keyword}{template}\ <>}
+\DoxyCodeLine{00095\ \textcolor{keyword}{inline}\ \_\_m128i\ \mbox{\hyperlink{namespacegemmlowp_af16b123f9b09573c1ea8fadcd0aec5b7}{Add}}(\_\_m128i\ a,\ \_\_m128i\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}})\ \{}
+\DoxyCodeLine{00096\ \ \ \textcolor{keywordflow}{return}\ \_mm\_add\_epi32(a,\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}});}
+\DoxyCodeLine{00097\ \}}
+\DoxyCodeLine{00098\ }
+\DoxyCodeLine{00099\ \textcolor{keyword}{template}\ <>}
+\DoxyCodeLine{00100\ \textcolor{keyword}{inline}\ \mbox{\hyperlink{structgemmlowp_1_1int16x8__m128i}{int16x8\_m128i}}\ \mbox{\hyperlink{namespacegemmlowp_af16b123f9b09573c1ea8fadcd0aec5b7}{Add}}(\mbox{\hyperlink{structgemmlowp_1_1int16x8__m128i}{int16x8\_m128i}}\ a,\ \mbox{\hyperlink{structgemmlowp_1_1int16x8__m128i}{int16x8\_m128i}}\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}})\ \{}
+\DoxyCodeLine{00101\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structgemmlowp_1_1int16x8__m128i}{int16x8\_m128i}}(\_mm\_add\_epi16(a.v,\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}}.v));}
+\DoxyCodeLine{00102\ \}}
+\DoxyCodeLine{00103\ }
+\DoxyCodeLine{00104\ \textcolor{keyword}{template}\ <>}
+\DoxyCodeLine{00105\ \textcolor{keyword}{inline}\ \_\_m128i\ \mbox{\hyperlink{namespacegemmlowp_a20cd00d97d43dff772207a00df5f77b2}{Mul}}(\_\_m128i\ a,\ \_\_m128i\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}})\ \{}
+\DoxyCodeLine{00106\ \ \ \textcolor{keywordflow}{return}\ \_mm\_mullo\_epi32(a,\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}});}
+\DoxyCodeLine{00107\ \}}
+\DoxyCodeLine{00108\ }
+\DoxyCodeLine{00109\ \textcolor{keyword}{template}\ <>}
+\DoxyCodeLine{00110\ \textcolor{keyword}{inline}\ \mbox{\hyperlink{structgemmlowp_1_1int16x8__m128i}{int16x8\_m128i}}\ \mbox{\hyperlink{namespacegemmlowp_a20cd00d97d43dff772207a00df5f77b2}{Mul}}(\mbox{\hyperlink{structgemmlowp_1_1int16x8__m128i}{int16x8\_m128i}}\ a,\ \mbox{\hyperlink{structgemmlowp_1_1int16x8__m128i}{int16x8\_m128i}}\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}})\ \{}
+\DoxyCodeLine{00111\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structgemmlowp_1_1int16x8__m128i}{int16x8\_m128i}}(\_mm\_mullo\_epi16(a.v,\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}}.v));}
+\DoxyCodeLine{00112\ \}}
+\DoxyCodeLine{00113\ }
+\DoxyCodeLine{00114\ \textcolor{keyword}{template}\ <>}
+\DoxyCodeLine{00115\ \textcolor{keyword}{inline}\ \_\_m128i\ \mbox{\hyperlink{namespacegemmlowp_a079b2c49b32e8161085f5993d80e2f07}{Sub}}(\_\_m128i\ a,\ \_\_m128i\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}})\ \{}
+\DoxyCodeLine{00116\ \ \ \textcolor{keywordflow}{return}\ \_mm\_sub\_epi32(a,\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}});}
+\DoxyCodeLine{00117\ \}}
+\DoxyCodeLine{00118\ }
+\DoxyCodeLine{00119\ \textcolor{keyword}{template}\ <>}
+\DoxyCodeLine{00120\ \textcolor{keyword}{inline}\ \mbox{\hyperlink{structgemmlowp_1_1int16x8__m128i}{int16x8\_m128i}}\ \mbox{\hyperlink{namespacegemmlowp_a079b2c49b32e8161085f5993d80e2f07}{Sub}}(\mbox{\hyperlink{structgemmlowp_1_1int16x8__m128i}{int16x8\_m128i}}\ a,\ \mbox{\hyperlink{structgemmlowp_1_1int16x8__m128i}{int16x8\_m128i}}\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}})\ \{}
+\DoxyCodeLine{00121\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structgemmlowp_1_1int16x8__m128i}{int16x8\_m128i}}(\_mm\_sub\_epi16(a.v,\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}}.v));}
+\DoxyCodeLine{00122\ \}}
+\DoxyCodeLine{00123\ }
+\DoxyCodeLine{00124\ \textcolor{keyword}{template}\ <>}
+\DoxyCodeLine{00125\ \textcolor{keyword}{inline}\ \_\_m128i\ \mbox{\hyperlink{namespacegemmlowp_a7bf5635dca3f76f608df6337ff7884ac}{Neg}}(\_\_m128i\ a)\ \{}
+\DoxyCodeLine{00126\ \ \ \textcolor{keywordflow}{return}\ \_mm\_sign\_epi32(a,\ \_mm\_set1\_epi32(-\/1));}
+\DoxyCodeLine{00127\ \}}
+\DoxyCodeLine{00128\ }
+\DoxyCodeLine{00129\ \textcolor{keyword}{template}\ <>}
+\DoxyCodeLine{00130\ \textcolor{keyword}{inline}\ \mbox{\hyperlink{structgemmlowp_1_1int16x8__m128i}{int16x8\_m128i}}\ \mbox{\hyperlink{namespacegemmlowp_a7bf5635dca3f76f608df6337ff7884ac}{Neg}}(\mbox{\hyperlink{structgemmlowp_1_1int16x8__m128i}{int16x8\_m128i}}\ a)\ \{}
+\DoxyCodeLine{00131\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structgemmlowp_1_1int16x8__m128i}{int16x8\_m128i}}(\_mm\_sign\_epi16(a.v,\ \_mm\_set1\_epi16(-\/1)));}
+\DoxyCodeLine{00132\ \}}
+\DoxyCodeLine{00133\ }
+\DoxyCodeLine{00134\ \textcolor{keyword}{template}\ <>}
+\DoxyCodeLine{00135\ \textcolor{keyword}{inline}\ \_\_m128i\ \mbox{\hyperlink{namespacegemmlowp_a980262a3a56242e79e4d8f93dfefd5ae}{ShiftLeft}}(\_\_m128i\ a,\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{mirror__pad_8cpp_aed7ea92f45bd273dde380a45ddced592}{offset}})\ \{}
+\DoxyCodeLine{00136\ \ \ \textcolor{keywordflow}{return}\ \_mm\_slli\_epi32(a,\ \mbox{\hyperlink{mirror__pad_8cpp_aed7ea92f45bd273dde380a45ddced592}{offset}});}
+\DoxyCodeLine{00137\ \}}
+\DoxyCodeLine{00138\ }
+\DoxyCodeLine{00139\ \textcolor{keyword}{template}\ <>}
+\DoxyCodeLine{00140\ \textcolor{keyword}{inline}\ \mbox{\hyperlink{structgemmlowp_1_1int16x8__m128i}{int16x8\_m128i}}\ \mbox{\hyperlink{namespacegemmlowp_a980262a3a56242e79e4d8f93dfefd5ae}{ShiftLeft}}(\mbox{\hyperlink{structgemmlowp_1_1int16x8__m128i}{int16x8\_m128i}}\ a,\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{mirror__pad_8cpp_aed7ea92f45bd273dde380a45ddced592}{offset}})\ \{}
+\DoxyCodeLine{00141\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structgemmlowp_1_1int16x8__m128i}{int16x8\_m128i}}(\_mm\_slli\_epi16(a.v,\ \mbox{\hyperlink{mirror__pad_8cpp_aed7ea92f45bd273dde380a45ddced592}{offset}}));}
+\DoxyCodeLine{00142\ \}}
+\DoxyCodeLine{00143\ }
+\DoxyCodeLine{00144\ \textcolor{keyword}{template}\ <>}
+\DoxyCodeLine{00145\ \textcolor{keyword}{inline}\ \_\_m128i\ \mbox{\hyperlink{namespacegemmlowp_a94fb8cb6ab638dd8c67a688ce81be00d}{ShiftRight}}(\_\_m128i\ a,\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{mirror__pad_8cpp_aed7ea92f45bd273dde380a45ddced592}{offset}})\ \{}
+\DoxyCodeLine{00146\ \ \ \textcolor{keywordflow}{return}\ \_mm\_srai\_epi32(a,\ \mbox{\hyperlink{mirror__pad_8cpp_aed7ea92f45bd273dde380a45ddced592}{offset}});}
+\DoxyCodeLine{00147\ \}}
+\DoxyCodeLine{00148\ }
+\DoxyCodeLine{00149\ \textcolor{keyword}{template}\ <>}
+\DoxyCodeLine{00150\ \textcolor{keyword}{inline}\ \mbox{\hyperlink{structgemmlowp_1_1int16x8__m128i}{int16x8\_m128i}}\ \mbox{\hyperlink{namespacegemmlowp_a94fb8cb6ab638dd8c67a688ce81be00d}{ShiftRight}}(\mbox{\hyperlink{structgemmlowp_1_1int16x8__m128i}{int16x8\_m128i}}\ a,\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{mirror__pad_8cpp_aed7ea92f45bd273dde380a45ddced592}{offset}})\ \{}
+\DoxyCodeLine{00151\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structgemmlowp_1_1int16x8__m128i}{int16x8\_m128i}}(\_mm\_srai\_epi16(a.v,\ \mbox{\hyperlink{mirror__pad_8cpp_aed7ea92f45bd273dde380a45ddced592}{offset}}));}
+\DoxyCodeLine{00152\ \}}
+\DoxyCodeLine{00153\ }
+\DoxyCodeLine{00154\ \textcolor{keyword}{template}\ <>}
+\DoxyCodeLine{00155\ \textcolor{keyword}{inline}\ \_\_m128i\ \mbox{\hyperlink{namespacegemmlowp_a9200374a9481b271d4ce140e9a449976}{SelectUsingMask}}(\_\_m128i\ if\_mask,\ \_\_m128i\ then\_val,}
+\DoxyCodeLine{00156\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \_\_m128i\ else\_val)\ \{}
+\DoxyCodeLine{00157\ \ \ \textcolor{comment}{//\ borrowed\ from\ Intel's\ arm\_neon\_sse.h\ header.}}
+\DoxyCodeLine{00158\ \ \ \textcolor{keywordflow}{return}\ \_mm\_or\_si128(\_mm\_and\_si128(if\_mask,\ then\_val),}
+\DoxyCodeLine{00159\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \_mm\_andnot\_si128(if\_mask,\ else\_val));}
+\DoxyCodeLine{00160\ \}}
+\DoxyCodeLine{00161\ }
+\DoxyCodeLine{00162\ \textcolor{keyword}{template}\ <>}
+\DoxyCodeLine{00163\ \textcolor{keyword}{inline}\ \mbox{\hyperlink{structgemmlowp_1_1int16x8__m128i}{int16x8\_m128i}}\ \mbox{\hyperlink{namespacegemmlowp_a9200374a9481b271d4ce140e9a449976}{SelectUsingMask}}(\mbox{\hyperlink{structgemmlowp_1_1int16x8__m128i}{int16x8\_m128i}}\ if\_mask,}
+\DoxyCodeLine{00164\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structgemmlowp_1_1int16x8__m128i}{int16x8\_m128i}}\ then\_val,}
+\DoxyCodeLine{00165\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structgemmlowp_1_1int16x8__m128i}{int16x8\_m128i}}\ else\_val)\ \{}
+\DoxyCodeLine{00166\ \ \ \textcolor{comment}{//\ borrowed\ from\ Intel's\ arm\_neon\_sse.h\ header.}}
+\DoxyCodeLine{00167\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structgemmlowp_1_1int16x8__m128i}{int16x8\_m128i}}(\mbox{\hyperlink{namespacegemmlowp_a9200374a9481b271d4ce140e9a449976}{SelectUsingMask}}(if\_mask.\mbox{\hyperlink{structgemmlowp_1_1int16x8__m128i_a274ae51dd411312c9bf362bf278e3c83}{v}},\ then\_val.\mbox{\hyperlink{structgemmlowp_1_1int16x8__m128i_a274ae51dd411312c9bf362bf278e3c83}{v}},\ else\_val.\mbox{\hyperlink{structgemmlowp_1_1int16x8__m128i_a274ae51dd411312c9bf362bf278e3c83}{v}}));}
+\DoxyCodeLine{00168\ \}}
+\DoxyCodeLine{00169\ }
+\DoxyCodeLine{00170\ \textcolor{keyword}{template}\ <>}
+\DoxyCodeLine{00171\ \textcolor{keyword}{inline}\ \_\_m128i\ \mbox{\hyperlink{namespacegemmlowp_acd42c48b5d493c5837bd4538561b7008}{MaskIfEqual}}(\_\_m128i\ a,\ \_\_m128i\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}})\ \{}
+\DoxyCodeLine{00172\ \ \ \textcolor{keywordflow}{return}\ \_mm\_cmpeq\_epi32(a,\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}});}
+\DoxyCodeLine{00173\ \}}
+\DoxyCodeLine{00174\ }
+\DoxyCodeLine{00175\ \textcolor{keyword}{template}\ <>}
+\DoxyCodeLine{00176\ \textcolor{keyword}{inline}\ \mbox{\hyperlink{structgemmlowp_1_1int16x8__m128i}{int16x8\_m128i}}\ \mbox{\hyperlink{namespacegemmlowp_acd42c48b5d493c5837bd4538561b7008}{MaskIfEqual}}(\mbox{\hyperlink{structgemmlowp_1_1int16x8__m128i}{int16x8\_m128i}}\ a,\ \mbox{\hyperlink{structgemmlowp_1_1int16x8__m128i}{int16x8\_m128i}}\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}})\ \{}
+\DoxyCodeLine{00177\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structgemmlowp_1_1int16x8__m128i}{int16x8\_m128i}}(\_mm\_cmpeq\_epi16(a.v,\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}}.v));}
+\DoxyCodeLine{00178\ \}}
+\DoxyCodeLine{00179\ }
+\DoxyCodeLine{00180\ \textcolor{keyword}{template}\ <>}
+\DoxyCodeLine{00181\ \textcolor{keyword}{inline}\ \_\_m128i\ \mbox{\hyperlink{namespacegemmlowp_a4f32c03d344a34f8e711bb874ff99fa2}{MaskIfNotEqual}}(\_\_m128i\ a,\ \_\_m128i\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}})\ \{}
+\DoxyCodeLine{00182\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacegemmlowp_a5e1591034bb01e6f23e8b7e7aeb17600}{BitNot}}(\mbox{\hyperlink{namespacegemmlowp_acd42c48b5d493c5837bd4538561b7008}{MaskIfEqual}}(a,\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}}));}
+\DoxyCodeLine{00183\ \}}
+\DoxyCodeLine{00184\ }
+\DoxyCodeLine{00185\ \textcolor{keyword}{template}\ <>}
+\DoxyCodeLine{00186\ \textcolor{keyword}{inline}\ \mbox{\hyperlink{structgemmlowp_1_1int16x8__m128i}{int16x8\_m128i}}\ \mbox{\hyperlink{namespacegemmlowp_a4f32c03d344a34f8e711bb874ff99fa2}{MaskIfNotEqual}}(\mbox{\hyperlink{structgemmlowp_1_1int16x8__m128i}{int16x8\_m128i}}\ a,\ \mbox{\hyperlink{structgemmlowp_1_1int16x8__m128i}{int16x8\_m128i}}\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}})\ \{}
+\DoxyCodeLine{00187\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacegemmlowp_a5e1591034bb01e6f23e8b7e7aeb17600}{BitNot}}(\mbox{\hyperlink{namespacegemmlowp_acd42c48b5d493c5837bd4538561b7008}{MaskIfEqual}}(a,\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}}));}
+\DoxyCodeLine{00188\ \}}
+\DoxyCodeLine{00189\ }
+\DoxyCodeLine{00190\ \textcolor{keyword}{template}\ <>}
+\DoxyCodeLine{00191\ \textcolor{keyword}{inline}\ \_\_m128i\ \mbox{\hyperlink{namespacegemmlowp_ae6984b5cd9abc82bf0c5c074bed0ebe3}{MaskIfZero}}(\_\_m128i\ a)\ \{}
+\DoxyCodeLine{00192\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacegemmlowp_acd42c48b5d493c5837bd4538561b7008}{MaskIfEqual}}(a,\ \_mm\_set1\_epi32(0));}
+\DoxyCodeLine{00193\ \}}
+\DoxyCodeLine{00194\ }
+\DoxyCodeLine{00195\ \textcolor{keyword}{template}\ <>}
+\DoxyCodeLine{00196\ \textcolor{keyword}{inline}\ \mbox{\hyperlink{structgemmlowp_1_1int16x8__m128i}{int16x8\_m128i}}\ \mbox{\hyperlink{namespacegemmlowp_ae6984b5cd9abc82bf0c5c074bed0ebe3}{MaskIfZero}}(\mbox{\hyperlink{structgemmlowp_1_1int16x8__m128i}{int16x8\_m128i}}\ a)\ \{}
+\DoxyCodeLine{00197\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacegemmlowp_acd42c48b5d493c5837bd4538561b7008}{MaskIfEqual}}(a,\ \mbox{\hyperlink{structgemmlowp_1_1int16x8__m128i}{int16x8\_m128i}}(\_mm\_set1\_epi16(0)));}
+\DoxyCodeLine{00198\ \}}
+\DoxyCodeLine{00199\ }
+\DoxyCodeLine{00200\ \textcolor{keyword}{template}\ <>}
+\DoxyCodeLine{00201\ \textcolor{keyword}{inline}\ \_\_m128i\ \mbox{\hyperlink{namespacegemmlowp_abc6b9204dc901bcd9b6797955d605622}{MaskIfNonZero}}(\_\_m128i\ a)\ \{}
+\DoxyCodeLine{00202\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacegemmlowp_a4f32c03d344a34f8e711bb874ff99fa2}{MaskIfNotEqual}}(a,\ \_mm\_set1\_epi32(0));}
+\DoxyCodeLine{00203\ \}}
+\DoxyCodeLine{00204\ }
+\DoxyCodeLine{00205\ \textcolor{keyword}{template}\ <>}
+\DoxyCodeLine{00206\ \textcolor{keyword}{inline}\ \mbox{\hyperlink{structgemmlowp_1_1int16x8__m128i}{int16x8\_m128i}}\ \mbox{\hyperlink{namespacegemmlowp_abc6b9204dc901bcd9b6797955d605622}{MaskIfNonZero}}(\mbox{\hyperlink{structgemmlowp_1_1int16x8__m128i}{int16x8\_m128i}}\ a)\ \{}
+\DoxyCodeLine{00207\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacegemmlowp_a4f32c03d344a34f8e711bb874ff99fa2}{MaskIfNotEqual}}(a,\ \mbox{\hyperlink{structgemmlowp_1_1int16x8__m128i}{int16x8\_m128i}}(\_mm\_set1\_epi16(0)));}
+\DoxyCodeLine{00208\ \}}
+\DoxyCodeLine{00209\ }
+\DoxyCodeLine{00210\ \textcolor{keyword}{template}\ <>}
+\DoxyCodeLine{00211\ \textcolor{keyword}{inline}\ \_\_m128i\ \mbox{\hyperlink{namespacegemmlowp_a1e955db8aed2ffb796737651b688da6f}{MaskIfGreaterThan}}(\_\_m128i\ a,\ \_\_m128i\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}})\ \{}
+\DoxyCodeLine{00212\ \ \ \textcolor{keywordflow}{return}\ \_mm\_cmpgt\_epi32(a,\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}});}
+\DoxyCodeLine{00213\ \}}
+\DoxyCodeLine{00214\ }
+\DoxyCodeLine{00215\ \textcolor{keyword}{template}\ <>}
+\DoxyCodeLine{00216\ \textcolor{keyword}{inline}\ \mbox{\hyperlink{structgemmlowp_1_1int16x8__m128i}{int16x8\_m128i}}\ \mbox{\hyperlink{namespacegemmlowp_a1e955db8aed2ffb796737651b688da6f}{MaskIfGreaterThan}}(\mbox{\hyperlink{structgemmlowp_1_1int16x8__m128i}{int16x8\_m128i}}\ a,\ \mbox{\hyperlink{structgemmlowp_1_1int16x8__m128i}{int16x8\_m128i}}\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}})\ \{}
+\DoxyCodeLine{00217\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structgemmlowp_1_1int16x8__m128i}{int16x8\_m128i}}(\_mm\_cmpgt\_epi16(a.v,\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}}.v));}
+\DoxyCodeLine{00218\ \}}
+\DoxyCodeLine{00219\ }
+\DoxyCodeLine{00220\ \textcolor{keyword}{template}\ <>}
+\DoxyCodeLine{00221\ \textcolor{keyword}{inline}\ \_\_m128i\ \mbox{\hyperlink{namespacegemmlowp_a03d0a1a3d2937ae240dc38420e8a4edd}{MaskIfLessThan}}(\_\_m128i\ a,\ \_\_m128i\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}})\ \{}
+\DoxyCodeLine{00222\ \ \ \textcolor{keywordflow}{return}\ \_mm\_cmplt\_epi32(a,\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}});}
+\DoxyCodeLine{00223\ \}}
+\DoxyCodeLine{00224\ }
+\DoxyCodeLine{00225\ \textcolor{keyword}{template}\ <>}
+\DoxyCodeLine{00226\ \textcolor{keyword}{inline}\ \mbox{\hyperlink{structgemmlowp_1_1int16x8__m128i}{int16x8\_m128i}}\ \mbox{\hyperlink{namespacegemmlowp_a03d0a1a3d2937ae240dc38420e8a4edd}{MaskIfLessThan}}(\mbox{\hyperlink{structgemmlowp_1_1int16x8__m128i}{int16x8\_m128i}}\ a,\ \mbox{\hyperlink{structgemmlowp_1_1int16x8__m128i}{int16x8\_m128i}}\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}})\ \{}
+\DoxyCodeLine{00227\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structgemmlowp_1_1int16x8__m128i}{int16x8\_m128i}}(\_mm\_cmplt\_epi16(a.v,\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}}.v));}
+\DoxyCodeLine{00228\ \}}
+\DoxyCodeLine{00229\ }
+\DoxyCodeLine{00230\ \textcolor{keyword}{template}\ <>}
+\DoxyCodeLine{00231\ \textcolor{keyword}{inline}\ \_\_m128i\ \mbox{\hyperlink{namespacegemmlowp_ab71e9056506cbf329cf53b7f55bdb6a7}{MaskIfGreaterThanOrEqual}}(\_\_m128i\ a,\ \_\_m128i\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}})\ \{}
+\DoxyCodeLine{00232\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacegemmlowp_a5e1591034bb01e6f23e8b7e7aeb17600}{BitNot}}(\mbox{\hyperlink{namespacegemmlowp_a03d0a1a3d2937ae240dc38420e8a4edd}{MaskIfLessThan}}(a,\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}}));}
+\DoxyCodeLine{00233\ \}}
+\DoxyCodeLine{00234\ }
+\DoxyCodeLine{00235\ \textcolor{keyword}{template}\ <>}
+\DoxyCodeLine{00236\ \textcolor{keyword}{inline}\ \mbox{\hyperlink{structgemmlowp_1_1int16x8__m128i}{int16x8\_m128i}}\ \mbox{\hyperlink{namespacegemmlowp_ab71e9056506cbf329cf53b7f55bdb6a7}{MaskIfGreaterThanOrEqual}}(\mbox{\hyperlink{structgemmlowp_1_1int16x8__m128i}{int16x8\_m128i}}\ a,}
+\DoxyCodeLine{00237\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structgemmlowp_1_1int16x8__m128i}{int16x8\_m128i}}\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}})\ \{}
+\DoxyCodeLine{00238\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacegemmlowp_a5e1591034bb01e6f23e8b7e7aeb17600}{BitNot}}(\mbox{\hyperlink{namespacegemmlowp_a03d0a1a3d2937ae240dc38420e8a4edd}{MaskIfLessThan}}(a,\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}}));}
+\DoxyCodeLine{00239\ \}}
+\DoxyCodeLine{00240\ }
+\DoxyCodeLine{00241\ \textcolor{keyword}{template}\ <>}
+\DoxyCodeLine{00242\ \textcolor{keyword}{inline}\ \_\_m128i\ \mbox{\hyperlink{namespacegemmlowp_a249ceb96980ceeae65983cd1cfff1a50}{MaskIfLessThanOrEqual}}(\_\_m128i\ a,\ \_\_m128i\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}})\ \{}
+\DoxyCodeLine{00243\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacegemmlowp_a5e1591034bb01e6f23e8b7e7aeb17600}{BitNot}}(\mbox{\hyperlink{namespacegemmlowp_a1e955db8aed2ffb796737651b688da6f}{MaskIfGreaterThan}}(a,\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}}));}
+\DoxyCodeLine{00244\ \}}
+\DoxyCodeLine{00245\ }
+\DoxyCodeLine{00246\ \textcolor{keyword}{template}\ <>}
+\DoxyCodeLine{00247\ \textcolor{keyword}{inline}\ \mbox{\hyperlink{structgemmlowp_1_1int16x8__m128i}{int16x8\_m128i}}\ \mbox{\hyperlink{namespacegemmlowp_a249ceb96980ceeae65983cd1cfff1a50}{MaskIfLessThanOrEqual}}(\mbox{\hyperlink{structgemmlowp_1_1int16x8__m128i}{int16x8\_m128i}}\ a,\ \mbox{\hyperlink{structgemmlowp_1_1int16x8__m128i}{int16x8\_m128i}}\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}})\ \{}
+\DoxyCodeLine{00248\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacegemmlowp_a5e1591034bb01e6f23e8b7e7aeb17600}{BitNot}}(\mbox{\hyperlink{namespacegemmlowp_a1e955db8aed2ffb796737651b688da6f}{MaskIfGreaterThan}}(a,\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}}));}
+\DoxyCodeLine{00249\ \}}
+\DoxyCodeLine{00250\ }
+\DoxyCodeLine{00251\ \textcolor{comment}{/*\ Assumptions:}}
+\DoxyCodeLine{00252\ \textcolor{comment}{\ \ \ -\/\ All\ and\ Any\ are\ used\ on\ masks.}}
+\DoxyCodeLine{00253\ \textcolor{comment}{\ \ \ -\/\ masks\ are\ all\_ones\ for\ true\ lanes,\ all\_zeroes\ otherwise.}}
+\DoxyCodeLine{00254\ \textcolor{comment}{Hence,\ All\ means\ all\ 128bits\ set,\ and\ Any\ means\ any\ bit\ set.}}
+\DoxyCodeLine{00255\ \textcolor{comment}{*/}}
+\DoxyCodeLine{00256\ }
+\DoxyCodeLine{00257\ \textcolor{keyword}{template}\ <>}
+\DoxyCodeLine{00258\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespacegemmlowp_a5e4fa9c14974ac6106725cd824c13d06}{All}}(\_\_m128i\ a)\ \{}
+\DoxyCodeLine{00259\ \ \ \textcolor{keywordflow}{return}\ \_mm\_testc\_si128(a,\ a);}
+\DoxyCodeLine{00260\ \}}
+\DoxyCodeLine{00261\ }
+\DoxyCodeLine{00262\ \textcolor{keyword}{template}\ <>}
+\DoxyCodeLine{00263\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespacegemmlowp_a5e4fa9c14974ac6106725cd824c13d06}{All}}(\mbox{\hyperlink{structgemmlowp_1_1int16x8__m128i}{int16x8\_m128i}}\ a)\ \{}
+\DoxyCodeLine{00264\ \ \ \textcolor{keywordflow}{return}\ \_mm\_testc\_si128(a.v,\ a.v);}
+\DoxyCodeLine{00265\ \}}
+\DoxyCodeLine{00266\ }
+\DoxyCodeLine{00267\ \textcolor{keyword}{template}\ <>}
+\DoxyCodeLine{00268\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespacegemmlowp_ad3d8f3086dbbef0f71218b6ae19c9e47}{Any}}(\_\_m128i\ a)\ \{}
+\DoxyCodeLine{00269\ \ \ \textcolor{keywordflow}{return}\ !\_mm\_testz\_si128(a,\ a);}
+\DoxyCodeLine{00270\ \}}
+\DoxyCodeLine{00271\ }
+\DoxyCodeLine{00272\ \textcolor{keyword}{template}\ <>}
+\DoxyCodeLine{00273\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespacegemmlowp_ad3d8f3086dbbef0f71218b6ae19c9e47}{Any}}(\mbox{\hyperlink{structgemmlowp_1_1int16x8__m128i}{int16x8\_m128i}}\ a)\ \{}
+\DoxyCodeLine{00274\ \ \ \textcolor{keywordflow}{return}\ !\_mm\_testz\_si128(a.v,\ a.v);}
+\DoxyCodeLine{00275\ \}}
+\DoxyCodeLine{00276\ }
+\DoxyCodeLine{00277\ \textcolor{keyword}{template}\ <>}
+\DoxyCodeLine{00278\ \textcolor{keyword}{inline}\ \_\_m128i\ \mbox{\hyperlink{namespacegemmlowp_a34891a7112dcf0d89456b754c5633e01}{RoundingHalfSum}}(\_\_m128i\ a,\ \_\_m128i\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}})\ \{}
+\DoxyCodeLine{00279\ \ \ \textcolor{comment}{/*\ \_\_m128i\ round\_bit\_mask,\ a\_over\_2,\ b\_over\_2,\ round\_bit,\ sum;\ */}}
+\DoxyCodeLine{00280\ \ \ \textcolor{comment}{/*\ We\ divide\ the\ inputs\ before\ the\ add\ to\ avoid\ the\ overflow\ and\ costly\ test}}
+\DoxyCodeLine{00281\ \textcolor{comment}{\ \ \ */}}
+\DoxyCodeLine{00282\ \ \ \textcolor{comment}{/*\ of\ checking\ if\ an\ overflow\ occured\ on\ signed\ add\ */}}
+\DoxyCodeLine{00283\ \ \ \textcolor{comment}{/*\ round\_bit\_mask\ =\ \_mm\_set1\_epi32(1);\ */}}
+\DoxyCodeLine{00284\ \ \ \textcolor{comment}{/*\ a\_over\_2\ =\ \_mm\_srai\_epi32(a,\ 1);\ */}}
+\DoxyCodeLine{00285\ \ \ \textcolor{comment}{/*\ b\_over\_2\ =\ \_mm\_srai\_epi32(b,\ 1);\ */}}
+\DoxyCodeLine{00286\ \ \ \textcolor{comment}{/*\ sum\ =\ Add(a\_over\_2,\ b\_over\_2);\ */}}
+\DoxyCodeLine{00287\ \ \ \textcolor{comment}{/*\ round\_bit\ =\ \_mm\_sign\_epi32(BitAnd(BitOr(a,b),\ round\_bit\_mask),\ sum);\ */}}
+\DoxyCodeLine{00288\ \ \ \textcolor{comment}{/*\ return\ Add(sum,\ round\_bit);\ */}}
+\DoxyCodeLine{00289\ }
+\DoxyCodeLine{00290\ \ \ \textcolor{comment}{/*\ Other\ possibility\ detecting\ overflow\ and\ xor\ the\ sign\ if\ an\ overflow}}
+\DoxyCodeLine{00291\ \textcolor{comment}{\ \ \ *\ happened*/}}
+\DoxyCodeLine{00292\ \ \ \_\_m128i\ one,\ sign\_bit\_mask,\ sum,\ rounded\_half\_sum,\ overflow,\ result;}
+\DoxyCodeLine{00293\ \ \ one\ =\ \_mm\_set1\_epi32(1);}
+\DoxyCodeLine{00294\ \ \ sign\_bit\_mask\ =\ \_mm\_set1\_epi32(0x80000000);}
+\DoxyCodeLine{00295\ \ \ sum\ =\ \mbox{\hyperlink{namespacegemmlowp_af16b123f9b09573c1ea8fadcd0aec5b7}{Add}}(a,\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}});}
+\DoxyCodeLine{00296\ \ \ rounded\_half\_sum\ =\ \_mm\_srai\_epi32(\mbox{\hyperlink{namespacegemmlowp_af16b123f9b09573c1ea8fadcd0aec5b7}{Add}}(sum,\ one),\ 1);}
+\DoxyCodeLine{00297\ \ \ overflow\ =}
+\DoxyCodeLine{00298\ \ \ \ \ \ \ \mbox{\hyperlink{namespacegemmlowp_ac30d505e781fb7914208c2430df65e3a}{BitAnd}}(\mbox{\hyperlink{namespacegemmlowp_ac30d505e781fb7914208c2430df65e3a}{BitAnd}}(\mbox{\hyperlink{namespacegemmlowp_acddfe6d594b0034b193a09e6d3e55241}{BitXor}}(a,\ rounded\_half\_sum),\ \mbox{\hyperlink{namespacegemmlowp_acddfe6d594b0034b193a09e6d3e55241}{BitXor}}(\mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}},\ rounded\_half\_sum)),}
+\DoxyCodeLine{00299\ \ \ \ \ \ \ \ \ \ \ \ \ \ sign\_bit\_mask);}
+\DoxyCodeLine{00300\ \ \ result\ =\ \mbox{\hyperlink{namespacegemmlowp_acddfe6d594b0034b193a09e6d3e55241}{BitXor}}(rounded\_half\_sum,\ overflow);}
+\DoxyCodeLine{00301\ \ \ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{00302\ \}}
+\DoxyCodeLine{00303\ }
+\DoxyCodeLine{00304\ \textcolor{keyword}{template}\ <>}
+\DoxyCodeLine{00305\ \textcolor{keyword}{inline}\ \mbox{\hyperlink{structgemmlowp_1_1int16x8__m128i}{int16x8\_m128i}}\ \mbox{\hyperlink{namespacegemmlowp_a34891a7112dcf0d89456b754c5633e01}{RoundingHalfSum}}(\mbox{\hyperlink{structgemmlowp_1_1int16x8__m128i}{int16x8\_m128i}}\ a,\ \mbox{\hyperlink{structgemmlowp_1_1int16x8__m128i}{int16x8\_m128i}}\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}})\ \{}
+\DoxyCodeLine{00306\ \ \ \textcolor{comment}{//\ Idea:\ go\ to\ unsigned\ to\ use\ \_mm\_avg\_epu16,}}
+\DoxyCodeLine{00307\ \ \ \textcolor{comment}{//\ borrowed\ from\ Intel's\ arm\_neon\_sse.h\ header.}}
+\DoxyCodeLine{00308\ \ \ \_\_m128i\ constant\_neg\_32768\ =\ \_mm\_set1\_epi16(-\/32768);}
+\DoxyCodeLine{00309\ \ \ \_\_m128i\ a\_unsigned\ =\ \_mm\_sub\_epi16(a.v,\ constant\_neg\_32768);}
+\DoxyCodeLine{00310\ \ \ \_\_m128i\ b\_unsigned\ =\ \_mm\_sub\_epi16(\mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}}.v,\ constant\_neg\_32768);}
+\DoxyCodeLine{00311\ \ \ \_\_m128i\ avg\_unsigned\ =\ \_mm\_avg\_epu16(a\_unsigned,\ b\_unsigned);}
+\DoxyCodeLine{00312\ \ \ \_\_m128i\ avg\ =\ \_mm\_add\_epi16(avg\_unsigned,\ constant\_neg\_32768);}
+\DoxyCodeLine{00313\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structgemmlowp_1_1int16x8__m128i}{int16x8\_m128i}}(avg);}
+\DoxyCodeLine{00314\ \}}
+\DoxyCodeLine{00315\ }
+\DoxyCodeLine{00316\ \textcolor{keyword}{template}\ <>}
+\DoxyCodeLine{00317\ \textcolor{keyword}{inline}\ \_\_m128i\ \mbox{\hyperlink{namespacegemmlowp_a7ef1c7121f41059f08e28aad77e2736f}{SaturatingRoundingDoublingHighMul}}(\_\_m128i\ a,\ \_\_m128i\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}})\ \{}
+\DoxyCodeLine{00318\ \ \ \_\_m128i\ min,\ saturation\_mask,\ a0\_a2,\ a1\_a3,\ b0\_b2,\ b1\_b3;}
+\DoxyCodeLine{00319\ \ \ \_\_m128i\ a0b0\_a2b2,\ a1b1\_a3b3,\ a0b0\_a2b2\_rounded,\ a1b1\_a3b3\_rounded;}
+\DoxyCodeLine{00320\ \ \ \_\_m128i\ a0b0\_a2b2\_rounded\_2x,\ a1b1\_a3b3\_rounded\_2x,\ result;}
+\DoxyCodeLine{00321\ \ \ \_\_m128i\ nudge;}
+\DoxyCodeLine{00322\ }
+\DoxyCodeLine{00323\ \ \ \textcolor{comment}{//\ saturation\ only\ happen\ if\ a\ ==\ b\ ==\ INT\_MIN}}
+\DoxyCodeLine{00324\ \ \ min\ =\ \_mm\_set1\_epi32(std::numeric\_limits<std::int32\_t>::min());}
+\DoxyCodeLine{00325\ \ \ saturation\_mask\ =\ \mbox{\hyperlink{namespacegemmlowp_ac30d505e781fb7914208c2430df65e3a}{BitAnd}}(\mbox{\hyperlink{namespacegemmlowp_acd42c48b5d493c5837bd4538561b7008}{MaskIfEqual}}(a,\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}}),\ \mbox{\hyperlink{namespacegemmlowp_acd42c48b5d493c5837bd4538561b7008}{MaskIfEqual}}(a,\ min));}
+\DoxyCodeLine{00326\ }
+\DoxyCodeLine{00327\ \ \ \textcolor{comment}{//\ a\ =\ a0\ |\ a1\ |\ a2\ |\ a3}}
+\DoxyCodeLine{00328\ \ \ \textcolor{comment}{//\ b\ =\ b0\ |\ b1\ |\ b2\ |\ b3}}
+\DoxyCodeLine{00329\ \ \ a0\_a2\ =\ a;}
+\DoxyCodeLine{00330\ \ \ a1\_a3\ =\ \_mm\_srli\_si128(a,\ 4);}
+\DoxyCodeLine{00331\ \ \ b0\_b2\ =\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}};}
+\DoxyCodeLine{00332\ \ \ b1\_b3\ =\ \_mm\_srli\_si128(\mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}},\ 4);}
+\DoxyCodeLine{00333\ }
+\DoxyCodeLine{00334\ \ \ a0b0\_a2b2\ =\ \_mm\_mul\_epi32(a0\_a2,\ b0\_b2);}
+\DoxyCodeLine{00335\ \ \ a1b1\_a3b3\ =\ \_mm\_mul\_epi32(a1\_a3,\ b1\_b3);}
+\DoxyCodeLine{00336\ }
+\DoxyCodeLine{00337\ \ \ \textcolor{comment}{//\ do\ the\ rounding\ and\ take\ into\ account\ that\ it\ will\ be\ doubled}}
+\DoxyCodeLine{00338\ \ \ nudge\ =\ \_mm\_set1\_epi64x(1\ <<\ 30);}
+\DoxyCodeLine{00339\ \ \ a0b0\_a2b2\_rounded\ =\ \_mm\_add\_epi64(a0b0\_a2b2,\ nudge);}
+\DoxyCodeLine{00340\ \ \ a1b1\_a3b3\_rounded\ =\ \_mm\_add\_epi64(a1b1\_a3b3,\ nudge);}
+\DoxyCodeLine{00341\ }
+\DoxyCodeLine{00342\ \ \ \textcolor{comment}{//\ do\ the\ doubling}}
+\DoxyCodeLine{00343\ \ \ a0b0\_a2b2\_rounded\_2x\ =\ \_mm\_slli\_epi64(a0b0\_a2b2\_rounded,\ 1);}
+\DoxyCodeLine{00344\ \ \ a1b1\_a3b3\_rounded\_2x\ =\ \_mm\_slli\_epi64(a1b1\_a3b3\_rounded,\ 1);}
+\DoxyCodeLine{00345\ }
+\DoxyCodeLine{00346\ \ \ \textcolor{comment}{//\ get\ the\ high\ part\ of\ the\ products}}
+\DoxyCodeLine{00347\ \ \ result\ =\ \_mm\_blend\_epi16(\_mm\_srli\_si128(a0b0\_a2b2\_rounded\_2x,\ 4),}
+\DoxyCodeLine{00348\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ a1b1\_a3b3\_rounded\_2x,\ 0xcc);}
+\DoxyCodeLine{00349\ }
+\DoxyCodeLine{00350\ \ \ \textcolor{comment}{//\ saturate\ those\ which\ overflowed}}
+\DoxyCodeLine{00351\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacegemmlowp_a9200374a9481b271d4ce140e9a449976}{SelectUsingMask}}(saturation\_mask,\ min,\ result);}
+\DoxyCodeLine{00352\ \}}
+\DoxyCodeLine{00353\ }
+\DoxyCodeLine{00354\ \textcolor{keyword}{template}\ <>}
+\DoxyCodeLine{00355\ \textcolor{keyword}{inline}\ \mbox{\hyperlink{structgemmlowp_1_1int16x8__m128i}{int16x8\_m128i}}\ \mbox{\hyperlink{namespacegemmlowp_a7ef1c7121f41059f08e28aad77e2736f}{SaturatingRoundingDoublingHighMul}}(\mbox{\hyperlink{structgemmlowp_1_1int16x8__m128i}{int16x8\_m128i}}\ a,}
+\DoxyCodeLine{00356\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structgemmlowp_1_1int16x8__m128i}{int16x8\_m128i}}\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}})\ \{}
+\DoxyCodeLine{00357\ \ \ \textcolor{comment}{//\ Idea:\ use\ \_mm\_mulhrs\_epi16\ then\ saturate\ with\ a\ bit-\/operation,}}
+\DoxyCodeLine{00358\ \ \ \textcolor{comment}{//\ borrowed\ from\ Intel's\ arm\_neon\_sse.h\ header.}}
+\DoxyCodeLine{00359\ \ \ \_\_m128i\ result\_unsaturated\ =\ \_mm\_mulhrs\_epi16(a.v,\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}}.v);}
+\DoxyCodeLine{00360\ \ \ \_\_m128i\ saturation\_mask\ =}
+\DoxyCodeLine{00361\ \ \ \ \ \ \ \_mm\_cmpeq\_epi16(result\_unsaturated,\ \_mm\_set1\_epi16(0x8000));}
+\DoxyCodeLine{00362\ \ \ \_\_m128i\ result\ =\ \_mm\_xor\_si128(result\_unsaturated,\ saturation\_mask);}
+\DoxyCodeLine{00363\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structgemmlowp_1_1int16x8__m128i}{int16x8\_m128i}}(result);}
+\DoxyCodeLine{00364\ \}}
+\DoxyCodeLine{00365\ }
+\DoxyCodeLine{00366\ \textcolor{keyword}{template}\ <>}
+\DoxyCodeLine{00367\ \textcolor{keyword}{inline}\ \_\_m128i\ \mbox{\hyperlink{namespacegemmlowp_ae1b2911d7f0478c3aace658825e7e41c}{Dup<\_\_m128i>}}(std::int32\_t\ \mbox{\hyperlink{detection__postprocess_8cpp_ad0da36b2558901e21e7a30f6c227a45e}{x}})\ \{}
+\DoxyCodeLine{00368\ \ \ \textcolor{keywordflow}{return}\ \_mm\_set1\_epi32(\mbox{\hyperlink{detection__postprocess_8cpp_ad0da36b2558901e21e7a30f6c227a45e}{x}});}
+\DoxyCodeLine{00369\ \}}
+\DoxyCodeLine{00370\ }
+\DoxyCodeLine{00371\ \textcolor{keyword}{template}\ <>}
+\DoxyCodeLine{00372\ \textcolor{keyword}{inline}\ \mbox{\hyperlink{structgemmlowp_1_1int16x8__m128i}{int16x8\_m128i}}\ \mbox{\hyperlink{namespacegemmlowp_ab67e708b2ac54308538c1edf0bf3bd17}{Dup<int16x8\_m128i>}}(std::int16\_t\ \mbox{\hyperlink{detection__postprocess_8cpp_ad0da36b2558901e21e7a30f6c227a45e}{x}})\ \{}
+\DoxyCodeLine{00373\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structgemmlowp_1_1int16x8__m128i}{int16x8\_m128i}}(\_mm\_set1\_epi16(\mbox{\hyperlink{detection__postprocess_8cpp_ad0da36b2558901e21e7a30f6c227a45e}{x}}));}
+\DoxyCodeLine{00374\ \}}
+\DoxyCodeLine{00375\ }
+\DoxyCodeLine{00376\ \textcolor{comment}{//\ So\ far\ this\ is\ only\ needed\ for\ int16.}}
+\DoxyCodeLine{00377\ \textcolor{keyword}{template}\ <>}
+\DoxyCodeLine{00378\ \textcolor{keyword}{inline}\ \mbox{\hyperlink{structgemmlowp_1_1int16x8__m128i}{int16x8\_m128i}}\ \mbox{\hyperlink{namespacegemmlowp_a33e1293a634924e4de112fa4214d0e0a}{SaturatingAdd}}(\mbox{\hyperlink{structgemmlowp_1_1int16x8__m128i}{int16x8\_m128i}}\ a,\ \mbox{\hyperlink{structgemmlowp_1_1int16x8__m128i}{int16x8\_m128i}}\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}})\ \{}
+\DoxyCodeLine{00379\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structgemmlowp_1_1int16x8__m128i}{int16x8\_m128i}}(\_mm\_adds\_epi16(a.v,\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}}.v));}
+\DoxyCodeLine{00380\ \}}
+\DoxyCodeLine{00381\ }
+\DoxyCodeLine{00382\ \}\ \ \textcolor{comment}{//\ end\ namespace\ gemmlowp}}
+\DoxyCodeLine{00383\ }
+\DoxyCodeLine{00384\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ GEMMLOWP\_INTERNAL\_FIXEDPOINT\_SSE\_H\_}}
+
+\end{DoxyCode}

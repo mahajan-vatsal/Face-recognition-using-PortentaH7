@@ -1,0 +1,320 @@
+\doxysection{kissfft.\+h}
+\hypertarget{kissfft_8h_source}{}\label{kissfft_8h_source}\index{Face\_Access\_inferencing/src/edge-\/impulse-\/sdk/dsp/kissfft/kissfft.h@{Face\_Access\_inferencing/src/edge-\/impulse-\/sdk/dsp/kissfft/kissfft.h}}
+\mbox{\hyperlink{kissfft_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{00002\ \textcolor{comment}{\ *\ \ Copyright\ (c)\ 2003-\/2010,\ Mark\ Borgerding.\ All\ rights\ reserved.}}
+\DoxyCodeLine{00003\ \textcolor{comment}{\ *\ \ This\ file\ is\ part\ of\ KISS\ FFT\ -\/\ https://github.com/mborgerding/kissfft}}
+\DoxyCodeLine{00004\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00005\ \textcolor{comment}{\ *\ \ SPDX-\/License-\/Identifier:\ BSD-\/3-\/Clause}}
+\DoxyCodeLine{00006\ \textcolor{comment}{\ *\ \ See\ COPYING\ file\ for\ more\ information.}}
+\DoxyCodeLine{00007\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{00008\ }
+\DoxyCodeLine{00009\ \textcolor{preprocessor}{\#ifndef\ KISSFFT\_CLASS\_HH}}
+\DoxyCodeLine{00010\ \textcolor{preprocessor}{\#define\ KISSFFT\_CLASS\_HH}}
+\DoxyCodeLine{00011\ \textcolor{preprocessor}{\#include\ <complex>}}
+\DoxyCodeLine{00012\ \textcolor{preprocessor}{\#include\ <utility>}}
+\DoxyCodeLine{00013\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{ei__vector_8h}{edge-\/impulse-\/sdk/dsp/ei\_vector.h}}"{}}}
+\DoxyCodeLine{00014\ }
+\DoxyCodeLine{00015\ }
+\DoxyCodeLine{00016\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ scalar\_t>}
+\DoxyCodeLine{00017\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classkissfft}{kissfft}}}
+\DoxyCodeLine{00018\ \{}
+\DoxyCodeLine{00019\ \ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00020\ }
+\DoxyCodeLine{00021\ \ \ \ \ \ \ \ \ \textcolor{keyword}{typedef}\ std::complex<scalar\_t>\ \mbox{\hyperlink{classkissfft_ad5a06e91492829b2654b2de2d428b3d6}{cpx\_t}};}
+\DoxyCodeLine{00022\ }
+\DoxyCodeLine{00023\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classkissfft_afd9438f82d8aef846cdaa2b78a22dcad}{kissfft}}(\ \textcolor{keyword}{const}\ std::size\_t\ nfft,}
+\DoxyCodeLine{00024\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{bool}\ inverse\ )}
+\DoxyCodeLine{00025\ \ \ \ \ \ \ \ \ \ \ \ \ :\mbox{\hyperlink{classkissfft_aeaef6beef8e8075c72d29a06f90987e2}{\_nfft}}(nfft)}
+\DoxyCodeLine{00026\ \ \ \ \ \ \ \ \ \ \ \ \ ,\mbox{\hyperlink{classkissfft_ae6ab19f275b79220b9c84545b9befe6b}{\_inverse}}(inverse)}
+\DoxyCodeLine{00027\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00028\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ fill\ twiddle\ factors}}
+\DoxyCodeLine{00029\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classkissfft_a5724815d03ecf256693d48322a6ea87b}{\_twiddles}}.resize(\mbox{\hyperlink{classkissfft_aeaef6beef8e8075c72d29a06f90987e2}{\_nfft}});}
+\DoxyCodeLine{00030\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ scalar\_t\ phinc\ =\ \ (\mbox{\hyperlink{classkissfft_ae6ab19f275b79220b9c84545b9befe6b}{\_inverse}}?2:-\/2)*\ std::acos(\ (scalar\_t)\ -\/1)\ \ /\ \mbox{\hyperlink{classkissfft_aeaef6beef8e8075c72d29a06f90987e2}{\_nfft}};}
+\DoxyCodeLine{00031\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (std::size\_t\ i=0;i<\mbox{\hyperlink{classkissfft_aeaef6beef8e8075c72d29a06f90987e2}{\_nfft}};++i)}
+\DoxyCodeLine{00032\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classkissfft_a5724815d03ecf256693d48322a6ea87b}{\_twiddles}}[i]\ =\ std::exp(\ \mbox{\hyperlink{classkissfft_ad5a06e91492829b2654b2de2d428b3d6}{cpx\_t}}(0,i*phinc)\ );}
+\DoxyCodeLine{00033\ }
+\DoxyCodeLine{00034\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//factorize}}
+\DoxyCodeLine{00035\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//start\ factoring\ out\ 4's,\ then\ 2's,\ then\ 3,5,7,9,...}}
+\DoxyCodeLine{00036\ \ \ \ \ \ \ \ \ \ \ \ \ std::size\_t\ n=\ \mbox{\hyperlink{classkissfft_aeaef6beef8e8075c72d29a06f90987e2}{\_nfft}};}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \ \ \ \ \ \ std::size\_t\ p=4;}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{do}\ \{}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (n\ \%\ p)\ \{}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}\ (p)\ \{}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ 4:\ p\ =\ 2;\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ 2:\ p\ =\ 3;\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00043\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}:\ p\ +=\ 2;\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (p*p>n)}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ p\ =\ n;\textcolor{comment}{//\ no\ more\ factors}}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ n\ /=\ p;}
+\DoxyCodeLine{00049\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classkissfft_aca566cbaa3b7e9d9cf67c7b7beba3d74}{\_stageRadix}}.push\_back(p);}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classkissfft_a605612a0eba8973ac124bd50e05566db}{\_stageRemainder}}.push\_back(n);}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ \ \ \ \ \}\textcolor{keywordflow}{while}(n>1);}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00053\ }
+\DoxyCodeLine{00054\ }
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classkissfft_ad71f74d0a0862e922783451ef84d7577}{assign}}(\ \textcolor{keyword}{const}\ std::size\_t\ nfft,}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{bool}\ inverse\ )}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ nfft\ !=\ \mbox{\hyperlink{classkissfft_aeaef6beef8e8075c72d29a06f90987e2}{\_nfft}}\ )}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classkissfft}{kissfft}}\ tmp(\ nfft,\ inverse\ );\ \textcolor{comment}{//\ O(n)\ time.}}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::swap(\ tmp,\ *\textcolor{keyword}{this}\ );\ \textcolor{comment}{//\ this\ is\ O(1)\ in\ C++11,\ O(n)\ otherwise.}}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (\ inverse\ !=\ \mbox{\hyperlink{classkissfft_ae6ab19f275b79220b9c84545b9befe6b}{\_inverse}}\ )}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ conjugate\ the\ twiddle\ factors.}}
+\DoxyCodeLine{00072\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\ \textcolor{keyword}{typename}\ \mbox{\hyperlink{ei__vector_8h_a127d3f2f8a2f0f47e13d28aea38916f4}{ei\_vector<cpx\_t>::iterator}}\ it\ =\ \mbox{\hyperlink{classkissfft_a5724815d03ecf256693d48322a6ea87b}{\_twiddles}}.begin();}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ it\ !=\ \mbox{\hyperlink{classkissfft_a5724815d03ecf256693d48322a6ea87b}{\_twiddles}}.end();\ ++it\ )}
+\DoxyCodeLine{00074\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ it-\/>imag(\ -\/it-\/>imag()\ );}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00077\ }
+\DoxyCodeLine{00090\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classkissfft_a166aed860359f5b9250c5fcc899aae14}{transform}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classkissfft_ad5a06e91492829b2654b2de2d428b3d6}{cpx\_t}}\ *\ fft\_in,\ \mbox{\hyperlink{classkissfft_ad5a06e91492829b2654b2de2d428b3d6}{cpx\_t}}\ *\ fft\_out,\ \textcolor{keyword}{const}\ std::size\_t\ stage\ =\ 0,\ \textcolor{keyword}{const}\ std::size\_t\ fstride\ =\ 1,\ \textcolor{keyword}{const}\ std::size\_t\ in\_stride\ =\ 1)\textcolor{keyword}{\ const}}
+\DoxyCodeLine{00091\ \textcolor{keyword}{\ \ \ \ \ \ \ \ }\{}
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ std::size\_t\ p\ =\ \mbox{\hyperlink{classkissfft_aca566cbaa3b7e9d9cf67c7b7beba3d74}{\_stageRadix}}[stage];}
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ std::size\_t\ m\ =\ \mbox{\hyperlink{classkissfft_a605612a0eba8973ac124bd50e05566db}{\_stageRemainder}}[stage];}
+\DoxyCodeLine{00094\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classkissfft_ad5a06e91492829b2654b2de2d428b3d6}{cpx\_t}}\ *\ \textcolor{keyword}{const}\ Fout\_beg\ =\ fft\_out;}
+\DoxyCodeLine{00095\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classkissfft_ad5a06e91492829b2654b2de2d428b3d6}{cpx\_t}}\ *\ \textcolor{keyword}{const}\ Fout\_end\ =\ fft\_out\ +\ p*m;}
+\DoxyCodeLine{00096\ }
+\DoxyCodeLine{00097\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (m==1)\ \{}
+\DoxyCodeLine{00098\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{do}\{}
+\DoxyCodeLine{00099\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ *fft\_out\ =\ *fft\_in;}
+\DoxyCodeLine{00100\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ fft\_in\ +=\ fstride*in\_stride;}
+\DoxyCodeLine{00101\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\textcolor{keywordflow}{while}(++fft\_out\ !=\ Fout\_end\ );}
+\DoxyCodeLine{00102\ \ \ \ \ \ \ \ \ \ \ \ \ \}\textcolor{keywordflow}{else}\{}
+\DoxyCodeLine{00103\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{do}\{}
+\DoxyCodeLine{00104\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ recursive\ call:}}
+\DoxyCodeLine{00105\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ DFT\ of\ size\ m*p\ performed\ by\ doing}}
+\DoxyCodeLine{00106\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ p\ instances\ of\ smaller\ DFTs\ of\ size\ m,}}
+\DoxyCodeLine{00107\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ each\ one\ takes\ a\ decimated\ version\ of\ the\ input}}
+\DoxyCodeLine{00108\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classkissfft_a166aed860359f5b9250c5fcc899aae14}{transform}}(fft\_in,\ fft\_out,\ stage+1,\ fstride*p,in\_stride);}
+\DoxyCodeLine{00109\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ fft\_in\ +=\ fstride*in\_stride;}
+\DoxyCodeLine{00110\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\textcolor{keywordflow}{while}(\ (fft\_out\ +=\ m)\ !=\ Fout\_end\ );}
+\DoxyCodeLine{00111\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00112\ }
+\DoxyCodeLine{00113\ \ \ \ \ \ \ \ \ \ \ \ \ fft\_out=Fout\_beg;}
+\DoxyCodeLine{00114\ }
+\DoxyCodeLine{00115\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ recombine\ the\ p\ smaller\ DFTs}}
+\DoxyCodeLine{00116\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}\ (p)\ \{}
+\DoxyCodeLine{00117\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ 2:\ \mbox{\hyperlink{classkissfft_a7470e4be767216a8dc0a0fb976a8cd75}{kf\_bfly2}}(fft\_out,fstride,m);\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00118\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ 3:\ \mbox{\hyperlink{classkissfft_af3f9f827e091a7acff31c28488ad9e5c}{kf\_bfly3}}(fft\_out,fstride,m);\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00119\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ 4:\ \mbox{\hyperlink{classkissfft_ab83db3f40f8deefb273b9cabd1af283a}{kf\_bfly4}}(fft\_out,fstride,m);\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00120\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ 5:\ \mbox{\hyperlink{classkissfft_a87f8bc1332a43162dc8e5a3209e90073}{kf\_bfly5}}(fft\_out,fstride,m);\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00121\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}:\ \mbox{\hyperlink{classkissfft_abeecb439c65ae83bcec984bffaba11c2}{kf\_bfly\_generic}}(fft\_out,fstride,m,p);\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00122\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00123\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00124\ }
+\DoxyCodeLine{00154\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classkissfft_a1f034808a68b2eef02f52145b82abf04}{transform\_real}}(\ \textcolor{keyword}{const}\ scalar\_t\ *\ \textcolor{keyword}{const}\ src,}
+\DoxyCodeLine{00155\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classkissfft_ad5a06e91492829b2654b2de2d428b3d6}{cpx\_t}}\ *\ \textcolor{keyword}{const}\ dst\ )\textcolor{keyword}{\ const}}
+\DoxyCodeLine{00156\ \textcolor{keyword}{\ \ \ \ \ \ \ \ }\{}
+\DoxyCodeLine{00157\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ std::size\_t\ N\ =\ \mbox{\hyperlink{classkissfft_aeaef6beef8e8075c72d29a06f90987e2}{\_nfft}};}
+\DoxyCodeLine{00158\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ N\ ==\ 0\ )}
+\DoxyCodeLine{00159\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00160\ }
+\DoxyCodeLine{00161\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ perform\ complex\ FFT}}
+\DoxyCodeLine{00162\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classkissfft_a166aed860359f5b9250c5fcc899aae14}{transform}}(\ \textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\mbox{\hyperlink{classkissfft_ad5a06e91492829b2654b2de2d428b3d6}{cpx\_t}}*\textcolor{keyword}{>}(src),\ dst\ );}
+\DoxyCodeLine{00163\ }
+\DoxyCodeLine{00164\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ post\ processing\ for\ k\ =\ 0\ and\ k\ =\ N}}
+\DoxyCodeLine{00165\ \ \ \ \ \ \ \ \ \ \ \ \ dst[0]\ =\ \mbox{\hyperlink{classkissfft_ad5a06e91492829b2654b2de2d428b3d6}{cpx\_t}}(\ dst[0].\mbox{\hyperlink{ceva__typedef_8h_a5f5a64ef503db0fc824df8320929b126}{real}}()\ +\ dst[0].\mbox{\hyperlink{ceva__typedef_8h_a06ebc6bb2d8547759c483e78d2087c51}{imag}}(),}
+\DoxyCodeLine{00166\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ dst[0].\mbox{\hyperlink{ceva__typedef_8h_a5f5a64ef503db0fc824df8320929b126}{real}}()\ -\/\ dst[0].\mbox{\hyperlink{ceva__typedef_8h_a06ebc6bb2d8547759c483e78d2087c51}{imag}}()\ );}
+\DoxyCodeLine{00167\ }
+\DoxyCodeLine{00168\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ post\ processing\ for\ all\ the\ other\ k\ =\ 1,\ 2,\ ...,\ N-\/1}}
+\DoxyCodeLine{00169\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ scalar\_t\ pi\ =\ std::acos(\ (scalar\_t)\ -\/1);}
+\DoxyCodeLine{00170\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ scalar\_t\ half\_phi\_inc\ =\ (\ \mbox{\hyperlink{classkissfft_ae6ab19f275b79220b9c84545b9befe6b}{\_inverse}}\ ?\ pi\ :\ -\/pi\ )\ /\ N;}
+\DoxyCodeLine{00171\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classkissfft_ad5a06e91492829b2654b2de2d428b3d6}{cpx\_t}}\ twiddle\_mul\ =\ std::exp(\ \mbox{\hyperlink{classkissfft_ad5a06e91492829b2654b2de2d428b3d6}{cpx\_t}}(0,\ half\_phi\_inc)\ );}
+\DoxyCodeLine{00172\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\ std::size\_t\ k\ =\ 1;\ 2*k\ <\ N;\ ++k\ )}
+\DoxyCodeLine{00173\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00174\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classkissfft_ad5a06e91492829b2654b2de2d428b3d6}{cpx\_t}}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a56eca241e2896b9f57a79589e76fd24b}{w}}\ =\ (scalar\_t)0.5\ *\ \mbox{\hyperlink{classkissfft_ad5a06e91492829b2654b2de2d428b3d6}{cpx\_t}}(}
+\DoxyCodeLine{00175\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ dst[k].\mbox{\hyperlink{ceva__typedef_8h_a5f5a64ef503db0fc824df8320929b126}{real}}()\ +\ dst[N-\/k].\mbox{\hyperlink{ceva__typedef_8h_a5f5a64ef503db0fc824df8320929b126}{real}}(),}
+\DoxyCodeLine{00176\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ dst[k].\mbox{\hyperlink{ceva__typedef_8h_a06ebc6bb2d8547759c483e78d2087c51}{imag}}()\ -\/\ dst[N-\/k].\mbox{\hyperlink{ceva__typedef_8h_a06ebc6bb2d8547759c483e78d2087c51}{imag}}()\ );}
+\DoxyCodeLine{00177\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classkissfft_ad5a06e91492829b2654b2de2d428b3d6}{cpx\_t}}\ z\ =\ (scalar\_t)0.5\ *\ \mbox{\hyperlink{classkissfft_ad5a06e91492829b2654b2de2d428b3d6}{cpx\_t}}(}
+\DoxyCodeLine{00178\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ dst[k].\mbox{\hyperlink{ceva__typedef_8h_a06ebc6bb2d8547759c483e78d2087c51}{imag}}()\ +\ dst[N-\/k].\mbox{\hyperlink{ceva__typedef_8h_a06ebc6bb2d8547759c483e78d2087c51}{imag}}(),}
+\DoxyCodeLine{00179\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/dst[k].\mbox{\hyperlink{ceva__typedef_8h_a5f5a64ef503db0fc824df8320929b126}{real}}()\ +\ dst[N-\/k].\mbox{\hyperlink{ceva__typedef_8h_a5f5a64ef503db0fc824df8320929b126}{real}}()\ );}
+\DoxyCodeLine{00180\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classkissfft_ad5a06e91492829b2654b2de2d428b3d6}{cpx\_t}}\ twiddle\ =}
+\DoxyCodeLine{00181\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ k\ \%\ 2\ ==\ 0\ ?}
+\DoxyCodeLine{00182\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classkissfft_a5724815d03ecf256693d48322a6ea87b}{\_twiddles}}[k/2]\ :}
+\DoxyCodeLine{00183\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classkissfft_a5724815d03ecf256693d48322a6ea87b}{\_twiddles}}[k/2]\ *\ twiddle\_mul;}
+\DoxyCodeLine{00184\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ dst[\ \ k]\ =\ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a56eca241e2896b9f57a79589e76fd24b}{w}}\ +\ twiddle\ *\ z;}
+\DoxyCodeLine{00185\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ dst[N-\/k]\ =\ std::conj(\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a56eca241e2896b9f57a79589e76fd24b}{w}}\ -\/\ twiddle\ *\ z\ );}
+\DoxyCodeLine{00186\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00187\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ N\ \%\ 2\ ==\ 0\ )}
+\DoxyCodeLine{00188\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ dst[N/2]\ =\ std::conj(\ dst[N/2]\ );}
+\DoxyCodeLine{00189\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00190\ }
+\DoxyCodeLine{00191\ \ \ \ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{00192\ }
+\DoxyCodeLine{00193\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classkissfft_a7470e4be767216a8dc0a0fb976a8cd75}{kf\_bfly2}}(\ \mbox{\hyperlink{classkissfft_ad5a06e91492829b2654b2de2d428b3d6}{cpx\_t}}\ *\ Fout,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ fstride,\ \textcolor{keyword}{const}\ std::size\_t\ m)\textcolor{keyword}{\ const}}
+\DoxyCodeLine{00194\ \textcolor{keyword}{\ \ \ \ \ \ \ \ }\{}
+\DoxyCodeLine{00195\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (std::size\_t\ k=0;k<m;++k)\ \{}
+\DoxyCodeLine{00196\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classkissfft_ad5a06e91492829b2654b2de2d428b3d6}{cpx\_t}}\ t\ =\ Fout[m+k]\ *\ \mbox{\hyperlink{classkissfft_a5724815d03ecf256693d48322a6ea87b}{\_twiddles}}[k*fstride];}
+\DoxyCodeLine{00197\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Fout[m+k]\ =\ Fout[k]\ -\/\ t;}
+\DoxyCodeLine{00198\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Fout[k]\ +=\ t;}
+\DoxyCodeLine{00199\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00200\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00201\ }
+\DoxyCodeLine{00202\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classkissfft_af3f9f827e091a7acff31c28488ad9e5c}{kf\_bfly3}}(\ \mbox{\hyperlink{classkissfft_ad5a06e91492829b2654b2de2d428b3d6}{cpx\_t}}\ *\ Fout,\ \textcolor{keyword}{const}\ std::size\_t\ fstride,\ \textcolor{keyword}{const}\ std::size\_t\ m)\textcolor{keyword}{\ const}}
+\DoxyCodeLine{00203\ \textcolor{keyword}{\ \ \ \ \ \ \ \ }\{}
+\DoxyCodeLine{00204\ \ \ \ \ \ \ \ \ \ \ \ \ std::size\_t\ k=m;}
+\DoxyCodeLine{00205\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ std::size\_t\ m2\ =\ 2*m;}
+\DoxyCodeLine{00206\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classkissfft_ad5a06e91492829b2654b2de2d428b3d6}{cpx\_t}}\ *tw1,*tw2;}
+\DoxyCodeLine{00207\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classkissfft_ad5a06e91492829b2654b2de2d428b3d6}{cpx\_t}}\ scratch[5];}
+\DoxyCodeLine{00208\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classkissfft_ad5a06e91492829b2654b2de2d428b3d6}{cpx\_t}}\ epi3\ =\ \mbox{\hyperlink{classkissfft_a5724815d03ecf256693d48322a6ea87b}{\_twiddles}}[fstride*m];}
+\DoxyCodeLine{00209\ }
+\DoxyCodeLine{00210\ \ \ \ \ \ \ \ \ \ \ \ \ tw1=tw2=\&\mbox{\hyperlink{classkissfft_a5724815d03ecf256693d48322a6ea87b}{\_twiddles}}[0];}
+\DoxyCodeLine{00211\ }
+\DoxyCodeLine{00212\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{do}\{}
+\DoxyCodeLine{00213\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ scratch[1]\ =\ Fout[m]\ \ *\ *tw1;}
+\DoxyCodeLine{00214\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ scratch[2]\ =\ Fout[m2]\ *\ *tw2;}
+\DoxyCodeLine{00215\ }
+\DoxyCodeLine{00216\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ scratch[3]\ =\ scratch[1]\ +\ scratch[2];}
+\DoxyCodeLine{00217\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ scratch[0]\ =\ scratch[1]\ -\/\ scratch[2];}
+\DoxyCodeLine{00218\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ tw1\ +=\ fstride;}
+\DoxyCodeLine{00219\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ tw2\ +=\ fstride*2;}
+\DoxyCodeLine{00220\ }
+\DoxyCodeLine{00221\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Fout[m]\ =\ Fout[0]\ -\/\ scratch[3]*scalar\_t(0.5);}
+\DoxyCodeLine{00222\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ scratch[0]\ *=\ epi3.imag();}
+\DoxyCodeLine{00223\ }
+\DoxyCodeLine{00224\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Fout[0]\ +=\ scratch[3];}
+\DoxyCodeLine{00225\ }
+\DoxyCodeLine{00226\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Fout[m2]\ =\ \mbox{\hyperlink{classkissfft_ad5a06e91492829b2654b2de2d428b3d6}{cpx\_t}}(\ \ Fout[m].\mbox{\hyperlink{ceva__typedef_8h_a5f5a64ef503db0fc824df8320929b126}{real}}()\ +\ scratch[0].\mbox{\hyperlink{ceva__typedef_8h_a06ebc6bb2d8547759c483e78d2087c51}{imag}}()\ ,\ Fout[m].\mbox{\hyperlink{ceva__typedef_8h_a06ebc6bb2d8547759c483e78d2087c51}{imag}}()\ -\/\ scratch[0].\mbox{\hyperlink{ceva__typedef_8h_a5f5a64ef503db0fc824df8320929b126}{real}}()\ );}
+\DoxyCodeLine{00227\ }
+\DoxyCodeLine{00228\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Fout[m]\ +=\ \mbox{\hyperlink{classkissfft_ad5a06e91492829b2654b2de2d428b3d6}{cpx\_t}}(\ -\/scratch[0].\mbox{\hyperlink{ceva__typedef_8h_a06ebc6bb2d8547759c483e78d2087c51}{imag}}(),scratch[0].\mbox{\hyperlink{ceva__typedef_8h_a5f5a64ef503db0fc824df8320929b126}{real}}()\ );}
+\DoxyCodeLine{00229\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ++Fout;}
+\DoxyCodeLine{00230\ \ \ \ \ \ \ \ \ \ \ \ \ \}\textcolor{keywordflow}{while}(-\/-\/k);}
+\DoxyCodeLine{00231\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00232\ }
+\DoxyCodeLine{00233\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classkissfft_ab83db3f40f8deefb273b9cabd1af283a}{kf\_bfly4}}(\ \mbox{\hyperlink{classkissfft_ad5a06e91492829b2654b2de2d428b3d6}{cpx\_t}}\ *\ \textcolor{keyword}{const}\ Fout,\ \textcolor{keyword}{const}\ std::size\_t\ fstride,\ \textcolor{keyword}{const}\ std::size\_t\ m)\textcolor{keyword}{\ const}}
+\DoxyCodeLine{00234\ \textcolor{keyword}{\ \ \ \ \ \ \ \ }\{}
+\DoxyCodeLine{00235\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classkissfft_ad5a06e91492829b2654b2de2d428b3d6}{cpx\_t}}\ scratch[7];}
+\DoxyCodeLine{00236\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ scalar\_t\ negative\_if\_inverse\ =\ \mbox{\hyperlink{classkissfft_ae6ab19f275b79220b9c84545b9befe6b}{\_inverse}}\ ?\ -\/1\ :\ +1;}
+\DoxyCodeLine{00237\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (std::size\_t\ k=0;k<m;++k)\ \{}
+\DoxyCodeLine{00238\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ scratch[0]\ =\ Fout[k+\ \ m]\ *\ \mbox{\hyperlink{classkissfft_a5724815d03ecf256693d48322a6ea87b}{\_twiddles}}[k*fstride\ \ ];}
+\DoxyCodeLine{00239\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ scratch[1]\ =\ Fout[k+2*m]\ *\ \mbox{\hyperlink{classkissfft_a5724815d03ecf256693d48322a6ea87b}{\_twiddles}}[k*fstride*2];}
+\DoxyCodeLine{00240\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ scratch[2]\ =\ Fout[k+3*m]\ *\ \mbox{\hyperlink{classkissfft_a5724815d03ecf256693d48322a6ea87b}{\_twiddles}}[k*fstride*3];}
+\DoxyCodeLine{00241\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ scratch[5]\ =\ Fout[k]\ -\/\ scratch[1];}
+\DoxyCodeLine{00242\ }
+\DoxyCodeLine{00243\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Fout[k]\ +=\ scratch[1];}
+\DoxyCodeLine{00244\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ scratch[3]\ =\ scratch[0]\ +\ scratch[2];}
+\DoxyCodeLine{00245\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ scratch[4]\ =\ scratch[0]\ -\/\ scratch[2];}
+\DoxyCodeLine{00246\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ scratch[4]\ =\ \mbox{\hyperlink{classkissfft_ad5a06e91492829b2654b2de2d428b3d6}{cpx\_t}}(\ scratch[4].\mbox{\hyperlink{ceva__typedef_8h_a06ebc6bb2d8547759c483e78d2087c51}{imag}}()*negative\_if\_inverse\ ,}
+\DoxyCodeLine{00247\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/scratch[4].\mbox{\hyperlink{ceva__typedef_8h_a5f5a64ef503db0fc824df8320929b126}{real}}()*negative\_if\_inverse\ );}
+\DoxyCodeLine{00248\ }
+\DoxyCodeLine{00249\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Fout[k+2*m]\ \ =\ Fout[k]\ -\/\ scratch[3];}
+\DoxyCodeLine{00250\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Fout[k\ \ \ \ ]+=\ scratch[3];}
+\DoxyCodeLine{00251\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Fout[k+\ \ m]\ =\ scratch[5]\ +\ scratch[4];}
+\DoxyCodeLine{00252\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Fout[k+3*m]\ =\ scratch[5]\ -\/\ scratch[4];}
+\DoxyCodeLine{00253\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00254\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00255\ }
+\DoxyCodeLine{00256\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classkissfft_a87f8bc1332a43162dc8e5a3209e90073}{kf\_bfly5}}(\ \mbox{\hyperlink{classkissfft_ad5a06e91492829b2654b2de2d428b3d6}{cpx\_t}}\ *\ \textcolor{keyword}{const}\ Fout,\ \textcolor{keyword}{const}\ std::size\_t\ fstride,\ \textcolor{keyword}{const}\ std::size\_t\ m)\textcolor{keyword}{\ const}}
+\DoxyCodeLine{00257\ \textcolor{keyword}{\ \ \ \ \ \ \ \ }\{}
+\DoxyCodeLine{00258\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classkissfft_ad5a06e91492829b2654b2de2d428b3d6}{cpx\_t}}\ *Fout0,*Fout1,*Fout2,*Fout3,*Fout4;}
+\DoxyCodeLine{00259\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classkissfft_ad5a06e91492829b2654b2de2d428b3d6}{cpx\_t}}\ scratch[13];}
+\DoxyCodeLine{00260\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classkissfft_ad5a06e91492829b2654b2de2d428b3d6}{cpx\_t}}\ ya\ =\ \mbox{\hyperlink{classkissfft_a5724815d03ecf256693d48322a6ea87b}{\_twiddles}}[fstride*m];}
+\DoxyCodeLine{00261\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classkissfft_ad5a06e91492829b2654b2de2d428b3d6}{cpx\_t}}\ yb\ =\ \mbox{\hyperlink{classkissfft_a5724815d03ecf256693d48322a6ea87b}{\_twiddles}}[fstride*2*m];}
+\DoxyCodeLine{00262\ }
+\DoxyCodeLine{00263\ \ \ \ \ \ \ \ \ \ \ \ \ Fout0=Fout;}
+\DoxyCodeLine{00264\ \ \ \ \ \ \ \ \ \ \ \ \ Fout1=Fout0+m;}
+\DoxyCodeLine{00265\ \ \ \ \ \ \ \ \ \ \ \ \ Fout2=Fout0+2*m;}
+\DoxyCodeLine{00266\ \ \ \ \ \ \ \ \ \ \ \ \ Fout3=Fout0+3*m;}
+\DoxyCodeLine{00267\ \ \ \ \ \ \ \ \ \ \ \ \ Fout4=Fout0+4*m;}
+\DoxyCodeLine{00268\ }
+\DoxyCodeLine{00269\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\ std::size\_t\ u=0;\ u<m;\ ++u\ )\ \{}
+\DoxyCodeLine{00270\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ scratch[0]\ =\ *Fout0;}
+\DoxyCodeLine{00271\ }
+\DoxyCodeLine{00272\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ scratch[1]\ =\ *Fout1\ *\ \mbox{\hyperlink{classkissfft_a5724815d03ecf256693d48322a6ea87b}{\_twiddles}}[\ \ u*fstride];}
+\DoxyCodeLine{00273\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ scratch[2]\ =\ *Fout2\ *\ \mbox{\hyperlink{classkissfft_a5724815d03ecf256693d48322a6ea87b}{\_twiddles}}[2*u*fstride];}
+\DoxyCodeLine{00274\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ scratch[3]\ =\ *Fout3\ *\ \mbox{\hyperlink{classkissfft_a5724815d03ecf256693d48322a6ea87b}{\_twiddles}}[3*u*fstride];}
+\DoxyCodeLine{00275\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ scratch[4]\ =\ *Fout4\ *\ \mbox{\hyperlink{classkissfft_a5724815d03ecf256693d48322a6ea87b}{\_twiddles}}[4*u*fstride];}
+\DoxyCodeLine{00276\ }
+\DoxyCodeLine{00277\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ scratch[7]\ =\ scratch[1]\ +\ scratch[4];}
+\DoxyCodeLine{00278\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ scratch[10]=\ scratch[1]\ -\/\ scratch[4];}
+\DoxyCodeLine{00279\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ scratch[8]\ =\ scratch[2]\ +\ scratch[3];}
+\DoxyCodeLine{00280\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ scratch[9]\ =\ scratch[2]\ -\/\ scratch[3];}
+\DoxyCodeLine{00281\ }
+\DoxyCodeLine{00282\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ *Fout0\ +=\ scratch[7];}
+\DoxyCodeLine{00283\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ *Fout0\ +=\ scratch[8];}
+\DoxyCodeLine{00284\ }
+\DoxyCodeLine{00285\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ scratch[5]\ =\ scratch[0]\ +\ \mbox{\hyperlink{classkissfft_ad5a06e91492829b2654b2de2d428b3d6}{cpx\_t}}(}
+\DoxyCodeLine{00286\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ scratch[7].\mbox{\hyperlink{ceva__typedef_8h_a5f5a64ef503db0fc824df8320929b126}{real}}()*ya.real()\ +\ scratch[8].real()*yb.real(),}
+\DoxyCodeLine{00287\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ scratch[7].imag()*ya.real()\ +\ scratch[8].imag()*yb.real()}
+\DoxyCodeLine{00288\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{00289\ }
+\DoxyCodeLine{00290\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ scratch[6]\ =\ \ \mbox{\hyperlink{classkissfft_ad5a06e91492829b2654b2de2d428b3d6}{cpx\_t}}(}
+\DoxyCodeLine{00291\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ scratch[10].\mbox{\hyperlink{ceva__typedef_8h_a06ebc6bb2d8547759c483e78d2087c51}{imag}}()*ya.imag()\ +\ scratch[9].imag()*yb.imag(),}
+\DoxyCodeLine{00292\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/scratch[10].real()*ya.imag()\ -\/\ scratch[9].real()*yb.imag()}
+\DoxyCodeLine{00293\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{00294\ }
+\DoxyCodeLine{00295\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ *Fout1\ =\ scratch[5]\ -\/\ scratch[6];}
+\DoxyCodeLine{00296\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ *Fout4\ =\ scratch[5]\ +\ scratch[6];}
+\DoxyCodeLine{00297\ }
+\DoxyCodeLine{00298\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ scratch[11]\ =\ scratch[0]\ +}
+\DoxyCodeLine{00299\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classkissfft_ad5a06e91492829b2654b2de2d428b3d6}{cpx\_t}}(}
+\DoxyCodeLine{00300\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ scratch[7].\mbox{\hyperlink{ceva__typedef_8h_a5f5a64ef503db0fc824df8320929b126}{real}}()*yb.real()\ +\ scratch[8].real()*ya.real(),}
+\DoxyCodeLine{00301\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ scratch[7].imag()*yb.real()\ +\ scratch[8].imag()*ya.real()}
+\DoxyCodeLine{00302\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{00303\ }
+\DoxyCodeLine{00304\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ scratch[12]\ =\ \mbox{\hyperlink{classkissfft_ad5a06e91492829b2654b2de2d428b3d6}{cpx\_t}}(}
+\DoxyCodeLine{00305\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/scratch[10].\mbox{\hyperlink{ceva__typedef_8h_a06ebc6bb2d8547759c483e78d2087c51}{imag}}()*yb.imag()\ +\ scratch[9].imag()*ya.imag(),}
+\DoxyCodeLine{00306\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ scratch[10].real()*yb.imag()\ -\/\ scratch[9].real()*ya.imag()}
+\DoxyCodeLine{00307\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{00308\ }
+\DoxyCodeLine{00309\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ *Fout2\ =\ scratch[11]\ +\ scratch[12];}
+\DoxyCodeLine{00310\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ *Fout3\ =\ scratch[11]\ -\/\ scratch[12];}
+\DoxyCodeLine{00311\ }
+\DoxyCodeLine{00312\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ++Fout0;}
+\DoxyCodeLine{00313\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ++Fout1;}
+\DoxyCodeLine{00314\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ++Fout2;}
+\DoxyCodeLine{00315\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ++Fout3;}
+\DoxyCodeLine{00316\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ++Fout4;}
+\DoxyCodeLine{00317\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00318\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00319\ }
+\DoxyCodeLine{00320\ \ \ \ \ \ \ \ \ \textcolor{comment}{/*\ perform\ the\ butterfly\ for\ one\ stage\ of\ a\ mixed\ radix\ FFT\ */}}
+\DoxyCodeLine{00321\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classkissfft_abeecb439c65ae83bcec984bffaba11c2}{kf\_bfly\_generic}}(}
+\DoxyCodeLine{00322\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classkissfft_ad5a06e91492829b2654b2de2d428b3d6}{cpx\_t}}\ *\ \textcolor{keyword}{const}\ Fout,}
+\DoxyCodeLine{00323\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ fstride,}
+\DoxyCodeLine{00324\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ std::size\_t\ m,}
+\DoxyCodeLine{00325\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ std::size\_t\ p}
+\DoxyCodeLine{00326\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ )\textcolor{keyword}{\ const}}
+\DoxyCodeLine{00327\ \textcolor{keyword}{\ \ \ \ \ \ \ \ }\{}
+\DoxyCodeLine{00328\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classkissfft_ad5a06e91492829b2654b2de2d428b3d6}{cpx\_t}}\ *\ twiddles\ =\ \&\mbox{\hyperlink{classkissfft_a5724815d03ecf256693d48322a6ea87b}{\_twiddles}}[0];}
+\DoxyCodeLine{00329\ }
+\DoxyCodeLine{00330\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(p\ >\ \mbox{\hyperlink{classkissfft_aeb5e16074ca8a8c80b6ad3b005ea4047}{\_scratchbuf}}.size())\ \mbox{\hyperlink{classkissfft_aeb5e16074ca8a8c80b6ad3b005ea4047}{\_scratchbuf}}.resize(p);}
+\DoxyCodeLine{00331\ }
+\DoxyCodeLine{00332\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\ std::size\_t\ u=0;\ u<m;\ ++u\ )\ \{}
+\DoxyCodeLine{00333\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::size\_t\ k\ =\ u;}
+\DoxyCodeLine{00334\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\ std::size\_t\ q1=0\ ;\ q1<p\ ;\ ++q1\ )\ \{}
+\DoxyCodeLine{00335\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classkissfft_aeb5e16074ca8a8c80b6ad3b005ea4047}{\_scratchbuf}}[q1]\ =\ Fout[\ k\ \ ];}
+\DoxyCodeLine{00336\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ k\ +=\ m;}
+\DoxyCodeLine{00337\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00338\ }
+\DoxyCodeLine{00339\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ k=u;}
+\DoxyCodeLine{00340\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\ std::size\_t\ q1=0\ ;\ q1<p\ ;\ ++q1\ )\ \{}
+\DoxyCodeLine{00341\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::size\_t\ twidx=0;}
+\DoxyCodeLine{00342\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Fout[\ k\ ]\ =\ \mbox{\hyperlink{classkissfft_aeb5e16074ca8a8c80b6ad3b005ea4047}{\_scratchbuf}}[0];}
+\DoxyCodeLine{00343\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\ std::size\_t\ q=1;q<p;++q\ )\ \{}
+\DoxyCodeLine{00344\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ twidx\ +=\ fstride\ *\ k;}
+\DoxyCodeLine{00345\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (twidx>=\mbox{\hyperlink{classkissfft_aeaef6beef8e8075c72d29a06f90987e2}{\_nfft}})}
+\DoxyCodeLine{00346\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ twidx-\/=\mbox{\hyperlink{classkissfft_aeaef6beef8e8075c72d29a06f90987e2}{\_nfft}};}
+\DoxyCodeLine{00347\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Fout[\ k\ ]\ +=\ \mbox{\hyperlink{classkissfft_aeb5e16074ca8a8c80b6ad3b005ea4047}{\_scratchbuf}}[q]\ *\ twiddles[twidx];}
+\DoxyCodeLine{00348\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00349\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ k\ +=\ m;}
+\DoxyCodeLine{00350\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00351\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00352\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00353\ }
+\DoxyCodeLine{00354\ \ \ \ \ \ \ \ \ std::size\_t\ \mbox{\hyperlink{classkissfft_aeaef6beef8e8075c72d29a06f90987e2}{\_nfft}};}
+\DoxyCodeLine{00355\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classkissfft_ae6ab19f275b79220b9c84545b9befe6b}{\_inverse}};}
+\DoxyCodeLine{00356\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__vector_8h_a127d3f2f8a2f0f47e13d28aea38916f4}{ei\_vector<cpx\_t>}}\ \mbox{\hyperlink{classkissfft_a5724815d03ecf256693d48322a6ea87b}{\_twiddles}};}
+\DoxyCodeLine{00357\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__vector_8h_a127d3f2f8a2f0f47e13d28aea38916f4}{ei\_vector<std::size\_t>}}\ \mbox{\hyperlink{classkissfft_aca566cbaa3b7e9d9cf67c7b7beba3d74}{\_stageRadix}};}
+\DoxyCodeLine{00358\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__vector_8h_a127d3f2f8a2f0f47e13d28aea38916f4}{ei\_vector<std::size\_t>}}\ \mbox{\hyperlink{classkissfft_a605612a0eba8973ac124bd50e05566db}{\_stageRemainder}};}
+\DoxyCodeLine{00359\ \ \ \ \ \ \ \ \ \textcolor{keyword}{mutable}\ \mbox{\hyperlink{ei__vector_8h_a127d3f2f8a2f0f47e13d28aea38916f4}{ei\_vector<cpx\_t>}}\ \mbox{\hyperlink{classkissfft_aeb5e16074ca8a8c80b6ad3b005ea4047}{\_scratchbuf}};}
+\DoxyCodeLine{00360\ \};}
+\DoxyCodeLine{00361\ \textcolor{preprocessor}{\#endif}}
+
+\end{DoxyCode}

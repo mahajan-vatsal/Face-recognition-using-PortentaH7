@@ -1,0 +1,71 @@
+\doxysection{flatbuffer\+\_\+utils.\+h}
+\hypertarget{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2micro_2flatbuffer__utils_8h_source}{}\label{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2micro_2flatbuffer__utils_8h_source}\index{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/arduino-\/examples-\/main/src/tensorflow/lite/micro/flatbuffer\_utils.h@{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/arduino-\/examples-\/main/src/tensorflow/lite/micro/flatbuffer\_utils.h}}
+\mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2micro_2flatbuffer__utils_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{/*\ Copyright\ 2021\ The\ TensorFlow\ Authors.\ All\ Rights\ Reserved.}}
+\DoxyCodeLine{00002\ \textcolor{comment}{}}
+\DoxyCodeLine{00003\ \textcolor{comment}{Licensed\ under\ the\ Apache\ License,\ Version\ 2.0\ (the\ "{}License"{});}}
+\DoxyCodeLine{00004\ \textcolor{comment}{you\ may\ not\ use\ this\ file\ except\ in\ compliance\ with\ the\ License.}}
+\DoxyCodeLine{00005\ \textcolor{comment}{You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{00006\ \textcolor{comment}{}}
+\DoxyCodeLine{00007\ \textcolor{comment}{\ \ \ \ http://www.apache.org/licenses/LICENSE-\/2.0}}
+\DoxyCodeLine{00008\ \textcolor{comment}{}}
+\DoxyCodeLine{00009\ \textcolor{comment}{Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ software}}
+\DoxyCodeLine{00010\ \textcolor{comment}{distributed\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,}}
+\DoxyCodeLine{00011\ \textcolor{comment}{WITHOUT\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,\ either\ express\ or\ implied.}}
+\DoxyCodeLine{00012\ \textcolor{comment}{See\ the\ License\ for\ the\ specific\ language\ governing\ permissions\ and}}
+\DoxyCodeLine{00013\ \textcolor{comment}{limitations\ under\ the\ License.}}
+\DoxyCodeLine{00014\ \textcolor{comment}{==============================================================================*/}}
+\DoxyCodeLine{00015\ }
+\DoxyCodeLine{00016\ \textcolor{preprocessor}{\#ifndef\ THIRD\_PARTY\_TFLITE\_MICRO\_TENSORFLOW\_LITE\_MICRO\_FLATBUFFER\_UTILS\_H\_}}
+\DoxyCodeLine{00017\ \textcolor{preprocessor}{\#define\ THIRD\_PARTY\_TFLITE\_MICRO\_TENSORFLOW\_LITE\_MICRO\_FLATBUFFER\_UTILS\_H\_}}
+\DoxyCodeLine{00018\ }
+\DoxyCodeLine{00019\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{flatbuffers_8h}{third\_party/flatbuffers/include/flatbuffers/flatbuffers.h}}"{}}}
+\DoxyCodeLine{00020\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{flexbuffers_8h}{third\_party/flatbuffers/include/flatbuffers/flexbuffers.h}}"{}}}
+\DoxyCodeLine{00021\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/c/common.h"{}}}
+\DoxyCodeLine{00022\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/schema/schema\_generated.h"{}}}
+\DoxyCodeLine{00023\ }
+\DoxyCodeLine{00024\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacetflite}{tflite}}\ \{}
+\DoxyCodeLine{00025\ \textcolor{comment}{//\ Kernels\ use\ flexbuffers::Map\ to\ pack\ their\ init\ parameters\ in\ a\ tflite\ file,}}
+\DoxyCodeLine{00026\ \textcolor{comment}{//\ with\ the\ parameter\ names\ as\ map\ keys\ and\ the\ parameter\ values\ as\ the}}
+\DoxyCodeLine{00027\ \textcolor{comment}{//\ corresponding\ map\ values.}}
+\DoxyCodeLine{00028\ \textcolor{comment}{//\ Accessing\ the\ map\ values\ using\ the\ flexbuffers:Map\ class\ is\ inline\ heavy,}}
+\DoxyCodeLine{00029\ \textcolor{comment}{//\ which\ can\ cause\ the\ code\ size\ to\ bloat\ beyond\ what's\ reasonable\ for\ a\ micro}}
+\DoxyCodeLine{00030\ \textcolor{comment}{//\ application.\ Use\ this\ class\ instead,\ when\ possible.}}
+\DoxyCodeLine{00031\ \textcolor{comment}{//\ FlexbufferWrapper\ takes\ advantage\ of\ the\ following\ properties\ of}}
+\DoxyCodeLine{00032\ \textcolor{comment}{//\ flexbuffers::Map:}}
+\DoxyCodeLine{00033\ \textcolor{comment}{//\ 1.\ It\ can\ be\ viewed\ as\ a\ flexbuffers::Vector\ of\ the\ values.}}
+\DoxyCodeLine{00034\ \textcolor{comment}{//\ 2.\ The\ values\ in\ the\ vector\ are\ ordered\ alphabetically\ by\ their\ keys.}}
+\DoxyCodeLine{00035\ \textcolor{comment}{//\ 3.\ All\ integer\ and\ Boolean\ values\ are\ stored\ as\ 64-\/bit\ numbers.}}
+\DoxyCodeLine{00036\ \textcolor{comment}{//\ 4.\ All\ floating\ point\ values\ are\ stored\ as\ double\ precision\ numbers.}}
+\DoxyCodeLine{00037\ \textcolor{comment}{//\ The\ properties\ are\ mentioned\ in\ the\ flexbuffers\ docs,\ but\ we\ rely\ on}}
+\DoxyCodeLine{00038\ \textcolor{comment}{//\ a\ unit\ test\ to\ catch\ design\ changes.}}
+\DoxyCodeLine{00039\ \textcolor{keyword}{class\ }FlexbufferWrapper\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{classflexbuffers_1_1_vector}{flexbuffers::Vector}}\ \{}
+\DoxyCodeLine{00040\ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00041\ \ \ \textcolor{comment}{//\ Construct\ with\ a\ serialized\ flexbuffer\ 'buffer'\ of\ 'size'\ bytes}}
+\DoxyCodeLine{00042\ \ \ \textcolor{keyword}{explicit}\ \mbox{\hyperlink{classtflite_1_1_flexbuffer_wrapper_aa2a7f9f6b93c690f70e6d93d810ccdf0}{FlexbufferWrapper}}(\textcolor{keyword}{const}\ uint8\_t*\ buffer,\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{classflexbuffers_1_1_sized_a886c94ebc26b6e00a7223b180967e59d}{size}});}
+\DoxyCodeLine{00043\ \ \ int64\_t\ \mbox{\hyperlink{classtflite_1_1_flexbuffer_wrapper_aa4b71d1ec5e864457992bcb35ee444b4}{ElementAsInt64}}(\textcolor{keywordtype}{size\_t}\ i)\ \textcolor{keyword}{const};}
+\DoxyCodeLine{00044\ \ \ uint64\_t\ \mbox{\hyperlink{classtflite_1_1_flexbuffer_wrapper_a53d4b74fc81a13171f490f6956a765a8}{ElementAsUInt64}}(\textcolor{keywordtype}{size\_t}\ i)\ \textcolor{keyword}{const};}
+\DoxyCodeLine{00045\ \ \ int32\_t\ \mbox{\hyperlink{classtflite_1_1_flexbuffer_wrapper_aff3e0b4ea0571476e9e2841e17206ebe}{ElementAsInt32}}(\textcolor{keywordtype}{size\_t}\ i)\ \textcolor{keyword}{const};}
+\DoxyCodeLine{00046\ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classtflite_1_1_flexbuffer_wrapper_a3f7f20bff589a23df0672904f1c68ec0}{ElementAsBool}}(\textcolor{keywordtype}{size\_t}\ i)\ \textcolor{keyword}{const};}
+\DoxyCodeLine{00047\ \ \ \textcolor{keywordtype}{double}\ \mbox{\hyperlink{classtflite_1_1_flexbuffer_wrapper_a22c650a06271393b6788e05d1ab280b0}{ElementAsDouble}}(\textcolor{keywordtype}{size\_t}\ i)\ \textcolor{keyword}{const};}
+\DoxyCodeLine{00048\ \ \ \textcolor{keywordtype}{float}\ \mbox{\hyperlink{classtflite_1_1_flexbuffer_wrapper_a9889e8227fb68e01f1ebbc08f8e5dca4}{ElementAsFloat}}(\textcolor{keywordtype}{size\_t}\ i)\ \textcolor{keyword}{const};}
+\DoxyCodeLine{00049\ \};}
+\DoxyCodeLine{00050\ }
+\DoxyCodeLine{00051\ \textcolor{comment}{//\ Return\ the\ number\ of\ operators\ in\ a\ subgraph\ tflite}}
+\DoxyCodeLine{00052\ uint32\_t\ \mbox{\hyperlink{namespacetflite_a24950a12c83b045ec6e74283dc06ddc2}{NumSubgraphOperators}}(\textcolor{keyword}{const}\ SubGraph*\ subgraph);}
+\DoxyCodeLine{00053\ uint32\_t\ \mbox{\hyperlink{namespacetflite_a24950a12c83b045ec6e74283dc06ddc2}{NumSubgraphOperators}}(\textcolor{keyword}{const}\ Model*\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2model_8h_ae142afd8c2e2c711c1c62440deebe03c}{model}},\ \textcolor{keywordtype}{int}\ subgraph\_idx);}
+\DoxyCodeLine{00054\ }
+\DoxyCodeLine{00055\ \textcolor{comment}{//\ Converts\ a\ flatbuffer\ array\ to\ a\ TfLiteArray.}}
+\DoxyCodeLine{00056\ \textcolor{comment}{//\ TODO(b/188459715):\ These\ function\ convert\ a\ const\ input\ to\ a\ non-\/const\ via\ a}}
+\DoxyCodeLine{00057\ \textcolor{comment}{//\ const\_cast.\ It\ is\ unclear\ exactly\ why\ this\ is\ required.}}
+\DoxyCodeLine{00058\ \mbox{\hyperlink{struct_tf_lite_int_array}{TfLiteIntArray}}*\ \mbox{\hyperlink{namespacetflite_ac5105e0857962c082303200391093912}{FlatBufferVectorToTfLiteTypeArray}}(}
+\DoxyCodeLine{00059\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classflatbuffers_1_1_vector}{flatbuffers::Vector<int32\_t>}}*\ flatbuffer\_array);}
+\DoxyCodeLine{00060\ \mbox{\hyperlink{struct_tf_lite_float_array}{TfLiteFloatArray}}*\ \mbox{\hyperlink{namespacetflite_ac5105e0857962c082303200391093912}{FlatBufferVectorToTfLiteTypeArray}}(}
+\DoxyCodeLine{00061\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classflatbuffers_1_1_vector}{flatbuffers::Vector<float>}}*\ flatbuffer\_array);}
+\DoxyCodeLine{00062\ }
+\DoxyCodeLine{00063\ \}\ \ \textcolor{comment}{//\ namespace\ tflite}}
+\DoxyCodeLine{00064\ }
+\DoxyCodeLine{00065\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ THIRD\_PARTY\_TFLITE\_MICRO\_TENSORFLOW\_LITE\_MICRO\_FLATBUFFER\_UTILS\_H\_}}
+
+\end{DoxyCode}

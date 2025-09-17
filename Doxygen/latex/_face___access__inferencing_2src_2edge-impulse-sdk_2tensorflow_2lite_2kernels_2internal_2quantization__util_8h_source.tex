@@ -1,0 +1,298 @@
+\doxysection{quantization\+\_\+util.\+h}
+\hypertarget{_face___access__inferencing_2src_2edge-impulse-sdk_2tensorflow_2lite_2kernels_2internal_2quantization__util_8h_source}{}\label{_face___access__inferencing_2src_2edge-impulse-sdk_2tensorflow_2lite_2kernels_2internal_2quantization__util_8h_source}\index{Face\_Access\_inferencing/src/edge-\/impulse-\/sdk/tensorflow/lite/kernels/internal/quantization\_util.h@{Face\_Access\_inferencing/src/edge-\/impulse-\/sdk/tensorflow/lite/kernels/internal/quantization\_util.h}}
+\mbox{\hyperlink{_face___access__inferencing_2src_2edge-impulse-sdk_2tensorflow_2lite_2kernels_2internal_2quantization__util_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{/*\ Copyright\ 2017\ The\ TensorFlow\ Authors.\ All\ Rights\ Reserved.}}
+\DoxyCodeLine{00002\ \textcolor{comment}{}}
+\DoxyCodeLine{00003\ \textcolor{comment}{Licensed\ under\ the\ Apache\ License,\ Version\ 2.0\ (the\ "{}License"{});}}
+\DoxyCodeLine{00004\ \textcolor{comment}{you\ may\ not\ use\ this\ file\ except\ in\ compliance\ with\ the\ License.}}
+\DoxyCodeLine{00005\ \textcolor{comment}{You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{00006\ \textcolor{comment}{}}
+\DoxyCodeLine{00007\ \textcolor{comment}{\ \ \ \ http://www.apache.org/licenses/LICENSE-\/2.0}}
+\DoxyCodeLine{00008\ \textcolor{comment}{}}
+\DoxyCodeLine{00009\ \textcolor{comment}{Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ software}}
+\DoxyCodeLine{00010\ \textcolor{comment}{distributed\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,}}
+\DoxyCodeLine{00011\ \textcolor{comment}{WITHOUT\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,\ either\ express\ or\ implied.}}
+\DoxyCodeLine{00012\ \textcolor{comment}{See\ the\ License\ for\ the\ specific\ language\ governing\ permissions\ and}}
+\DoxyCodeLine{00013\ \textcolor{comment}{limitations\ under\ the\ License.}}
+\DoxyCodeLine{00014\ \textcolor{comment}{==============================================================================*/}}
+\DoxyCodeLine{00015\ \textcolor{preprocessor}{\#ifndef\ TENSORFLOW\_LITE\_KERNELS\_INTERNAL\_QUANTIZATION\_UTIL\_H\_}}
+\DoxyCodeLine{00016\ \textcolor{preprocessor}{\#define\ TENSORFLOW\_LITE\_KERNELS\_INTERNAL\_QUANTIZATION\_UTIL\_H\_}}
+\DoxyCodeLine{00017\ }
+\DoxyCodeLine{00018\ \textcolor{preprocessor}{\#include\ <cmath>}}
+\DoxyCodeLine{00019\ \textcolor{preprocessor}{\#include\ <cstdint>}}
+\DoxyCodeLine{00020\ \textcolor{preprocessor}{\#include\ <limits>}}
+\DoxyCodeLine{00021\ }
+\DoxyCodeLine{00022\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{_face___access__inferencing_2src_2edge-impulse-sdk_2tensorflow_2lite_2kernels_2internal_2compatibility_8h}{edge-\/impulse-\/sdk/tensorflow/lite/kernels/internal/compatibility.h}}"{}}}
+\DoxyCodeLine{00023\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{_face___access__inferencing_2src_2edge-impulse-sdk_2tensorflow_2lite_2kernels_2internal_2cppmath_8h}{edge-\/impulse-\/sdk/tensorflow/lite/kernels/internal/cppmath.h}}"{}}}
+\DoxyCodeLine{00024\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{_face___access__inferencing_2src_2edge-impulse-sdk_2tensorflow_2lite_2kernels_2internal_2types_8h}{edge-\/impulse-\/sdk/tensorflow/lite/kernels/internal/types.h}}"{}}}
+\DoxyCodeLine{00025\ }
+\DoxyCodeLine{00026\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacetflite}{tflite}}\ \{}
+\DoxyCodeLine{00027\ }
+\DoxyCodeLine{00028\ \textcolor{comment}{//\ Given\ the\ min\ and\ max\ values\ of\ a\ float\ array,\ return}}
+\DoxyCodeLine{00029\ \textcolor{comment}{//\ reasonable\ quantization\ parameters\ to\ use\ for\ this\ array.}}
+\DoxyCodeLine{00030\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{00031\ QuantizationParams\ \mbox{\hyperlink{namespacetflite_affc16f55570ecb72142f5e7babd208f8}{ChooseQuantizationParams}}(\textcolor{keywordtype}{double}\ rmin,\ \textcolor{keywordtype}{double}\ rmax,}
+\DoxyCodeLine{00032\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ narrow\_range)\ \{}
+\DoxyCodeLine{00033\ \ \ \textcolor{keyword}{const}\ T\ qmin\ =\ std::numeric\_limits<T>::min()\ +\ (narrow\_range\ ?\ 1\ :\ 0);}
+\DoxyCodeLine{00034\ \ \ \textcolor{keyword}{const}\ T\ qmax\ =\ std::numeric\_limits<T>::max();}
+\DoxyCodeLine{00035\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{double}\ qmin\_double\ =\ qmin;}
+\DoxyCodeLine{00036\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{double}\ qmax\_double\ =\ qmax;}
+\DoxyCodeLine{00037\ \ \ \textcolor{comment}{//\ 0\ should\ always\ be\ a\ representable\ value.\ Let's\ assume\ that\ the\ initial}}
+\DoxyCodeLine{00038\ \ \ \textcolor{comment}{//\ min,max\ range\ contains\ 0.}}
+\DoxyCodeLine{00039\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src82599f02174ce2f1c2fd003f3eee8b73_ace9cd769315c29ddbc38accac7c00720}{TFLITE\_CHECK\_LE}}(rmin,\ 0.);}
+\DoxyCodeLine{00040\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src82599f02174ce2f1c2fd003f3eee8b73_ac0c26f95fb7945df93981da0bc05ac94}{TFLITE\_CHECK\_GE}}(rmax,\ 0.);}
+\DoxyCodeLine{00041\ \ \ \textcolor{keywordflow}{if}\ (rmin\ ==\ rmax)\ \{}
+\DoxyCodeLine{00042\ \ \ \ \ \textcolor{comment}{//\ Special\ case\ where\ the\ min,max\ range\ is\ a\ point.\ Should\ be\ \{0\}.}}
+\DoxyCodeLine{00043\ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src82599f02174ce2f1c2fd003f3eee8b73_a44455408f6c9ed7a185e2a124d2a4127}{TFLITE\_CHECK\_EQ}}(rmin,\ 0.);}
+\DoxyCodeLine{00044\ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src82599f02174ce2f1c2fd003f3eee8b73_a44455408f6c9ed7a185e2a124d2a4127}{TFLITE\_CHECK\_EQ}}(rmax,\ 0.);}
+\DoxyCodeLine{00045\ \ \ \ \ QuantizationParams\ quantization\_params;}
+\DoxyCodeLine{00046\ \ \ \ \ quantization\_params.zero\_point\ =\ 0;}
+\DoxyCodeLine{00047\ \ \ \ \ quantization\_params.scale\ =\ 0.;}
+\DoxyCodeLine{00048\ \ \ \ \ \textcolor{keywordflow}{return}\ quantization\_params;}
+\DoxyCodeLine{00049\ \ \ \}}
+\DoxyCodeLine{00050\ }
+\DoxyCodeLine{00051\ \ \ \textcolor{comment}{//\ General\ case.}}
+\DoxyCodeLine{00052\ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{00053\ \ \ \textcolor{comment}{//\ First\ determine\ the\ scale.}}
+\DoxyCodeLine{00054\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{double}\ \mbox{\hyperlink{batch__matmul__test_8cc_ab89fe30f475eefcbf59653d919c456bd}{scale}}\ =\ (rmax\ -\/\ rmin)\ /\ (qmax\_double\ -\/\ qmin\_double);}
+\DoxyCodeLine{00055\ }
+\DoxyCodeLine{00056\ \ \ \textcolor{comment}{//\ Zero-\/point\ computation.}}
+\DoxyCodeLine{00057\ \ \ \textcolor{comment}{//\ First\ the\ initial\ floating-\/point\ computation.\ The\ zero-\/point\ can\ be}}
+\DoxyCodeLine{00058\ \ \ \textcolor{comment}{//\ determined\ from\ solving\ an\ affine\ equation\ for\ any\ known\ pair}}
+\DoxyCodeLine{00059\ \ \ \textcolor{comment}{//\ (real\ value,\ corresponding\ quantized\ value).}}
+\DoxyCodeLine{00060\ \ \ \textcolor{comment}{//\ We\ know\ two\ such\ pairs:\ (rmin,\ qmin)\ and\ (rmax,\ qmax).}}
+\DoxyCodeLine{00061\ \ \ \textcolor{comment}{//\ The\ arithmetic\ error\ on\ the\ zero\ point\ computed\ from\ either\ pair}}
+\DoxyCodeLine{00062\ \ \ \textcolor{comment}{//\ will\ be\ roughly\ machine\_epsilon\ *\ (sum\ of\ absolute\ values\ of\ terms)}}
+\DoxyCodeLine{00063\ \ \ \textcolor{comment}{//\ so\ we\ want\ to\ use\ the\ variant\ that\ adds\ the\ smaller\ terms.}}
+\DoxyCodeLine{00064\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{double}\ zero\_point\_from\_min\ =\ qmin\_double\ -\/\ rmin\ /\ \mbox{\hyperlink{batch__matmul__test_8cc_ab89fe30f475eefcbf59653d919c456bd}{scale}};}
+\DoxyCodeLine{00065\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{double}\ zero\_point\_from\_max\ =\ qmax\_double\ -\/\ rmax\ /\ \mbox{\hyperlink{batch__matmul__test_8cc_ab89fe30f475eefcbf59653d919c456bd}{scale}};}
+\DoxyCodeLine{00066\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{double}\ zero\_point\_from\_min\_error\ =}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ std::abs(qmin\_double)\ +\ std::abs(rmin\ /\ \mbox{\hyperlink{batch__matmul__test_8cc_ab89fe30f475eefcbf59653d919c456bd}{scale}});}
+\DoxyCodeLine{00068\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{double}\ zero\_point\_from\_max\_error\ =}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ std::abs(qmax\_double)\ +\ std::abs(rmax\ /\ \mbox{\hyperlink{batch__matmul__test_8cc_ab89fe30f475eefcbf59653d919c456bd}{scale}});}
+\DoxyCodeLine{00070\ }
+\DoxyCodeLine{00071\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{double}\ zero\_point\_double\ =}
+\DoxyCodeLine{00072\ \ \ \ \ \ \ zero\_point\_from\_min\_error\ <\ zero\_point\_from\_max\_error}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \ \ \ \ ?\ zero\_point\_from\_min}
+\DoxyCodeLine{00074\ \ \ \ \ \ \ \ \ \ \ :\ zero\_point\_from\_max;}
+\DoxyCodeLine{00075\ }
+\DoxyCodeLine{00076\ \ \ \textcolor{comment}{//\ Now\ we\ need\ to\ nudge\ the\ zero\ point\ to\ be\ an\ integer}}
+\DoxyCodeLine{00077\ \ \ \textcolor{comment}{//\ (our\ zero\ points\ are\ integer,\ and\ this\ is\ motivated\ by\ the\ requirement}}
+\DoxyCodeLine{00078\ \ \ \textcolor{comment}{//\ to\ be\ able\ to\ represent\ the\ real\ value\ "{}0"{}\ exactly\ as\ a\ quantized\ value,}}
+\DoxyCodeLine{00079\ \ \ \textcolor{comment}{//\ which\ is\ required\ in\ multiple\ places,\ for\ example\ in\ Im2col\ with\ SAME}}
+\DoxyCodeLine{00080\ \ \ \textcolor{comment}{//\ padding).}}
+\DoxyCodeLine{00081\ \ \ T\ nudged\_zero\_point\ =\ 0;}
+\DoxyCodeLine{00082\ \ \ \textcolor{keywordflow}{if}\ (zero\_point\_double\ <\ qmin\_double)\ \{}
+\DoxyCodeLine{00083\ \ \ \ \ nudged\_zero\_point\ =\ qmin;}
+\DoxyCodeLine{00084\ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (zero\_point\_double\ >\ qmax\_double)\ \{}
+\DoxyCodeLine{00085\ \ \ \ \ nudged\_zero\_point\ =\ qmax;}
+\DoxyCodeLine{00086\ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00087\ \ \ \ \ nudged\_zero\_point\ =\ \textcolor{keyword}{static\_cast<}T\textcolor{keyword}{>}(round(zero\_point\_double));}
+\DoxyCodeLine{00088\ \ \ \}}
+\DoxyCodeLine{00089\ \ \ \textcolor{comment}{//\ The\ zero\ point\ should\ always\ be\ in\ the\ range\ of\ quantized\ value,}}
+\DoxyCodeLine{00090\ \ \ \textcolor{comment}{//\ [qmin,\ qmax].}}
+\DoxyCodeLine{00091\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src82599f02174ce2f1c2fd003f3eee8b73_ac0c26f95fb7945df93981da0bc05ac94}{TFLITE\_CHECK\_GE}}(nudged\_zero\_point,\ qmin);}
+\DoxyCodeLine{00092\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src82599f02174ce2f1c2fd003f3eee8b73_ace9cd769315c29ddbc38accac7c00720}{TFLITE\_CHECK\_LE}}(nudged\_zero\_point,\ qmax);}
+\DoxyCodeLine{00093\ }
+\DoxyCodeLine{00094\ \ \ \textcolor{comment}{//\ Finally,\ store\ the\ result\ nudged\ quantization\ params.}}
+\DoxyCodeLine{00095\ \ \ QuantizationParams\ quantization\_params;}
+\DoxyCodeLine{00096\ \ \ quantization\_params.zero\_point\ =\ nudged\_zero\_point;}
+\DoxyCodeLine{00097\ \ \ quantization\_params.scale\ =\ \mbox{\hyperlink{batch__matmul__test_8cc_ab89fe30f475eefcbf59653d919c456bd}{scale}};}
+\DoxyCodeLine{00098\ \ \ \textcolor{keywordflow}{return}\ quantization\_params;}
+\DoxyCodeLine{00099\ \}}
+\DoxyCodeLine{00100\ }
+\DoxyCodeLine{00101\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{00102\ QuantizationParams\ \mbox{\hyperlink{namespacetflite_affc16f55570ecb72142f5e7babd208f8}{ChooseQuantizationParams}}(\textcolor{keywordtype}{double}\ rmin,\ \textcolor{keywordtype}{double}\ rmax)\ \{}
+\DoxyCodeLine{00103\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacetflite_affc16f55570ecb72142f5e7babd208f8}{ChooseQuantizationParams<T>}}(rmin,\ rmax,\ \textcolor{keyword}{false});}
+\DoxyCodeLine{00104\ \}}
+\DoxyCodeLine{00105\ }
+\DoxyCodeLine{00106\ \textcolor{comment}{//\ Converts\ a\ floating-\/point\ number\ to\ an\ integer.\ For\ all\ inputs\ x\ where}}
+\DoxyCodeLine{00107\ \textcolor{comment}{//\ static\_cast<IntOut>(x)\ is\ legal\ according\ to\ the\ C++\ standard,\ the\ result}}
+\DoxyCodeLine{00108\ \textcolor{comment}{//\ is\ identical\ to\ that\ cast\ (i.e.\ the\ result\ is\ x\ with\ its\ fractional\ part}}
+\DoxyCodeLine{00109\ \textcolor{comment}{//\ truncated\ whenever\ that\ is\ representable\ as\ IntOut).}}
+\DoxyCodeLine{00110\ \textcolor{comment}{//}}
+\DoxyCodeLine{00111\ \textcolor{comment}{//\ static\_cast\ would\ cause\ undefined\ behavior\ for\ the\ following\ cases,\ which}}
+\DoxyCodeLine{00112\ \textcolor{comment}{//\ have\ well-\/defined\ behavior\ for\ this\ function:}}
+\DoxyCodeLine{00113\ \textcolor{comment}{//}}
+\DoxyCodeLine{00114\ \textcolor{comment}{//\ \ 1.\ If\ x\ is\ NaN,\ the\ result\ is\ zero.}}
+\DoxyCodeLine{00115\ \textcolor{comment}{//}}
+\DoxyCodeLine{00116\ \textcolor{comment}{//\ \ 2.\ If\ the\ truncated\ form\ of\ x\ is\ above\ the\ representable\ range\ of\ IntOut,}}
+\DoxyCodeLine{00117\ \textcolor{comment}{//\ \ \ \ \ the\ result\ is\ std::numeric\_limits<IntOut>::max().}}
+\DoxyCodeLine{00118\ \textcolor{comment}{//}}
+\DoxyCodeLine{00119\ \textcolor{comment}{//\ \ 3.\ If\ the\ truncated\ form\ of\ x\ is\ below\ the\ representable\ range\ of\ IntOut,}}
+\DoxyCodeLine{00120\ \textcolor{comment}{//\ \ \ \ \ the\ result\ is\ std::numeric\_limits<IntOut>::min().}}
+\DoxyCodeLine{00121\ \textcolor{comment}{//}}
+\DoxyCodeLine{00122\ \textcolor{comment}{//\ Note\ that\ cases\ \#2\ and\ \#3\ cover\ infinities\ as\ well\ as\ finite\ numbers.}}
+\DoxyCodeLine{00123\ \textcolor{comment}{//}}
+\DoxyCodeLine{00124\ \textcolor{comment}{//\ The\ range\ of\ FloatIn\ must\ include\ the\ range\ of\ IntOut,\ otherwise}}
+\DoxyCodeLine{00125\ \textcolor{comment}{//\ the\ results\ are\ undefined.}}
+\DoxyCodeLine{00126\ \textcolor{comment}{//\ TODO(sfeuz):\ Replace\ by\ absl::SafeCast\ once\ available.}}
+\DoxyCodeLine{00127\ \textcolor{keyword}{template}\ <\textcolor{keyword}{class}\ IntOut,\ \textcolor{keyword}{class}\ FloatIn>}
+\DoxyCodeLine{00128\ IntOut\ \mbox{\hyperlink{namespacetflite_a07a0a87d136974cdc0cbe14df362b00b}{SafeCast}}(FloatIn\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a6150e0515f7202e2fb518f7206ed97dc}{x}})\ \{}
+\DoxyCodeLine{00129\ \ \ \textcolor{keyword}{static\_assert}(!std::numeric\_limits<FloatIn>::is\_integer,}
+\DoxyCodeLine{00130\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}FloatIn\ is\ integer"{}});}
+\DoxyCodeLine{00131\ \ \ \textcolor{keyword}{static\_assert}(std::numeric\_limits<IntOut>::is\_integer,}
+\DoxyCodeLine{00132\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}IntOut\ is\ not\ integer"{}});}
+\DoxyCodeLine{00133\ \ \ \textcolor{keyword}{static\_assert}(std::numeric\_limits<IntOut>::radix\ ==\ 2,\ \textcolor{stringliteral}{"{}IntOut\ is\ base\ 2"{}});}
+\DoxyCodeLine{00134\ }
+\DoxyCodeLine{00135\ \ \ \textcolor{comment}{//\ Special\ case\ NaN,\ for\ which\ the\ logic\ below\ doesn't\ work.}}
+\DoxyCodeLine{00136\ \ \ \textcolor{keywordflow}{if}\ (std::isnan(\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a6150e0515f7202e2fb518f7206ed97dc}{x}}))\ \{}
+\DoxyCodeLine{00137\ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00138\ \ \ \}}
+\DoxyCodeLine{00139\ }
+\DoxyCodeLine{00140\ \ \ \textcolor{comment}{//\ Negative\ values\ all\ clip\ to\ zero\ for\ unsigned\ results.}}
+\DoxyCodeLine{00141\ \ \ \textcolor{keywordflow}{if}\ (!std::numeric\_limits<IntOut>::is\_signed\ \&\&\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a6150e0515f7202e2fb518f7206ed97dc}{x}}\ <\ 0)\ \{}
+\DoxyCodeLine{00142\ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00143\ \ \ \}}
+\DoxyCodeLine{00144\ }
+\DoxyCodeLine{00145\ \ \ \textcolor{comment}{//\ Handle\ infinities.}}
+\DoxyCodeLine{00146\ \ \ \textcolor{keywordflow}{if}\ (std::isinf(\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a6150e0515f7202e2fb518f7206ed97dc}{x}}))\ \{}
+\DoxyCodeLine{00147\ \ \ \ \ \textcolor{keywordflow}{return}\ x\ <\ 0\ ?\ std::numeric\_limits<IntOut>::min()}
+\DoxyCodeLine{00148\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ std::numeric\_limits<IntOut>::\mbox{\hyperlink{common__functions_8h_affe776513b24d84b39af8ab0930fef7f}{max}}();}
+\DoxyCodeLine{00149\ \ \ \}}
+\DoxyCodeLine{00150\ }
+\DoxyCodeLine{00151\ \ \ \textcolor{comment}{//\ Set\ exp\ such\ that\ x\ ==\ f\ *\ 2\string^exp\ for\ some\ f\ with\ |f|\ in\ [0.5,\ 1.0),}}
+\DoxyCodeLine{00152\ \ \ \textcolor{comment}{//\ unless\ x\ is\ zero\ in\ which\ case\ exp\ ==\ 0.\ Note\ that\ this\ implies\ that\ the}}
+\DoxyCodeLine{00153\ \ \ \textcolor{comment}{//\ magnitude\ of\ x\ is\ strictly\ less\ than\ 2\string^exp.}}
+\DoxyCodeLine{00154\ \ \ \textcolor{keywordtype}{int}\ exp\ =\ 0;}
+\DoxyCodeLine{00155\ \ \ std::frexp(\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a6150e0515f7202e2fb518f7206ed97dc}{x}},\ \&exp);}
+\DoxyCodeLine{00156\ }
+\DoxyCodeLine{00157\ \ \ \textcolor{comment}{//\ Let\ N\ be\ the\ number\ of\ non-\/sign\ bits\ in\ the\ representation\ of\ IntOut.\ If}}
+\DoxyCodeLine{00158\ \ \ \textcolor{comment}{//\ the\ magnitude\ of\ x\ is\ strictly\ less\ than\ 2\string^N,\ the\ truncated\ version\ of\ x}}
+\DoxyCodeLine{00159\ \ \ \textcolor{comment}{//\ is\ representable\ as\ IntOut.\ The\ only\ representable\ integer\ for\ which\ this}}
+\DoxyCodeLine{00160\ \ \ \textcolor{comment}{//\ is\ not\ the\ case\ is\ kMin\ for\ signed\ types\ (i.e.\ -\/2\string^N),\ but\ that\ is\ covered}}
+\DoxyCodeLine{00161\ \ \ \textcolor{comment}{//\ by\ the\ fall-\/through\ below.}}
+\DoxyCodeLine{00162\ \ \ \textcolor{keywordflow}{if}\ (exp\ <=\ std::numeric\_limits<IntOut>::digits)\ \{}
+\DoxyCodeLine{00163\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a6150e0515f7202e2fb518f7206ed97dc}{x}};}
+\DoxyCodeLine{00164\ \ \ \}}
+\DoxyCodeLine{00165\ }
+\DoxyCodeLine{00166\ \ \ \textcolor{comment}{//\ Handle\ numbers\ with\ magnitude\ >=\ 2\string^N.}}
+\DoxyCodeLine{00167\ \ \ \textcolor{keywordflow}{return}\ x\ <\ 0\ ?\ std::numeric\_limits<IntOut>::min()}
+\DoxyCodeLine{00168\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ std::numeric\_limits<IntOut>::\mbox{\hyperlink{common__functions_8h_affe776513b24d84b39af8ab0930fef7f}{max}}();}
+\DoxyCodeLine{00169\ \}}
+\DoxyCodeLine{00170\ }
+\DoxyCodeLine{00171\ \textcolor{comment}{//\ Decompose\ a\ double\ multiplier\ into\ a\ Q0.31\ int32\ representation\ of\ its}}
+\DoxyCodeLine{00172\ \textcolor{comment}{//\ significand,\ and\ shift\ representation\ of\ NEGATIVE\ its\ exponent\ -\/-\/-\/}}
+\DoxyCodeLine{00173\ \textcolor{comment}{//\ this\ is\ intended\ as\ a\ RIGHT-\/shift.}}
+\DoxyCodeLine{00174\ \textcolor{comment}{//}}
+\DoxyCodeLine{00175\ \textcolor{comment}{//\ Restricted\ to\ the\ case\ where\ the\ multiplier\ <\ 1\ (and\ non-\/negative).}}
+\DoxyCodeLine{00176\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_acfa88a394f81fe161ef92faba1f6b614}{QuantizeMultiplierSmallerThanOneExp}}(\textcolor{keywordtype}{double}\ double\_multiplier,}
+\DoxyCodeLine{00177\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ int32\_t*\ quantized\_multiplier,}
+\DoxyCodeLine{00178\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}*\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src07231aa9a2b381aa3c97687e9f0d823d_aba8502090d4b86973c4819d3a60ce19d}{left\_shift}});}
+\DoxyCodeLine{00179\ }
+\DoxyCodeLine{00180\ \textcolor{comment}{//\ Decompose\ a\ double\ multiplier\ into\ a\ Q0.31\ int32\ representation\ of\ its}}
+\DoxyCodeLine{00181\ \textcolor{comment}{//\ significand,\ and\ shift\ representation\ of\ its\ exponent.}}
+\DoxyCodeLine{00182\ \textcolor{comment}{//}}
+\DoxyCodeLine{00183\ \textcolor{comment}{//\ Restricted\ to\ the\ case\ where\ the\ multiplier\ >\ 1.}}
+\DoxyCodeLine{00184\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_a48fdff763bda2d6352f5c23b463eeb03}{QuantizeMultiplierGreaterThanOne}}(\textcolor{keywordtype}{double}\ double\_multiplier,}
+\DoxyCodeLine{00185\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ int32\_t*\ quantized\_multiplier,}
+\DoxyCodeLine{00186\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}*\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src07231aa9a2b381aa3c97687e9f0d823d_aba8502090d4b86973c4819d3a60ce19d}{left\_shift}});}
+\DoxyCodeLine{00187\ }
+\DoxyCodeLine{00188\ \textcolor{comment}{//\ Decompose\ a\ double\ multiplier\ into\ a\ Q0.31\ int32\ representation\ of\ its}}
+\DoxyCodeLine{00189\ \textcolor{comment}{//\ significand,\ and\ shift\ representation\ of\ its\ exponent.}}
+\DoxyCodeLine{00190\ \textcolor{comment}{//}}
+\DoxyCodeLine{00191\ \textcolor{comment}{//\ Handles\ an\ arbitrary\ positive\ multiplier.\ The\ 'shift'\ output-\/value\ is}}
+\DoxyCodeLine{00192\ \textcolor{comment}{//\ basically\ the\ 'floating-\/point\ exponent'\ of\ the\ multiplier:}}
+\DoxyCodeLine{00193\ \textcolor{comment}{//\ Negative\ for\ a\ right-\/shift\ (when\ the\ multiplier\ is\ <1),\ positive\ for\ a}}
+\DoxyCodeLine{00194\ \textcolor{comment}{//\ left-\/shift\ (when\ the\ multiplier\ is\ >1)}}
+\DoxyCodeLine{00195\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_a6c8c2f7ccd5e79b0bb461cee555839fd}{QuantizeMultiplier}}(\textcolor{keywordtype}{double}\ double\_multiplier,\ int32\_t*\ quantized\_multiplier,}
+\DoxyCodeLine{00196\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}*\ \mbox{\hyperlink{wm8960__regs_8h_ace4e4903c356d90d7a0e7548fc1e8b50}{shift}});}
+\DoxyCodeLine{00197\ }
+\DoxyCodeLine{00198\ \textcolor{comment}{//\ Splits\ a\ double\ input\ value\ into\ a\ returned\ fraction,\ and\ a\ shift\ value\ from}}
+\DoxyCodeLine{00199\ \textcolor{comment}{//\ the\ exponent,\ using\ only\ bitwise\ and\ integer\ operations\ to\ support}}
+\DoxyCodeLine{00200\ \textcolor{comment}{//\ microcontrollers\ and\ other\ environments\ without\ floating-\/point\ support.}}
+\DoxyCodeLine{00201\ \textcolor{comment}{//}}
+\DoxyCodeLine{00202\ \textcolor{comment}{//\ This\ is\ designed\ to\ be\ a\ replacement\ for\ how\ std::frexp()\ is\ used\ within\ the}}
+\DoxyCodeLine{00203\ \textcolor{comment}{//\ QuantizeMultiplier()\ function,\ and\ so\ has\ a\ different\ signature\ than\ the}}
+\DoxyCodeLine{00204\ \textcolor{comment}{//\ standard\ version,\ returning\ a\ 64-\/bit\ integer\ rather\ than\ a\ double.\ This}}
+\DoxyCodeLine{00205\ \textcolor{comment}{//\ result\ has\ a\ maximum\ value\ of\ 1<<31,\ with\ the\ fraction\ expressed\ as\ a}}
+\DoxyCodeLine{00206\ \textcolor{comment}{//\ proportion\ of\ that\ maximum.}}
+\DoxyCodeLine{00207\ \textcolor{comment}{//}}
+\DoxyCodeLine{00208\ \textcolor{comment}{//\ std::frexp()\ returns\ NaNs\ and\ infinities\ unmodified,\ but\ since\ we're}}
+\DoxyCodeLine{00209\ \textcolor{comment}{//\ returning\ integers\ that\ can't\ represent\ those\ values,\ instead\ we\ return}}
+\DoxyCodeLine{00210\ \textcolor{comment}{//\ a\ shift\ of\ std::numeric\_limits<int>::max()\ for\ all\ bad\ numbers,\ with\ an\ int64}}
+\DoxyCodeLine{00211\ \textcolor{comment}{//\ result\ of\ 0\ for\ NaNs,\ std:numeric\_limits<int64\_t>::max()\ for\ +INFINITY,\ and}}
+\DoxyCodeLine{00212\ \textcolor{comment}{//\ std::numeric\_limits<int64\_t>::min()\ for\ -\/INFINITY.\ Denormalized\ inputs\ will}}
+\DoxyCodeLine{00213\ \textcolor{comment}{//\ result\ in\ return\ values\ that\ end\ up\ truncating\ some\ bits\ at\ the\ end,}}
+\DoxyCodeLine{00214\ \textcolor{comment}{//\ reflecting\ the\ loss\ of\ precision\ inherent\ in\ denormalization.}}
+\DoxyCodeLine{00215\ int64\_t\ \mbox{\hyperlink{namespacetflite_a63b68f07ebfdd0a78c33b7b8ccc25d2a}{IntegerFrExp}}(\textcolor{keywordtype}{double}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src5afb18c45f6346167aa977a363205143_a9cebfb3d6ddd692fbdd268cf4b9ad024}{input}},\ \textcolor{keywordtype}{int}*\ \mbox{\hyperlink{wm8960__regs_8h_ace4e4903c356d90d7a0e7548fc1e8b50}{shift}});}
+\DoxyCodeLine{00216\ }
+\DoxyCodeLine{00217\ \textcolor{comment}{//\ Converts\ an\ integer\ fraction\ in\ the\ format\ produced\ by\ IntegerFrExp\ (where}}
+\DoxyCodeLine{00218\ \textcolor{comment}{//\ 0x40000000\ is\ 1.0)\ and\ an\ exponent\ shift\ (between\ -\/1022\ and\ +1022)\ into\ an}}
+\DoxyCodeLine{00219\ \textcolor{comment}{//\ IEEE\ binary64\ double\ format\ result.\ The\ implementation\ uses\ only\ integer\ and}}
+\DoxyCodeLine{00220\ \textcolor{comment}{//\ bitwise\ operators,\ so\ no\ floating\ point\ hardware\ support\ or\ emulation\ is}}
+\DoxyCodeLine{00221\ \textcolor{comment}{//\ needed.\ This\ is\ here\ so\ quantized\ operations\ can\ run\ non-\/time-\/critical}}
+\DoxyCodeLine{00222\ \textcolor{comment}{//\ preparation\ calculations\ on\ microcontrollers\ and\ other\ platforms\ without}}
+\DoxyCodeLine{00223\ \textcolor{comment}{//\ float\ support.}}
+\DoxyCodeLine{00224\ \textcolor{keywordtype}{double}\ \mbox{\hyperlink{namespacetflite_abd14643ae3c30a9aa87c0cbd90a1af35}{DoubleFromFractionAndShift}}(int64\_t\ fraction,\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{wm8960__regs_8h_ace4e4903c356d90d7a0e7548fc1e8b50}{shift}});}
+\DoxyCodeLine{00225\ }
+\DoxyCodeLine{00226\ \textcolor{comment}{//\ Performs\ a\ multiplication\ of\ two\ numbers\ in\ double\ format,\ using\ only\ integer}}
+\DoxyCodeLine{00227\ \textcolor{comment}{//\ and\ bitwise\ instructions.\ This\ is\ aimed\ at\ supporting\ housekeeping\ functions}}
+\DoxyCodeLine{00228\ \textcolor{comment}{//\ for\ quantized\ operations\ on\ microcontrollers\ without\ floating-\/point\ hardware.}}
+\DoxyCodeLine{00229\ \textcolor{keywordtype}{double}\ \mbox{\hyperlink{namespacetflite_a32d8f9582a2d58f10a77f8ed085fe008}{IntegerDoubleMultiply}}(\textcolor{keywordtype}{double}\ a,\ \textcolor{keywordtype}{double}\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}});}
+\DoxyCodeLine{00230\ }
+\DoxyCodeLine{00231\ \textcolor{comment}{//\ Returns\ -\/1\ if\ a\ is\ less\ than\ b,\ 0\ if\ a\ and\ b\ are\ equal,\ and\ +1\ if\ a\ is}}
+\DoxyCodeLine{00232\ \textcolor{comment}{//\ greater\ than\ b.\ It\ is\ implemented\ using\ only\ integer\ and\ logical\ instructions}}
+\DoxyCodeLine{00233\ \textcolor{comment}{//\ so\ that\ it\ can\ be\ easily\ run\ on\ microcontrollers\ for\ quantized\ operations.}}
+\DoxyCodeLine{00234\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{namespacetflite_a96227b530e5a70b7ddc5b976f139d9e8}{IntegerDoubleCompare}}(\textcolor{keywordtype}{double}\ a,\ \textcolor{keywordtype}{double}\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}});}
+\DoxyCodeLine{00235\ }
+\DoxyCodeLine{00236\ \textcolor{comment}{//\ This\ first\ creates\ a\ multiplier\ in\ a\ double\ equivalent\ of}}
+\DoxyCodeLine{00237\ \textcolor{comment}{//\ Q(input\_integer\_bits).(31-\/input\_integer\_bits)\ representation,\ with\ extra}}
+\DoxyCodeLine{00238\ \textcolor{comment}{//\ precision\ in\ the\ double's\ fractional\ bits.\ \ It\ then\ splits\ the\ result\ into}}
+\DoxyCodeLine{00239\ \textcolor{comment}{//\ significand\ and\ exponent.}}
+\DoxyCodeLine{00240\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_adeda734f7432bab8e02bbdae75733fcb}{PreprocessSoftmaxScaling}}(\textcolor{keywordtype}{double}\ beta,\ \textcolor{keywordtype}{double}\ input\_scale,}
+\DoxyCodeLine{00241\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ input\_integer\_bits,}
+\DoxyCodeLine{00242\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ int32\_t*\ quantized\_multiplier,\ \textcolor{keywordtype}{int}*\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src07231aa9a2b381aa3c97687e9f0d823d_aba8502090d4b86973c4819d3a60ce19d}{left\_shift}});}
+\DoxyCodeLine{00243\ \textcolor{comment}{//\ Like\ PreprocessSoftmaxScaling,\ but\ inverse\ scaling\ factors\ also\ calculated.}}
+\DoxyCodeLine{00244\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_a2969682eda451a07624de14469c62530}{PreprocessLogSoftmaxScalingExp}}(\textcolor{keywordtype}{double}\ beta,\ \textcolor{keywordtype}{double}\ input\_scale,}
+\DoxyCodeLine{00245\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ input\_integer\_bits,}
+\DoxyCodeLine{00246\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ int32\_t*\ quantized\_multiplier,}
+\DoxyCodeLine{00247\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}*\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src07231aa9a2b381aa3c97687e9f0d823d_aba8502090d4b86973c4819d3a60ce19d}{left\_shift}},}
+\DoxyCodeLine{00248\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ int32\_t*\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src22d562cad0a0e140a9fafc1c6a662e94_aeaead7ad2cad2b6ef0e1c10b9d3d0e14}{reverse\_scaling\_divisor}},}
+\DoxyCodeLine{00249\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}*\ reverse\_scaling\_left\_shift);}
+\DoxyCodeLine{00250\ \textcolor{comment}{//\ Calculate\ the\ largest\ input\ that\ will\ result\ in\ a\ within-\/bounds\ intermediate}}
+\DoxyCodeLine{00251\ \textcolor{comment}{//\ result\ within\ MultiplyByQuantizedMultiplierGreaterThanOne.\ \ In\ other\ words,}}
+\DoxyCodeLine{00252\ \textcolor{comment}{//\ it\ must\ not\ overflow\ before\ we\ reduce\ the\ value\ by\ multiplication\ by\ the}}
+\DoxyCodeLine{00253\ \textcolor{comment}{//\ input\ multiplier.\ \ The\ negative\ radius\ is\ used\ as\ the\ minimum\ difference\ in}}
+\DoxyCodeLine{00254\ \textcolor{comment}{//\ Softmax.}}
+\DoxyCodeLine{00255\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{namespacetflite_a46381b633a0c5d536530e6bbe84f2c36}{CalculateInputRadius}}(\textcolor{keywordtype}{int}\ input\_integer\_bits,\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src22d562cad0a0e140a9fafc1c6a662e94_ab506e2cea5f71a0ac8c91740f2195f23}{input\_left\_shift}},}
+\DoxyCodeLine{00256\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ total\_signed\_bits\ =\ 31);}
+\DoxyCodeLine{00257\ }
+\DoxyCodeLine{00258\ \textcolor{comment}{//\ Nudges\ a\ min/max\ quantization\ range\ to\ ensure\ zero\ is\ zero.}}
+\DoxyCodeLine{00259\ \textcolor{comment}{//\ Gymnastics\ with\ nudged\ zero\ point\ is\ to\ ensure\ that\ real\ zero\ maps\ to}}
+\DoxyCodeLine{00260\ \textcolor{comment}{//\ an\ integer,\ which\ is\ required\ for\ e.g.\ zero-\/padding\ in\ convolutional\ layers.}}
+\DoxyCodeLine{00261\ \textcolor{comment}{//\ Outputs\ nudged\_min,\ nudged\_max,\ nudged\_scale.}}
+\DoxyCodeLine{00262\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_aa1944b3bdd0aab21660d175ee6e3a401}{NudgeQuantizationRange}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{float}\ \mbox{\hyperlink{common__functions_8h_ac6afabdc09a49a433ee19d8a9486056d}{min}},\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{float}\ \mbox{\hyperlink{common__functions_8h_affe776513b24d84b39af8ab0930fef7f}{max}},}
+\DoxyCodeLine{00263\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ quant\_min,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ quant\_max,}
+\DoxyCodeLine{00264\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}*\ nudged\_min,\ \textcolor{keywordtype}{float}*\ nudged\_max,}
+\DoxyCodeLine{00265\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}*\ nudged\_scale);}
+\DoxyCodeLine{00266\ }
+\DoxyCodeLine{00267\ \textcolor{comment}{//\ Fake\ quantizes\ (quantizes\ and\ dequantizes)\ input\_data\ using\ the\ scale,}}
+\DoxyCodeLine{00268\ \textcolor{comment}{//\ nudged\_min,\ and\ nudged\_max\ from\ NudgeQuantizationRange.\ This\ matches\ the\ code}}
+\DoxyCodeLine{00269\ \textcolor{comment}{//\ in\ TensorFlow's\ FakeQuantizeWithMinMaxVarsFunctor.}}
+\DoxyCodeLine{00270\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_a7fbb165ac46b135c00e9ab837541e70c}{FakeQuantizeArray}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{float}\ nudged\_scale,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{float}\ nudged\_min,}
+\DoxyCodeLine{00271\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{float}\ nudged\_max,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{float}*\ \mbox{\hyperlink{add__n__test_8cc_a5612ba79d1f0b544c7aeae4621166fea}{input\_data}},}
+\DoxyCodeLine{00272\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}*\ \mbox{\hyperlink{add__n__test_8cc_a3305b43869c4b837b0a33c12cff5069b}{output\_data}},\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{float}\ \mbox{\hyperlink{hello__world__model_8cc_a439227feff9d7f55384e8780cfc2eb82}{size}});}
+\DoxyCodeLine{00273\ }
+\DoxyCodeLine{00274\ \textcolor{comment}{//\ If\ x\ is\ approximately\ a\ power\ of\ two\ (with\ any\ positive\ or\ negative}}
+\DoxyCodeLine{00275\ \textcolor{comment}{//\ exponent),\ stores\ that\ exponent\ (i.e.\ log2(x))\ in\ *log2\_result,\ otherwise}}
+\DoxyCodeLine{00276\ \textcolor{comment}{//\ returns\ false.}}
+\DoxyCodeLine{00277\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespacetflite_a4514cc7726c2062867cf498aa19e441c}{CheckedLog2}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{float}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a6150e0515f7202e2fb518f7206ed97dc}{x}},\ \textcolor{keywordtype}{int}*\ log2\_result);}
+\DoxyCodeLine{00278\ }
+\DoxyCodeLine{00279\ \textcolor{comment}{//\ Decomposes\ an\ array\ of\ double\ multipliers\ into\ a\ Q0.31\ int32\ representation}}
+\DoxyCodeLine{00280\ \textcolor{comment}{//\ of\ its\ significand,\ and\ shift\ representation\ of\ its\ exponent.}}
+\DoxyCodeLine{00281\ \textcolor{comment}{//}}
+\DoxyCodeLine{00282\ \textcolor{comment}{//\ Handles\ an\ arbitrary\ multiplier.\ The\ 'shift'\ output-\/value\ is}}
+\DoxyCodeLine{00283\ \textcolor{comment}{//\ basically\ the\ 'floating-\/point\ exponent'\ of\ the\ multiplier:}}
+\DoxyCodeLine{00284\ \textcolor{comment}{//\ Negative\ for\ a\ right-\/shift\ (when\ the\ multiplier\ is\ <1),\ positive\ for\ a}}
+\DoxyCodeLine{00285\ \textcolor{comment}{//\ left-\/shift\ (when\ the\ multiplier\ is\ >1)}}
+\DoxyCodeLine{00286\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_a4ffbda73d66cf53e66cc23213f84bd7c}{QuantizeMultiplierArray}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{double}*\ effective\_scales,\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{hello__world__model_8cc_a439227feff9d7f55384e8780cfc2eb82}{size}},}
+\DoxyCodeLine{00287\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ int32\_t*\ effective\_scale\_significand,}
+\DoxyCodeLine{00288\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}*\ effective\_shift);}
+\DoxyCodeLine{00289\ }
+\DoxyCodeLine{00290\ \}\ \ \textcolor{comment}{//\ namespace\ tflite}}
+\DoxyCodeLine{00291\ }
+\DoxyCodeLine{00292\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ TENSORFLOW\_LITE\_KERNELS\_INTERNAL\_QUANTIZATION\_UTIL\_H\_}}
+
+\end{DoxyCode}

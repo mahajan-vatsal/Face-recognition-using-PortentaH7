@@ -1,0 +1,19 @@
+\doxysubsection{Sine Cosine}
+\hypertarget{group___sin_cos}{}\label{group___sin_cos}\index{Sine Cosine@{Sine Cosine}}
+Collaboration diagram for Sine Cosine\+:
+% FIG 0
+Computes the trigonometric sine and cosine values using a combination of table lookup and linear interpolation. There are separate functions for Q31 and floating-\/point data types. The input to the floating-\/point version is in degrees while the fixed-\/point Q31 have a scaled input with the range \mbox{[}-\/1 0.\+9999\mbox{]} mapping to \mbox{[}-\/180 +180\mbox{]} degrees.
+
+The floating point function also allows values that are out of the usual range. When this happens, the function will take extra time to adjust the input value to the range of \mbox{[}-\/180 180\mbox{]}.
+
+The result is accurate to 5 digits after the decimal point.
+
+The implementation is based on table lookup using 360 values together with linear interpolation. The steps used are\+:
+\begin{DoxyEnumerate}
+\item Calculation of the nearest integer table index.
+\item Compute the fractional portion (fract) of the input.
+\item Fetch the value corresponding to {\ttfamily index} from sine table to {\ttfamily y0} and also value from {\ttfamily index+1} to {\ttfamily y1}.
+\item Sine value is computed as {\ttfamily  \texorpdfstring{$\ast$}{*}psin\+Val = y0 + (fract \texorpdfstring{$\ast$}{*} (y1 -\/ y0))}.
+\item Fetch the value corresponding to {\ttfamily index} from cosine table to {\ttfamily y0} and also value from {\ttfamily index+1} to {\ttfamily y1}.
+\item Cosine value is computed as {\ttfamily  \texorpdfstring{$\ast$}{*}pcos\+Val = y0 + (fract \texorpdfstring{$\ast$}{*} (y1 -\/ y0))}. 
+\end{DoxyEnumerate}

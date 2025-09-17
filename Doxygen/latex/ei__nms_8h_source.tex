@@ -1,0 +1,371 @@
+\doxysection{ei\+\_\+nms.\+h}
+\hypertarget{ei__nms_8h_source}{}\label{ei__nms_8h_source}\index{Face\_Access\_inferencing/src/edge-\/impulse-\/sdk/classifier/ei\_nms.h@{Face\_Access\_inferencing/src/edge-\/impulse-\/sdk/classifier/ei\_nms.h}}
+\mbox{\hyperlink{ei__nms_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{00002\ \textcolor{comment}{\ *\ Copyright\ (c)\ 2022\ EdgeImpulse\ Inc.}}
+\DoxyCodeLine{00003\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00004\ \textcolor{comment}{\ *\ Licensed\ under\ the\ Apache\ License,\ Version\ 2.0\ (the\ "{}License"{});}}
+\DoxyCodeLine{00005\ \textcolor{comment}{\ *\ you\ may\ not\ use\ this\ file\ except\ in\ compliance\ with\ the\ License.}}
+\DoxyCodeLine{00006\ \textcolor{comment}{\ *\ You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{00007\ \textcolor{comment}{\ *\ http://www.apache.org/licenses/LICENSE-\/2.0}}
+\DoxyCodeLine{00008\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00009\ \textcolor{comment}{\ *\ Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,}}
+\DoxyCodeLine{00010\ \textcolor{comment}{\ *\ software\ distributed\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS}}
+\DoxyCodeLine{00011\ \textcolor{comment}{\ *\ IS"{}\ BASIS,\ WITHOUT\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,\ either}}
+\DoxyCodeLine{00012\ \textcolor{comment}{\ *\ express\ or\ implied.\ See\ the\ License\ for\ the\ specific\ language}}
+\DoxyCodeLine{00013\ \textcolor{comment}{\ *\ governing\ permissions\ and\ limitations\ under\ the\ License.}}
+\DoxyCodeLine{00014\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00015\ \textcolor{comment}{\ *\ SPDX-\/License-\/Identifier:\ Apache-\/2.0}}
+\DoxyCodeLine{00016\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{00017\ }
+\DoxyCodeLine{00018\ \textcolor{preprocessor}{\#ifndef\ \_EDGE\_IMPULSE\_NMS\_H\_}}
+\DoxyCodeLine{00019\ \textcolor{preprocessor}{\#define\ \_EDGE\_IMPULSE\_NMS\_H\_}}
+\DoxyCodeLine{00020\ }
+\DoxyCodeLine{00021\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{model__metadata_8h}{model-\/parameters/model\_metadata.h}}"{}}}
+\DoxyCodeLine{00022\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{ei__model__types_8h}{edge-\/impulse-\/sdk/classifier/ei\_model\_types.h}}"{}}}
+\DoxyCodeLine{00023\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{ei__classifier__types_8h}{edge-\/impulse-\/sdk/classifier/ei\_classifier\_types.h}}"{}}}
+\DoxyCodeLine{00024\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{ei__classifier__porting_8h}{edge-\/impulse-\/sdk/porting/ei\_classifier\_porting.h}}"{}}}
+\DoxyCodeLine{00025\ }
+\DoxyCodeLine{00026\ \textcolor{preprocessor}{\#if\ (EI\_CLASSIFIER\_OBJECT\_DETECTION\_LAST\_LAYER\ ==\ EI\_CLASSIFIER\_LAST\_LAYER\_YOLOV5)\ ||\ (EI\_CLASSIFIER\_OBJECT\_DETECTION\_LAST\_LAYER\ ==\ EI\_CLASSIFIER\_LAST\_LAYER\_YOLOV5\_V5\_DRPAI)\ ||\ (EI\_CLASSIFIER\_OBJECT\_DETECTION\_LAST\_LAYER\ ==\ EI\_CLASSIFIER\_LAST\_LAYER\_YOLOX)\ ||\ (EI\_CLASSIFIER\_OBJECT\_DETECTION\_LAST\_LAYER\ ==\ EI\_CLASSIFIER\_LAST\_LAYER\_TAO\_RETINANET)\ ||\ (EI\_CLASSIFIER\_OBJECT\_DETECTION\_LAST\_LAYER\ ==\ EI\_CLASSIFIER\_LAST\_LAYER\_TAO\_SSD)\ ||\ (EI\_CLASSIFIER\_OBJECT\_DETECTION\_LAST\_LAYER\ ==\ EI\_CLASSIFIER\_LAST\_LAYER\_TAO\_YOLOV3)\ ||\ (EI\_CLASSIFIER\_OBJECT\_DETECTION\_LAST\_LAYER\ ==\ EI\_CLASSIFIER\_LAST\_LAYER\_TAO\_YOLOV4)\ ||\ (EI\_CLASSIFIER\_OBJECT\_DETECTION\_LAST\_LAYER\ ==\ EI\_CLASSIFIER\_LAST\_LAYER\_YOLOV2)}}
+\DoxyCodeLine{00027\ }
+\DoxyCodeLine{00028\ \textcolor{comment}{//\ The\ code\ below\ comes\ from\ tensorflow/lite/kernels/internal/reference/non\_max\_suppression.h}}
+\DoxyCodeLine{00029\ \textcolor{comment}{//\ Copyright\ 2019\ The\ TensorFlow\ Authors.\ \ All\ rights\ reserved.}}
+\DoxyCodeLine{00030\ \textcolor{comment}{//\ Licensed\ under\ the\ Apache\ License,\ Version\ 2.0}}
+\DoxyCodeLine{00031\ \textcolor{preprocessor}{\#include\ <algorithm>}}
+\DoxyCodeLine{00032\ \textcolor{preprocessor}{\#include\ <cmath>}}
+\DoxyCodeLine{00033\ \textcolor{preprocessor}{\#include\ <deque>}}
+\DoxyCodeLine{00034\ \textcolor{preprocessor}{\#include\ <queue>}}
+\DoxyCodeLine{00035\ }
+\DoxyCodeLine{00036\ \textcolor{comment}{//\ A\ pair\ of\ diagonal\ corners\ of\ the\ box.}}
+\DoxyCodeLine{00037\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_box_corner_encoding}{BoxCornerEncoding}}\ \{}
+\DoxyCodeLine{00038\ \ \ \textcolor{keywordtype}{float}\ \mbox{\hyperlink{struct_box_corner_encoding_a580dc3b5da1c86d2f63ededa5b6497d4}{y1}};}
+\DoxyCodeLine{00039\ \ \ \textcolor{keywordtype}{float}\ \mbox{\hyperlink{struct_box_corner_encoding_aa71db7ef98027d2632c632a7b864d369}{x1}};}
+\DoxyCodeLine{00040\ \ \ \textcolor{keywordtype}{float}\ \mbox{\hyperlink{struct_box_corner_encoding_a2da034331d066a6b274afe9aeed6c7db}{y2}};}
+\DoxyCodeLine{00041\ \ \ \textcolor{keywordtype}{float}\ \mbox{\hyperlink{struct_box_corner_encoding_a53c57f9c7b8af9793040fbcb0d5659b4}{x2}};}
+\DoxyCodeLine{00042\ \};}
+\DoxyCodeLine{00043\ }
+\DoxyCodeLine{00044\ \textcolor{keyword}{static}\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{float}\ \mbox{\hyperlink{ei__nms_8h_a11acc1f11ac0a08fbbdeafa753dd5376}{ComputeIntersectionOverUnion}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{float}*\ boxes,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ i,}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ j)\ \{}
+\DoxyCodeLine{00046\ \ \ \textcolor{keyword}{auto}\&\ box\_i\ =\ \textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\mbox{\hyperlink{struct_box_corner_encoding}{BoxCornerEncoding}}*\textcolor{keyword}{>}(boxes)[i];}
+\DoxyCodeLine{00047\ \ \ \textcolor{keyword}{auto}\&\ box\_j\ =\ \textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\mbox{\hyperlink{struct_box_corner_encoding}{BoxCornerEncoding}}*\textcolor{keyword}{>}(boxes)[j];}
+\DoxyCodeLine{00048\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{float}\ box\_i\_y\_min\ =\ std::min<float>(box\_i.y1,\ box\_i.y2);}
+\DoxyCodeLine{00049\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{float}\ box\_i\_y\_max\ =\ std::max<float>(box\_i.y1,\ box\_i.y2);}
+\DoxyCodeLine{00050\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{float}\ box\_i\_x\_min\ =\ std::min<float>(box\_i.x1,\ box\_i.x2);}
+\DoxyCodeLine{00051\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{float}\ box\_i\_x\_max\ =\ std::max<float>(box\_i.x1,\ box\_i.x2);}
+\DoxyCodeLine{00052\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{float}\ box\_j\_y\_min\ =\ std::min<float>(box\_j.y1,\ box\_j.y2);}
+\DoxyCodeLine{00053\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{float}\ box\_j\_y\_max\ =\ std::max<float>(box\_j.y1,\ box\_j.y2);}
+\DoxyCodeLine{00054\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{float}\ box\_j\_x\_min\ =\ std::min<float>(box\_j.x1,\ box\_j.x2);}
+\DoxyCodeLine{00055\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{float}\ box\_j\_x\_max\ =\ std::max<float>(box\_j.x1,\ box\_j.x2);}
+\DoxyCodeLine{00056\ }
+\DoxyCodeLine{00057\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{float}\ area\_i\ =}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ (box\_i\_y\_max\ -\/\ box\_i\_y\_min)\ *\ (box\_i\_x\_max\ -\/\ box\_i\_x\_min);}
+\DoxyCodeLine{00059\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{float}\ area\_j\ =}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ (box\_j\_y\_max\ -\/\ box\_j\_y\_min)\ *\ (box\_j\_x\_max\ -\/\ box\_j\_x\_min);}
+\DoxyCodeLine{00061\ \ \ \textcolor{keywordflow}{if}\ (area\_i\ <=\ 0\ ||\ area\_j\ <=\ 0)\ \textcolor{keywordflow}{return}\ 0.0;}
+\DoxyCodeLine{00062\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{float}\ intersection\_ymax\ =\ std::min<float>(box\_i\_y\_max,\ box\_j\_y\_max);}
+\DoxyCodeLine{00063\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{float}\ intersection\_xmax\ =\ std::min<float>(box\_i\_x\_max,\ box\_j\_x\_max);}
+\DoxyCodeLine{00064\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{float}\ intersection\_ymin\ =\ std::max<float>(box\_i\_y\_min,\ box\_j\_y\_min);}
+\DoxyCodeLine{00065\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{float}\ intersection\_xmin\ =\ std::max<float>(box\_i\_x\_min,\ box\_j\_x\_min);}
+\DoxyCodeLine{00066\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{float}\ intersection\_area\ =}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ std::max<float>(intersection\_ymax\ -\/\ intersection\_ymin,\ 0.0)\ *}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ std::max<float>(intersection\_xmax\ -\/\ intersection\_xmin,\ 0.0);}
+\DoxyCodeLine{00069\ \ \ \textcolor{keywordflow}{return}\ intersection\_area\ /\ (area\_i\ +\ area\_j\ -\/\ intersection\_area);}
+\DoxyCodeLine{00070\ \}}
+\DoxyCodeLine{00071\ }
+\DoxyCodeLine{00072\ \textcolor{comment}{//\ Implements\ (Single-\/Class)\ Soft\ NMS\ (with\ Gaussian\ weighting).}}
+\DoxyCodeLine{00073\ \textcolor{comment}{//\ Supports\ functionality\ of\ TensorFlow\ ops\ NonMaxSuppressionV4\ \&\ V5.}}
+\DoxyCodeLine{00074\ \textcolor{comment}{//\ Reference:\ "{}Soft-\/NMS\ -\/\ Improving\ Object\ Detection\ With\ One\ Line\ of\ Code"{}}}
+\DoxyCodeLine{00075\ \textcolor{comment}{//\ \ \ \ \ \ \ \ \ \ \ \ [Bodla\ et\ al,\ https://arxiv.org/abs/1704.04503]}}
+\DoxyCodeLine{00076\ \textcolor{comment}{//\ Implementation\ adapted\ from\ the\ TensorFlow\ NMS\ code\ at}}
+\DoxyCodeLine{00077\ \textcolor{comment}{//\ tensorflow/core/kernels/non\_max\_suppression\_op.cc.}}
+\DoxyCodeLine{00078\ \textcolor{comment}{//}}
+\DoxyCodeLine{00079\ \textcolor{comment}{//\ Arguments:}}
+\DoxyCodeLine{00080\ \textcolor{comment}{//\ \ boxes:\ box\ encodings\ in\ format\ [y1,\ x1,\ y2,\ x2],\ shape:\ [num\_boxes,\ 4]}}
+\DoxyCodeLine{00081\ \textcolor{comment}{//\ \ num\_boxes:\ number\ of\ candidates}}
+\DoxyCodeLine{00082\ \textcolor{comment}{//\ \ scores:\ scores\ for\ candidate\ boxes,\ in\ the\ same\ order.\ shape:\ [num\_boxes]}}
+\DoxyCodeLine{00083\ \textcolor{comment}{//\ \ max\_output\_size:\ the\ maximum\ number\ of\ selections.}}
+\DoxyCodeLine{00084\ \textcolor{comment}{//\ \ iou\_threshold:\ Intersection-\/over-\/Union\ (IoU)\ threshold\ for\ NMS}}
+\DoxyCodeLine{00085\ \textcolor{comment}{//\ \ score\_threshold:\ All\ candidate\ scores\ below\ this\ value\ are\ rejected}}
+\DoxyCodeLine{00086\ \textcolor{comment}{//\ \ soft\_nms\_sigma:\ Soft\ NMS\ parameter,\ used\ for\ decaying\ scores}}
+\DoxyCodeLine{00087\ \textcolor{comment}{//}}
+\DoxyCodeLine{00088\ \textcolor{comment}{//\ Outputs:}}
+\DoxyCodeLine{00089\ \textcolor{comment}{//\ \ selected\_indices:\ all\ the\ selected\ indices.\ Underlying\ array\ must\ have}}
+\DoxyCodeLine{00090\ \textcolor{comment}{//\ \ \ \ length\ >=\ max\_output\_size.\ Cannot\ be\ null.}}
+\DoxyCodeLine{00091\ \textcolor{comment}{//\ \ selected\_scores:\ scores\ of\ selected\ indices.\ Defer\ from\ original\ value\ for}}
+\DoxyCodeLine{00092\ \textcolor{comment}{//\ \ \ \ Soft\ NMS.\ If\ not\ null,\ array\ must\ have\ length\ >=\ max\_output\_size.}}
+\DoxyCodeLine{00093\ \textcolor{comment}{//\ \ num\_selected\_indices:\ Number\ of\ selections.\ Only\ these\ many\ elements\ are}}
+\DoxyCodeLine{00094\ \textcolor{comment}{//\ \ \ \ set\ in\ selected\_indices,\ selected\_scores.\ Cannot\ be\ null.}}
+\DoxyCodeLine{00095\ \textcolor{comment}{//}}
+\DoxyCodeLine{00096\ \textcolor{comment}{//\ Assumes\ inputs\ are\ valid\ (for\ eg,\ iou\_threshold\ must\ be\ >=\ 0).}}
+\DoxyCodeLine{00097\ \textcolor{keyword}{static}\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{ei__nms_8h_a3875255bb1752c3dc2e2103daf346d43}{NonMaxSuppression}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{float}*\ boxes,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ num\_boxes,}
+\DoxyCodeLine{00098\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{float}*\ \mbox{\hyperlink{ei__fill__result__struct_8h_a834fa4160fcfdf8d438de54f4d897147}{scores}},\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ max\_output\_size,}
+\DoxyCodeLine{00099\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{float}\ iou\_threshold,}
+\DoxyCodeLine{00100\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{float}\ score\_threshold,}
+\DoxyCodeLine{00101\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{float}\ soft\_nms\_sigma,\ \textcolor{keywordtype}{int}*\ selected\_indices,}
+\DoxyCodeLine{00102\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}*\ selected\_scores,}
+\DoxyCodeLine{00103\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}*\ num\_selected\_indices)\ \{}
+\DoxyCodeLine{00104\ \ \ \textcolor{keyword}{struct\ }Candidate\ \{}
+\DoxyCodeLine{00105\ \ \ \ \ \textcolor{keywordtype}{int}\ index;}
+\DoxyCodeLine{00106\ \ \ \ \ \textcolor{keywordtype}{float}\ score;}
+\DoxyCodeLine{00107\ \ \ \ \ \textcolor{keywordtype}{int}\ suppress\_begin\_index;}
+\DoxyCodeLine{00108\ \ \ \};}
+\DoxyCodeLine{00109\ }
+\DoxyCodeLine{00110\ \ \ \textcolor{comment}{//\ Priority\ queue\ to\ hold\ candidates.}}
+\DoxyCodeLine{00111\ \ \ \textcolor{keyword}{auto}\ cmp\ =\ [](\textcolor{keyword}{const}\ Candidate\ bs\_i,\ \textcolor{keyword}{const}\ Candidate\ bs\_j)\ \{}
+\DoxyCodeLine{00112\ \ \ \ \ \textcolor{keywordflow}{return}\ bs\_i.score\ <\ bs\_j.score;}
+\DoxyCodeLine{00113\ \ \ \};}
+\DoxyCodeLine{00114\ \ \ std::priority\_queue<Candidate,\ std::deque<Candidate>,\ \textcolor{keyword}{decltype}(cmp)>}
+\DoxyCodeLine{00115\ \ \ \ \ \ \ candidate\_priority\_queue(cmp);}
+\DoxyCodeLine{00116\ \ \ \textcolor{comment}{//\ Populate\ queue\ with\ candidates\ above\ the\ score\ threshold.}}
+\DoxyCodeLine{00117\ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ num\_boxes;\ ++i)\ \{}
+\DoxyCodeLine{00118\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{ei__fill__result__struct_8h_a834fa4160fcfdf8d438de54f4d897147}{scores}}[i]\ >\ score\_threshold)\ \{}
+\DoxyCodeLine{00119\ \ \ \ \ \ \ candidate\_priority\_queue.emplace(Candidate(\{i,\ \mbox{\hyperlink{ei__fill__result__struct_8h_a834fa4160fcfdf8d438de54f4d897147}{scores}}[i],\ 0\}));}
+\DoxyCodeLine{00120\ \ \ \ \ \}}
+\DoxyCodeLine{00121\ \ \ \}}
+\DoxyCodeLine{00122\ }
+\DoxyCodeLine{00123\ \ \ *num\_selected\_indices\ =\ 0;}
+\DoxyCodeLine{00124\ \ \ \textcolor{keywordtype}{int}\ num\_outputs\ =\ std::min(\textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{int}\textcolor{keyword}{>}(candidate\_priority\_queue.size()),}
+\DoxyCodeLine{00125\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ max\_output\_size);}
+\DoxyCodeLine{00126\ \ \ \textcolor{keywordflow}{if}\ (num\_outputs\ ==\ 0)\ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00127\ }
+\DoxyCodeLine{00128\ \ \ \textcolor{comment}{//\ NMS\ loop.}}
+\DoxyCodeLine{00129\ \ \ \textcolor{keywordtype}{float}\ \mbox{\hyperlink{batch__matmul__test_8cc_ab89fe30f475eefcbf59653d919c456bd}{scale}}\ =\ 0;}
+\DoxyCodeLine{00130\ \ \ \textcolor{keywordflow}{if}\ (soft\_nms\_sigma\ >\ 0.0)\ \{}
+\DoxyCodeLine{00131\ \ \ \ \ \mbox{\hyperlink{batch__matmul__test_8cc_ab89fe30f475eefcbf59653d919c456bd}{scale}}\ =\ -\/0.5\ /\ soft\_nms\_sigma;}
+\DoxyCodeLine{00132\ \ \ \}}
+\DoxyCodeLine{00133\ \ \ \textcolor{keywordflow}{while}\ (*num\_selected\_indices\ <\ num\_outputs\ \&\&}
+\DoxyCodeLine{00134\ \ \ \ \ \ \ \ \ \ !candidate\_priority\_queue.empty())\ \{}
+\DoxyCodeLine{00135\ \ \ \ \ Candidate\ next\_candidate\ =\ candidate\_priority\_queue.top();}
+\DoxyCodeLine{00136\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{float}\ original\_score\ =\ next\_candidate.score;}
+\DoxyCodeLine{00137\ \ \ \ \ candidate\_priority\_queue.pop();}
+\DoxyCodeLine{00138\ }
+\DoxyCodeLine{00139\ \ \ \ \ \textcolor{comment}{//\ Overlapping\ boxes\ are\ likely\ to\ have\ similar\ scores,\ therefore\ we}}
+\DoxyCodeLine{00140\ \ \ \ \ \textcolor{comment}{//\ iterate\ through\ the\ previously\ selected\ boxes\ backwards\ in\ order\ to}}
+\DoxyCodeLine{00141\ \ \ \ \ \textcolor{comment}{//\ see\ if\ \`{}next\_candidate`\ should\ be\ suppressed.\ We\ also\ enforce\ a\ property}}
+\DoxyCodeLine{00142\ \ \ \ \ \textcolor{comment}{//\ that\ a\ candidate\ can\ be\ suppressed\ by\ another\ candidate\ no\ more\ than}}
+\DoxyCodeLine{00143\ \ \ \ \ \textcolor{comment}{//\ once\ via\ \`{}suppress\_begin\_index`\ which\ tracks\ which\ previously\ selected}}
+\DoxyCodeLine{00144\ \ \ \ \ \textcolor{comment}{//\ boxes\ have\ already\ been\ compared\ against\ next\_candidate\ prior\ to\ a\ given}}
+\DoxyCodeLine{00145\ \ \ \ \ \textcolor{comment}{//\ iteration.\ \ These\ previous\ selected\ boxes\ are\ then\ skipped\ over\ in\ the}}
+\DoxyCodeLine{00146\ \ \ \ \ \textcolor{comment}{//\ following\ loop.}}
+\DoxyCodeLine{00147\ \ \ \ \ \textcolor{keywordtype}{bool}\ should\_hard\_suppress\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00148\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ j\ =\ *num\_selected\_indices\ -\/\ 1;}
+\DoxyCodeLine{00149\ \ \ \ \ \ \ \ \ \ j\ >=\ next\_candidate.suppress\_begin\_index;\ -\/-\/j)\ \{}
+\DoxyCodeLine{00150\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{float}\ iou\ =\ \mbox{\hyperlink{ei__nms_8h_a11acc1f11ac0a08fbbdeafa753dd5376}{ComputeIntersectionOverUnion}}(}
+\DoxyCodeLine{00151\ \ \ \ \ \ \ \ \ \ \ boxes,\ next\_candidate.index,\ selected\_indices[j]);}
+\DoxyCodeLine{00152\ }
+\DoxyCodeLine{00153\ \ \ \ \ \ \ \textcolor{comment}{//\ First\ decide\ whether\ to\ perform\ hard\ suppression.}}
+\DoxyCodeLine{00154\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (iou\ >=\ iou\_threshold)\ \{}
+\DoxyCodeLine{00155\ \ \ \ \ \ \ \ \ should\_hard\_suppress\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00156\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00157\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00158\ }
+\DoxyCodeLine{00159\ \ \ \ \ \ \ \textcolor{comment}{//\ Suppress\ score\ if\ NMS\ sigma\ >\ 0.}}
+\DoxyCodeLine{00160\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (soft\_nms\_sigma\ >\ 0.0)\ \{}
+\DoxyCodeLine{00161\ \ \ \ \ \ \ \ \ next\_candidate.score\ =}
+\DoxyCodeLine{00162\ \ \ \ \ \ \ \ \ \ \ \ \ next\_candidate.score\ *\ std::exp(\mbox{\hyperlink{batch__matmul__test_8cc_ab89fe30f475eefcbf59653d919c456bd}{scale}}\ *\ iou\ *\ iou);}
+\DoxyCodeLine{00163\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00164\ }
+\DoxyCodeLine{00165\ \ \ \ \ \ \ \textcolor{comment}{//\ If\ score\ has\ fallen\ below\ score\_threshold,\ it\ won't\ be\ pushed\ back\ into}}
+\DoxyCodeLine{00166\ \ \ \ \ \ \ \textcolor{comment}{//\ the\ queue.}}
+\DoxyCodeLine{00167\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (next\_candidate.score\ <=\ score\_threshold)\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00168\ \ \ \ \ \}}
+\DoxyCodeLine{00169\ \ \ \ \ \textcolor{comment}{//\ If\ \`{}next\_candidate.score`\ has\ not\ dropped\ below\ \`{}score\_threshold`}}
+\DoxyCodeLine{00170\ \ \ \ \ \textcolor{comment}{//\ by\ this\ point,\ then\ we\ know\ that\ we\ went\ through\ all\ of\ the\ previous}}
+\DoxyCodeLine{00171\ \ \ \ \ \textcolor{comment}{//\ selections\ and\ can\ safely\ update\ \`{}suppress\_begin\_index`\ to}}
+\DoxyCodeLine{00172\ \ \ \ \ \textcolor{comment}{//\ \`{}selected.size()`.\ If\ on\ the\ other\ hand\ \`{}next\_candidate.score`}}
+\DoxyCodeLine{00173\ \ \ \ \ \textcolor{comment}{//\ *has*\ dropped\ below\ the\ score\ threshold,\ then\ since\ \`{}suppress\_weight`}}
+\DoxyCodeLine{00174\ \ \ \ \ \textcolor{comment}{//\ always\ returns\ values\ in\ [0,\ 1],\ further\ suppression\ by\ items\ that\ were}}
+\DoxyCodeLine{00175\ \ \ \ \ \textcolor{comment}{//\ not\ covered\ in\ the\ above\ for\ loop\ would\ not\ have\ caused\ the\ algorithm}}
+\DoxyCodeLine{00176\ \ \ \ \ \textcolor{comment}{//\ to\ select\ this\ item.\ We\ thus\ do\ the\ same\ update\ to}}
+\DoxyCodeLine{00177\ \ \ \ \ \textcolor{comment}{//\ \`{}suppress\_begin\_index`,\ but\ really,\ this\ element\ will\ not\ be\ added\ back}}
+\DoxyCodeLine{00178\ \ \ \ \ \textcolor{comment}{//\ into\ the\ priority\ queue.}}
+\DoxyCodeLine{00179\ \ \ \ \ next\_candidate.suppress\_begin\_index\ =\ *num\_selected\_indices;}
+\DoxyCodeLine{00180\ }
+\DoxyCodeLine{00181\ \ \ \ \ \textcolor{keywordflow}{if}\ (!should\_hard\_suppress)\ \{}
+\DoxyCodeLine{00182\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (next\_candidate.score\ ==\ original\_score)\ \{}
+\DoxyCodeLine{00183\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Suppression\ has\ not\ occurred,\ so\ select\ next\_candidate.}}
+\DoxyCodeLine{00184\ \ \ \ \ \ \ \ \ selected\_indices[*num\_selected\_indices]\ =\ next\_candidate.index;}
+\DoxyCodeLine{00185\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (selected\_scores)\ \{}
+\DoxyCodeLine{00186\ \ \ \ \ \ \ \ \ \ \ selected\_scores[*num\_selected\_indices]\ =\ next\_candidate.score;}
+\DoxyCodeLine{00187\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00188\ \ \ \ \ \ \ \ \ ++*num\_selected\_indices;}
+\DoxyCodeLine{00189\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00190\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ ((soft\_nms\_sigma\ >\ 0.0)\ \&\&\ (next\_candidate.score\ >\ score\_threshold))\ \{}
+\DoxyCodeLine{00191\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Soft\ suppression\ might\ have\ occurred\ and\ current\ score\ is\ still}}
+\DoxyCodeLine{00192\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ greater\ than\ score\_threshold;\ add\ next\_candidate\ back\ onto\ priority}}
+\DoxyCodeLine{00193\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ queue.}}
+\DoxyCodeLine{00194\ \ \ \ \ \ \ \ \ candidate\_priority\_queue.push(next\_candidate);}
+\DoxyCodeLine{00195\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00196\ \ \ \ \ \}}
+\DoxyCodeLine{00197\ \ \ \}}
+\DoxyCodeLine{00198\ \}}
+\DoxyCodeLine{00199\ }
+\DoxyCodeLine{00203\ \mbox{\hyperlink{group__ei__returntypes_gad9580b47a6cd5e74cfc31a03bdfecebe}{EI\_IMPULSE\_ERROR}}\ \mbox{\hyperlink{ei__nms_8h_a7094782da5838379a9c04509535d9539}{ei\_run\_nms}}(}
+\DoxyCodeLine{00204\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structei__impulse}{ei\_impulse\_t}}\ *impulse,}
+\DoxyCodeLine{00205\ \ \ \ \ std::vector<ei\_impulse\_result\_bounding\_box\_t>\ *\mbox{\hyperlink{ei__fill__result__struct_8h_a552360f0118a39d7ed26327e2d7c129d}{results}},}
+\DoxyCodeLine{00206\ \ \ \ \ \textcolor{keywordtype}{float}\ *boxes,}
+\DoxyCodeLine{00207\ \ \ \ \ \textcolor{keywordtype}{float}\ *\mbox{\hyperlink{ei__fill__result__struct_8h_a834fa4160fcfdf8d438de54f4d897147}{scores}},}
+\DoxyCodeLine{00208\ \ \ \ \ \textcolor{keywordtype}{int}\ *classes,}
+\DoxyCodeLine{00209\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ bb\_count,}
+\DoxyCodeLine{00210\ \ \ \ \ \textcolor{keywordtype}{bool}\ clip\_boxes,}
+\DoxyCodeLine{00211\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{ei__fill__result__struct_8h_a881f62341b5a41a3c5707268bd537be1}{debug}})\ \{}
+\DoxyCodeLine{00212\ }
+\DoxyCodeLine{00213\ \ \ \ \ \textcolor{keywordflow}{if}\ (bb\_count\ <\ 1)\ \{}
+\DoxyCodeLine{00214\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{ei__fill__result__struct_8h_a2fb43be102b153d659b668ad295aff40}{EI\_IMPULSE\_OK}};}
+\DoxyCodeLine{00215\ \ \ \ \ \}}
+\DoxyCodeLine{00216\ }
+\DoxyCodeLine{00217\ \ \ \ \ \textcolor{keywordtype}{int}\ *selected\_indices\ =\ (\textcolor{keywordtype}{int}*)\mbox{\hyperlink{group__ei__user__functions_ga71ecca5661ac4434a709c88e4c39b4aa}{ei\_malloc}}(1\ *\ bb\_count\ *\ \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{int}));}
+\DoxyCodeLine{00218\ \ \ \ \ \textcolor{keywordtype}{float}\ *selected\_scores\ =\ (\textcolor{keywordtype}{float}*)\mbox{\hyperlink{group__ei__user__functions_ga71ecca5661ac4434a709c88e4c39b4aa}{ei\_malloc}}(1\ *\ bb\_count\ *\ \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{float}));}
+\DoxyCodeLine{00219\ }
+\DoxyCodeLine{00220\ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{ei__fill__result__struct_8h_a834fa4160fcfdf8d438de54f4d897147}{scores}}\ ||\ !boxes\ ||\ !selected\_indices\ ||\ !selected\_scores\ ||\ !classes)\ \{}
+\DoxyCodeLine{00221\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group__ei__user__functions_ga7a6a70833407ff1870c12396ce2c4aa3}{ei\_free}}(selected\_indices);}
+\DoxyCodeLine{00222\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group__ei__user__functions_ga7a6a70833407ff1870c12396ce2c4aa3}{ei\_free}}(selected\_scores);}
+\DoxyCodeLine{00223\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{group__ei__returntypes_ggad9580b47a6cd5e74cfc31a03bdfecebead0236d7fea5da8a0c29305ab2394fa56}{EI\_IMPULSE\_OUT\_OF\_MEMORY}};}
+\DoxyCodeLine{00224\ \ \ \ \ \}}
+\DoxyCodeLine{00225\ }
+\DoxyCodeLine{00226\ \ \ \ \ \textcolor{comment}{//\ \ boxes:\ box\ encodings\ in\ format\ [y1,\ x1,\ y2,\ x2],\ shape:\ [num\_boxes,\ 4]}}
+\DoxyCodeLine{00227\ \ \ \ \ \textcolor{comment}{//\ \ num\_boxes:\ number\ of\ candidates}}
+\DoxyCodeLine{00228\ \ \ \ \ \textcolor{comment}{//\ \ scores:\ scores\ for\ candidate\ boxes,\ in\ the\ same\ order.\ shape:\ [num\_boxes]}}
+\DoxyCodeLine{00229\ \ \ \ \ \textcolor{comment}{//\ \ max\_output\_size:\ the\ maximum\ number\ of\ selections.}}
+\DoxyCodeLine{00230\ \ \ \ \ \textcolor{comment}{//\ \ iou\_threshold:\ Intersection-\/over-\/Union\ (IoU)\ threshold\ for\ NMS}}
+\DoxyCodeLine{00231\ \ \ \ \ \textcolor{comment}{//\ \ score\_threshold:\ All\ candidate\ scores\ below\ this\ value\ are\ rejected}}
+\DoxyCodeLine{00232\ \ \ \ \ \textcolor{comment}{//\ \ soft\_nms\_sigma:\ Soft\ NMS\ parameter,\ used\ for\ decaying\ scores}}
+\DoxyCodeLine{00233\ }
+\DoxyCodeLine{00234\ \ \ \ \ \textcolor{keywordtype}{int}\ num\_selected\_indices;}
+\DoxyCodeLine{00235\ }
+\DoxyCodeLine{00236\ \ \ \ \ \mbox{\hyperlink{ei__nms_8h_a3875255bb1752c3dc2e2103daf346d43}{NonMaxSuppression}}(}
+\DoxyCodeLine{00237\ \ \ \ \ \ \ \ \ (\textcolor{keyword}{const}\ \textcolor{keywordtype}{float}*)boxes,\ \textcolor{comment}{//\ boxes}}
+\DoxyCodeLine{00238\ \ \ \ \ \ \ \ \ bb\_count,\ \textcolor{comment}{//\ num\_boxes}}
+\DoxyCodeLine{00239\ \ \ \ \ \ \ \ \ (\textcolor{keyword}{const}\ \textcolor{keywordtype}{float}*)\mbox{\hyperlink{ei__fill__result__struct_8h_a834fa4160fcfdf8d438de54f4d897147}{scores}},\ \textcolor{comment}{//\ scores}}
+\DoxyCodeLine{00240\ \ \ \ \ \ \ \ \ bb\_count,\ \textcolor{comment}{//\ max\_output\_size}}
+\DoxyCodeLine{00241\ \ \ \ \ \ \ \ \ impulse-\/>\mbox{\hyperlink{structei__impulse_aef827f36f017a1cb762be74845651638}{object\_detection\_nms}}.\mbox{\hyperlink{structei__object__detection__nms__config__t_a4d7fd773eb07c8d16e3730b6790967e5}{iou\_threshold}},\ \textcolor{comment}{//\ iou\_threshold}}
+\DoxyCodeLine{00242\ \ \ \ \ \ \ \ \ impulse-\/>\mbox{\hyperlink{structei__impulse_aef827f36f017a1cb762be74845651638}{object\_detection\_nms}}.\mbox{\hyperlink{structei__object__detection__nms__config__t_a943c972b0b47d30819a6917472b5d19b}{confidence\_threshold}},\ \textcolor{comment}{//\ score\_threshold}}
+\DoxyCodeLine{00243\ \ \ \ \ \ \ \ \ 0.0f,\ \textcolor{comment}{//\ soft\_nms\_sigma}}
+\DoxyCodeLine{00244\ \ \ \ \ \ \ \ \ selected\_indices,}
+\DoxyCodeLine{00245\ \ \ \ \ \ \ \ \ selected\_scores,}
+\DoxyCodeLine{00246\ \ \ \ \ \ \ \ \ \&num\_selected\_indices);}
+\DoxyCodeLine{00247\ }
+\DoxyCodeLine{00248\ \ \ \ \ std::vector<ei\_impulse\_result\_bounding\_box\_t>\ new\_results;}
+\DoxyCodeLine{00249\ }
+\DoxyCodeLine{00250\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ ix\ =\ 0;\ ix\ <\ (size\_t)num\_selected\_indices;\ ix++)\ \{}
+\DoxyCodeLine{00251\ }
+\DoxyCodeLine{00252\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ out\_ix\ =\ selected\_indices[ix];}
+\DoxyCodeLine{00253\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structei__impulse__result__bounding__box__t}{ei\_impulse\_result\_bounding\_box\_t}}\ bb;}
+\DoxyCodeLine{00254\ \ \ \ \ \ \ \ \ bb.\mbox{\hyperlink{structei__impulse__result__bounding__box__t_ac647acf95b521ebf8927391f008c7357}{label}}\ \ =\ impulse-\/>\mbox{\hyperlink{structei__impulse_a607812514059117270a76019baa13b4a}{categories}}[classes[out\_ix]];}
+\DoxyCodeLine{00255\ \ \ \ \ \ \ \ \ bb.\mbox{\hyperlink{structei__impulse__result__bounding__box__t_a10e03a8eb4466e3ae15127a9c410cb27}{value}}\ \ =\ selected\_scores[ix];}
+\DoxyCodeLine{00256\ }
+\DoxyCodeLine{00257\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a5c6190dc7aa1bd7aafb9592a64f7046d}{ymin}}\ =\ boxes[(out\_ix\ *\ 4)\ +\ 0];}
+\DoxyCodeLine{00258\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a058f249a5e6d20724cb0784b40a183e8}{xmin}}\ =\ boxes[(out\_ix\ *\ 4)\ +\ 1];}
+\DoxyCodeLine{00259\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_acee1a082369857c7ee64924a0d9bc706}{ymax}}\ =\ boxes[(out\_ix\ *\ 4)\ +\ 2];}
+\DoxyCodeLine{00260\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a9c42f51718ed192ed1841a53d2b0e507}{xmax}}\ =\ boxes[(out\_ix\ *\ 4)\ +\ 3];}
+\DoxyCodeLine{00261\ }
+\DoxyCodeLine{00262\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (clip\_boxes)\ \{}
+\DoxyCodeLine{00263\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a5c6190dc7aa1bd7aafb9592a64f7046d}{ymin}}\ =\ std::min(std::max(\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a5c6190dc7aa1bd7aafb9592a64f7046d}{ymin}},\ 0.0f),\ (\textcolor{keywordtype}{float})impulse-\/>\mbox{\hyperlink{structei__impulse_a5942f00730eec808be7862623464a3b6}{input\_height}});}
+\DoxyCodeLine{00264\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a058f249a5e6d20724cb0784b40a183e8}{xmin}}\ =\ std::min(std::max(\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a058f249a5e6d20724cb0784b40a183e8}{xmin}},\ 0.0f),\ (\textcolor{keywordtype}{float})impulse-\/>\mbox{\hyperlink{structei__impulse_ae60988f0fadb5594fb6a7f00ef9f075a}{input\_width}});}
+\DoxyCodeLine{00265\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_acee1a082369857c7ee64924a0d9bc706}{ymax}}\ =\ std::min(std::max(\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_acee1a082369857c7ee64924a0d9bc706}{ymax}},\ 0.0f),\ (\textcolor{keywordtype}{float})impulse-\/>\mbox{\hyperlink{structei__impulse_a5942f00730eec808be7862623464a3b6}{input\_height}});}
+\DoxyCodeLine{00266\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a9c42f51718ed192ed1841a53d2b0e507}{xmax}}\ =\ std::min(std::max(\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a9c42f51718ed192ed1841a53d2b0e507}{xmax}},\ 0.0f),\ (\textcolor{keywordtype}{float})impulse-\/>\mbox{\hyperlink{structei__impulse_ae60988f0fadb5594fb6a7f00ef9f075a}{input\_width}});}
+\DoxyCodeLine{00267\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00268\ }
+\DoxyCodeLine{00269\ \ \ \ \ \ \ \ \ bb.\mbox{\hyperlink{structei__impulse__result__bounding__box__t_a46d1af783fdb0bfb2e207bbaf6063ed4}{y}}\ \ \ \ \ \ =\ \textcolor{keyword}{static\_cast<}uint32\_t\textcolor{keyword}{>}(\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a5c6190dc7aa1bd7aafb9592a64f7046d}{ymin}});}
+\DoxyCodeLine{00270\ \ \ \ \ \ \ \ \ bb.\mbox{\hyperlink{structei__impulse__result__bounding__box__t_aec938e40bb68a95f8a5b5e51d29f3a7b}{x}}\ \ \ \ \ \ =\ \textcolor{keyword}{static\_cast<}uint32\_t\textcolor{keyword}{>}(\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a058f249a5e6d20724cb0784b40a183e8}{xmin}});}
+\DoxyCodeLine{00271\ \ \ \ \ \ \ \ \ bb.\mbox{\hyperlink{structei__impulse__result__bounding__box__t_affdd4d311dc7a74ead2c9cf4554b2204}{height}}\ =\ \textcolor{keyword}{static\_cast<}uint32\_t\textcolor{keyword}{>}(\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_acee1a082369857c7ee64924a0d9bc706}{ymax}})\ -\/\ bb.\mbox{\hyperlink{structei__impulse__result__bounding__box__t_a46d1af783fdb0bfb2e207bbaf6063ed4}{y}};}
+\DoxyCodeLine{00272\ \ \ \ \ \ \ \ \ bb.\mbox{\hyperlink{structei__impulse__result__bounding__box__t_a17a605f30dc677e1441b66d38b9e4ade}{width}}\ \ =\ \textcolor{keyword}{static\_cast<}uint32\_t\textcolor{keyword}{>}(\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a9c42f51718ed192ed1841a53d2b0e507}{xmax}})\ -\/\ bb.\mbox{\hyperlink{structei__impulse__result__bounding__box__t_aec938e40bb68a95f8a5b5e51d29f3a7b}{x}};}
+\DoxyCodeLine{00273\ \ \ \ \ \ \ \ \ new\_results.push\_back(bb);}
+\DoxyCodeLine{00274\ }
+\DoxyCodeLine{00275\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{ei__fill__result__struct_8h_a881f62341b5a41a3c5707268bd537be1}{debug}})\ \{}
+\DoxyCodeLine{00276\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}Found\ bb\ with\ label\ \%s\(\backslash\)n"{}},\ bb.\mbox{\hyperlink{structei__impulse__result__bounding__box__t_ac647acf95b521ebf8927391f008c7357}{label}});}
+\DoxyCodeLine{00277\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00278\ }
+\DoxyCodeLine{00279\ \ \ \ \ \}}
+\DoxyCodeLine{00280\ }
+\DoxyCodeLine{00281\ \ \ \ \ \mbox{\hyperlink{ei__fill__result__struct_8h_a552360f0118a39d7ed26327e2d7c129d}{results}}-\/>clear();}
+\DoxyCodeLine{00282\ }
+\DoxyCodeLine{00283\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ ix\ =\ 0;\ ix\ <\ new\_results.size();\ ix++)\ \{}
+\DoxyCodeLine{00284\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__fill__result__struct_8h_a552360f0118a39d7ed26327e2d7c129d}{results}}-\/>push\_back(new\_results[ix]);}
+\DoxyCodeLine{00285\ \ \ \ \ \}}
+\DoxyCodeLine{00286\ }
+\DoxyCodeLine{00287\ \ \ \ \ \mbox{\hyperlink{group__ei__user__functions_ga7a6a70833407ff1870c12396ce2c4aa3}{ei\_free}}(selected\_indices);}
+\DoxyCodeLine{00288\ \ \ \ \ \mbox{\hyperlink{group__ei__user__functions_ga7a6a70833407ff1870c12396ce2c4aa3}{ei\_free}}(selected\_scores);}
+\DoxyCodeLine{00289\ }
+\DoxyCodeLine{00290\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{ei__fill__result__struct_8h_a2fb43be102b153d659b668ad295aff40}{EI\_IMPULSE\_OK}};}
+\DoxyCodeLine{00291\ }
+\DoxyCodeLine{00292\ \}}
+\DoxyCodeLine{00293\ }
+\DoxyCodeLine{00297\ \mbox{\hyperlink{group__ei__returntypes_gad9580b47a6cd5e74cfc31a03bdfecebe}{EI\_IMPULSE\_ERROR}}\ \mbox{\hyperlink{ei__nms_8h_a7094782da5838379a9c04509535d9539}{ei\_run\_nms}}(}
+\DoxyCodeLine{00298\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structei__impulse}{ei\_impulse\_t}}\ *impulse,}
+\DoxyCodeLine{00299\ \ \ \ \ std::vector<ei\_impulse\_result\_bounding\_box\_t>\ *\mbox{\hyperlink{ei__fill__result__struct_8h_a552360f0118a39d7ed26327e2d7c129d}{results}},}
+\DoxyCodeLine{00300\ \ \ \ \ \textcolor{keywordtype}{bool}\ clip\_boxes,}
+\DoxyCodeLine{00301\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{ei__fill__result__struct_8h_a881f62341b5a41a3c5707268bd537be1}{debug}})\ \{}
+\DoxyCodeLine{00302\ }
+\DoxyCodeLine{00303\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ bb\_count\ =\ 0;}
+\DoxyCodeLine{00304\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ ix\ =\ 0;\ ix\ <\ \mbox{\hyperlink{ei__fill__result__struct_8h_a552360f0118a39d7ed26327e2d7c129d}{results}}-\/>size();\ ix++)\ \{}
+\DoxyCodeLine{00305\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ bb\ =\ \mbox{\hyperlink{ei__fill__result__struct_8h_a552360f0118a39d7ed26327e2d7c129d}{results}}-\/>at(ix);}
+\DoxyCodeLine{00306\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (bb.value\ ==\ 0)\ \{}
+\DoxyCodeLine{00307\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{continue};}
+\DoxyCodeLine{00308\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00309\ \ \ \ \ \ \ \ \ bb\_count++;}
+\DoxyCodeLine{00310\ \ \ \ \ \}}
+\DoxyCodeLine{00311\ }
+\DoxyCodeLine{00312\ \ \ \ \ \textcolor{keywordflow}{if}\ (bb\_count\ <\ 1)\ \{}
+\DoxyCodeLine{00313\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{ei__fill__result__struct_8h_a2fb43be102b153d659b668ad295aff40}{EI\_IMPULSE\_OK}};}
+\DoxyCodeLine{00314\ \ \ \ \ \}}
+\DoxyCodeLine{00315\ }
+\DoxyCodeLine{00316\ \ \ \ \ \textcolor{keywordtype}{float}\ *boxes\ =\ (\textcolor{keywordtype}{float}*)\mbox{\hyperlink{group__ei__user__functions_ga71ecca5661ac4434a709c88e4c39b4aa}{ei\_malloc}}(4\ *\ bb\_count\ *\ \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{float}));}
+\DoxyCodeLine{00317\ \ \ \ \ \textcolor{keywordtype}{float}\ *\mbox{\hyperlink{ei__fill__result__struct_8h_a834fa4160fcfdf8d438de54f4d897147}{scores}}\ =\ (\textcolor{keywordtype}{float}*)\mbox{\hyperlink{group__ei__user__functions_ga71ecca5661ac4434a709c88e4c39b4aa}{ei\_malloc}}(1\ *\ bb\_count\ *\ \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{float}));}
+\DoxyCodeLine{00318\ \ \ \ \ \textcolor{keywordtype}{int}\ *classes\ =\ (\textcolor{keywordtype}{int}*)\ \mbox{\hyperlink{group__ei__user__functions_ga71ecca5661ac4434a709c88e4c39b4aa}{ei\_malloc}}(bb\_count\ *\ \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{int}));}
+\DoxyCodeLine{00319\ }
+\DoxyCodeLine{00320\ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{ei__fill__result__struct_8h_a834fa4160fcfdf8d438de54f4d897147}{scores}}\ ||\ !boxes\ ||\ !classes)\ \{}
+\DoxyCodeLine{00321\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group__ei__user__functions_ga7a6a70833407ff1870c12396ce2c4aa3}{ei\_free}}(boxes);}
+\DoxyCodeLine{00322\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group__ei__user__functions_ga7a6a70833407ff1870c12396ce2c4aa3}{ei\_free}}(\mbox{\hyperlink{ei__fill__result__struct_8h_a834fa4160fcfdf8d438de54f4d897147}{scores}});}
+\DoxyCodeLine{00323\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group__ei__user__functions_ga7a6a70833407ff1870c12396ce2c4aa3}{ei\_free}}(classes);}
+\DoxyCodeLine{00324\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{group__ei__returntypes_ggad9580b47a6cd5e74cfc31a03bdfecebead0236d7fea5da8a0c29305ab2394fa56}{EI\_IMPULSE\_OUT\_OF\_MEMORY}};}
+\DoxyCodeLine{00325\ \ \ \ \ \}}
+\DoxyCodeLine{00326\ }
+\DoxyCodeLine{00327\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ box\_ix\ =\ 0;}
+\DoxyCodeLine{00328\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ ix\ =\ 0;\ ix\ <\ \mbox{\hyperlink{ei__fill__result__struct_8h_a552360f0118a39d7ed26327e2d7c129d}{results}}-\/>size();\ ix++)\ \{}
+\DoxyCodeLine{00329\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ bb\ =\ \mbox{\hyperlink{ei__fill__result__struct_8h_a552360f0118a39d7ed26327e2d7c129d}{results}}-\/>at(ix);}
+\DoxyCodeLine{00330\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (bb.value\ ==\ 0)\ \{}
+\DoxyCodeLine{00331\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{continue};}
+\DoxyCodeLine{00332\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00333\ \ \ \ \ \ \ \ \ boxes[(box\_ix\ *\ 4)\ +\ 0]\ =\ bb.y;}
+\DoxyCodeLine{00334\ \ \ \ \ \ \ \ \ boxes[(box\_ix\ *\ 4)\ +\ 1]\ =\ bb.x;}
+\DoxyCodeLine{00335\ \ \ \ \ \ \ \ \ boxes[(box\_ix\ *\ 4)\ +\ 2]\ =\ bb.y\ +\ bb.height;}
+\DoxyCodeLine{00336\ \ \ \ \ \ \ \ \ boxes[(box\_ix\ *\ 4)\ +\ 3]\ =\ bb.x\ +\ bb.width;}
+\DoxyCodeLine{00337\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__fill__result__struct_8h_a834fa4160fcfdf8d438de54f4d897147}{scores}}[box\_ix]\ =\ bb.value;}
+\DoxyCodeLine{00338\ }
+\DoxyCodeLine{00339\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ j\ =\ 0;\ j\ <\ impulse-\/>\mbox{\hyperlink{structei__impulse_a36de79e491fb2b96379e4dc3c384c436}{label\_count}};\ j++)\ \{}
+\DoxyCodeLine{00340\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (strcmp(impulse-\/>\mbox{\hyperlink{structei__impulse_a607812514059117270a76019baa13b4a}{categories}}[j],\ bb.label)\ ==\ 0)}
+\DoxyCodeLine{00341\ \ \ \ \ \ \ \ \ \ \ classes[box\_ix]\ =\ j;}
+\DoxyCodeLine{00342\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00343\ }
+\DoxyCodeLine{00344\ \ \ \ \ \ \ \ \ box\_ix++;}
+\DoxyCodeLine{00345\ \ \ \ \ \}}
+\DoxyCodeLine{00346\ }
+\DoxyCodeLine{00347\ \ \ \ \ \mbox{\hyperlink{group__ei__returntypes_gad9580b47a6cd5e74cfc31a03bdfecebe}{EI\_IMPULSE\_ERROR}}\ nms\_res\ =\ \mbox{\hyperlink{ei__nms_8h_a7094782da5838379a9c04509535d9539}{ei\_run\_nms}}(impulse,\ \mbox{\hyperlink{ei__fill__result__struct_8h_a552360f0118a39d7ed26327e2d7c129d}{results}},}
+\DoxyCodeLine{00348\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ boxes,\ \mbox{\hyperlink{ei__fill__result__struct_8h_a834fa4160fcfdf8d438de54f4d897147}{scores}},}
+\DoxyCodeLine{00349\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ classes,\ bb\_count,}
+\DoxyCodeLine{00350\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ clip\_boxes,}
+\DoxyCodeLine{00351\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__fill__result__struct_8h_a881f62341b5a41a3c5707268bd537be1}{debug}});}
+\DoxyCodeLine{00352\ }
+\DoxyCodeLine{00353\ }
+\DoxyCodeLine{00354\ \ \ \ \ \mbox{\hyperlink{group__ei__user__functions_ga7a6a70833407ff1870c12396ce2c4aa3}{ei\_free}}(boxes);}
+\DoxyCodeLine{00355\ \ \ \ \ \mbox{\hyperlink{group__ei__user__functions_ga7a6a70833407ff1870c12396ce2c4aa3}{ei\_free}}(\mbox{\hyperlink{ei__fill__result__struct_8h_a834fa4160fcfdf8d438de54f4d897147}{scores}});}
+\DoxyCodeLine{00356\ \ \ \ \ \mbox{\hyperlink{group__ei__user__functions_ga7a6a70833407ff1870c12396ce2c4aa3}{ei\_free}}(classes);}
+\DoxyCodeLine{00357\ }
+\DoxyCodeLine{00358\ \ \ \ \ \textcolor{keywordflow}{return}\ nms\_res;}
+\DoxyCodeLine{00359\ }
+\DoxyCodeLine{00360\ \}}
+\DoxyCodeLine{00361\ }
+\DoxyCodeLine{00365\ \mbox{\hyperlink{group__ei__returntypes_gad9580b47a6cd5e74cfc31a03bdfecebe}{EI\_IMPULSE\_ERROR}}\ \mbox{\hyperlink{ei__nms_8h_a7094782da5838379a9c04509535d9539}{ei\_run\_nms}}(}
+\DoxyCodeLine{00366\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structei__impulse}{ei\_impulse\_t}}\ *impulse,}
+\DoxyCodeLine{00367\ \ \ \ \ std::vector<ei\_impulse\_result\_bounding\_box\_t>\ *\mbox{\hyperlink{ei__fill__result__struct_8h_a552360f0118a39d7ed26327e2d7c129d}{results}},}
+\DoxyCodeLine{00368\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{ei__fill__result__struct_8h_a881f62341b5a41a3c5707268bd537be1}{debug}}\ =\ \textcolor{keyword}{false})\ \{}
+\DoxyCodeLine{00369\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{ei__nms_8h_a7094782da5838379a9c04509535d9539}{ei\_run\_nms}}(impulse,\ \mbox{\hyperlink{ei__fill__result__struct_8h_a552360f0118a39d7ed26327e2d7c129d}{results}},\ \textcolor{keyword}{true},\ \mbox{\hyperlink{ei__fill__result__struct_8h_a881f62341b5a41a3c5707268bd537be1}{debug}});}
+\DoxyCodeLine{00370\ \}}
+\DoxyCodeLine{00371\ }
+\DoxyCodeLine{00372\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ \#if\ (EI\_CLASSIFIER\_OBJECT\_DETECTION\_LAST\_LAYER\ ==\ EI\_CLASSIFIER\_LAST\_LAYER\_YOLOV5)\ ||\ (EI\_CLASSIFIER\_OBJECT\_DETECTION\_LAST\_LAYER\ ==\ EI\_CLASSIFIER\_LAST\_LAYER\_YOLOV5\_V5\_DRPAI)\ ||\ (EI\_CLASSIFIER\_OBJECT\_DETECTION\_LAST\_LAYER\ ==\ EI\_CLASSIFIER\_LAST\_LAYER\_YOLOX)\ ||\ (EI\_CLASSIFIER\_OBJECT\_DETECTION\_LAST\_LAYER\ ==\ EI\_CLASSIFIER\_LAST\_LAYER\_TAO\_RETINANET)\ ||\ (EI\_CLASSIFIER\_OBJECT\_DETECTION\_LAST\_LAYER\ ==\ EI\_CLASSIFIER\_LAST\_LAYER\_TAO\_SSD)\ ||\ (EI\_CLASSIFIER\_OBJECT\_DETECTION\_LAST\_LAYER\ ==\ EI\_CLASSIFIER\_LAST\_LAYER\_TAO\_YOLOV3)\ ||\ (EI\_CLASSIFIER\_OBJECT\_DETECTION\_LAST\_LAYER\ ==\ EI\_CLASSIFIER\_LAST\_LAYER\_TAO\_YOLOV4)}}
+\DoxyCodeLine{00373\ }
+\DoxyCodeLine{00374\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ \_EDGE\_IMPULSE\_NMS\_H\_}}
+
+\end{DoxyCode}

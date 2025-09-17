@@ -1,0 +1,140 @@
+\doxysection{fb\+\_\+buffer.\+h}
+\hypertarget{fb__buffer_8h_source}{}\label{fb__buffer_8h_source}\index{Face\_Access\_inferencing/src/edge-\/impulse-\/sdk/third\_party/flatbuffers/include/flatbuffers/fb\_buffer.h@{Face\_Access\_inferencing/src/edge-\/impulse-\/sdk/third\_party/flatbuffers/include/flatbuffers/fb\_buffer.h}}
+\mbox{\hyperlink{fb__buffer_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{00002\ \textcolor{comment}{\ *\ Copyright\ 2021\ Google\ Inc.\ All\ rights\ reserved.}}
+\DoxyCodeLine{00003\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00004\ \textcolor{comment}{\ *\ Licensed\ under\ the\ Apache\ License,\ Version\ 2.0\ (the\ "{}License"{});}}
+\DoxyCodeLine{00005\ \textcolor{comment}{\ *\ you\ may\ not\ use\ this\ file\ except\ in\ compliance\ with\ the\ License.}}
+\DoxyCodeLine{00006\ \textcolor{comment}{\ *\ You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{00007\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00008\ \textcolor{comment}{\ *\ \ \ \ \ http://www.apache.org/licenses/LICENSE-\/2.0}}
+\DoxyCodeLine{00009\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00010\ \textcolor{comment}{\ *\ Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ software}}
+\DoxyCodeLine{00011\ \textcolor{comment}{\ *\ distributed\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,}}
+\DoxyCodeLine{00012\ \textcolor{comment}{\ *\ WITHOUT\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,\ either\ express\ or\ implied.}}
+\DoxyCodeLine{00013\ \textcolor{comment}{\ *\ See\ the\ License\ for\ the\ specific\ language\ governing\ permissions\ and}}
+\DoxyCodeLine{00014\ \textcolor{comment}{\ *\ limitations\ under\ the\ License.}}
+\DoxyCodeLine{00015\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{00016\ }
+\DoxyCodeLine{00017\ \textcolor{preprocessor}{\#ifndef\ FLATBUFFERS\_BUFFER\_H\_}}
+\DoxyCodeLine{00018\ \textcolor{preprocessor}{\#define\ FLATBUFFERS\_BUFFER\_H\_}}
+\DoxyCodeLine{00019\ }
+\DoxyCodeLine{00020\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{fb__base_8h}{edge-\/impulse-\/sdk/third\_party/flatbuffers/include/flatbuffers/fb\_base.h}}"{}}}
+\DoxyCodeLine{00021\ }
+\DoxyCodeLine{00022\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespaceflatbuffers}{flatbuffers}}\ \{}
+\DoxyCodeLine{00023\ }
+\DoxyCodeLine{00024\ \textcolor{comment}{//\ Wrapper\ for\ uoffset\_t\ to\ allow\ safe\ template\ specialization.}}
+\DoxyCodeLine{00025\ \textcolor{comment}{//\ Value\ is\ allowed\ to\ be\ 0\ to\ indicate\ a\ null\ object\ (see\ e.g.\ AddOffset).}}
+\DoxyCodeLine{00026\ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{namespacetflite_ad093cc94812e4efd6794e4d9ab430305}{Offset}}\ \{}
+\DoxyCodeLine{00027\ \ \ uoffset\_t\ o;}
+\DoxyCodeLine{00028\ \ \ \mbox{\hyperlink{namespacetflite_ad093cc94812e4efd6794e4d9ab430305}{Offset}}()\ :\ o(0)\ \{\}}
+\DoxyCodeLine{00029\ \ \ \mbox{\hyperlink{namespacetflite_ad093cc94812e4efd6794e4d9ab430305}{Offset}}(uoffset\_t\ \_o)\ :\ o(\_o)\ \{\}}
+\DoxyCodeLine{00030\ \ \ Offset<void>\ Union()\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ Offset<void>(o);\ \}}
+\DoxyCodeLine{00031\ \ \ \textcolor{keywordtype}{bool}\ IsNull()\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ !o;\ \}}
+\DoxyCodeLine{00032\ \};}
+\DoxyCodeLine{00033\ }
+\DoxyCodeLine{00034\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ EndianCheck()\ \{}
+\DoxyCodeLine{00035\ \ \ \textcolor{keywordtype}{int}\ endiantest\ =\ 1;}
+\DoxyCodeLine{00036\ \ \ \textcolor{comment}{//\ If\ this\ fails,\ see\ FLATBUFFERS\_LITTLEENDIAN\ above.}}
+\DoxyCodeLine{00037\ \ \ \mbox{\hyperlink{base_8h_ab2116a3957cb3c19761609ea7fd796fe}{FLATBUFFERS\_ASSERT}}(*\textcolor{keyword}{reinterpret\_cast<}\textcolor{keywordtype}{char}\ *\textcolor{keyword}{>}(\&endiantest)\ ==}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ FLATBUFFERS\_LITTLEENDIAN);}
+\DoxyCodeLine{00039\ \ \ (void)endiantest;}
+\DoxyCodeLine{00040\ \}}
+\DoxyCodeLine{00041\ }
+\DoxyCodeLine{00042\ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>\ FLATBUFFERS\_CONSTEXPR\ \textcolor{keywordtype}{size\_t}\ AlignOf()\ \{}
+\DoxyCodeLine{00043\ \ \ \textcolor{comment}{//\ clang-\/format\ off}}
+\DoxyCodeLine{00044\ \textcolor{preprocessor}{\ \ \#ifdef\ \_MSC\_VER}}
+\DoxyCodeLine{00045\ \ \ \ \ \textcolor{keywordflow}{return}\ \_\_alignof(T);}
+\DoxyCodeLine{00046\ \textcolor{preprocessor}{\ \ \#else}}
+\DoxyCodeLine{00047\ \textcolor{preprocessor}{\ \ \ \ \#ifndef\ alignof}}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \_\_alignof\_\_(T);}
+\DoxyCodeLine{00049\ \textcolor{preprocessor}{\ \ \ \ \#else}}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{alignof}(T);}
+\DoxyCodeLine{00051\ \textcolor{preprocessor}{\ \ \ \ \#endif}}
+\DoxyCodeLine{00052\ \textcolor{preprocessor}{\ \ \#endif}}
+\DoxyCodeLine{00053\ \ \ \textcolor{comment}{//\ clang-\/format\ on}}
+\DoxyCodeLine{00054\ \}}
+\DoxyCodeLine{00055\ }
+\DoxyCodeLine{00056\ \textcolor{comment}{//\ Lexicographically\ compare\ two\ strings\ (possibly\ containing\ nulls),\ and}}
+\DoxyCodeLine{00057\ \textcolor{comment}{//\ return\ true\ if\ the\ first\ is\ less\ than\ the\ second.}}
+\DoxyCodeLine{00058\ \textcolor{keyword}{static}\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{bool}\ StringLessThan(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *a\_data,\ uoffset\_t\ a\_size,}
+\DoxyCodeLine{00059\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *b\_data,\ uoffset\_t\ b\_size)\ \{}
+\DoxyCodeLine{00060\ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ cmp\ =\ memcmp(a\_data,\ b\_data,\ (std::min)(a\_size,\ b\_size));}
+\DoxyCodeLine{00061\ \ \ \textcolor{keywordflow}{return}\ cmp\ ==\ 0\ ?\ a\_size\ <\ b\_size\ :\ cmp\ <\ 0;}
+\DoxyCodeLine{00062\ \}}
+\DoxyCodeLine{00063\ }
+\DoxyCodeLine{00064\ \textcolor{comment}{//\ When\ we\ read\ serialized\ data\ from\ memory,\ in\ the\ case\ of\ most\ scalars,}}
+\DoxyCodeLine{00065\ \textcolor{comment}{//\ we\ want\ to\ just\ read\ T,\ but\ in\ the\ case\ of\ Offset,\ we\ want\ to\ actually}}
+\DoxyCodeLine{00066\ \textcolor{comment}{//\ perform\ the\ indirection\ and\ return\ a\ pointer.}}
+\DoxyCodeLine{00067\ \textcolor{comment}{//\ The\ template\ specialization\ below\ does\ just\ that.}}
+\DoxyCodeLine{00068\ \textcolor{comment}{//\ It\ is\ wrapped\ in\ a\ struct\ since\ function\ templates\ can't\ overload\ on\ the}}
+\DoxyCodeLine{00069\ \textcolor{comment}{//\ return\ type\ like\ this.}}
+\DoxyCodeLine{00070\ \textcolor{comment}{//\ The\ typedef\ is\ for\ the\ convenience\ of\ callers\ of\ this\ function}}
+\DoxyCodeLine{00071\ \textcolor{comment}{//\ (avoiding\ the\ need\ for\ a\ trailing\ return\ decltype)}}
+\DoxyCodeLine{00072\ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>\ \textcolor{keyword}{struct\ }IndirectHelper\ \{}
+\DoxyCodeLine{00073\ \ \ \textcolor{keyword}{typedef}\ T\ return\_type;}
+\DoxyCodeLine{00074\ \ \ \textcolor{keyword}{typedef}\ T\ mutable\_return\_type;}
+\DoxyCodeLine{00075\ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ element\_stride\ =\ \textcolor{keyword}{sizeof}(T);}
+\DoxyCodeLine{00076\ \ \ \textcolor{keyword}{static}\ return\_type\ Read(\textcolor{keyword}{const}\ uint8\_t\ *p,\ uoffset\_t\ i)\ \{}
+\DoxyCodeLine{00077\ \ \ \ \ \textcolor{keywordflow}{return}\ EndianScalar((\textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }T\ *\textcolor{keyword}{>}(p))[i]);}
+\DoxyCodeLine{00078\ \ \ \}}
+\DoxyCodeLine{00079\ \};}
+\DoxyCodeLine{00080\ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>\ \textcolor{keyword}{struct\ }IndirectHelper<\mbox{\hyperlink{namespacetflite_ad093cc94812e4efd6794e4d9ab430305}{Offset}}<T>>\ \{}
+\DoxyCodeLine{00081\ \ \ \textcolor{keyword}{typedef}\ \textcolor{keyword}{const}\ T\ *return\_type;}
+\DoxyCodeLine{00082\ \ \ \textcolor{keyword}{typedef}\ T\ *mutable\_return\_type;}
+\DoxyCodeLine{00083\ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ element\_stride\ =\ \textcolor{keyword}{sizeof}(uoffset\_t);}
+\DoxyCodeLine{00084\ \ \ \textcolor{keyword}{static}\ return\_type\ Read(\textcolor{keyword}{const}\ uint8\_t\ *p,\ uoffset\_t\ i)\ \{}
+\DoxyCodeLine{00085\ \ \ \ \ p\ +=\ i\ *\ \textcolor{keyword}{sizeof}(uoffset\_t);}
+\DoxyCodeLine{00086\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{reinterpret\_cast<}return\_type\textcolor{keyword}{>}(p\ +\ ReadScalar<uoffset\_t>(p));}
+\DoxyCodeLine{00087\ \ \ \}}
+\DoxyCodeLine{00088\ \};}
+\DoxyCodeLine{00089\ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>\ \textcolor{keyword}{struct\ }IndirectHelper<\mbox{\hyperlink{namespacecreate__size__log_a6cb70a61389c2f433e9c103a9f685a45}{const}}\ T\ *>\ \{}
+\DoxyCodeLine{00090\ \ \ \textcolor{keyword}{typedef}\ \textcolor{keyword}{const}\ T\ *return\_type;}
+\DoxyCodeLine{00091\ \ \ \textcolor{keyword}{typedef}\ T\ *mutable\_return\_type;}
+\DoxyCodeLine{00092\ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ element\_stride\ =\ \textcolor{keyword}{sizeof}(T);}
+\DoxyCodeLine{00093\ \ \ \textcolor{keyword}{static}\ return\_type\ Read(\textcolor{keyword}{const}\ uint8\_t\ *p,\ uoffset\_t\ i)\ \{}
+\DoxyCodeLine{00094\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }T\ *\textcolor{keyword}{>}(p\ +\ i\ *\ \textcolor{keyword}{sizeof}(T));}
+\DoxyCodeLine{00095\ \ \ \}}
+\DoxyCodeLine{00096\ \};}
+\DoxyCodeLine{00097\ }
+\DoxyCodeLine{00105\ \textcolor{keyword}{inline}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *GetBufferIdentifier(\textcolor{keyword}{const}\ \textcolor{keywordtype}{void}\ *buf,}
+\DoxyCodeLine{00106\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ size\_prefixed\ =\ \textcolor{keyword}{false})\ \{}
+\DoxyCodeLine{00107\ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\textcolor{keywordtype}{char}\ *\textcolor{keyword}{>}(buf)\ +}
+\DoxyCodeLine{00108\ \ \ \ \ \ \ \ \ \ ((size\_prefixed)\ ?\ 2\ *\ \textcolor{keyword}{sizeof}(uoffset\_t)\ :\ \textcolor{keyword}{sizeof}(uoffset\_t));}
+\DoxyCodeLine{00109\ \}}
+\DoxyCodeLine{00110\ }
+\DoxyCodeLine{00111\ \textcolor{comment}{//\ Helper\ to\ see\ if\ the\ identifier\ in\ a\ buffer\ has\ the\ expected\ value.}}
+\DoxyCodeLine{00112\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{bool}\ BufferHasIdentifier(\textcolor{keyword}{const}\ \textcolor{keywordtype}{void}\ *buf,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *identifier,}
+\DoxyCodeLine{00113\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ size\_prefixed\ =\ \textcolor{keyword}{false})\ \{}
+\DoxyCodeLine{00114\ \ \ \textcolor{keywordflow}{return}\ strncmp(GetBufferIdentifier(buf,\ size\_prefixed),\ identifier,}
+\DoxyCodeLine{00115\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ flatbuffers::kFileIdentifierLength)\ ==\ 0;}
+\DoxyCodeLine{00116\ \}}
+\DoxyCodeLine{00117\ }
+\DoxyCodeLine{00119\ \textcolor{comment}{//\ Helpers\ to\ get\ a\ typed\ pointer\ to\ the\ root\ object\ contained\ in\ the\ buffer.}}
+\DoxyCodeLine{00120\ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>\ T\ *GetMutableRoot(\textcolor{keywordtype}{void}\ *buf)\ \{}
+\DoxyCodeLine{00121\ \ \ EndianCheck();}
+\DoxyCodeLine{00122\ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{reinterpret\_cast<}T\ *\textcolor{keyword}{>}(}
+\DoxyCodeLine{00123\ \ \ \ \ \ \ \textcolor{keyword}{reinterpret\_cast<}uint8\_t\ *\textcolor{keyword}{>}(buf)\ +}
+\DoxyCodeLine{00124\ \ \ \ \ \ \ EndianScalar(*\textcolor{keyword}{reinterpret\_cast<}uoffset\_t\ *\textcolor{keyword}{>}(buf)));}
+\DoxyCodeLine{00125\ \}}
+\DoxyCodeLine{00126\ }
+\DoxyCodeLine{00127\ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>\ T\ *GetMutableSizePrefixedRoot(\textcolor{keywordtype}{void}\ *buf)\ \{}
+\DoxyCodeLine{00128\ \ \ \textcolor{keywordflow}{return}\ GetMutableRoot<T>(\textcolor{keyword}{reinterpret\_cast<}uint8\_t\ *\textcolor{keyword}{>}(buf)\ +}
+\DoxyCodeLine{00129\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{sizeof}(uoffset\_t));}
+\DoxyCodeLine{00130\ \}}
+\DoxyCodeLine{00131\ }
+\DoxyCodeLine{00132\ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>\ \textcolor{keyword}{const}\ T\ *GetRoot(\textcolor{keyword}{const}\ \textcolor{keywordtype}{void}\ *buf)\ \{}
+\DoxyCodeLine{00133\ \ \ \textcolor{keywordflow}{return}\ GetMutableRoot<T>(\textcolor{keyword}{const\_cast<}\textcolor{keywordtype}{void}\ *\textcolor{keyword}{>}(buf));}
+\DoxyCodeLine{00134\ \}}
+\DoxyCodeLine{00135\ }
+\DoxyCodeLine{00136\ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>\ \textcolor{keyword}{const}\ T\ *GetSizePrefixedRoot(\textcolor{keyword}{const}\ \textcolor{keywordtype}{void}\ *buf)\ \{}
+\DoxyCodeLine{00137\ \ \ \textcolor{keywordflow}{return}\ GetRoot<T>(\textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }uint8\_t\ *\textcolor{keyword}{>}(buf)\ +\ \textcolor{keyword}{sizeof}(uoffset\_t));}
+\DoxyCodeLine{00138\ \}}
+\DoxyCodeLine{00139\ }
+\DoxyCodeLine{00140\ \}\ \ \textcolor{comment}{//\ namespace\ flatbuffers}}
+\DoxyCodeLine{00141\ }
+\DoxyCodeLine{00142\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ FLATBUFFERS\_BUFFER\_H\_}}
+
+\end{DoxyCode}

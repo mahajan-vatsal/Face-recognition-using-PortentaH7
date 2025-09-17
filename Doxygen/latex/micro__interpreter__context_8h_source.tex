@@ -1,0 +1,129 @@
+\doxysection{micro\+\_\+interpreter\+\_\+context.\+h}
+\hypertarget{micro__interpreter__context_8h_source}{}\label{micro__interpreter__context_8h_source}\index{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/main/tensorflow/lite/micro/micro\_interpreter\_context.h@{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/main/tensorflow/lite/micro/micro\_interpreter\_context.h}}
+\mbox{\hyperlink{micro__interpreter__context_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{/*\ Copyright\ 2021\ The\ TensorFlow\ Authors.\ All\ Rights\ Reserved.}}
+\DoxyCodeLine{00002\ \textcolor{comment}{}}
+\DoxyCodeLine{00003\ \textcolor{comment}{Licensed\ under\ the\ Apache\ License,\ Version\ 2.0\ (the\ "{}License"{});}}
+\DoxyCodeLine{00004\ \textcolor{comment}{you\ may\ not\ use\ this\ file\ except\ in\ compliance\ with\ the\ License.}}
+\DoxyCodeLine{00005\ \textcolor{comment}{You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{00006\ \textcolor{comment}{}}
+\DoxyCodeLine{00007\ \textcolor{comment}{\ \ \ \ http://www.apache.org/licenses/LICENSE-\/2.0}}
+\DoxyCodeLine{00008\ \textcolor{comment}{}}
+\DoxyCodeLine{00009\ \textcolor{comment}{Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ software}}
+\DoxyCodeLine{00010\ \textcolor{comment}{distributed\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,}}
+\DoxyCodeLine{00011\ \textcolor{comment}{WITHOUT\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,\ either\ express\ or\ implied.}}
+\DoxyCodeLine{00012\ \textcolor{comment}{See\ the\ License\ for\ the\ specific\ language\ governing\ permissions\ and}}
+\DoxyCodeLine{00013\ \textcolor{comment}{limitations\ under\ the\ License.}}
+\DoxyCodeLine{00014\ \textcolor{comment}{==============================================================================*/}}
+\DoxyCodeLine{00015\ }
+\DoxyCodeLine{00016\ \textcolor{preprocessor}{\#ifndef\ TENSORFLOW\_LITE\_MICRO\_MICRO\_INTERPRETER\_CONTEXT\_H\_}}
+\DoxyCodeLine{00017\ \textcolor{preprocessor}{\#define\ TENSORFLOW\_LITE\_MICRO\_MICRO\_INTERPRETER\_CONTEXT\_H\_}}
+\DoxyCodeLine{00018\ }
+\DoxyCodeLine{00019\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/c/common.h"{}}}
+\DoxyCodeLine{00020\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/micro/micro\_allocator.h"{}}}
+\DoxyCodeLine{00021\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/micro/micro\_context.h"{}}}
+\DoxyCodeLine{00022\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{micro__interpreter__graph_8h}{tensorflow/lite/micro/micro\_interpreter\_graph.h}}"{}}}
+\DoxyCodeLine{00023\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/micro/micro\_log.h"{}}}
+\DoxyCodeLine{00024\ }
+\DoxyCodeLine{00025\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacetflite}{tflite}}\ \{}
+\DoxyCodeLine{00026\ }
+\DoxyCodeLine{00027\ \textcolor{comment}{//\ A\ full\ implementation\ of\ the\ MicroContext,\ to\ be\ used\ by\ the}}
+\DoxyCodeLine{00028\ \textcolor{comment}{//\ MicroInterpreter.\ Kernels\ should\ not\ depend\ on\ this\ directly.\ Instead\ they}}
+\DoxyCodeLine{00029\ \textcolor{comment}{//\ should\ only\ depend\ on\ the\ MicroContext.}}
+\DoxyCodeLine{00030\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classtflite_1_1_micro_interpreter_context}{MicroInterpreterContext}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{classtflite_1_1_micro_context}{MicroContext}}\ \{}
+\DoxyCodeLine{00031\ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00032\ \ \ \textcolor{comment}{//\ Enum\ that\ allows\ MicroContext\ to\ keep\ track\ of\ the\ stages\ different\ memory}}
+\DoxyCodeLine{00033\ \ \ \textcolor{comment}{//\ planning\ APIs\ are\ available\ to\ kernels.}}
+\DoxyCodeLine{00034\ \ \ \textcolor{keyword}{enum\ class}\ \mbox{\hyperlink{classtflite_1_1_micro_interpreter_context_a86aedfce1b11dc169facdb716a460ceb}{InterpreterState}}\ \{}
+\DoxyCodeLine{00035\ \ \ \ \ \mbox{\hyperlink{classtflite_1_1_micro_interpreter_context_a86aedfce1b11dc169facdb716a460cebab217b1cb58a6ee4ef35a6c84cf367659}{kInit}},}
+\DoxyCodeLine{00036\ \ \ \ \ \mbox{\hyperlink{classtflite_1_1_micro_interpreter_context_a86aedfce1b11dc169facdb716a460cebac1942508691f99ccdce80abf69ad89af}{kPrepare}},}
+\DoxyCodeLine{00037\ \ \ \ \ \mbox{\hyperlink{classtflite_1_1_micro_interpreter_context_a86aedfce1b11dc169facdb716a460ceba7528fdc39df03be283f64d5e890c1d0b}{kMemoryPlanning}},}
+\DoxyCodeLine{00038\ \ \ \ \ \mbox{\hyperlink{classtflite_1_1_micro_interpreter_context_a86aedfce1b11dc169facdb716a460cebada22a1e5168b0872109cffb2ba0b30f1}{kInvoke}},}
+\DoxyCodeLine{00039\ \ \ \};}
+\DoxyCodeLine{00040\ }
+\DoxyCodeLine{00041\ \ \ \textcolor{comment}{//\ Does\ not\ take\ any\ ownership,\ and\ all\ pointers\ must\ refer\ to\ valid\ objects}}
+\DoxyCodeLine{00042\ \ \ \textcolor{comment}{//\ that\ outlive\ the\ one\ constructed.}}
+\DoxyCodeLine{00043\ \ \ \mbox{\hyperlink{classtflite_1_1_micro_interpreter_context_a0d6e2f9f01280b10ef9f4716df170aa5}{MicroInterpreterContext}}(\mbox{\hyperlink{classtflite_1_1_micro_allocator}{MicroAllocator}}*\ allocator,\ \textcolor{keyword}{const}\ Model*\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2model_8h_ae142afd8c2e2c711c1c62440deebe03c}{model}},}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classtflite_1_1_micro_interpreter_graph}{MicroInterpreterGraph}}*\ \mbox{\hyperlink{namespacegraph}{graph}});}
+\DoxyCodeLine{00045\ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{classtflite_1_1_micro_interpreter_context_a93938eacfcb33d03f00e056fab9bb48a}{\string~MicroInterpreterContext}}();}
+\DoxyCodeLine{00046\ }
+\DoxyCodeLine{00047\ \ \ \textcolor{comment}{//\ Allocate\ persistent\ buffer\ which\ has\ the\ same\ life\ time\ as\ the\ interpreter.}}
+\DoxyCodeLine{00048\ \ \ \textcolor{comment}{//\ Returns\ nullptr\ on\ failure.}}
+\DoxyCodeLine{00049\ \ \ \textcolor{comment}{//\ The\ memory\ is\ allocated\ from\ the\ tail.}}
+\DoxyCodeLine{00050\ \ \ \textcolor{comment}{//\ This\ method\ is\ only\ available\ in\ Init\ or\ Prepare\ stage.}}
+\DoxyCodeLine{00051\ \ \ \textcolor{comment}{//\ Virtual\ so\ that\ it\ can\ be\ faked\ for\ kernel\ tests.}}
+\DoxyCodeLine{00052\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}*\ \mbox{\hyperlink{classtflite_1_1_micro_interpreter_context_a7fd3fd83c481ada435a06785dadcde2f}{AllocatePersistentBuffer}}(\textcolor{keywordtype}{size\_t}\ bytes)\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00053\ }
+\DoxyCodeLine{00054\ \ \ \textcolor{comment}{//\ Request\ a\ scratch\ buffer\ in\ the\ arena\ through\ static\ memory\ planning.}}
+\DoxyCodeLine{00055\ \ \ \textcolor{comment}{//\ This\ method\ is\ only\ available\ in\ Prepare\ stage\ and\ the\ buffer\ is\ allocated}}
+\DoxyCodeLine{00056\ \ \ \textcolor{comment}{//\ by\ the\ interpreter\ between\ Prepare\ and\ Eval\ stage.\ In\ Eval\ stage,}}
+\DoxyCodeLine{00057\ \ \ \textcolor{comment}{//\ GetScratchBuffer\ API\ can\ be\ used\ to\ fetch\ the\ address.}}
+\DoxyCodeLine{00058\ \ \ \textcolor{comment}{//\ Virtual\ so\ that\ it\ can\ be\ faked\ for\ kernel\ tests.}}
+\DoxyCodeLine{00059\ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_interpreter_context_a13564f98da503227f7c31858af711e43}{RequestScratchBufferInArena}}(\textcolor{keywordtype}{size\_t}\ bytes,}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}*\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src7bb90234a942007b3f55b52484ee7c3e_a82de2679c069b1bce97a7d4aeb83cf60}{buffer\_idx}})\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00061\ }
+\DoxyCodeLine{00062\ \ \ \textcolor{comment}{//\ Get\ the\ scratch\ buffer\ pointer.}}
+\DoxyCodeLine{00063\ \ \ \textcolor{comment}{//\ This\ method\ is\ only\ available\ in\ Eval\ stage.}}
+\DoxyCodeLine{00064\ \ \ \textcolor{comment}{//\ Virtual\ so\ that\ it\ can\ be\ faked\ for\ kernel\ tests.}}
+\DoxyCodeLine{00065\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}*\ \mbox{\hyperlink{classtflite_1_1_micro_interpreter_context_a500d3baaf9722728626a6afff71cece5}{GetScratchBuffer}}(\textcolor{keywordtype}{int}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src7bb90234a942007b3f55b52484ee7c3e_a82de2679c069b1bce97a7d4aeb83cf60}{buffer\_idx}})\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00066\ }
+\DoxyCodeLine{00067\ \ \ \textcolor{comment}{//\ Returns\ a\ temporary\ TfLiteTensor\ struct\ for\ a\ given\ index.}}
+\DoxyCodeLine{00068\ \ \ \textcolor{comment}{//\ Virtual\ so\ that\ it\ can\ be\ faked\ for\ kernel\ tests.}}
+\DoxyCodeLine{00069\ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{struct_tf_lite_tensor}{TfLiteTensor}}*\ \mbox{\hyperlink{classtflite_1_1_micro_interpreter_context_afd65bf8d10f989fe2313bd6d3a47ec86}{AllocateTempTfLiteTensor}}(\textcolor{keywordtype}{int}\ tensor\_idx)\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00070\ }
+\DoxyCodeLine{00071\ \ \ \textcolor{comment}{//\ Deallocates\ a\ temp\ TfLiteTensor.}}
+\DoxyCodeLine{00072\ \ \ \textcolor{comment}{//\ Virtual\ so\ that\ it\ can\ be\ faked\ for\ kernel\ tests.}}
+\DoxyCodeLine{00073\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classtflite_1_1_micro_interpreter_context_ac136a207e9f8cf683330c5b8214c3450}{DeallocateTempTfLiteTensor}}(\mbox{\hyperlink{struct_tf_lite_tensor}{TfLiteTensor}}*\ \mbox{\hyperlink{namespacetensor}{tensor}})\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00074\ }
+\DoxyCodeLine{00075\ \ \ \textcolor{comment}{//\ Returns\ a\ pointer\ to\ a\ temporary\ buffer\ (from\ the\ arena).}}
+\DoxyCodeLine{00076\ \ \ \textcolor{comment}{//\ This\ API\ is\ only\ valid\ from\ the\ kernel's\ Prepare\ function\ and}}
+\DoxyCodeLine{00077\ \ \ \textcolor{comment}{//\ the\ buffer's\ lifetime\ is\ also\ that\ of\ the\ Prepare\ function.}}
+\DoxyCodeLine{00078\ \ \ \textcolor{comment}{//\ Virtual\ so\ that\ it\ can\ be\ faked\ for\ kernel\ tests.}}
+\DoxyCodeLine{00079\ \ \ \textcolor{keyword}{virtual}\ uint8\_t*\ \mbox{\hyperlink{classtflite_1_1_micro_interpreter_context_adf5a983bdfa008cda3b9f6f970f1ab74}{AllocateTempBuffer}}(\textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{hello__world__model_8cc_a439227feff9d7f55384e8780cfc2eb82}{size}},\ \textcolor{keywordtype}{size\_t}\ alignment)\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00080\ }
+\DoxyCodeLine{00081\ \ \ \textcolor{comment}{//\ Signals\ that\ the\ temporary\ buffer\ is\ no\ longer\ needed.}}
+\DoxyCodeLine{00082\ \ \ \textcolor{comment}{//\ Virtual\ so\ that\ it\ can\ be\ faked\ for\ kernel\ tests.}}
+\DoxyCodeLine{00083\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classtflite_1_1_micro_interpreter_context_aa7fe62d085824d3c2ba3cd32f0b247dd}{DeallocateTempBuffer}}(uint8\_t*\ \mbox{\hyperlink{nano__ble33__sense__accelerometer__continuous_8ino_a221f01f29c6cba77d9479aba615283f5}{buffer}})\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00084\ }
+\DoxyCodeLine{00085\ \ \ \textcolor{comment}{//\ Returns\ a\ TfLiteEvalTensor\ struct\ for\ a\ given\ index.}}
+\DoxyCodeLine{00086\ \ \ \textcolor{comment}{//\ Virtual\ so\ that\ it\ can\ be\ faked\ for\ kernel\ tests.}}
+\DoxyCodeLine{00087\ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{struct_tf_lite_eval_tensor}{TfLiteEvalTensor}}*\ \mbox{\hyperlink{classtflite_1_1_micro_interpreter_context_ab315a9672d1094cb821cb760879ce15e}{GetEvalTensor}}(\textcolor{keywordtype}{int}\ tensor\_idx)\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00088\ }
+\DoxyCodeLine{00089\ \ \ \textcolor{comment}{//\ Sets\ the\ State\ of\ MemoryPlanning\ MicroInterpreterContext}}
+\DoxyCodeLine{00090\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classtflite_1_1_micro_interpreter_context_acddcb2c2005cd9091ab231f237873736}{SetInterpreterState}}(\mbox{\hyperlink{classtflite_1_1_micro_interpreter_context_a86aedfce1b11dc169facdb716a460ceb}{InterpreterState}}\ \mbox{\hyperlink{ethosu55__interface_8h_adc6e5733fc3c22f0a7b2914188c49c90}{state}});}
+\DoxyCodeLine{00091\ }
+\DoxyCodeLine{00092\ \ \ \textcolor{comment}{//\ Sets\ the\ State\ of\ MemoryPlanning\ MicroInterpreterContext}}
+\DoxyCodeLine{00093\ \ \ \mbox{\hyperlink{classtflite_1_1_micro_interpreter_context_a86aedfce1b11dc169facdb716a460ceb}{InterpreterState}}\ \mbox{\hyperlink{classtflite_1_1_micro_interpreter_context_a2ef93c62cf07eb5f767ad96402a8d324}{GetInterpreterState}}()\ \textcolor{keyword}{const};}
+\DoxyCodeLine{00094\ }
+\DoxyCodeLine{00095\ \ \ \textcolor{comment}{//\ Does\ not\ take\ ownership\ of\ the\ pointer\ and\ the\ pointer\ must\ refer\ to\ valid}}
+\DoxyCodeLine{00096\ \ \ \textcolor{comment}{//\ an\ object\ that\ outlive\ this\ class\ instance.}}
+\DoxyCodeLine{00097\ \ \ \textcolor{comment}{//\ This\ can\ only\ be\ called\ once\ to\ set\ one\ external\ context.}}
+\DoxyCodeLine{00098\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_interpreter_context_ac5be982044592193c953bf45f674ff18}{set\_external\_context}}(\textcolor{keywordtype}{void}*\ external\_context\_payload)\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00099\ }
+\DoxyCodeLine{00100\ \ \ \textcolor{keywordtype}{void}*\ \mbox{\hyperlink{classtflite_1_1_micro_interpreter_context_aa93806dc07ce056b6c64efec5beb8c6c}{external\_context}}()\textcolor{keyword}{\ override\ }\{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1_micro_interpreter_context_a70e2b7a7771b8245a4f488ecc1e896dc}{external\_context\_payload\_}};\ \}}
+\DoxyCodeLine{00101\ }
+\DoxyCodeLine{00102\ \ \ \mbox{\hyperlink{classtflite_1_1_micro_graph}{MicroGraph}}\&\ \mbox{\hyperlink{classtflite_1_1_micro_interpreter_context_a19476185fd73f3d7addc9d7a49e81a5d}{graph}}()\textcolor{keyword}{\ override\ }\{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1_micro_interpreter_context_a2149c9b46b746d4382d3969e7455d8c1}{graph\_}};\ \}}
+\DoxyCodeLine{00103\ }
+\DoxyCodeLine{00104\ \ \ \textcolor{comment}{//\ Sets\ the\ pointer\ to\ a\ list\ of\ ScratchBufferHandle\ instances.}}
+\DoxyCodeLine{00105\ \ \ \textcolor{comment}{//\ Not\ API\ between\ TFLM\ and\ kernels.\ Primarily\ used\ by\ the\ framework\ for}}
+\DoxyCodeLine{00106\ \ \ \textcolor{comment}{//\ housekeeping\ in\ MicroInterpreterContext.}}
+\DoxyCodeLine{00107\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classtflite_1_1_micro_interpreter_context_a28eb634f6e8d5a9c5879a7f6ff28daf0}{SetScratchBufferHandles}}(\mbox{\hyperlink{structtflite_1_1_scratch_buffer_handle}{ScratchBufferHandle}}*\ scratch\_buffer\_handles);}
+\DoxyCodeLine{00108\ }
+\DoxyCodeLine{00109\ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{00110\ \ \ \mbox{\hyperlink{classtflite_1_1_micro_allocator}{MicroAllocator}}\&\ \mbox{\hyperlink{classtflite_1_1_micro_interpreter_context_ae5f45a360e443a8062000d9dc97972e2}{allocator\_}};}
+\DoxyCodeLine{00111\ \ \ \mbox{\hyperlink{classtflite_1_1_micro_interpreter_graph}{MicroInterpreterGraph}}\&\ \mbox{\hyperlink{classtflite_1_1_micro_interpreter_context_a2149c9b46b746d4382d3969e7455d8c1}{graph\_}};}
+\DoxyCodeLine{00112\ \ \ \textcolor{keyword}{const}\ Model*\ \mbox{\hyperlink{classtflite_1_1_micro_interpreter_context_a81dc50c7baa43ed08c554bf9dd61aa7d}{model\_}};}
+\DoxyCodeLine{00113\ \ \ \mbox{\hyperlink{classtflite_1_1_micro_interpreter_context_a86aedfce1b11dc169facdb716a460ceb}{InterpreterState}}\ \mbox{\hyperlink{classtflite_1_1_micro_interpreter_context_a40bddc92763e151da8d22a1ec1ca6332}{state\_}};}
+\DoxyCodeLine{00114\ }
+\DoxyCodeLine{00115\ \ \ \mbox{\hyperlink{structtflite_1_1_scratch_buffer_handle}{ScratchBufferHandle}}*\ \mbox{\hyperlink{classtflite_1_1_micro_interpreter_context_a9d00a90033c68528c8354dd840e4f0b1}{scratch\_buffer\_handles\_}}\ =\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{00116\ \ \ \textcolor{keywordtype}{void}*\ \mbox{\hyperlink{classtflite_1_1_micro_interpreter_context_a70e2b7a7771b8245a4f488ecc1e896dc}{external\_context\_payload\_}}\ =\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{00117\ }
+\DoxyCodeLine{00118\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src336b24cffab807348972c47c46f8de00_a92a34c72cfcc4f6c5bd49086ba082af4}{TF\_LITE\_REMOVE\_VIRTUAL\_DELETE}}}
+\DoxyCodeLine{00119\ \};}
+\DoxyCodeLine{00120\ }
+\DoxyCodeLine{00121\ \}\ \ \textcolor{comment}{//\ namespace\ tflite}}
+\DoxyCodeLine{00122\ }
+\DoxyCodeLine{00123\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ TENSORFLOW\_LITE\_MICRO\_MICRO\_INTERPRETER\_CONTEXT\_H\_}}
+
+\end{DoxyCode}

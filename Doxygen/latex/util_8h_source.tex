@@ -1,0 +1,731 @@
+\doxysection{util.\+h}
+\hypertarget{util_8h_source}{}\label{util_8h_source}\index{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/arduino-\/examples-\/main/src/third\_party/flatbuffers/include/flatbuffers/util.h@{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/arduino-\/examples-\/main/src/third\_party/flatbuffers/include/flatbuffers/util.h}}
+\mbox{\hyperlink{util_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{00002\ \textcolor{comment}{\ *\ Copyright\ 2014\ Google\ Inc.\ All\ rights\ reserved.}}
+\DoxyCodeLine{00003\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00004\ \textcolor{comment}{\ *\ Licensed\ under\ the\ Apache\ License,\ Version\ 2.0\ (the\ "{}License"{});}}
+\DoxyCodeLine{00005\ \textcolor{comment}{\ *\ you\ may\ not\ use\ this\ file\ except\ in\ compliance\ with\ the\ License.}}
+\DoxyCodeLine{00006\ \textcolor{comment}{\ *\ You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{00007\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00008\ \textcolor{comment}{\ *\ \ \ \ \ http://www.apache.org/licenses/LICENSE-\/2.0}}
+\DoxyCodeLine{00009\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00010\ \textcolor{comment}{\ *\ Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ software}}
+\DoxyCodeLine{00011\ \textcolor{comment}{\ *\ distributed\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,}}
+\DoxyCodeLine{00012\ \textcolor{comment}{\ *\ WITHOUT\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,\ either\ express\ or\ implied.}}
+\DoxyCodeLine{00013\ \textcolor{comment}{\ *\ See\ the\ License\ for\ the\ specific\ language\ governing\ permissions\ and}}
+\DoxyCodeLine{00014\ \textcolor{comment}{\ *\ limitations\ under\ the\ License.}}
+\DoxyCodeLine{00015\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{00016\ }
+\DoxyCodeLine{00017\ \textcolor{preprocessor}{\#ifndef\ FLATBUFFERS\_UTIL\_H\_}}
+\DoxyCodeLine{00018\ \textcolor{preprocessor}{\#define\ FLATBUFFERS\_UTIL\_H\_}}
+\DoxyCodeLine{00019\ }
+\DoxyCodeLine{00020\ \textcolor{preprocessor}{\#include\ <ctype.h>}}
+\DoxyCodeLine{00021\ \textcolor{preprocessor}{\#include\ <errno.h>}}
+\DoxyCodeLine{00022\ }
+\DoxyCodeLine{00023\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{base_8h}{third\_party/flatbuffers/include/flatbuffers/base.h}}"{}}}
+\DoxyCodeLine{00024\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{stl__emulation_8h}{third\_party/flatbuffers/include/flatbuffers/stl\_emulation.h}}"{}}}
+\DoxyCodeLine{00025\ }
+\DoxyCodeLine{00026\ \textcolor{comment}{//\ For\ TFLM\ we\ always\ want\ to\ use\ FLATBUFFERS\_PREFER\_PRINTF=1.\ See}}
+\DoxyCodeLine{00027\ \textcolor{comment}{//\ http://b/211811553\ for\ more\ context.}}
+\DoxyCodeLine{00028\ \textcolor{preprocessor}{\#ifndef\ FLATBUFFERS\_PREFER\_PRINTF}}
+\DoxyCodeLine{00029\ \textcolor{preprocessor}{\#define\ FLATBUFFERS\_PREFER\_PRINTF\ 1}}
+\DoxyCodeLine{00030\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00031\ }
+\DoxyCodeLine{00032\ \textcolor{preprocessor}{\#ifndef\ FLATBUFFERS\_PREFER\_PRINTF}}
+\DoxyCodeLine{00033\ \textcolor{preprocessor}{\#\ \ include\ <iomanip>}}
+\DoxyCodeLine{00034\ \textcolor{preprocessor}{\#\ \ include\ <sstream>}}
+\DoxyCodeLine{00035\ \textcolor{preprocessor}{\#else\ \ }\textcolor{comment}{//\ FLATBUFFERS\_PREFER\_PRINTF}}
+\DoxyCodeLine{00036\ \textcolor{preprocessor}{\#\ \ include\ <float.h>}}
+\DoxyCodeLine{00037\ \textcolor{preprocessor}{\#\ \ include\ <stdio.h>}}
+\DoxyCodeLine{00038\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ FLATBUFFERS\_PREFER\_PRINTF}}
+\DoxyCodeLine{00039\ }
+\DoxyCodeLine{00040\ \textcolor{preprocessor}{\#include\ <string>}}
+\DoxyCodeLine{00041\ }
+\DoxyCodeLine{00042\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespaceflatbuffers}{flatbuffers}}\ \{}
+\DoxyCodeLine{00043\ }
+\DoxyCodeLine{00044\ \textcolor{comment}{//\ @locale-\/independent\ functions\ for\ ASCII\ characters\ set.}}
+\DoxyCodeLine{00045\ }
+\DoxyCodeLine{00046\ \textcolor{comment}{//\ Fast\ checking\ that\ character\ lies\ in\ closed\ range:\ [a\ <=\ x\ <=\ b]}}
+\DoxyCodeLine{00047\ \textcolor{comment}{//\ using\ one\ compare\ (conditional\ branch)\ operator.}}
+\DoxyCodeLine{00048\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespaceflatbuffers_a27d262eb4cd4f4f5bf86668c0c67be98}{check\_ascii\_range}}(\textcolor{keywordtype}{char}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a6150e0515f7202e2fb518f7206ed97dc}{x}},\ \textcolor{keywordtype}{char}\ a,\ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}})\ \{}
+\DoxyCodeLine{00049\ \ \ \mbox{\hyperlink{base_8h_ab2116a3957cb3c19761609ea7fd796fe}{FLATBUFFERS\_ASSERT}}(a\ <=\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}});}
+\DoxyCodeLine{00050\ \ \ \textcolor{comment}{//\ (Hacker's\ Delight):\ \`{}a\ <=\ x\ <=\ b`\ <=>\ \`{}(x-\/a)\ <=\{u\}\ (b-\/a)`.}}
+\DoxyCodeLine{00051\ \ \ \textcolor{comment}{//\ The\ x,\ a,\ b\ will\ be\ promoted\ to\ int\ and\ subtracted\ without\ overflow.}}
+\DoxyCodeLine{00052\ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\textcolor{keyword}{>}(\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a6150e0515f7202e2fb518f7206ed97dc}{x}}\ -\/\ a)\ <=\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\textcolor{keyword}{>}(\mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}}\ -\/\ a);}
+\DoxyCodeLine{00053\ \}}
+\DoxyCodeLine{00054\ }
+\DoxyCodeLine{00055\ \textcolor{comment}{//\ Case-\/insensitive\ isalpha}}
+\DoxyCodeLine{00056\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespaceflatbuffers_a4c2da1af3390c50fe43f16a5e27315cf}{is\_alpha}}(\textcolor{keywordtype}{char}\ c)\ \{}
+\DoxyCodeLine{00057\ \ \ \textcolor{comment}{//\ ASCII\ only:\ alpha\ to\ upper\ case\ =>\ reset\ bit\ 0x20\ (\string~0x20\ =\ 0xDF).}}
+\DoxyCodeLine{00058\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespaceflatbuffers_a27d262eb4cd4f4f5bf86668c0c67be98}{check\_ascii\_range}}(c\ \&\ 0xDF,\ \textcolor{charliteral}{'a'}\ \&\ 0xDF,\ \textcolor{charliteral}{'z'}\ \&\ 0xDF);}
+\DoxyCodeLine{00059\ \}}
+\DoxyCodeLine{00060\ }
+\DoxyCodeLine{00061\ \textcolor{comment}{//\ Check\ for\ uppercase\ alpha}}
+\DoxyCodeLine{00062\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespaceflatbuffers_af7212781f264bf55dc5c227ceba01838}{is\_alpha\_upper}}(\textcolor{keywordtype}{char}\ c)\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespaceflatbuffers_a27d262eb4cd4f4f5bf86668c0c67be98}{check\_ascii\_range}}(c,\ \textcolor{charliteral}{'A'},\ \textcolor{charliteral}{'Z'});\ \}}
+\DoxyCodeLine{00063\ }
+\DoxyCodeLine{00064\ \textcolor{comment}{//\ Check\ (case-\/insensitive)\ that\ \`{}c`\ is\ equal\ to\ alpha.}}
+\DoxyCodeLine{00065\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespaceflatbuffers_acefb3899ff2918e062daef70ba7dba91}{is\_alpha\_char}}(\textcolor{keywordtype}{char}\ c,\ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{leaky__relu__test_8cc_ab1551d8043c2aa4410fb7dbb1fe3be7b}{alpha}})\ \{}
+\DoxyCodeLine{00066\ \ \ \mbox{\hyperlink{base_8h_ab2116a3957cb3c19761609ea7fd796fe}{FLATBUFFERS\_ASSERT}}(\mbox{\hyperlink{namespaceflatbuffers_a4c2da1af3390c50fe43f16a5e27315cf}{is\_alpha}}(\mbox{\hyperlink{leaky__relu__test_8cc_ab1551d8043c2aa4410fb7dbb1fe3be7b}{alpha}}));}
+\DoxyCodeLine{00067\ \ \ \textcolor{comment}{//\ ASCII\ only:\ alpha\ to\ upper\ case\ =>\ reset\ bit\ 0x20\ (\string~0x20\ =\ 0xDF).}}
+\DoxyCodeLine{00068\ \ \ \textcolor{keywordflow}{return}\ ((c\ \&\ 0xDF)\ ==\ (\mbox{\hyperlink{leaky__relu__test_8cc_ab1551d8043c2aa4410fb7dbb1fe3be7b}{alpha}}\ \&\ 0xDF));}
+\DoxyCodeLine{00069\ \}}
+\DoxyCodeLine{00070\ }
+\DoxyCodeLine{00071\ \textcolor{comment}{//\ https://en.cppreference.com/w/cpp/string/byte/isxdigit}}
+\DoxyCodeLine{00072\ \textcolor{comment}{//\ isdigit\ and\ isxdigit\ are\ the\ only\ standard\ narrow\ character\ classification}}
+\DoxyCodeLine{00073\ \textcolor{comment}{//\ functions\ that\ are\ not\ affected\ by\ the\ currently\ installed\ C\ locale.\ although}}
+\DoxyCodeLine{00074\ \textcolor{comment}{//\ some\ implementations\ (e.g.\ Microsoft\ in\ 1252\ codepage)\ may\ classify}}
+\DoxyCodeLine{00075\ \textcolor{comment}{//\ additional\ single-\/byte\ characters\ as\ digits.}}
+\DoxyCodeLine{00076\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespaceflatbuffers_a880e3a3b3e735c4223ba3d07f1ffd1ae}{is\_digit}}(\textcolor{keywordtype}{char}\ c)\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespaceflatbuffers_a27d262eb4cd4f4f5bf86668c0c67be98}{check\_ascii\_range}}(c,\ \textcolor{charliteral}{'0'},\ \textcolor{charliteral}{'9'});\ \}}
+\DoxyCodeLine{00077\ }
+\DoxyCodeLine{00078\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespaceflatbuffers_a330059caffb5a7d065a0358a0e70eba9}{is\_xdigit}}(\textcolor{keywordtype}{char}\ c)\ \{}
+\DoxyCodeLine{00079\ \ \ \textcolor{comment}{//\ Replace\ by\ look-\/up\ table.}}
+\DoxyCodeLine{00080\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespaceflatbuffers_a880e3a3b3e735c4223ba3d07f1ffd1ae}{is\_digit}}(c)\ ||\ \mbox{\hyperlink{namespaceflatbuffers_a27d262eb4cd4f4f5bf86668c0c67be98}{check\_ascii\_range}}(c\ \&\ 0xDF,\ \textcolor{charliteral}{'a'}\ \&\ 0xDF,\ \textcolor{charliteral}{'f'}\ \&\ 0xDF);}
+\DoxyCodeLine{00081\ \}}
+\DoxyCodeLine{00082\ }
+\DoxyCodeLine{00083\ \textcolor{comment}{//\ Case-\/insensitive\ isalnum}}
+\DoxyCodeLine{00084\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespaceflatbuffers_ae3b791bbfbcf9b9d1d9dc1fd524d6527}{is\_alnum}}(\textcolor{keywordtype}{char}\ c)\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespaceflatbuffers_a4c2da1af3390c50fe43f16a5e27315cf}{is\_alpha}}(c)\ ||\ \mbox{\hyperlink{namespaceflatbuffers_a880e3a3b3e735c4223ba3d07f1ffd1ae}{is\_digit}}(c);\ \}}
+\DoxyCodeLine{00085\ }
+\DoxyCodeLine{00086\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{namespaceflatbuffers_a4afdd264ecb7637a777fc4378b7aa8f8}{CharToUpper}}(\textcolor{keywordtype}{char}\ c)\ \{}
+\DoxyCodeLine{00087\ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{char}\textcolor{keyword}{>}(::toupper(\textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\textcolor{keyword}{>}(c)));}
+\DoxyCodeLine{00088\ \}}
+\DoxyCodeLine{00089\ }
+\DoxyCodeLine{00090\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{namespaceflatbuffers_ad44e774ea7eb641d7f2c5d81473bdfa7}{CharToLower}}(\textcolor{keywordtype}{char}\ c)\ \{}
+\DoxyCodeLine{00091\ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{char}\textcolor{keyword}{>}(::tolower(\textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\textcolor{keyword}{>}(c)));}
+\DoxyCodeLine{00092\ \}}
+\DoxyCodeLine{00093\ }
+\DoxyCodeLine{00094\ \textcolor{comment}{//\ @end-\/locale-\/independent\ functions\ for\ ASCII\ character\ set}}
+\DoxyCodeLine{00095\ }
+\DoxyCodeLine{00096\ \textcolor{preprocessor}{\#ifdef\ FLATBUFFERS\_PREFER\_PRINTF}}
+\DoxyCodeLine{00097\ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{namespaceflatbuffers_a9ba245ce95965cd0b94bfa8556101440}{IntToDigitCount}}(T\ t)\ \{}
+\DoxyCodeLine{00098\ \ \ \textcolor{keywordtype}{size\_t}\ digit\_count\ =\ 0;}
+\DoxyCodeLine{00099\ \ \ \textcolor{comment}{//\ Count\ the\ sign\ for\ negative\ numbers}}
+\DoxyCodeLine{00100\ \ \ \textcolor{keywordflow}{if}\ (t\ <\ 0)\ digit\_count++;}
+\DoxyCodeLine{00101\ \ \ \textcolor{comment}{//\ Count\ a\ single\ 0\ left\ of\ the\ dot\ for\ fractional\ numbers}}
+\DoxyCodeLine{00102\ \ \ \textcolor{keywordflow}{if}\ (-\/1\ <\ t\ \&\&\ t\ <\ 1)\ digit\_count++;}
+\DoxyCodeLine{00103\ \ \ \textcolor{comment}{//\ Count\ digits\ until\ fractional\ part}}
+\DoxyCodeLine{00104\ \ \ T\ eps\ =\ std::numeric\_limits<T>::epsilon();}
+\DoxyCodeLine{00105\ \ \ \textcolor{keywordflow}{while}\ (t\ <=\ (-\/1\ +\ eps)\ ||\ (1\ -\/\ eps)\ <=\ t)\ \{}
+\DoxyCodeLine{00106\ \ \ \ \ t\ /=\ 10;}
+\DoxyCodeLine{00107\ \ \ \ \ digit\_count++;}
+\DoxyCodeLine{00108\ \ \ \}}
+\DoxyCodeLine{00109\ \ \ \textcolor{keywordflow}{return}\ digit\_count;}
+\DoxyCodeLine{00110\ \}}
+\DoxyCodeLine{00111\ }
+\DoxyCodeLine{00112\ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{namespaceflatbuffers_a2283b23f71c6ca417aa7a8d61a370231}{NumToStringWidth}}(T\ t,\ \textcolor{keywordtype}{int}\ precision\ =\ 0)\ \{}
+\DoxyCodeLine{00113\ \ \ \textcolor{keywordtype}{size\_t}\ string\_width\ =\ \mbox{\hyperlink{namespaceflatbuffers_a9ba245ce95965cd0b94bfa8556101440}{IntToDigitCount}}(t);}
+\DoxyCodeLine{00114\ \ \ \textcolor{comment}{//\ Count\ the\ dot\ for\ floating\ point\ numbers}}
+\DoxyCodeLine{00115\ \ \ \textcolor{keywordflow}{if}\ (precision)\ string\_width\ +=\ (precision\ +\ 1);}
+\DoxyCodeLine{00116\ \ \ \textcolor{keywordflow}{return}\ string\_width;}
+\DoxyCodeLine{00117\ \}}
+\DoxyCodeLine{00118\ }
+\DoxyCodeLine{00119\ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{00120\ std::string\ \mbox{\hyperlink{namespaceflatbuffers_aef38c532228ad558d7499744c5ac8c8b}{NumToStringImplWrapper}}(T\ t,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *fmt,\ \textcolor{keywordtype}{int}\ precision\ =\ 0)\ \{}
+\DoxyCodeLine{00121\ \ \ \textcolor{keywordtype}{size\_t}\ string\_width\ =\ \mbox{\hyperlink{namespaceflatbuffers_a2283b23f71c6ca417aa7a8d61a370231}{NumToStringWidth}}(t,\ precision);}
+\DoxyCodeLine{00122\ \ \ std::string\ s(string\_width,\ 0x00);}
+\DoxyCodeLine{00123\ \ \ \textcolor{comment}{//\ Allow\ snprintf\ to\ use\ std::string\ trailing\ null\ to\ detect\ buffer\ overflow}}
+\DoxyCodeLine{00124\ \ \ snprintf(\textcolor{keyword}{const\_cast<}\textcolor{keywordtype}{char}\ *\textcolor{keyword}{>}(s.data()),\ (s.size()\ +\ 1),\ fmt,\ string\_width,\ t);}
+\DoxyCodeLine{00125\ \ \ \textcolor{keywordflow}{return}\ s;}
+\DoxyCodeLine{00126\ \}}
+\DoxyCodeLine{00127\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ FLATBUFFERS\_PREFER\_PRINTF}}
+\DoxyCodeLine{00128\ }
+\DoxyCodeLine{00129\ \textcolor{comment}{//\ Convert\ an\ integer\ or\ floating\ point\ value\ to\ a\ string.}}
+\DoxyCodeLine{00130\ \textcolor{comment}{//\ In\ contrast\ to\ std::stringstream,\ "{}char"{}\ values\ are}}
+\DoxyCodeLine{00131\ \textcolor{comment}{//\ converted\ to\ a\ string\ of\ digits,\ and\ we\ don't\ use\ scientific\ notation.}}
+\DoxyCodeLine{00132\ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>\ std::string\ \mbox{\hyperlink{namespaceflatbuffers_a3cd13d0bf35e8b0c8f0005863fb00a21}{NumToString}}(T\ t)\ \{}
+\DoxyCodeLine{00133\ \ \ \textcolor{comment}{//\ clang-\/format\ off}}
+\DoxyCodeLine{00134\ }
+\DoxyCodeLine{00135\ \textcolor{preprocessor}{\ \ \#ifndef\ FLATBUFFERS\_PREFER\_PRINTF}}
+\DoxyCodeLine{00136\ \ \ \ \ std::stringstream\ ss;}
+\DoxyCodeLine{00137\ \ \ \ \ ss\ <<\ t;}
+\DoxyCodeLine{00138\ \ \ \ \ \textcolor{keywordflow}{return}\ ss.str();}
+\DoxyCodeLine{00139\ \textcolor{preprocessor}{\ \ \#else\ }\textcolor{comment}{//\ FLATBUFFERS\_PREFER\_PRINTF}}
+\DoxyCodeLine{00140\ \ \ \ \ \textcolor{keyword}{auto}\ v\ =\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{long}\ \textcolor{keywordtype}{long}\textcolor{keyword}{>}(t);}
+\DoxyCodeLine{00141\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespaceflatbuffers_aef38c532228ad558d7499744c5ac8c8b}{NumToStringImplWrapper}}(v,\ \textcolor{stringliteral}{"{}\%.*lld"{}});}
+\DoxyCodeLine{00142\ \textcolor{preprocessor}{\ \ \#endif\ }\textcolor{comment}{//\ FLATBUFFERS\_PREFER\_PRINTF}}
+\DoxyCodeLine{00143\ \ \ \textcolor{comment}{//\ clang-\/format\ on}}
+\DoxyCodeLine{00144\ \}}
+\DoxyCodeLine{00145\ \textcolor{comment}{//\ Avoid\ char\ types\ used\ as\ character\ data.}}
+\DoxyCodeLine{00146\ \textcolor{keyword}{template}<>\ \textcolor{keyword}{inline}\ std::string\ \mbox{\hyperlink{namespaceflatbuffers_a7531726283eaf7977cf9990da1114fdd}{NumToString<signed\ char>}}(\textcolor{keywordtype}{signed}\ \textcolor{keywordtype}{char}\ t)\ \{}
+\DoxyCodeLine{00147\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespaceflatbuffers_a3cd13d0bf35e8b0c8f0005863fb00a21}{NumToString}}(\textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{int}\textcolor{keyword}{>}(t));}
+\DoxyCodeLine{00148\ \}}
+\DoxyCodeLine{00149\ \textcolor{keyword}{template}<>\ \textcolor{keyword}{inline}\ std::string\ \mbox{\hyperlink{namespaceflatbuffers_aa3085b78eeebe6ccf5beef8bda4b34ed}{NumToString<unsigned\ char>}}(\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ t)\ \{}
+\DoxyCodeLine{00150\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespaceflatbuffers_a3cd13d0bf35e8b0c8f0005863fb00a21}{NumToString}}(\textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{int}\textcolor{keyword}{>}(t));}
+\DoxyCodeLine{00151\ \}}
+\DoxyCodeLine{00152\ \textcolor{keyword}{template}<>\ \textcolor{keyword}{inline}\ std::string\ \mbox{\hyperlink{namespaceflatbuffers_a8373c7217d5e5d46b32a1c8aa498a33d}{NumToString<char>}}(\textcolor{keywordtype}{char}\ t)\ \{}
+\DoxyCodeLine{00153\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespaceflatbuffers_a3cd13d0bf35e8b0c8f0005863fb00a21}{NumToString}}(\textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{int}\textcolor{keyword}{>}(t));}
+\DoxyCodeLine{00154\ \}}
+\DoxyCodeLine{00155\ }
+\DoxyCodeLine{00156\ \textcolor{comment}{//\ Special\ versions\ for\ floats/doubles.}}
+\DoxyCodeLine{00157\ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>\ std::string\ \mbox{\hyperlink{namespaceflatbuffers_add145b416cc4318c72340306f415d543}{FloatToString}}(T\ t,\ \textcolor{keywordtype}{int}\ precision)\ \{}
+\DoxyCodeLine{00158\ \ \ \textcolor{comment}{//\ clang-\/format\ off}}
+\DoxyCodeLine{00159\ }
+\DoxyCodeLine{00160\ \textcolor{preprocessor}{\ \ \#ifndef\ FLATBUFFERS\_PREFER\_PRINTF}}
+\DoxyCodeLine{00161\ \ \ \ \ \textcolor{comment}{//\ to\_string()\ prints\ different\ numbers\ of\ digits\ for\ floats\ depending\ on}}
+\DoxyCodeLine{00162\ \ \ \ \ \textcolor{comment}{//\ platform\ and\ isn't\ available\ on\ Android,\ so\ we\ use\ stringstream}}
+\DoxyCodeLine{00163\ \ \ \ \ std::stringstream\ ss;}
+\DoxyCodeLine{00164\ \ \ \ \ \textcolor{comment}{//\ Use\ std::fixed\ to\ suppress\ scientific\ notation.}}
+\DoxyCodeLine{00165\ \ \ \ \ ss\ <<\ std::fixed;}
+\DoxyCodeLine{00166\ \ \ \ \ \textcolor{comment}{//\ Default\ precision\ is\ 6,\ we\ want\ that\ to\ be\ higher\ for\ doubles.}}
+\DoxyCodeLine{00167\ \ \ \ \ ss\ <<\ std::setprecision(precision);}
+\DoxyCodeLine{00168\ \ \ \ \ ss\ <<\ t;}
+\DoxyCodeLine{00169\ \ \ \ \ \textcolor{keyword}{auto}\ s\ =\ ss.str();}
+\DoxyCodeLine{00170\ \textcolor{preprocessor}{\ \ \#else\ }\textcolor{comment}{//\ FLATBUFFERS\_PREFER\_PRINTF}}
+\DoxyCodeLine{00171\ \ \ \ \ \textcolor{keyword}{auto}\ v\ =\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{double}\textcolor{keyword}{>}(t);}
+\DoxyCodeLine{00172\ \ \ \ \ \textcolor{keyword}{auto}\ s\ =\ \mbox{\hyperlink{namespaceflatbuffers_aef38c532228ad558d7499744c5ac8c8b}{NumToStringImplWrapper}}(v,\ \textcolor{stringliteral}{"{}\%0.*f"{}},\ precision);}
+\DoxyCodeLine{00173\ \textcolor{preprocessor}{\ \ \#endif\ }\textcolor{comment}{//\ FLATBUFFERS\_PREFER\_PRINTF}}
+\DoxyCodeLine{00174\ \ \ \textcolor{comment}{//\ clang-\/format\ on}}
+\DoxyCodeLine{00175\ \ \ \textcolor{comment}{//\ Sadly,\ std::fixed\ turns\ "{}1"{}\ into\ "{}1.00000"{},\ so\ here\ we\ undo\ that.}}
+\DoxyCodeLine{00176\ \ \ \textcolor{keyword}{auto}\ p\ =\ s.find\_last\_not\_of(\textcolor{charliteral}{'0'});}
+\DoxyCodeLine{00177\ \ \ \textcolor{keywordflow}{if}\ (p\ !=\ std::string::npos)\ \{}
+\DoxyCodeLine{00178\ \ \ \ \ \textcolor{comment}{//\ Strip\ trailing\ zeroes.\ If\ it\ is\ a\ whole\ number,\ keep\ one\ zero.}}
+\DoxyCodeLine{00179\ \ \ \ \ s.resize(p\ +\ (s[p]\ ==\ \textcolor{charliteral}{'.'}\ ?\ 2\ :\ 1));}
+\DoxyCodeLine{00180\ \ \ \}}
+\DoxyCodeLine{00181\ \ \ \textcolor{keywordflow}{return}\ s;}
+\DoxyCodeLine{00182\ \}}
+\DoxyCodeLine{00183\ }
+\DoxyCodeLine{00184\ \textcolor{keyword}{template}<>\ \textcolor{keyword}{inline}\ std::string\ \mbox{\hyperlink{namespaceflatbuffers_a4c5838654079ef43c3887d1600d721f7}{NumToString<double>}}(\textcolor{keywordtype}{double}\ t)\ \{}
+\DoxyCodeLine{00185\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespaceflatbuffers_add145b416cc4318c72340306f415d543}{FloatToString}}(t,\ 12);}
+\DoxyCodeLine{00186\ \}}
+\DoxyCodeLine{00187\ \textcolor{keyword}{template}<>\ \textcolor{keyword}{inline}\ std::string\ \mbox{\hyperlink{namespaceflatbuffers_a6dcef4565da4a091953b09c5d96bae2a}{NumToString<float>}}(\textcolor{keywordtype}{float}\ t)\ \{}
+\DoxyCodeLine{00188\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespaceflatbuffers_add145b416cc4318c72340306f415d543}{FloatToString}}(t,\ 6);}
+\DoxyCodeLine{00189\ \}}
+\DoxyCodeLine{00190\ }
+\DoxyCodeLine{00191\ \textcolor{comment}{//\ Convert\ an\ integer\ value\ to\ a\ hexadecimal\ string.}}
+\DoxyCodeLine{00192\ \textcolor{comment}{//\ The\ returned\ string\ length\ is\ always\ xdigits\ long,\ prefixed\ by\ 0\ digits.}}
+\DoxyCodeLine{00193\ \textcolor{comment}{//\ For\ example,\ IntToStringHex(0x23,\ 8)\ returns\ the\ string\ "{}00000023"{}.}}
+\DoxyCodeLine{00194\ \textcolor{keyword}{inline}\ std::string\ \mbox{\hyperlink{namespaceflatbuffers_a4a1d66ec4ae994cbdd6a371026b01182}{IntToStringHex}}(\textcolor{keywordtype}{int}\ i,\ \textcolor{keywordtype}{int}\ xdigits)\ \{}
+\DoxyCodeLine{00195\ \ \ \mbox{\hyperlink{base_8h_ab2116a3957cb3c19761609ea7fd796fe}{FLATBUFFERS\_ASSERT}}(i\ >=\ 0);}
+\DoxyCodeLine{00196\ \ \ \textcolor{comment}{//\ clang-\/format\ off}}
+\DoxyCodeLine{00197\ }
+\DoxyCodeLine{00198\ \textcolor{preprocessor}{\ \ \#ifndef\ FLATBUFFERS\_PREFER\_PRINTF}}
+\DoxyCodeLine{00199\ \ \ \ \ std::stringstream\ ss;}
+\DoxyCodeLine{00200\ \ \ \ \ ss\ <<\ std::setw(xdigits)\ <<\ std::setfill(\textcolor{charliteral}{'0'})\ <<\ std::hex\ <<\ std::uppercase}
+\DoxyCodeLine{00201\ \ \ \ \ \ \ \ <<\ i;}
+\DoxyCodeLine{00202\ \ \ \ \ \textcolor{keywordflow}{return}\ ss.str();}
+\DoxyCodeLine{00203\ \textcolor{preprocessor}{\ \ \#else\ }\textcolor{comment}{//\ FLATBUFFERS\_PREFER\_PRINTF}}
+\DoxyCodeLine{00204\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespaceflatbuffers_aef38c532228ad558d7499744c5ac8c8b}{NumToStringImplWrapper}}(i,\ \textcolor{stringliteral}{"{}\%.*X"{}},\ xdigits);}
+\DoxyCodeLine{00205\ \textcolor{preprocessor}{\ \ \#endif\ }\textcolor{comment}{//\ FLATBUFFERS\_PREFER\_PRINTF}}
+\DoxyCodeLine{00206\ \ \ \textcolor{comment}{//\ clang-\/format\ on}}
+\DoxyCodeLine{00207\ \}}
+\DoxyCodeLine{00208\ }
+\DoxyCodeLine{00209\ \textcolor{comment}{//\ clang-\/format\ off}}
+\DoxyCodeLine{00210\ \textcolor{comment}{//\ Use\ locale\ independent\ functions\ \{strtod\_l,\ strtof\_l,\ strtoll\_l,\ strtoull\_l\}.}}
+\DoxyCodeLine{00211\ \textcolor{preprocessor}{\#if\ defined(FLATBUFFERS\_LOCALE\_INDEPENDENT)\ \&\&\ (FLATBUFFERS\_LOCALE\_INDEPENDENT\ >\ 0)}}
+\DoxyCodeLine{00212\ \ \ \textcolor{keyword}{class\ }ClassicLocale\ \{}
+\DoxyCodeLine{00213\ \textcolor{preprocessor}{\ \ \ \ \#ifdef\ \_MSC\_VER}}
+\DoxyCodeLine{00214\ \ \ \ \ \ \ \textcolor{keyword}{typedef}\ \_locale\_t\ locale\_type;}
+\DoxyCodeLine{00215\ \textcolor{preprocessor}{\ \ \ \ \#else}}
+\DoxyCodeLine{00216\ \ \ \ \ \ \ \textcolor{keyword}{typedef}\ locale\_t\ locale\_type;\ \ \textcolor{comment}{//\ POSIX.1-\/2008\ locale\_t\ type}}
+\DoxyCodeLine{00217\ \textcolor{preprocessor}{\ \ \ \ \#endif}}
+\DoxyCodeLine{00218\ \ \ \ \ ClassicLocale();}
+\DoxyCodeLine{00219\ \ \ \ \ \string~ClassicLocale();}
+\DoxyCodeLine{00220\ \ \ \ \ locale\_type\ locale\_;}
+\DoxyCodeLine{00221\ \ \ \ \ \textcolor{keyword}{static}\ ClassicLocale\ instance\_;}
+\DoxyCodeLine{00222\ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00223\ \ \ \ \ \textcolor{keyword}{static}\ locale\_type\ Get()\ \{\ \textcolor{keywordflow}{return}\ instance\_.locale\_;\ \}}
+\DoxyCodeLine{00224\ \ \ \};}
+\DoxyCodeLine{00225\ }
+\DoxyCodeLine{00226\ \textcolor{preprocessor}{\ \ \#ifdef\ \_MSC\_VER}}
+\DoxyCodeLine{00227\ \textcolor{preprocessor}{\ \ \ \ \#define\ \_\_strtoull\_impl(s,\ pe,\ b)\ \_strtoui64\_l(s,\ pe,\ b,\ ClassicLocale::Get())}}
+\DoxyCodeLine{00228\ \textcolor{preprocessor}{\ \ \ \ \#define\ \_\_strtoll\_impl(s,\ pe,\ b)\ \_strtoi64\_l(s,\ pe,\ b,\ ClassicLocale::Get())}}
+\DoxyCodeLine{00229\ \textcolor{preprocessor}{\ \ \ \ \#define\ \_\_strtod\_impl(s,\ pe)\ \_strtod\_l(s,\ pe,\ ClassicLocale::Get())}}
+\DoxyCodeLine{00230\ \textcolor{preprocessor}{\ \ \ \ \#define\ \_\_strtof\_impl(s,\ pe)\ \_strtof\_l(s,\ pe,\ ClassicLocale::Get())}}
+\DoxyCodeLine{00231\ \textcolor{preprocessor}{\ \ \#else}}
+\DoxyCodeLine{00232\ \textcolor{preprocessor}{\ \ \ \ \#define\ \_\_strtoull\_impl(s,\ pe,\ b)\ strtoull\_l(s,\ pe,\ b,\ ClassicLocale::Get())}}
+\DoxyCodeLine{00233\ \textcolor{preprocessor}{\ \ \ \ \#define\ \_\_strtoll\_impl(s,\ pe,\ b)\ strtoll\_l(s,\ pe,\ b,\ ClassicLocale::Get())}}
+\DoxyCodeLine{00234\ \textcolor{preprocessor}{\ \ \ \ \#define\ \_\_strtod\_impl(s,\ pe)\ strtod\_l(s,\ pe,\ ClassicLocale::Get())}}
+\DoxyCodeLine{00235\ \textcolor{preprocessor}{\ \ \ \ \#define\ \_\_strtof\_impl(s,\ pe)\ strtof\_l(s,\ pe,\ ClassicLocale::Get())}}
+\DoxyCodeLine{00236\ \textcolor{preprocessor}{\ \ \#endif}}
+\DoxyCodeLine{00237\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00238\ \textcolor{preprocessor}{\ \ \#define\ \_\_strtod\_impl(s,\ pe)\ strtod(s,\ pe)}}
+\DoxyCodeLine{00239\ \textcolor{preprocessor}{\ \ \#define\ \_\_strtof\_impl(s,\ pe)\ static\_cast<float>(strtod(s,\ pe))}}
+\DoxyCodeLine{00240\ \textcolor{preprocessor}{\ \ \#ifdef\ \_MSC\_VER}}
+\DoxyCodeLine{00241\ \textcolor{preprocessor}{\ \ \ \ \#define\ \_\_strtoull\_impl(s,\ pe,\ b)\ \_strtoui64(s,\ pe,\ b)}}
+\DoxyCodeLine{00242\ \textcolor{preprocessor}{\ \ \ \ \#define\ \_\_strtoll\_impl(s,\ pe,\ b)\ \_strtoi64(s,\ pe,\ b)}}
+\DoxyCodeLine{00243\ \textcolor{preprocessor}{\ \ \#else}}
+\DoxyCodeLine{00244\ \textcolor{preprocessor}{\ \ \ \ \#define\ \_\_strtoull\_impl(s,\ pe,\ b)\ strtoull(s,\ pe,\ b)}}
+\DoxyCodeLine{00245\ \textcolor{preprocessor}{\ \ \ \ \#define\ \_\_strtoll\_impl(s,\ pe,\ b)\ strtoll(s,\ pe,\ b)}}
+\DoxyCodeLine{00246\ \textcolor{preprocessor}{\ \ \#endif}}
+\DoxyCodeLine{00247\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00248\ }
+\DoxyCodeLine{00249\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespaceflatbuffers_ae8ca7c457a87af9b556c1c50fea9f439}{strtoval\_impl}}(int64\_t\ *val,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *str,\ \textcolor{keywordtype}{char}\ **\mbox{\hyperlink{namespaceflatbuffers_a9864458b536a64d851158ab330cf5d06}{endptr}},}
+\DoxyCodeLine{00250\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ base)\ \{}
+\DoxyCodeLine{00251\ \ \ \ \ *val\ =\ \mbox{\hyperlink{util_8h_a13c3cc0243719c0e4a065cc8613a4b64}{\_\_strtoll\_impl}}(str,\ \mbox{\hyperlink{namespaceflatbuffers_a9864458b536a64d851158ab330cf5d06}{endptr}},\ base);}
+\DoxyCodeLine{00252\ \}}
+\DoxyCodeLine{00253\ }
+\DoxyCodeLine{00254\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespaceflatbuffers_ae8ca7c457a87af9b556c1c50fea9f439}{strtoval\_impl}}(uint64\_t\ *val,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *str,\ \textcolor{keywordtype}{char}\ **\mbox{\hyperlink{namespaceflatbuffers_a9864458b536a64d851158ab330cf5d06}{endptr}},}
+\DoxyCodeLine{00255\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ base)\ \{}
+\DoxyCodeLine{00256\ \ \ *val\ =\ \mbox{\hyperlink{util_8h_a4c79eefc17513ccbc139b91f5fd8f901}{\_\_strtoull\_impl}}(str,\ \mbox{\hyperlink{namespaceflatbuffers_a9864458b536a64d851158ab330cf5d06}{endptr}},\ base);}
+\DoxyCodeLine{00257\ \}}
+\DoxyCodeLine{00258\ }
+\DoxyCodeLine{00259\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespaceflatbuffers_ae8ca7c457a87af9b556c1c50fea9f439}{strtoval\_impl}}(\textcolor{keywordtype}{double}\ *val,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *str,\ \textcolor{keywordtype}{char}\ **\mbox{\hyperlink{namespaceflatbuffers_a9864458b536a64d851158ab330cf5d06}{endptr}})\ \{}
+\DoxyCodeLine{00260\ \ \ *val\ =\ \mbox{\hyperlink{util_8h_a7d0164d0bbb2c0c96cdbf13596d66cdb}{\_\_strtod\_impl}}(str,\ \mbox{\hyperlink{namespaceflatbuffers_a9864458b536a64d851158ab330cf5d06}{endptr}});}
+\DoxyCodeLine{00261\ \}}
+\DoxyCodeLine{00262\ }
+\DoxyCodeLine{00263\ \textcolor{comment}{//\ UBSAN:\ double\ to\ float\ is\ safe\ if\ numeric\_limits<float>::is\_iec559\ is\ true.}}
+\DoxyCodeLine{00264\ \mbox{\hyperlink{namespaceflatbuffers_a76e4bb913a67dab48790e7db3d79241d}{\_\_supress\_ubsan\_\_}}(\textcolor{stringliteral}{"{}float-\/cast-\/overflow"{}})}
+\DoxyCodeLine{00265\ inline\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespaceflatbuffers_ae8ca7c457a87af9b556c1c50fea9f439}{strtoval\_impl}}(\textcolor{keywordtype}{float}\ *val,\ const\ \textcolor{keywordtype}{char}\ *str,\ \textcolor{keywordtype}{char}\ **\mbox{\hyperlink{namespaceflatbuffers_a9864458b536a64d851158ab330cf5d06}{endptr}})\ \{}
+\DoxyCodeLine{00266\ \ \ *val\ =\ \mbox{\hyperlink{util_8h_ae56e317871de7fbc3942efcb5fe96002}{\_\_strtof\_impl}}(str,\ \mbox{\hyperlink{namespaceflatbuffers_a9864458b536a64d851158ab330cf5d06}{endptr}});}
+\DoxyCodeLine{00267\ \}}
+\DoxyCodeLine{00268\ \textcolor{preprocessor}{\#undef\ \_\_strtoull\_impl}}
+\DoxyCodeLine{00269\ \textcolor{preprocessor}{\#undef\ \_\_strtoll\_impl}}
+\DoxyCodeLine{00270\ \textcolor{preprocessor}{\#undef\ \_\_strtod\_impl}}
+\DoxyCodeLine{00271\ \textcolor{preprocessor}{\#undef\ \_\_strtof\_impl}}
+\DoxyCodeLine{00272\ \textcolor{comment}{//\ clang-\/format\ on}}
+\DoxyCodeLine{00273\ }
+\DoxyCodeLine{00274\ \textcolor{comment}{//\ Adaptor\ for\ strtoull()/strtoll().}}
+\DoxyCodeLine{00275\ \textcolor{comment}{//\ Flatbuffers\ accepts\ numbers\ with\ any\ count\ of\ leading\ zeros\ (-\/009\ is\ -\/9),}}
+\DoxyCodeLine{00276\ \textcolor{comment}{//\ while\ strtoll\ with\ base=0\ interprets\ first\ leading\ zero\ as\ octal\ prefix.}}
+\DoxyCodeLine{00277\ \textcolor{comment}{//\ In\ future,\ it\ is\ possible\ to\ add\ prefixed\ 0b0101.}}
+\DoxyCodeLine{00278\ \textcolor{comment}{//\ 1)\ Checks\ errno\ code\ for\ overflow\ condition\ (out\ of\ range).}}
+\DoxyCodeLine{00279\ \textcolor{comment}{//\ 2)\ If\ base\ <=\ 0,\ function\ try\ to\ detect\ base\ of\ number\ by\ prefix.}}
+\DoxyCodeLine{00280\ \textcolor{comment}{//}}
+\DoxyCodeLine{00281\ \textcolor{comment}{//\ Return\ value\ (like\ strtoull\ and\ strtoll,\ but\ reject\ partial\ result):}}
+\DoxyCodeLine{00282\ \textcolor{comment}{//\ -\/\ If\ successful,\ an\ integer\ value\ corresponding\ to\ the\ str\ is\ returned.}}
+\DoxyCodeLine{00283\ \textcolor{comment}{//\ -\/\ If\ full\ string\ conversion\ can't\ be\ performed,\ 0\ is\ returned.}}
+\DoxyCodeLine{00284\ \textcolor{comment}{//\ -\/\ If\ the\ converted\ value\ falls\ out\ of\ range\ of\ corresponding\ return\ type,\ a}}
+\DoxyCodeLine{00285\ \textcolor{comment}{//\ range\ error\ occurs.\ In\ this\ case\ value\ MAX(T)/MIN(T)\ is\ returned.}}
+\DoxyCodeLine{00286\ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{00287\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespaceflatbuffers_a429f340f0aa01d2fd66afed67af73ab1}{StringToIntegerImpl}}(T\ *val,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *\textcolor{keyword}{const}\ str,}
+\DoxyCodeLine{00288\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ base\ =\ 0,}
+\DoxyCodeLine{00289\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{bool}\ check\_errno\ =\ \textcolor{keyword}{true})\ \{}
+\DoxyCodeLine{00290\ \ \ \textcolor{comment}{//\ T\ is\ int64\_t\ or\ uint64\_T}}
+\DoxyCodeLine{00291\ \ \ \mbox{\hyperlink{base_8h_ab2116a3957cb3c19761609ea7fd796fe}{FLATBUFFERS\_ASSERT}}(str);}
+\DoxyCodeLine{00292\ \ \ \textcolor{keywordflow}{if}\ (base\ <=\ 0)\ \{}
+\DoxyCodeLine{00293\ \ \ \ \ \textcolor{keyword}{auto}\ s\ =\ \mbox{\hyperlink{namespaceflatbuffers_a9be0767818b12c2f751339da8787c0ad}{str}};}
+\DoxyCodeLine{00294\ \ \ \ \ \textcolor{keywordflow}{while}\ (*s\ \&\&\ !\mbox{\hyperlink{namespaceflatbuffers_a880e3a3b3e735c4223ba3d07f1ffd1ae}{is\_digit}}(*s))\ s++;}
+\DoxyCodeLine{00295\ \ \ \ \ \textcolor{keywordflow}{if}\ (s[0]\ ==\ \textcolor{charliteral}{'0'}\ \&\&\ \mbox{\hyperlink{namespaceflatbuffers_acefb3899ff2918e062daef70ba7dba91}{is\_alpha\_char}}(s[1],\ \textcolor{charliteral}{'X'}))}
+\DoxyCodeLine{00296\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespaceflatbuffers_a429f340f0aa01d2fd66afed67af73ab1}{StringToIntegerImpl}}(val,\ str,\ 16,\ check\_errno);}
+\DoxyCodeLine{00297\ \ \ \ \ \textcolor{comment}{//\ if\ a\ prefix\ not\ match,\ try\ base=10}}
+\DoxyCodeLine{00298\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespaceflatbuffers_a429f340f0aa01d2fd66afed67af73ab1}{StringToIntegerImpl}}(val,\ str,\ 10,\ check\_errno);}
+\DoxyCodeLine{00299\ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00300\ \ \ \ \ \textcolor{keywordflow}{if}\ (check\_errno)\ errno\ =\ 0;\ \ \textcolor{comment}{//\ clear\ thread-\/local\ errno}}
+\DoxyCodeLine{00301\ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespaceflatbuffers_a9864458b536a64d851158ab330cf5d06}{endptr}}\ =\ \mbox{\hyperlink{namespaceflatbuffers_a9be0767818b12c2f751339da8787c0ad}{str}};}
+\DoxyCodeLine{00302\ \ \ \ \ \mbox{\hyperlink{namespaceflatbuffers_ae8ca7c457a87af9b556c1c50fea9f439}{strtoval\_impl}}(val,\ str,\ \textcolor{keyword}{const\_cast<}\textcolor{keywordtype}{char}\ **\textcolor{keyword}{>}(\&\mbox{\hyperlink{namespaceflatbuffers_a9864458b536a64d851158ab330cf5d06}{endptr}}),\ base);}
+\DoxyCodeLine{00303\ \ \ \ \ \textcolor{keywordflow}{if}\ ((*\mbox{\hyperlink{namespaceflatbuffers_a9864458b536a64d851158ab330cf5d06}{endptr}}\ !=\ \textcolor{charliteral}{'\(\backslash\)0'})\ ||\ (\mbox{\hyperlink{namespaceflatbuffers_a9864458b536a64d851158ab330cf5d06}{endptr}}\ ==\ str))\ \{}
+\DoxyCodeLine{00304\ \ \ \ \ \ \ *val\ =\ 0;\ \ \ \ \ \ \textcolor{comment}{//\ erase\ partial\ result}}
+\DoxyCodeLine{00305\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};\ \ \textcolor{comment}{//\ invalid\ string}}
+\DoxyCodeLine{00306\ \ \ \ \ \}}
+\DoxyCodeLine{00307\ \ \ \ \ \textcolor{comment}{//\ errno\ is\ out-\/of-\/range,\ return\ MAX/MIN}}
+\DoxyCodeLine{00308\ \ \ \ \ \textcolor{keywordflow}{if}\ (check\_errno\ \&\&\ errno)\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00309\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00310\ \ \ \}}
+\DoxyCodeLine{00311\ \}}
+\DoxyCodeLine{00312\ }
+\DoxyCodeLine{00313\ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{00314\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespaceflatbuffers_ab036b6473ac5f6deaad92fb9ed85e3bd}{StringToFloatImpl}}(T\ *val,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *\textcolor{keyword}{const}\ str)\ \{}
+\DoxyCodeLine{00315\ \ \ \textcolor{comment}{//\ Type\ T\ must\ be\ either\ float\ or\ double.}}
+\DoxyCodeLine{00316\ \ \ \mbox{\hyperlink{base_8h_ab2116a3957cb3c19761609ea7fd796fe}{FLATBUFFERS\_ASSERT}}(str\ \&\&\ val);}
+\DoxyCodeLine{00317\ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcdc91c794b43404000e39f72876c1c287_a4415abf9861e3883a31d588f3909eba9}{end}}\ =\ \mbox{\hyperlink{namespaceflatbuffers_a9be0767818b12c2f751339da8787c0ad}{str}};}
+\DoxyCodeLine{00318\ \ \ \mbox{\hyperlink{namespaceflatbuffers_ae8ca7c457a87af9b556c1c50fea9f439}{strtoval\_impl}}(val,\ str,\ \textcolor{keyword}{const\_cast<}\textcolor{keywordtype}{char}\ **\textcolor{keyword}{>}(\&\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcdc91c794b43404000e39f72876c1c287_a4415abf9861e3883a31d588f3909eba9}{end}}));}
+\DoxyCodeLine{00319\ \ \ \textcolor{keyword}{auto}\ done\ =\ (\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcdc91c794b43404000e39f72876c1c287_a4415abf9861e3883a31d588f3909eba9}{end}}\ !=\ \mbox{\hyperlink{namespaceflatbuffers_a9be0767818b12c2f751339da8787c0ad}{str}})\ \&\&\ (*\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcdc91c794b43404000e39f72876c1c287_a4415abf9861e3883a31d588f3909eba9}{end}}\ ==\ \textcolor{charliteral}{'\(\backslash\)0'});}
+\DoxyCodeLine{00320\ \ \ \textcolor{keywordflow}{if}\ (!done)\ *val\ =\ 0;\ \ \textcolor{comment}{//\ erase\ partial\ result}}
+\DoxyCodeLine{00321\ \ \ \textcolor{keywordflow}{return}\ done;}
+\DoxyCodeLine{00322\ \}}
+\DoxyCodeLine{00323\ }
+\DoxyCodeLine{00324\ \textcolor{comment}{//\ Convert\ a\ string\ to\ an\ instance\ of\ T.}}
+\DoxyCodeLine{00325\ \textcolor{comment}{//\ Return\ value\ (matched\ with\ StringToInteger64Impl\ and\ strtod):}}
+\DoxyCodeLine{00326\ \textcolor{comment}{//\ -\/\ If\ successful,\ a\ numeric\ value\ corresponding\ to\ the\ str\ is\ returned.}}
+\DoxyCodeLine{00327\ \textcolor{comment}{//\ -\/\ If\ full\ string\ conversion\ can't\ be\ performed,\ 0\ is\ returned.}}
+\DoxyCodeLine{00328\ \textcolor{comment}{//\ -\/\ If\ the\ converted\ value\ falls\ out\ of\ range\ of\ corresponding\ return\ type,\ a}}
+\DoxyCodeLine{00329\ \textcolor{comment}{//\ range\ error\ occurs.\ In\ this\ case\ value\ MAX(T)/MIN(T)\ is\ returned.}}
+\DoxyCodeLine{00330\ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespaceflatbuffers_aa1ddd4070b72ace12ef4b4e235986391}{StringToNumber}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *s,\ T\ *val)\ \{}
+\DoxyCodeLine{00331\ \ \ \textcolor{comment}{//\ Assert\ on\ \`{}unsigned\ long`\ and\ \`{}signed\ long`\ on\ LP64.}}
+\DoxyCodeLine{00332\ \ \ \textcolor{comment}{//\ If\ it\ is\ necessary,\ it\ could\ be\ solved\ with\ flatbuffers::enable\_if<B,T>.}}
+\DoxyCodeLine{00333\ \ \ \textcolor{keyword}{static\_assert}(\textcolor{keyword}{sizeof}(T)\ <\ \textcolor{keyword}{sizeof}(int64\_t),\ \textcolor{stringliteral}{"{}unexpected\ type\ T"{}});}
+\DoxyCodeLine{00334\ \ \ \mbox{\hyperlink{base_8h_ab2116a3957cb3c19761609ea7fd796fe}{FLATBUFFERS\_ASSERT}}(s\ \&\&\ val);}
+\DoxyCodeLine{00335\ \ \ int64\_t\ i64;}
+\DoxyCodeLine{00336\ \ \ \textcolor{comment}{//\ The\ errno\ check\ isn't\ needed,\ will\ return\ MAX/MIN\ on\ overflow.}}
+\DoxyCodeLine{00337\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{namespaceflatbuffers_a429f340f0aa01d2fd66afed67af73ab1}{StringToIntegerImpl}}(\&i64,\ s,\ 0,\ \textcolor{keyword}{false}))\ \{}
+\DoxyCodeLine{00338\ \ \ \ \ \textcolor{keyword}{const}\ int64\_t\ \mbox{\hyperlink{common__functions_8h_affe776513b24d84b39af8ab0930fef7f}{max}}\ =\ (\mbox{\hyperlink{classflatbuffers_1_1numeric__limits}{flatbuffers::numeric\_limits<T>::max}})();}
+\DoxyCodeLine{00339\ \ \ \ \ \textcolor{keyword}{const}\ int64\_t\ \mbox{\hyperlink{common__functions_8h_ac6afabdc09a49a433ee19d8a9486056d}{min}}\ =\ \mbox{\hyperlink{classflatbuffers_1_1numeric__limits}{flatbuffers::numeric\_limits<T>::lowest}}();}
+\DoxyCodeLine{00340\ \ \ \ \ \textcolor{keywordflow}{if}\ (i64\ >\ \mbox{\hyperlink{common__functions_8h_affe776513b24d84b39af8ab0930fef7f}{max}})\ \{}
+\DoxyCodeLine{00341\ \ \ \ \ \ \ *val\ =\ \textcolor{keyword}{static\_cast<}T\textcolor{keyword}{>}(\mbox{\hyperlink{common__functions_8h_affe776513b24d84b39af8ab0930fef7f}{max}});}
+\DoxyCodeLine{00342\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00343\ \ \ \ \ \}}
+\DoxyCodeLine{00344\ \ \ \ \ \textcolor{keywordflow}{if}\ (i64\ <\ \mbox{\hyperlink{common__functions_8h_ac6afabdc09a49a433ee19d8a9486056d}{min}})\ \{}
+\DoxyCodeLine{00345\ \ \ \ \ \ \ \textcolor{comment}{//\ For\ unsigned\ types\ return\ max\ to\ distinguish\ from}}
+\DoxyCodeLine{00346\ \ \ \ \ \ \ \textcolor{comment}{//\ "{}no\ conversion\ can\ be\ performed"{}\ when\ 0\ is\ returned.}}
+\DoxyCodeLine{00347\ \ \ \ \ \ \ *val\ =\ \textcolor{keyword}{static\_cast<}T\textcolor{keyword}{>}(\mbox{\hyperlink{structflatbuffers_1_1is__unsigned}{flatbuffers::is\_unsigned<T>::value}}\ ?\ \mbox{\hyperlink{common__functions_8h_affe776513b24d84b39af8ab0930fef7f}{max}}\ :\ \mbox{\hyperlink{common__functions_8h_ac6afabdc09a49a433ee19d8a9486056d}{min}});}
+\DoxyCodeLine{00348\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00349\ \ \ \ \ \}}
+\DoxyCodeLine{00350\ \ \ \ \ *val\ =\ \textcolor{keyword}{static\_cast<}T\textcolor{keyword}{>}(i64);}
+\DoxyCodeLine{00351\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00352\ \ \ \}}
+\DoxyCodeLine{00353\ \ \ *val\ =\ 0;}
+\DoxyCodeLine{00354\ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00355\ \}}
+\DoxyCodeLine{00356\ }
+\DoxyCodeLine{00357\ \textcolor{keyword}{template}<>\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespaceflatbuffers_a0581a15ff13dd13dd249180233f7e093}{StringToNumber<int64\_t>}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *str,\ int64\_t\ *val)\ \{}
+\DoxyCodeLine{00358\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespaceflatbuffers_a429f340f0aa01d2fd66afed67af73ab1}{StringToIntegerImpl}}(val,\ str);}
+\DoxyCodeLine{00359\ \}}
+\DoxyCodeLine{00360\ }
+\DoxyCodeLine{00361\ \textcolor{keyword}{template}<>}
+\DoxyCodeLine{00362\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespaceflatbuffers_a7ff179c5549bef6d6f6a72fd0cba598b}{StringToNumber<uint64\_t>}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *str,\ uint64\_t\ *val)\ \{}
+\DoxyCodeLine{00363\ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{namespaceflatbuffers_a429f340f0aa01d2fd66afed67af73ab1}{StringToIntegerImpl}}(val,\ str))\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00364\ \ \ \textcolor{comment}{//\ The\ strtoull\ accepts\ negative\ numbers:}}
+\DoxyCodeLine{00365\ \ \ \textcolor{comment}{//\ If\ the\ minus\ sign\ was\ part\ of\ the\ input\ sequence,\ the\ numeric\ value}}
+\DoxyCodeLine{00366\ \ \ \textcolor{comment}{//\ calculated\ from\ the\ sequence\ of\ digits\ is\ negated\ as\ if\ by\ unary\ minus}}
+\DoxyCodeLine{00367\ \ \ \textcolor{comment}{//\ in\ the\ result\ type,\ which\ applies\ unsigned\ integer\ wraparound\ rules.}}
+\DoxyCodeLine{00368\ \ \ \textcolor{comment}{//\ Fix\ this\ behaviour\ (except\ -\/0).}}
+\DoxyCodeLine{00369\ \ \ \textcolor{keywordflow}{if}\ (*val)\ \{}
+\DoxyCodeLine{00370\ \ \ \ \ \textcolor{keyword}{auto}\ s\ =\ \mbox{\hyperlink{namespaceflatbuffers_a9be0767818b12c2f751339da8787c0ad}{str}};}
+\DoxyCodeLine{00371\ \ \ \ \ \textcolor{keywordflow}{while}\ (*s\ \&\&\ !\mbox{\hyperlink{namespaceflatbuffers_a880e3a3b3e735c4223ba3d07f1ffd1ae}{is\_digit}}(*s))\ s++;}
+\DoxyCodeLine{00372\ \ \ \ \ s\ =\ (s\ >\ \mbox{\hyperlink{namespaceflatbuffers_a9be0767818b12c2f751339da8787c0ad}{str}})\ ?\ (s\ -\/\ 1)\ :\ s;\ \ \textcolor{comment}{//\ step\ back\ to\ one\ symbol}}
+\DoxyCodeLine{00373\ \ \ \ \ \textcolor{keywordflow}{if}\ (*s\ ==\ \textcolor{charliteral}{'-\/'})\ \{}
+\DoxyCodeLine{00374\ \ \ \ \ \ \ \textcolor{comment}{//\ For\ unsigned\ types\ return\ the\ max\ to\ distinguish\ from}}
+\DoxyCodeLine{00375\ \ \ \ \ \ \ \textcolor{comment}{//\ "{}no\ conversion\ can\ be\ performed"{}.}}
+\DoxyCodeLine{00376\ \ \ \ \ \ \ *val\ =\ (\mbox{\hyperlink{classflatbuffers_1_1numeric__limits}{flatbuffers::numeric\_limits<uint64\_t>::max}})();}
+\DoxyCodeLine{00377\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00378\ \ \ \ \ \}}
+\DoxyCodeLine{00379\ \ \ \}}
+\DoxyCodeLine{00380\ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00381\ \}}
+\DoxyCodeLine{00382\ }
+\DoxyCodeLine{00383\ \textcolor{keyword}{template}<>\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespaceflatbuffers_aa1ddd4070b72ace12ef4b4e235986391}{StringToNumber}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *s,\ \textcolor{keywordtype}{float}\ *val)\ \{}
+\DoxyCodeLine{00384\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespaceflatbuffers_ab036b6473ac5f6deaad92fb9ed85e3bd}{StringToFloatImpl}}(val,\ s);}
+\DoxyCodeLine{00385\ \}}
+\DoxyCodeLine{00386\ }
+\DoxyCodeLine{00387\ \textcolor{keyword}{template}<>\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespaceflatbuffers_aa1ddd4070b72ace12ef4b4e235986391}{StringToNumber}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *s,\ \textcolor{keywordtype}{double}\ *val)\ \{}
+\DoxyCodeLine{00388\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespaceflatbuffers_ab036b6473ac5f6deaad92fb9ed85e3bd}{StringToFloatImpl}}(val,\ s);}
+\DoxyCodeLine{00389\ \}}
+\DoxyCodeLine{00390\ }
+\DoxyCodeLine{00391\ \textcolor{keyword}{inline}\ int64\_t\ \mbox{\hyperlink{namespaceflatbuffers_a4d5b601ad8f91307a947821726661583}{StringToInt}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *s,\ \textcolor{keywordtype}{int}\ base\ =\ 10)\ \{}
+\DoxyCodeLine{00392\ \ \ int64\_t\ val;}
+\DoxyCodeLine{00393\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespaceflatbuffers_a429f340f0aa01d2fd66afed67af73ab1}{StringToIntegerImpl}}(\&val,\ s,\ base)\ ?\ val\ :\ 0;}
+\DoxyCodeLine{00394\ \}}
+\DoxyCodeLine{00395\ }
+\DoxyCodeLine{00396\ \textcolor{keyword}{inline}\ uint64\_t\ \mbox{\hyperlink{namespaceflatbuffers_ad86e0fd2693e425ef8fe9402265ef255}{StringToUInt}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *s,\ \textcolor{keywordtype}{int}\ base\ =\ 10)\ \{}
+\DoxyCodeLine{00397\ \ \ uint64\_t\ val;}
+\DoxyCodeLine{00398\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespaceflatbuffers_a429f340f0aa01d2fd66afed67af73ab1}{StringToIntegerImpl}}(\&val,\ s,\ base)\ ?\ val\ :\ 0;}
+\DoxyCodeLine{00399\ \}}
+\DoxyCodeLine{00400\ }
+\DoxyCodeLine{00401\ \textcolor{keyword}{typedef}\ bool\ (*\mbox{\hyperlink{namespaceflatbuffers_ac2e6a46fa79a884e90146a2965e66713}{LoadFileFunction}})(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *filename,\ \textcolor{keywordtype}{bool}\ binary,}
+\DoxyCodeLine{00402\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::string\ *dest);}
+\DoxyCodeLine{00403\ \textcolor{keyword}{typedef}\ bool\ (*\mbox{\hyperlink{namespaceflatbuffers_aa9c793b51c165cdde8181f282cf1ae27}{FileExistsFunction}})(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *filename);}
+\DoxyCodeLine{00404\ }
+\DoxyCodeLine{00405\ \mbox{\hyperlink{namespaceflatbuffers_ac2e6a46fa79a884e90146a2965e66713}{LoadFileFunction}}\ \mbox{\hyperlink{namespaceflatbuffers_a0a7f9224e47177d8cba2060586417fda}{SetLoadFileFunction}}(\mbox{\hyperlink{namespaceflatbuffers_ac2e6a46fa79a884e90146a2965e66713}{LoadFileFunction}}\ load\_file\_function);}
+\DoxyCodeLine{00406\ }
+\DoxyCodeLine{00407\ \mbox{\hyperlink{namespaceflatbuffers_aa9c793b51c165cdde8181f282cf1ae27}{FileExistsFunction}}\ \mbox{\hyperlink{namespaceflatbuffers_aabcde67ff10ec0ad382d975acda3388a}{SetFileExistsFunction}}(}
+\DoxyCodeLine{00408\ \ \ \ \ \mbox{\hyperlink{namespaceflatbuffers_aa9c793b51c165cdde8181f282cf1ae27}{FileExistsFunction}}\ file\_exists\_function);}
+\DoxyCodeLine{00409\ }
+\DoxyCodeLine{00410\ \textcolor{comment}{//\ Check\ if\ file\ "{}name"{}\ exists.}}
+\DoxyCodeLine{00411\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespaceflatbuffers_a88b388cb1b8d1ae66c2e578a2481e187}{FileExists}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *name);}
+\DoxyCodeLine{00412\ }
+\DoxyCodeLine{00413\ \textcolor{comment}{//\ Check\ if\ "{}name"{}\ exists\ and\ it\ is\ also\ a\ directory.}}
+\DoxyCodeLine{00414\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespaceflatbuffers_a9772bd69a02cfb2271d08b858b601e17}{DirExists}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *name);}
+\DoxyCodeLine{00415\ }
+\DoxyCodeLine{00416\ \textcolor{comment}{//\ Load\ file\ "{}name"{}\ into\ "{}buf"{}\ returning\ true\ if\ successful}}
+\DoxyCodeLine{00417\ \textcolor{comment}{//\ false\ otherwise.\ \ If\ "{}binary"{}\ is\ false\ data\ is\ read}}
+\DoxyCodeLine{00418\ \textcolor{comment}{//\ using\ ifstream's\ text\ mode,\ otherwise\ data\ is\ read\ with}}
+\DoxyCodeLine{00419\ \textcolor{comment}{//\ no\ transcoding.}}
+\DoxyCodeLine{00420\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespaceflatbuffers_adb0f54864393764f0239c737eeffecc7}{LoadFile}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *name,\ \textcolor{keywordtype}{bool}\ binary,\ std::string\ *buf);}
+\DoxyCodeLine{00421\ }
+\DoxyCodeLine{00422\ \textcolor{comment}{//\ Save\ data\ "{}buf"{}\ of\ length\ "{}len"{}\ bytes\ into\ a\ file}}
+\DoxyCodeLine{00423\ \textcolor{comment}{//\ "{}name"{}\ returning\ true\ if\ successful,\ false\ otherwise.}}
+\DoxyCodeLine{00424\ \textcolor{comment}{//\ If\ "{}binary"{}\ is\ false\ data\ is\ written\ using\ ifstream's}}
+\DoxyCodeLine{00425\ \textcolor{comment}{//\ text\ mode,\ otherwise\ data\ is\ written\ with\ no}}
+\DoxyCodeLine{00426\ \textcolor{comment}{//\ transcoding.}}
+\DoxyCodeLine{00427\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespaceflatbuffers_a1830a93a1a14a9227046889c82cf11b7}{SaveFile}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *name,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *buf,\ \textcolor{keywordtype}{size\_t}\ len,\ \textcolor{keywordtype}{bool}\ binary);}
+\DoxyCodeLine{00428\ }
+\DoxyCodeLine{00429\ \textcolor{comment}{//\ Save\ data\ "{}buf"{}\ into\ file\ "{}name"{}\ returning\ true\ if}}
+\DoxyCodeLine{00430\ \textcolor{comment}{//\ successful,\ false\ otherwise.\ \ If\ "{}binary"{}\ is\ false}}
+\DoxyCodeLine{00431\ \textcolor{comment}{//\ data\ is\ written\ using\ ifstream's\ text\ mode,\ otherwise}}
+\DoxyCodeLine{00432\ \textcolor{comment}{//\ data\ is\ written\ with\ no\ transcoding.}}
+\DoxyCodeLine{00433\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespaceflatbuffers_a1830a93a1a14a9227046889c82cf11b7}{SaveFile}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *name,\ \textcolor{keyword}{const}\ std::string\ \&buf,\ \textcolor{keywordtype}{bool}\ binary)\ \{}
+\DoxyCodeLine{00434\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespaceflatbuffers_a1830a93a1a14a9227046889c82cf11b7}{SaveFile}}(name,\ buf.c\_str(),\ buf.size(),\ binary);}
+\DoxyCodeLine{00435\ \}}
+\DoxyCodeLine{00436\ }
+\DoxyCodeLine{00437\ \textcolor{comment}{//\ Functionality\ for\ minimalistic\ portable\ path\ handling.}}
+\DoxyCodeLine{00438\ }
+\DoxyCodeLine{00439\ \textcolor{comment}{//\ The\ functions\ below\ behave\ correctly\ regardless\ of\ whether\ posix\ ('/')\ or}}
+\DoxyCodeLine{00440\ \textcolor{comment}{//\ Windows\ ('/'\ or\ '\(\backslash\)\(\backslash\)')\ separators\ are\ used.}}
+\DoxyCodeLine{00441\ }
+\DoxyCodeLine{00442\ \textcolor{comment}{//\ Any\ new\ separators\ inserted\ are\ always\ posix.}}
+\DoxyCodeLine{00443\ FLATBUFFERS\_CONSTEXPR\ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{namespaceflatbuffers_a1bc4d5e6da57c98881fca7e817ad82e8}{kPathSeparator}}\ =\ \textcolor{charliteral}{'/'};}
+\DoxyCodeLine{00444\ }
+\DoxyCodeLine{00445\ \textcolor{comment}{//\ Returns\ the\ path\ with\ the\ extension,\ if\ any,\ removed.}}
+\DoxyCodeLine{00446\ std::string\ \mbox{\hyperlink{namespaceflatbuffers_ad7dffc812b878c06bd5e5ac9e2c70172}{StripExtension}}(\textcolor{keyword}{const}\ std::string\ \&filepath);}
+\DoxyCodeLine{00447\ }
+\DoxyCodeLine{00448\ \textcolor{comment}{//\ Returns\ the\ extension,\ if\ any.}}
+\DoxyCodeLine{00449\ std::string\ \mbox{\hyperlink{namespaceflatbuffers_a1704908b63639924a3736b8ce48f1400}{GetExtension}}(\textcolor{keyword}{const}\ std::string\ \&filepath);}
+\DoxyCodeLine{00450\ }
+\DoxyCodeLine{00451\ \textcolor{comment}{//\ Return\ the\ last\ component\ of\ the\ path,\ after\ the\ last\ separator.}}
+\DoxyCodeLine{00452\ std::string\ \mbox{\hyperlink{namespaceflatbuffers_a3212db6c4a413235b28ce0750aa057fd}{StripPath}}(\textcolor{keyword}{const}\ std::string\ \&filepath);}
+\DoxyCodeLine{00453\ }
+\DoxyCodeLine{00454\ \textcolor{comment}{//\ Strip\ the\ last\ component\ of\ the\ path\ +\ separator.}}
+\DoxyCodeLine{00455\ std::string\ \mbox{\hyperlink{namespaceflatbuffers_a09f281f8826c229afd784ac1f46350f7}{StripFileName}}(\textcolor{keyword}{const}\ std::string\ \&filepath);}
+\DoxyCodeLine{00456\ }
+\DoxyCodeLine{00457\ std::string\ \mbox{\hyperlink{namespaceflatbuffers_a8046b89ecdedcbe378a2cc69a4183ea5}{StripPrefix}}(\textcolor{keyword}{const}\ std::string\ \&filepath,}
+\DoxyCodeLine{00458\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ std::string\ \&prefix\_to\_remove);}
+\DoxyCodeLine{00459\ }
+\DoxyCodeLine{00460\ \textcolor{comment}{//\ Concatenates\ a\ path\ with\ a\ filename,\ regardless\ of\ whether\ the\ path}}
+\DoxyCodeLine{00461\ \textcolor{comment}{//\ ends\ in\ a\ separator\ or\ not.}}
+\DoxyCodeLine{00462\ std::string\ \mbox{\hyperlink{namespaceflatbuffers_a81d3975f802226260741acd09ea84ad6}{ConCatPathFileName}}(\textcolor{keyword}{const}\ std::string\ \&path,}
+\DoxyCodeLine{00463\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ std::string\ \&filename);}
+\DoxyCodeLine{00464\ }
+\DoxyCodeLine{00465\ \textcolor{comment}{//\ Replaces\ any\ '\(\backslash\)\(\backslash\)'\ separators\ with\ '/'}}
+\DoxyCodeLine{00466\ std::string\ \mbox{\hyperlink{namespaceflatbuffers_ae3abb67cca51051b442417b9058aaeb5}{PosixPath}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *path);}
+\DoxyCodeLine{00467\ std::string\ \mbox{\hyperlink{namespaceflatbuffers_ae3abb67cca51051b442417b9058aaeb5}{PosixPath}}(\textcolor{keyword}{const}\ std::string\ \&path);}
+\DoxyCodeLine{00468\ }
+\DoxyCodeLine{00469\ \textcolor{comment}{//\ This\ function\ ensure\ a\ directory\ exists,\ by\ recursively}}
+\DoxyCodeLine{00470\ \textcolor{comment}{//\ creating\ dirs\ for\ any\ parts\ of\ the\ path\ that\ don't\ exist\ yet.}}
+\DoxyCodeLine{00471\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespaceflatbuffers_afc2afc1bab7652f985672b6e57009c93}{EnsureDirExists}}(\textcolor{keyword}{const}\ std::string\ \&filepath);}
+\DoxyCodeLine{00472\ }
+\DoxyCodeLine{00473\ \textcolor{comment}{//\ Obtains\ the\ absolute\ path\ from\ any\ other\ path.}}
+\DoxyCodeLine{00474\ \textcolor{comment}{//\ Returns\ the\ input\ path\ if\ the\ absolute\ path\ couldn't\ be\ resolved.}}
+\DoxyCodeLine{00475\ std::string\ \mbox{\hyperlink{namespaceflatbuffers_a52e690fc106d40e8ab685b18f54483f0}{AbsolutePath}}(\textcolor{keyword}{const}\ std::string\ \&filepath);}
+\DoxyCodeLine{00476\ }
+\DoxyCodeLine{00477\ \textcolor{comment}{//\ Returns\ files\ relative\ to\ the\ -\/-\/project\_root\ path,\ prefixed\ with\ \`{}//`.}}
+\DoxyCodeLine{00478\ std::string\ \mbox{\hyperlink{namespaceflatbuffers_a90f6f33cad52b2ed3bae316eb76c77c6}{RelativeToRootPath}}(\textcolor{keyword}{const}\ std::string\ \&project,}
+\DoxyCodeLine{00479\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ std::string\ \&filepath);}
+\DoxyCodeLine{00480\ }
+\DoxyCodeLine{00481\ \textcolor{comment}{//\ To\ and\ from\ UTF-\/8\ unicode\ conversion\ functions}}
+\DoxyCodeLine{00482\ }
+\DoxyCodeLine{00483\ \textcolor{comment}{//\ Convert\ a\ unicode\ code\ point\ into\ a\ UTF-\/8\ representation\ by\ appending\ it}}
+\DoxyCodeLine{00484\ \textcolor{comment}{//\ to\ a\ string.\ Returns\ the\ number\ of\ bytes\ generated.}}
+\DoxyCodeLine{00485\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{namespaceflatbuffers_a15130f94df72f64209884eb969ac4277}{ToUTF8}}(uint32\_t\ ucc,\ std::string\ *out)\ \{}
+\DoxyCodeLine{00486\ \ \ \mbox{\hyperlink{base_8h_ab2116a3957cb3c19761609ea7fd796fe}{FLATBUFFERS\_ASSERT}}(!(ucc\ \&\ 0x80000000));\ \ \textcolor{comment}{//\ Top\ bit\ can't\ be\ set.}}
+\DoxyCodeLine{00487\ \ \ \textcolor{comment}{//\ 6\ possible\ encodings:\ http://en.wikipedia.org/wiki/UTF-\/8}}
+\DoxyCodeLine{00488\ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ 6;\ i++)\ \{}
+\DoxyCodeLine{00489\ \ \ \ \ \textcolor{comment}{//\ Max\ bits\ this\ encoding\ can\ represent.}}
+\DoxyCodeLine{00490\ \ \ \ \ uint32\_t\ max\_bits\ =\ 6\ +\ i\ *\ 5\ +\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{int}\textcolor{keyword}{>}(!i);}
+\DoxyCodeLine{00491\ \ \ \ \ \textcolor{keywordflow}{if}\ (ucc\ <\ (1u\ <<\ max\_bits))\ \{\ \ \textcolor{comment}{//\ does\ it\ fit?}}
+\DoxyCodeLine{00492\ \ \ \ \ \ \ \textcolor{comment}{//\ Remaining\ bits\ not\ encoded\ in\ the\ first\ byte,\ store\ 6\ bits\ each}}
+\DoxyCodeLine{00493\ \ \ \ \ \ \ uint32\_t\ remain\_bits\ =\ i\ *\ 6;}
+\DoxyCodeLine{00494\ \ \ \ \ \ \ \textcolor{comment}{//\ Store\ first\ byte:}}
+\DoxyCodeLine{00495\ \ \ \ \ \ \ (*out)\ +=\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{char}\textcolor{keyword}{>}((0xFE\ <<\ (max\_bits\ -\/\ remain\_bits))\ |}
+\DoxyCodeLine{00496\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (ucc\ >>\ remain\_bits));}
+\DoxyCodeLine{00497\ \ \ \ \ \ \ \textcolor{comment}{//\ Store\ remaining\ bytes:}}
+\DoxyCodeLine{00498\ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ j\ =\ i\ -\/\ 1;\ j\ >=\ 0;\ j-\/-\/)\ \{}
+\DoxyCodeLine{00499\ \ \ \ \ \ \ \ \ (*out)\ +=\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{char}\textcolor{keyword}{>}(((ucc\ >>\ (j\ *\ 6))\ \&\ 0x3F)\ |\ 0x80);}
+\DoxyCodeLine{00500\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00501\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ i\ +\ 1;\ \ \textcolor{comment}{//\ Return\ the\ number\ of\ bytes\ added.}}
+\DoxyCodeLine{00502\ \ \ \ \ \}}
+\DoxyCodeLine{00503\ \ \ \}}
+\DoxyCodeLine{00504\ \ \ \mbox{\hyperlink{base_8h_ab2116a3957cb3c19761609ea7fd796fe}{FLATBUFFERS\_ASSERT}}(0);\ \ \textcolor{comment}{//\ Impossible\ to\ arrive\ here.}}
+\DoxyCodeLine{00505\ \ \ \textcolor{keywordflow}{return}\ -\/1;}
+\DoxyCodeLine{00506\ \}}
+\DoxyCodeLine{00507\ }
+\DoxyCodeLine{00508\ \textcolor{comment}{//\ Converts\ whatever\ prefix\ of\ the\ incoming\ string\ corresponds\ to\ a\ valid}}
+\DoxyCodeLine{00509\ \textcolor{comment}{//\ UTF-\/8\ sequence\ into\ a\ unicode\ code.\ The\ incoming\ pointer\ will\ have\ been}}
+\DoxyCodeLine{00510\ \textcolor{comment}{//\ advanced\ past\ all\ bytes\ parsed.}}
+\DoxyCodeLine{00511\ \textcolor{comment}{//\ returns\ -\/1\ upon\ corrupt\ UTF-\/8\ encoding\ (ignore\ the\ incoming\ pointer\ in}}
+\DoxyCodeLine{00512\ \textcolor{comment}{//\ this\ case).}}
+\DoxyCodeLine{00513\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{namespaceflatbuffers_ab009b4b2ffac16779320e9526f68bf10}{FromUTF8}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ **in)\ \{}
+\DoxyCodeLine{00514\ \ \ \textcolor{keywordtype}{int}\ len\ =\ 0;}
+\DoxyCodeLine{00515\ \ \ \textcolor{comment}{//\ Count\ leading\ 1\ bits.}}
+\DoxyCodeLine{00516\ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ \mbox{\hyperlink{wm8960__regs_8h_aa8c909ec5613d6178530fd55e62024c7}{mask}}\ =\ 0x80;\ \mbox{\hyperlink{wm8960__regs_8h_aa8c909ec5613d6178530fd55e62024c7}{mask}}\ >=\ 0x04;\ \mbox{\hyperlink{wm8960__regs_8h_aa8c909ec5613d6178530fd55e62024c7}{mask}}\ >>=\ 1)\ \{}
+\DoxyCodeLine{00517\ \ \ \ \ \textcolor{keywordflow}{if}\ (**in\ \&\ \mbox{\hyperlink{wm8960__regs_8h_aa8c909ec5613d6178530fd55e62024c7}{mask}})\ \{}
+\DoxyCodeLine{00518\ \ \ \ \ \ \ len++;}
+\DoxyCodeLine{00519\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00520\ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00521\ \ \ \ \ \}}
+\DoxyCodeLine{00522\ \ \ \}}
+\DoxyCodeLine{00523\ \ \ \textcolor{keywordflow}{if}\ ((\textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\textcolor{keyword}{>}(**in)\ <<\ len)\ \&\ 0x80)}
+\DoxyCodeLine{00524\ \ \ \ \ \textcolor{keywordflow}{return}\ -\/1;\ \ \textcolor{comment}{//\ Bit\ after\ leading\ 1's\ must\ be\ 0.}}
+\DoxyCodeLine{00525\ \ \ \textcolor{keywordflow}{if}\ (!len)\ \textcolor{keywordflow}{return}\ *(*in)++;}
+\DoxyCodeLine{00526\ \ \ \textcolor{comment}{//\ UTF-\/8\ encoded\ values\ with\ a\ length\ are\ between\ 2\ and\ 4\ bytes.}}
+\DoxyCodeLine{00527\ \ \ \textcolor{keywordflow}{if}\ (len\ <\ 2\ ||\ len\ >\ 4)\ \{\ \textcolor{keywordflow}{return}\ -\/1;\ \}}
+\DoxyCodeLine{00528\ \ \ \textcolor{comment}{//\ Grab\ initial\ bits\ of\ the\ code.}}
+\DoxyCodeLine{00529\ \ \ \textcolor{keywordtype}{int}\ ucc\ =\ *(*in)++\ \&\ ((1\ <<\ (7\ -\/\ len))\ -\/\ 1);}
+\DoxyCodeLine{00530\ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ len\ -\/\ 1;\ i++)\ \{}
+\DoxyCodeLine{00531\ \ \ \ \ \textcolor{keywordflow}{if}\ ((**in\ \&\ 0xC0)\ !=\ 0x80)\ \textcolor{keywordflow}{return}\ -\/1;\ \ \textcolor{comment}{//\ Upper\ bits\ must\ 1\ 0.}}
+\DoxyCodeLine{00532\ \ \ \ \ ucc\ <<=\ 6;}
+\DoxyCodeLine{00533\ \ \ \ \ ucc\ |=\ *(*in)++\ \&\ 0x3F;\ \ \textcolor{comment}{//\ Grab\ 6\ more\ bits\ of\ the\ code.}}
+\DoxyCodeLine{00534\ \ \ \}}
+\DoxyCodeLine{00535\ \ \ \textcolor{comment}{//\ UTF-\/8\ cannot\ encode\ values\ between\ 0xD800\ and\ 0xDFFF\ (reserved\ for}}
+\DoxyCodeLine{00536\ \ \ \textcolor{comment}{//\ UTF-\/16\ surrogate\ pairs).}}
+\DoxyCodeLine{00537\ \ \ \textcolor{keywordflow}{if}\ (ucc\ >=\ 0xD800\ \&\&\ ucc\ <=\ 0xDFFF)\ \{\ \textcolor{keywordflow}{return}\ -\/1;\ \}}
+\DoxyCodeLine{00538\ \ \ \textcolor{comment}{//\ UTF-\/8\ must\ represent\ code\ points\ in\ their\ shortest\ possible\ encoding.}}
+\DoxyCodeLine{00539\ \ \ \textcolor{keywordflow}{switch}\ (len)\ \{}
+\DoxyCodeLine{00540\ \ \ \ \ \textcolor{keywordflow}{case}\ 2:}
+\DoxyCodeLine{00541\ \ \ \ \ \ \ \textcolor{comment}{//\ Two\ bytes\ of\ UTF-\/8\ can\ represent\ code\ points\ from\ U+0080\ to\ U+07FF.}}
+\DoxyCodeLine{00542\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (ucc\ <\ 0x0080\ ||\ ucc\ >\ 0x07FF)\ \{\ \textcolor{keywordflow}{return}\ -\/1;\ \}}
+\DoxyCodeLine{00543\ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00544\ \ \ \ \ \textcolor{keywordflow}{case}\ 3:}
+\DoxyCodeLine{00545\ \ \ \ \ \ \ \textcolor{comment}{//\ Three\ bytes\ of\ UTF-\/8\ can\ represent\ code\ points\ from\ U+0800\ to\ U+FFFF.}}
+\DoxyCodeLine{00546\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (ucc\ <\ 0x0800\ ||\ ucc\ >\ 0xFFFF)\ \{\ \textcolor{keywordflow}{return}\ -\/1;\ \}}
+\DoxyCodeLine{00547\ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00548\ \ \ \ \ \textcolor{keywordflow}{case}\ 4:}
+\DoxyCodeLine{00549\ \ \ \ \ \ \ \textcolor{comment}{//\ Four\ bytes\ of\ UTF-\/8\ can\ represent\ code\ points\ from\ U+10000\ to\ U+10FFFF.}}
+\DoxyCodeLine{00550\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (ucc\ <\ 0x10000\ ||\ ucc\ >\ 0x10FFFF)\ \{\ \textcolor{keywordflow}{return}\ -\/1;\ \}}
+\DoxyCodeLine{00551\ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00552\ \ \ \}}
+\DoxyCodeLine{00553\ \ \ \textcolor{keywordflow}{return}\ ucc;}
+\DoxyCodeLine{00554\ \}}
+\DoxyCodeLine{00555\ }
+\DoxyCodeLine{00556\ \textcolor{preprocessor}{\#ifndef\ FLATBUFFERS\_PREFER\_PRINTF}}
+\DoxyCodeLine{00557\ \textcolor{comment}{//\ Wraps\ a\ string\ to\ a\ maximum\ length,\ inserting\ new\ lines\ where\ necessary.\ Any}}
+\DoxyCodeLine{00558\ \textcolor{comment}{//\ existing\ whitespace\ will\ be\ collapsed\ down\ to\ a\ single\ space.\ A\ prefix\ or}}
+\DoxyCodeLine{00559\ \textcolor{comment}{//\ suffix\ can\ be\ provided,\ which\ will\ be\ inserted\ before\ or\ after\ a\ wrapped}}
+\DoxyCodeLine{00560\ \textcolor{comment}{//\ line,\ respectively.}}
+\DoxyCodeLine{00561\ \textcolor{keyword}{inline}\ std::string\ WordWrap(\textcolor{keyword}{const}\ std::string\ in,\ \textcolor{keywordtype}{size\_t}\ max\_length,}
+\DoxyCodeLine{00562\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ std::string\ wrapped\_line\_prefix,}
+\DoxyCodeLine{00563\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ std::string\ wrapped\_line\_suffix)\ \{}
+\DoxyCodeLine{00564\ \ \ std::istringstream\ in\_stream(in);}
+\DoxyCodeLine{00565\ \ \ std::string\ wrapped,\ line,\ word;}
+\DoxyCodeLine{00566\ }
+\DoxyCodeLine{00567\ \ \ in\_stream\ >>\ word;}
+\DoxyCodeLine{00568\ \ \ line\ =\ word;}
+\DoxyCodeLine{00569\ }
+\DoxyCodeLine{00570\ \ \ \textcolor{keywordflow}{while}\ (in\_stream\ >>\ word)\ \{}
+\DoxyCodeLine{00571\ \ \ \ \ \textcolor{keywordflow}{if}\ ((line.length()\ +\ 1\ +\ word.length()\ +\ wrapped\_line\_suffix.length())\ <}
+\DoxyCodeLine{00572\ \ \ \ \ \ \ \ \ max\_length)\ \{}
+\DoxyCodeLine{00573\ \ \ \ \ \ \ line\ +=\ \textcolor{stringliteral}{"{}\ "{}}\ +\ word;}
+\DoxyCodeLine{00574\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00575\ \ \ \ \ \ \ wrapped\ +=\ line\ +\ wrapped\_line\_suffix\ +\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}};}
+\DoxyCodeLine{00576\ \ \ \ \ \ \ line\ =\ wrapped\_line\_prefix\ +\ word;}
+\DoxyCodeLine{00577\ \ \ \ \ \}}
+\DoxyCodeLine{00578\ \ \ \}}
+\DoxyCodeLine{00579\ \ \ wrapped\ +=\ line;}
+\DoxyCodeLine{00580\ }
+\DoxyCodeLine{00581\ \ \ \textcolor{keywordflow}{return}\ wrapped;}
+\DoxyCodeLine{00582\ \}}
+\DoxyCodeLine{00583\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ !FLATBUFFERS\_PREFER\_PRINTF}}
+\DoxyCodeLine{00584\ }
+\DoxyCodeLine{00585\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespaceflatbuffers_a734ade019a5359f53f396856ea4ff4b5}{EscapeString}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *s,\ \textcolor{keywordtype}{size\_t}\ length,\ std::string\ *\_text,}
+\DoxyCodeLine{00586\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ allow\_non\_utf8,\ \textcolor{keywordtype}{bool}\ natural\_utf8)\ \{}
+\DoxyCodeLine{00587\ \ \ std::string\ \&text\ =\ *\_text;}
+\DoxyCodeLine{00588\ \ \ text\ +=\ \textcolor{stringliteral}{"{}\(\backslash\)"{}"{}};}
+\DoxyCodeLine{00589\ \ \ \textcolor{keywordflow}{for}\ (uoffset\_t\ i\ =\ 0;\ i\ <\ length;\ i++)\ \{}
+\DoxyCodeLine{00590\ \ \ \ \ \textcolor{keywordtype}{char}\ c\ =\ s[i];}
+\DoxyCodeLine{00591\ \ \ \ \ \textcolor{keywordflow}{switch}\ (c)\ \{}
+\DoxyCodeLine{00592\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'\(\backslash\)n'}:\ text\ +=\ \textcolor{stringliteral}{"{}\(\backslash\)\(\backslash\)n"{}};\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00593\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'\(\backslash\)t'}:\ text\ +=\ \textcolor{stringliteral}{"{}\(\backslash\)\(\backslash\)t"{}};\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00594\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'\(\backslash\)r'}:\ text\ +=\ \textcolor{stringliteral}{"{}\(\backslash\)\(\backslash\)r"{}};\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00595\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'\(\backslash\)b'}:\ text\ +=\ \textcolor{stringliteral}{"{}\(\backslash\)\(\backslash\)b"{}};\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00596\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'\(\backslash\)f'}:\ text\ +=\ \textcolor{stringliteral}{"{}\(\backslash\)\(\backslash\)f"{}};\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00597\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'\(\backslash\)"{}'}:\ text\ +=\ \textcolor{stringliteral}{"{}\(\backslash\)\(\backslash\)\(\backslash\)"{}"{}};\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00598\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'\(\backslash\)\(\backslash\)'}:\ text\ +=\ \textcolor{stringliteral}{"{}\(\backslash\)\(\backslash\)\(\backslash\)\(\backslash\)"{}};\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00599\ \ \ \ \ \ \ \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{00600\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (c\ >=\ \textcolor{charliteral}{'\ '}\ \&\&\ c\ <=\ \textcolor{charliteral}{'\string~'})\ \{}
+\DoxyCodeLine{00601\ \ \ \ \ \ \ \ \ \ \ text\ +=\ c;}
+\DoxyCodeLine{00602\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00603\ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Not\ printable\ ASCII\ data.\ Let's\ see\ if\ it's\ valid\ UTF-\/8\ first:}}
+\DoxyCodeLine{00604\ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *utf8\ =\ s\ +\ i;}
+\DoxyCodeLine{00605\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ ucc\ =\ \mbox{\hyperlink{namespaceflatbuffers_ab009b4b2ffac16779320e9526f68bf10}{FromUTF8}}(\&utf8);}
+\DoxyCodeLine{00606\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (ucc\ <\ 0)\ \{}
+\DoxyCodeLine{00607\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (allow\_non\_utf8)\ \{}
+\DoxyCodeLine{00608\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ text\ +=\ \textcolor{stringliteral}{"{}\(\backslash\)\(\backslash\)x"{}};}
+\DoxyCodeLine{00609\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ text\ +=\ \mbox{\hyperlink{namespaceflatbuffers_a4a1d66ec4ae994cbdd6a371026b01182}{IntToStringHex}}(\textcolor{keyword}{static\_cast<}uint8\_t\textcolor{keyword}{>}(c),\ 2);}
+\DoxyCodeLine{00610\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00611\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ There\ are\ two\ cases\ here:}}
+\DoxyCodeLine{00612\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{00613\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ 1)\ We\ reached\ here\ by\ parsing\ an\ IDL\ file.\ In\ that\ case,}}
+\DoxyCodeLine{00614\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ we\ previously\ checked\ for\ non-\/UTF-\/8,\ so\ we\ shouldn't\ reach}}
+\DoxyCodeLine{00615\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ here.}}
+\DoxyCodeLine{00616\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{00617\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ 2)\ We\ reached\ here\ by\ someone\ calling\ GenerateText()}}
+\DoxyCodeLine{00618\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ on\ a\ previously-\/serialized\ flatbuffer.\ The\ data\ might\ have}}
+\DoxyCodeLine{00619\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ non-\/UTF-\/8\ Strings,\ or\ might\ be\ corrupt.}}
+\DoxyCodeLine{00620\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{00621\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ In\ both\ cases,\ we\ have\ to\ give\ up\ and\ inform\ the\ caller}}
+\DoxyCodeLine{00622\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ they\ have\ no\ JSON.}}
+\DoxyCodeLine{00623\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00624\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00625\ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00626\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (natural\_utf8)\ \{}
+\DoxyCodeLine{00627\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ utf8\ points\ to\ past\ all\ utf-\/8\ bytes\ parsed}}
+\DoxyCodeLine{00628\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ text.append(s\ +\ i,\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{size\_t}\textcolor{keyword}{>}(utf8\ -\/\ s\ -\/\ i));}
+\DoxyCodeLine{00629\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (ucc\ <=\ 0xFFFF)\ \{}
+\DoxyCodeLine{00630\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Parses\ as\ Unicode\ within\ JSON's\ \(\backslash\)uXXXX\ range,\ so\ use\ that.}}
+\DoxyCodeLine{00631\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ text\ +=\ \textcolor{stringliteral}{"{}\(\backslash\)\(\backslash\)u"{}};}
+\DoxyCodeLine{00632\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ text\ +=\ \mbox{\hyperlink{namespaceflatbuffers_a4a1d66ec4ae994cbdd6a371026b01182}{IntToStringHex}}(ucc,\ 4);}
+\DoxyCodeLine{00633\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (ucc\ <=\ 0x10FFFF)\ \{}
+\DoxyCodeLine{00634\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Encode\ Unicode\ SMP\ values\ to\ a\ surrogate\ pair\ using\ two\ \(\backslash\)u}}
+\DoxyCodeLine{00635\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ escapes.}}
+\DoxyCodeLine{00636\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ uint32\_t\ base\ =\ ucc\ -\/\ 0x10000;}
+\DoxyCodeLine{00637\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ high\_surrogate\ =\ (base\ >>\ 10)\ +\ 0xD800;}
+\DoxyCodeLine{00638\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ low\_surrogate\ =\ (base\ \&\ 0x03FF)\ +\ 0xDC00;}
+\DoxyCodeLine{00639\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ text\ +=\ \textcolor{stringliteral}{"{}\(\backslash\)\(\backslash\)u"{}};}
+\DoxyCodeLine{00640\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ text\ +=\ \mbox{\hyperlink{namespaceflatbuffers_a4a1d66ec4ae994cbdd6a371026b01182}{IntToStringHex}}(high\_surrogate,\ 4);}
+\DoxyCodeLine{00641\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ text\ +=\ \textcolor{stringliteral}{"{}\(\backslash\)\(\backslash\)u"{}};}
+\DoxyCodeLine{00642\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ text\ +=\ \mbox{\hyperlink{namespaceflatbuffers_a4a1d66ec4ae994cbdd6a371026b01182}{IntToStringHex}}(low\_surrogate,\ 4);}
+\DoxyCodeLine{00643\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00644\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Skip\ past\ characters\ recognized.}}
+\DoxyCodeLine{00645\ \ \ \ \ \ \ \ \ \ \ \ \ i\ =\ \textcolor{keyword}{static\_cast<}uoffset\_t\textcolor{keyword}{>}(utf8\ -\/\ s\ -\/\ 1);}
+\DoxyCodeLine{00646\ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00647\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00648\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00649\ \ \ \ \ \}}
+\DoxyCodeLine{00650\ \ \ \}}
+\DoxyCodeLine{00651\ \ \ text\ +=\ \textcolor{stringliteral}{"{}\(\backslash\)"{}"{}};}
+\DoxyCodeLine{00652\ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00653\ \}}
+\DoxyCodeLine{00654\ }
+\DoxyCodeLine{00655\ \textcolor{keyword}{inline}\ std::string\ \mbox{\hyperlink{namespaceflatbuffers_a6c95fc7efaad9227a4e9fc8e945fe043}{BufferToHexText}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{void}\ *\mbox{\hyperlink{nano__ble33__sense__accelerometer__continuous_8ino_a221f01f29c6cba77d9479aba615283f5}{buffer}},\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{stacker_8cc_a799a743b3abd553a37fc01ad3097df08}{buffer\_size}},}
+\DoxyCodeLine{00656\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ max\_length,}
+\DoxyCodeLine{00657\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ std::string\ \&wrapped\_line\_prefix,}
+\DoxyCodeLine{00658\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ std::string\ \&wrapped\_line\_suffix)\ \{}
+\DoxyCodeLine{00659\ \ \ std::string\ text\ =\ wrapped\_line\_prefix;}
+\DoxyCodeLine{00660\ \ \ \textcolor{keywordtype}{size\_t}\ start\_offset\ =\ 0;}
+\DoxyCodeLine{00661\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *s\ =\ \textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\textcolor{keywordtype}{char}\ *\textcolor{keyword}{>}(\mbox{\hyperlink{nano__ble33__sense__accelerometer__continuous_8ino_a221f01f29c6cba77d9479aba615283f5}{buffer}});}
+\DoxyCodeLine{00662\ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ s\ \&\&\ i\ <\ \mbox{\hyperlink{stacker_8cc_a799a743b3abd553a37fc01ad3097df08}{buffer\_size}};\ i++)\ \{}
+\DoxyCodeLine{00663\ \ \ \ \ \textcolor{comment}{//\ Last\ iteration\ or\ do\ we\ have\ more?}}
+\DoxyCodeLine{00664\ \ \ \ \ \textcolor{keywordtype}{bool}\ have\_more\ =\ i\ +\ 1\ <\ \mbox{\hyperlink{stacker_8cc_a799a743b3abd553a37fc01ad3097df08}{buffer\_size}};}
+\DoxyCodeLine{00665\ \ \ \ \ text\ +=\ \textcolor{stringliteral}{"{}0x"{}};}
+\DoxyCodeLine{00666\ \ \ \ \ text\ +=\ \mbox{\hyperlink{namespaceflatbuffers_a4a1d66ec4ae994cbdd6a371026b01182}{IntToStringHex}}(\textcolor{keyword}{static\_cast<}uint8\_t\textcolor{keyword}{>}(s[i]),\ 2);}
+\DoxyCodeLine{00667\ \ \ \ \ \textcolor{keywordflow}{if}\ (have\_more)\ \{\ text\ +=\ \textcolor{charliteral}{','};\ \}}
+\DoxyCodeLine{00668\ \ \ \ \ \textcolor{comment}{//\ If\ we\ have\ more\ to\ process\ and\ we\ reached\ max\_length}}
+\DoxyCodeLine{00669\ \ \ \ \ \textcolor{keywordflow}{if}\ (have\_more\ \&\&}
+\DoxyCodeLine{00670\ \ \ \ \ \ \ \ \ text.size()\ +\ wrapped\_line\_suffix.size()\ >=\ start\_offset\ +\ max\_length)\ \{}
+\DoxyCodeLine{00671\ \ \ \ \ \ \ text\ +=\ wrapped\_line\_suffix;}
+\DoxyCodeLine{00672\ \ \ \ \ \ \ text\ +=\ \textcolor{charliteral}{'\(\backslash\)n'};}
+\DoxyCodeLine{00673\ \ \ \ \ \ \ start\_offset\ =\ text.size();}
+\DoxyCodeLine{00674\ \ \ \ \ \ \ text\ +=\ wrapped\_line\_prefix;}
+\DoxyCodeLine{00675\ \ \ \ \ \}}
+\DoxyCodeLine{00676\ \ \ \}}
+\DoxyCodeLine{00677\ \ \ text\ +=\ wrapped\_line\_suffix;}
+\DoxyCodeLine{00678\ \ \ \textcolor{keywordflow}{return}\ text;}
+\DoxyCodeLine{00679\ \}}
+\DoxyCodeLine{00680\ }
+\DoxyCodeLine{00681\ \textcolor{comment}{//\ Remove\ paired\ quotes\ in\ a\ string:\ "{}text"{}|'text'\ -\/>\ text.}}
+\DoxyCodeLine{00682\ std::string\ \mbox{\hyperlink{namespaceflatbuffers_aa42798aa5403cc98717691e91b1c953a}{RemoveStringQuotes}}(\textcolor{keyword}{const}\ std::string\ \&s);}
+\DoxyCodeLine{00683\ }
+\DoxyCodeLine{00684\ \textcolor{comment}{//\ Change\ th\ global\ C-\/locale\ to\ locale\ with\ name\ <locale\_name>.}}
+\DoxyCodeLine{00685\ \textcolor{comment}{//\ Returns\ an\ actual\ locale\ name\ in\ <\_value>,\ useful\ if\ locale\_name\ is\ "{}"{}\ or}}
+\DoxyCodeLine{00686\ \textcolor{comment}{//\ null.}}
+\DoxyCodeLine{00687\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespaceflatbuffers_aff8fe745d1f4c0240891d1ff76e06a0b}{SetGlobalTestLocale}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *locale\_name,}
+\DoxyCodeLine{00688\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::string\ *\_value\ =\ \textcolor{keyword}{nullptr});}
+\DoxyCodeLine{00689\ }
+\DoxyCodeLine{00690\ \textcolor{comment}{//\ Read\ (or\ test)\ a\ value\ of\ environment\ variable.}}
+\DoxyCodeLine{00691\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespaceflatbuffers_afdb814895dc0225e7585d2ba4d6ade16}{ReadEnvironmentVariable}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *var\_name,}
+\DoxyCodeLine{00692\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::string\ *\_value\ =\ \textcolor{keyword}{nullptr});}
+\DoxyCodeLine{00693\ }
+\DoxyCodeLine{00694\ \textcolor{comment}{//\ MSVC\ specific:\ Send\ all\ assert\ reports\ to\ STDOUT\ to\ prevent\ CI\ hangs.}}
+\DoxyCodeLine{00695\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespaceflatbuffers_a1a405e4441eb1fd55cf62c8006660bba}{SetupDefaultCRTReportMode}}();}
+\DoxyCodeLine{00696\ }
+\DoxyCodeLine{00697\ \textcolor{keyword}{enum\ class}\ \mbox{\hyperlink{namespaceflatbuffers_a51f13331958603317b446d2ea6d46c55}{Case}}\ \{}
+\DoxyCodeLine{00698\ \ \ \mbox{\hyperlink{namespaceflatbuffers_a51f13331958603317b446d2ea6d46c55a25c2dc47991b3df171ed5192bcf70390}{kUnknown}}\ =\ 0,}
+\DoxyCodeLine{00699\ \ \ \textcolor{comment}{//\ TheQuickBrownFox}}
+\DoxyCodeLine{00700\ \ \ \mbox{\hyperlink{namespaceflatbuffers_a51f13331958603317b446d2ea6d46c55a9f2f58218b575491fdfd8059304771b4}{kUpperCamel}}\ =\ 1,}
+\DoxyCodeLine{00701\ \ \ \textcolor{comment}{//\ theQuickBrownFox}}
+\DoxyCodeLine{00702\ \ \ \mbox{\hyperlink{namespaceflatbuffers_a51f13331958603317b446d2ea6d46c55a7e914b0f91be0644bfcdb1b41bea4276}{kLowerCamel}}\ =\ 2,}
+\DoxyCodeLine{00703\ \ \ \textcolor{comment}{//\ the\_quick\_brown\_fox}}
+\DoxyCodeLine{00704\ \ \ \mbox{\hyperlink{namespaceflatbuffers_a51f13331958603317b446d2ea6d46c55ace09f69cca13787871caca11f27b9738}{kSnake}}\ =\ 3,}
+\DoxyCodeLine{00705\ \ \ \textcolor{comment}{//\ THE\_QUICK\_BROWN\_FOX}}
+\DoxyCodeLine{00706\ \ \ \mbox{\hyperlink{namespaceflatbuffers_a51f13331958603317b446d2ea6d46c55a0b18c153eab45af9b74f271de1a78678}{kScreamingSnake}}\ =\ 4,}
+\DoxyCodeLine{00707\ \ \ \textcolor{comment}{//\ THEQUICKBROWNFOX}}
+\DoxyCodeLine{00708\ \ \ \mbox{\hyperlink{namespaceflatbuffers_a51f13331958603317b446d2ea6d46c55af4a517c4032759fa5bf634ed194191a9}{kAllUpper}}\ =\ 5,}
+\DoxyCodeLine{00709\ \ \ \textcolor{comment}{//\ thequickbrownfox}}
+\DoxyCodeLine{00710\ \ \ \mbox{\hyperlink{namespaceflatbuffers_a51f13331958603317b446d2ea6d46c55a338832c98c52f2a6e2d4d1a859e65813}{kAllLower}}\ =\ 6,}
+\DoxyCodeLine{00711\ \ \ \textcolor{comment}{//\ the-\/quick-\/brown-\/fox}}
+\DoxyCodeLine{00712\ \ \ \mbox{\hyperlink{namespaceflatbuffers_a51f13331958603317b446d2ea6d46c55a709d0f8df698591a7475d017ba410b02}{kDasher}}\ =\ 7,}
+\DoxyCodeLine{00713\ \ \ \textcolor{comment}{//\ THEQuiCKBr\_ownFox\ (or\ whatever\ you\ want,\ we\ won't\ change\ it)}}
+\DoxyCodeLine{00714\ \ \ \mbox{\hyperlink{namespaceflatbuffers_a51f13331958603317b446d2ea6d46c55afae526507e17bfc6f0d14e125189063a}{kKeep}}\ =\ 8,}
+\DoxyCodeLine{00715\ \ \ \textcolor{comment}{//\ the\_quick\_brown\_fox123\ (as\ opposed\ to\ the\_quick\_brown\_fox\_123)}}
+\DoxyCodeLine{00716\ \ \ \mbox{\hyperlink{namespaceflatbuffers_a51f13331958603317b446d2ea6d46c55ae19a406f9861663bd70eef943d80c1e4}{kSnake2}}\ =\ 9,}
+\DoxyCodeLine{00717\ \};}
+\DoxyCodeLine{00718\ }
+\DoxyCodeLine{00719\ \textcolor{comment}{//\ Convert\ the\ \`{}input`\ string\ of\ case\ \`{}input\_case`\ to\ the\ specified\ \`{}output\_case`.}}
+\DoxyCodeLine{00720\ std::string\ \mbox{\hyperlink{namespaceflatbuffers_a2d22ce6be342773407559f0c20ab68d1}{ConvertCase}}(\textcolor{keyword}{const}\ std::string\ \&\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src5afb18c45f6346167aa977a363205143_a9cebfb3d6ddd692fbdd268cf4b9ad024}{input}},\ \mbox{\hyperlink{namespaceflatbuffers_a51f13331958603317b446d2ea6d46c55}{Case}}\ output\_case,}
+\DoxyCodeLine{00721\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespaceflatbuffers_a51f13331958603317b446d2ea6d46c55}{Case}}\ input\_case\ =\ \mbox{\hyperlink{namespaceflatbuffers_a51f13331958603317b446d2ea6d46c55ace09f69cca13787871caca11f27b9738}{Case::kSnake}});}
+\DoxyCodeLine{00722\ }
+\DoxyCodeLine{00723\ \}\ \ \textcolor{comment}{//\ namespace\ flatbuffers}}
+\DoxyCodeLine{00724\ }
+\DoxyCodeLine{00725\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ FLATBUFFERS\_UTIL\_H\_}}
+
+\end{DoxyCode}

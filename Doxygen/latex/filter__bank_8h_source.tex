@@ -1,0 +1,75 @@
+\doxysection{filter\+\_\+bank.\+h}
+\hypertarget{filter__bank_8h_source}{}\label{filter__bank_8h_source}\index{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/main/signal/src/filter\_bank.h@{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/main/signal/src/filter\_bank.h}}
+\mbox{\hyperlink{filter__bank_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{/*\ Copyright\ 2019\ The\ TensorFlow\ Authors.\ All\ Rights\ Reserved.}}
+\DoxyCodeLine{00002\ \textcolor{comment}{}}
+\DoxyCodeLine{00003\ \textcolor{comment}{Licensed\ under\ the\ Apache\ License,\ Version\ 2.0\ (the\ "{}License"{});}}
+\DoxyCodeLine{00004\ \textcolor{comment}{you\ may\ not\ use\ this\ file\ except\ in\ compliance\ with\ the\ License.}}
+\DoxyCodeLine{00005\ \textcolor{comment}{You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{00006\ \textcolor{comment}{}}
+\DoxyCodeLine{00007\ \textcolor{comment}{\ \ \ \ http://www.apache.org/licenses/LICENSE-\/2.0}}
+\DoxyCodeLine{00008\ \textcolor{comment}{}}
+\DoxyCodeLine{00009\ \textcolor{comment}{Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ software}}
+\DoxyCodeLine{00010\ \textcolor{comment}{distributed\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,}}
+\DoxyCodeLine{00011\ \textcolor{comment}{WITHOUT\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,\ either\ express\ or\ implied.}}
+\DoxyCodeLine{00012\ \textcolor{comment}{See\ the\ License\ for\ the\ specific\ language\ governing\ permissions\ and}}
+\DoxyCodeLine{00013\ \textcolor{comment}{limitations\ under\ the\ License.}}
+\DoxyCodeLine{00014\ \textcolor{comment}{==============================================================================*/}}
+\DoxyCodeLine{00015\ }
+\DoxyCodeLine{00016\ \textcolor{preprocessor}{\#ifndef\ SIGNAL\_SRC\_FILTER\_BANK\_H\_}}
+\DoxyCodeLine{00017\ \textcolor{preprocessor}{\#define\ SIGNAL\_SRC\_FILTER\_BANK\_H\_}}
+\DoxyCodeLine{00018\ }
+\DoxyCodeLine{00019\ \textcolor{preprocessor}{\#include\ <stdint.h>}}
+\DoxyCodeLine{00020\ }
+\DoxyCodeLine{00021\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacetflite}{tflite}}\ \{}
+\DoxyCodeLine{00022\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacetflm__signal}{tflm\_signal}}\ \{}
+\DoxyCodeLine{00023\ \textcolor{comment}{//\ TODO(b/286250473):\ remove\ namespace\ once\ de-\/duped\ libraries\ above}}
+\DoxyCodeLine{00024\ }
+\DoxyCodeLine{00025\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structtflite_1_1tflm__signal_1_1_filterbank_config}{FilterbankConfig}}\ \{}
+\DoxyCodeLine{00026\ \ \ \textcolor{comment}{//\ Number\ of\ filterbank\ channels}}
+\DoxyCodeLine{00027\ \ \ int32\_t\ \mbox{\hyperlink{structtflite_1_1tflm__signal_1_1_filterbank_config_a77c95a00477b2fa99193ebfb207da414}{num\_channels}};}
+\DoxyCodeLine{00028\ }
+\DoxyCodeLine{00029\ \ \ \textcolor{comment}{//\ Each\ of\ the\ following\ three\ arrays\ is\ of\ size\ num\_channels\ +\ 1}}
+\DoxyCodeLine{00030\ \ \ \textcolor{comment}{//\ An\ extra\ channel\ is\ needed\ for\ scratch.\ See\ implementation\ of}}
+\DoxyCodeLine{00031\ \ \ \textcolor{comment}{//\ FilterbankAccumulateChannels()\ for\ more\ details}}
+\DoxyCodeLine{00032\ }
+\DoxyCodeLine{00033\ \ \ \textcolor{comment}{//\ For\ each\ channel,\ the\ index\ in\ the\ input\ (spectrum)\ where\ its\ band\ starts}}
+\DoxyCodeLine{00034\ \ \ \textcolor{keyword}{const}\ int16\_t*\ \mbox{\hyperlink{structtflite_1_1tflm__signal_1_1_filterbank_config_aa05a1811a87f90da3d1890eaf5db207d}{channel\_frequency\_starts}};}
+\DoxyCodeLine{00035\ \ \ \textcolor{comment}{//\ For\ each\ channel,\ the\ index\ in\ the\ weights/unweights\ arrays\ where}}
+\DoxyCodeLine{00036\ \ \ \textcolor{comment}{//\ it\ filter\ weights\ start}}
+\DoxyCodeLine{00037\ \ \ \textcolor{keyword}{const}\ int16\_t*\ \mbox{\hyperlink{structtflite_1_1tflm__signal_1_1_filterbank_config_a9eb0e4196a915efe3562a8c59997f013}{channel\_weight\_starts}};}
+\DoxyCodeLine{00038\ \ \ \textcolor{comment}{//\ For\ each\ channel,\ the\ number\ of\ bins\ in\ the\ input\ (spectrum)\ that\ span}}
+\DoxyCodeLine{00039\ \ \ \textcolor{comment}{//\ its\ band}}
+\DoxyCodeLine{00040\ \ \ \textcolor{keyword}{const}\ int16\_t*\ \mbox{\hyperlink{structtflite_1_1tflm__signal_1_1_filterbank_config_ade65f8ae51c08b1845d5fbf25afce24c}{channel\_widths}};}
+\DoxyCodeLine{00041\ }
+\DoxyCodeLine{00042\ \ \ \textcolor{comment}{//\ The\ weights\ array\ holds\ the\ triangular\ filter\ weights\ of\ all\ the\ filters}}
+\DoxyCodeLine{00043\ \ \ \textcolor{comment}{//\ in\ the\ bank.\ The\ output\ of\ each\ filter\ in\ the\ bank\ is\ caluclated\ by}}
+\DoxyCodeLine{00044\ \ \ \textcolor{comment}{//\ multiplying\ the\ elements\ in\ the\ input\ spectrum\ that\ are\ in\ its\ band}}
+\DoxyCodeLine{00045\ \ \ \textcolor{comment}{//\ (see\ above:\ channel\_frequency\_starts,\ channel\_widths)\ by\ the\ filter\ weights}}
+\DoxyCodeLine{00046\ \ \ \textcolor{comment}{//\ then\ accumulating.\ Each\ element\ in\ the\ unweights\ array\ holds\ the\ 1\ minus}}
+\DoxyCodeLine{00047\ \ \ \textcolor{comment}{//\ corresponding\ elements\ in\ the\ weights\ array\ and\ is\ used\ to\ make\ this}}
+\DoxyCodeLine{00048\ \ \ \textcolor{comment}{//\ operation\ more\ efficient.\ For\ more\ details,\ see\ documnetation\ in}}
+\DoxyCodeLine{00049\ \ \ \textcolor{comment}{//\ FilterbankAccumulateChannels()}}
+\DoxyCodeLine{00050\ \ \ \textcolor{keyword}{const}\ int16\_t*\ \mbox{\hyperlink{structtflite_1_1tflm__signal_1_1_filterbank_config_a86e9449c37c678a3678209c55a344769}{weights}};}
+\DoxyCodeLine{00051\ \ \ \textcolor{keyword}{const}\ int16\_t*\ \mbox{\hyperlink{structtflite_1_1tflm__signal_1_1_filterbank_config_ac3700b6a493ac8795c3bb048ca4ee657}{unweights}};}
+\DoxyCodeLine{00052\ \ \ int32\_t\ \mbox{\hyperlink{structtflite_1_1tflm__signal_1_1_filterbank_config_a9aa68a7e172ba501d3900ff9e3ebc491}{output\_scale}};}
+\DoxyCodeLine{00053\ }
+\DoxyCodeLine{00054\ \ \ int32\_t\ \mbox{\hyperlink{structtflite_1_1tflm__signal_1_1_filterbank_config_a95d6a7ad2aed30a8d9bab7805726d741}{input\_correction\_bits}};}
+\DoxyCodeLine{00055\ \};}
+\DoxyCodeLine{00056\ }
+\DoxyCodeLine{00057\ \textcolor{comment}{//\ Accumulate\ the\ energy\ spectrum\ bins\ in\ \`{}input`\ into\ filter\ bank\ channels}}
+\DoxyCodeLine{00058\ \textcolor{comment}{//\ contained\ in\ \`{}output`.}}
+\DoxyCodeLine{00059\ \textcolor{comment}{//\ *\ \`{}input`\ -\/\ Spectral\ energy\ array}}
+\DoxyCodeLine{00060\ \textcolor{comment}{//\ *\ \`{}output`\ -\/\ of\ size\ \`{}config.num\_channels`\ +\ 1.}}
+\DoxyCodeLine{00061\ \textcolor{comment}{//\ \ \ \ \ \ \ \ \ \ \ \ \ \ Elements\ [1:num\_channels]\ contain\ the\ filter\ bank\ channels.}}
+\DoxyCodeLine{00062\ \textcolor{comment}{//\ \ \ \ \ \ \ \ \ \ \ \ \ \ Element\ 0\ is\ used\ as\ scratch\ and\ should\ be\ ignored}}
+\DoxyCodeLine{00063\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1tflm__signal_aabd780c30e9a5547171904cecbbef584}{FilterbankAccumulateChannels}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structtflite_1_1tflm__signal_1_1_filterbank_config}{FilterbankConfig}}*\ \mbox{\hyperlink{micro_2kernels_2filter__bank_8cc_ac0f32fd234a078ace764ae2fc15c41a0}{config}},}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ uint32\_t*\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src5afb18c45f6346167aa977a363205143_a9cebfb3d6ddd692fbdd268cf4b9ad024}{input}},\ uint64\_t*\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbcd3bbe90c4644d53fde1ce4e312f437_a7a2a916a8059078c2d7a05f46c7126fd}{output}});}
+\DoxyCodeLine{00065\ }
+\DoxyCodeLine{00066\ \}\ \ \textcolor{comment}{//\ namespace\ tflm\_signal}}
+\DoxyCodeLine{00067\ \}\ \ \textcolor{comment}{//\ namespace\ tflite}}
+\DoxyCodeLine{00068\ }
+\DoxyCodeLine{00069\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ SIGNAL\_SRC\_FILTER\_BANK\_H\_}}
+
+\end{DoxyCode}

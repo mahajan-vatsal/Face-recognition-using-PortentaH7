@@ -1,0 +1,169 @@
+\doxysection{c\+\_\+api\+\_\+types.\+h}
+\hypertarget{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_source}{}\label{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_source}\index{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/arduino-\/examples-\/main/src/tensorflow/lite/core/c/c\_api\_types.h@{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/arduino-\/examples-\/main/src/tensorflow/lite/core/c/c\_api\_types.h}}
+\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{/*\ Copyright\ 2020\ The\ TensorFlow\ Authors.\ All\ Rights\ Reserved.}}
+\DoxyCodeLine{00002\ \textcolor{comment}{}}
+\DoxyCodeLine{00003\ \textcolor{comment}{Licensed\ under\ the\ Apache\ License,\ Version\ 2.0\ (the\ "{}License"{});}}
+\DoxyCodeLine{00004\ \textcolor{comment}{you\ may\ not\ use\ this\ file\ except\ in\ compliance\ with\ the\ License.}}
+\DoxyCodeLine{00005\ \textcolor{comment}{You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{00006\ \textcolor{comment}{}}
+\DoxyCodeLine{00007\ \textcolor{comment}{\ \ \ \ http://www.apache.org/licenses/LICENSE-\/2.0}}
+\DoxyCodeLine{00008\ \textcolor{comment}{}}
+\DoxyCodeLine{00009\ \textcolor{comment}{Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ software}}
+\DoxyCodeLine{00010\ \textcolor{comment}{distributed\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,}}
+\DoxyCodeLine{00011\ \textcolor{comment}{WITHOUT\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,\ either\ express\ or\ implied.}}
+\DoxyCodeLine{00012\ \textcolor{comment}{See\ the\ License\ for\ the\ specific\ language\ governing\ permissions\ and}}
+\DoxyCodeLine{00013\ \textcolor{comment}{limitations\ under\ the\ License.}}
+\DoxyCodeLine{00014\ \textcolor{comment}{==============================================================================*/}}
+\DoxyCodeLine{00015\ }
+\DoxyCodeLine{00016\ \textcolor{comment}{//\ This\ file\ declares\ types\ used\ by\ the\ pure\ C\ inference\ API\ defined\ in\ c\_api.h,}}
+\DoxyCodeLine{00017\ \textcolor{comment}{//\ some\ of\ which\ are\ also\ used\ in\ the\ C++\ and\ C\ kernel\ and\ interpreter\ APIs.}}
+\DoxyCodeLine{00018\ }
+\DoxyCodeLine{00024\ }
+\DoxyCodeLine{00025\ \textcolor{preprocessor}{\#ifndef\ TENSORFLOW\_LITE\_CORE\_C\_C\_API\_TYPES\_H\_}}
+\DoxyCodeLine{00026\ \textcolor{preprocessor}{\#define\ TENSORFLOW\_LITE\_CORE\_C\_C\_API\_TYPES\_H\_}}
+\DoxyCodeLine{00027\ }
+\DoxyCodeLine{00028\ \textcolor{preprocessor}{\#include\ <stdint.h>}}
+\DoxyCodeLine{00029\ }
+\DoxyCodeLine{00030\ \textcolor{preprocessor}{\#ifdef\ \_\_cplusplus}}
+\DoxyCodeLine{00031\ \textcolor{keyword}{extern}\ \textcolor{stringliteral}{"{}C"{}}\ \{}
+\DoxyCodeLine{00032\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00033\ }
+\DoxyCodeLine{00034\ \textcolor{comment}{//\ Define\ TFL\_CAPI\_EXPORT\ macro\ to\ export\ a\ function\ properly\ with\ a\ shared}}
+\DoxyCodeLine{00035\ \textcolor{comment}{//\ library.}}
+\DoxyCodeLine{00036\ \textcolor{preprocessor}{\#ifdef\ SWIG}}
+\DoxyCodeLine{00037\ \textcolor{preprocessor}{\#define\ TFL\_CAPI\_EXPORT}}
+\DoxyCodeLine{00038\ \textcolor{preprocessor}{\#elif\ defined(TFL\_STATIC\_LIBRARY\_BUILD)}}
+\DoxyCodeLine{00039\ \textcolor{preprocessor}{\#define\ TFL\_CAPI\_EXPORT}}
+\DoxyCodeLine{00040\ \textcolor{preprocessor}{\#else\ \ }\textcolor{comment}{//\ not\ definded\ TFL\_STATIC\_LIBRARY\_BUILD}}
+\DoxyCodeLine{00041\ \textcolor{preprocessor}{\#if\ defined(\_WIN32)}}
+\DoxyCodeLine{00042\ \textcolor{preprocessor}{\#ifdef\ TFL\_COMPILE\_LIBRARY}}
+\DoxyCodeLine{00043\ \textcolor{preprocessor}{\#define\ TFL\_CAPI\_EXPORT\ \_\_declspec(dllexport)}}
+\DoxyCodeLine{00044\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00045\ \textcolor{preprocessor}{\#define\ TFL\_CAPI\_EXPORT\ \_\_declspec(dllimport)}}
+\DoxyCodeLine{00046\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ TFL\_COMPILE\_LIBRARY}}
+\DoxyCodeLine{00047\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00048\ \textcolor{preprocessor}{\#define\ TFL\_CAPI\_EXPORT\ \_\_attribute\_\_((visibility("{}default"{})))}}
+\DoxyCodeLine{00049\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ \_WIN32}}
+\DoxyCodeLine{00050\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ SWIG}}
+\DoxyCodeLine{00051\ }
+\DoxyCodeLine{00052\ \textcolor{comment}{//\ Note\ that\ new\ error\ status\ values\ may\ be\ added\ in\ future\ in\ order\ to}}
+\DoxyCodeLine{00053\ \textcolor{comment}{//\ indicate\ more\ fine-\/grained\ internal\ states,\ therefore,\ applications\ should}}
+\DoxyCodeLine{00054\ \textcolor{comment}{//\ not\ rely\ on\ status\ values\ being\ members\ of\ the\ enum.}}
+\DoxyCodeLine{00055\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{enum}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \{}
+\DoxyCodeLine{00056\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361ab25fe210808197f1b6601df8ccdcd699}{kTfLiteOk}}\ =\ 0,}
+\DoxyCodeLine{00057\ }
+\DoxyCodeLine{00058\ \ \ \textcolor{comment}{//\ Generally\ referring\ to\ an\ error\ in\ the\ runtime\ (i.e.\ interpreter)}}
+\DoxyCodeLine{00059\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361a0bf230cf34a88de9e37834dc127437db}{kTfLiteError}}\ =\ 1,}
+\DoxyCodeLine{00060\ }
+\DoxyCodeLine{00061\ \ \ \textcolor{comment}{//\ Generally\ referring\ to\ an\ error\ from\ a\ TfLiteDelegate\ itself.}}
+\DoxyCodeLine{00062\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361a73a5cedf4e108bb964c0a24e2a4470e1}{kTfLiteDelegateError}}\ =\ 2,}
+\DoxyCodeLine{00063\ }
+\DoxyCodeLine{00064\ \ \ \textcolor{comment}{//\ Generally\ referring\ to\ an\ error\ in\ applying\ a\ delegate\ due\ to}}
+\DoxyCodeLine{00065\ \ \ \textcolor{comment}{//\ incompatibility\ between\ runtime\ and\ delegate,\ e.g.,\ this\ error\ is\ returned}}
+\DoxyCodeLine{00066\ \ \ \textcolor{comment}{//\ when\ trying\ to\ apply\ a\ TF\ Lite\ delegate\ onto\ a\ model\ graph\ that's\ already}}
+\DoxyCodeLine{00067\ \ \ \textcolor{comment}{//\ immutable.}}
+\DoxyCodeLine{00068\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361a007a36e9810b4a7ae835ffc124e0a32c}{kTfLiteApplicationError}}\ =\ 3,}
+\DoxyCodeLine{00069\ }
+\DoxyCodeLine{00070\ \ \ \textcolor{comment}{//\ Generally\ referring\ to\ serialized\ delegate\ data\ not\ being\ found.}}
+\DoxyCodeLine{00071\ \ \ \textcolor{comment}{//\ See\ tflite::delegates::Serialization.}}
+\DoxyCodeLine{00072\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361a558db700e43e10a7c451d2c1551fda98}{kTfLiteDelegateDataNotFound}}\ =\ 4,}
+\DoxyCodeLine{00073\ }
+\DoxyCodeLine{00074\ \ \ \textcolor{comment}{//\ Generally\ referring\ to\ data-\/writing\ issues\ in\ delegate\ serialization.}}
+\DoxyCodeLine{00075\ \ \ \textcolor{comment}{//\ See\ tflite::delegates::Serialization.}}
+\DoxyCodeLine{00076\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361a45c0f5eb58b0d5696d373d81b412e49a}{kTfLiteDelegateDataWriteError}}\ =\ 5,}
+\DoxyCodeLine{00077\ }
+\DoxyCodeLine{00078\ \ \ \textcolor{comment}{//\ Generally\ referring\ to\ data-\/reading\ issues\ in\ delegate\ serialization.}}
+\DoxyCodeLine{00079\ \ \ \textcolor{comment}{//\ See\ tflite::delegates::Serialization.}}
+\DoxyCodeLine{00080\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361aeff408401134dd5c601de782e68d065e}{kTfLiteDelegateDataReadError}}\ =\ 6,}
+\DoxyCodeLine{00081\ }
+\DoxyCodeLine{00082\ \ \ \textcolor{comment}{//\ Generally\ referring\ to\ issues\ when\ the\ TF\ Lite\ model\ has\ ops\ that\ cannot\ be}}
+\DoxyCodeLine{00083\ \ \ \textcolor{comment}{//\ resolved\ at\ runtime.\ This\ could\ happen\ when\ the\ specific\ op\ is\ not}}
+\DoxyCodeLine{00084\ \ \ \textcolor{comment}{//\ registered\ or\ built\ with\ the\ TF\ Lite\ framework.}}
+\DoxyCodeLine{00085\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361ace42b5a195672087346b67784778104d}{kTfLiteUnresolvedOps}}\ =\ 7,}
+\DoxyCodeLine{00086\ }
+\DoxyCodeLine{00087\ \ \ \textcolor{comment}{//\ Generally\ referring\ to\ invocation\ cancelled\ by\ the\ user.}}
+\DoxyCodeLine{00088\ \ \ \textcolor{comment}{//\ See\ \`{}interpreter::Cancel`.}}
+\DoxyCodeLine{00089\ \ \ \textcolor{comment}{//\ TODO(b/194915839):\ Implement\ \`{}interpreter::Cancel`.}}
+\DoxyCodeLine{00090\ \ \ \textcolor{comment}{//\ TODO(b/250636993):\ Cancellation\ triggered\ by\ \`{}SetCancellationFunction`}}
+\DoxyCodeLine{00091\ \ \ \textcolor{comment}{//\ should\ also\ return\ this\ status\ code.}}
+\DoxyCodeLine{00092\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361a558a51ea592f1c4ccddb3d83af6cb0e4}{kTfLiteCancelled}}\ =\ 8,}
+\DoxyCodeLine{00093\ \}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}};}
+\DoxyCodeLine{00094\ }
+\DoxyCodeLine{00095\ \textcolor{comment}{//\ Types\ supported\ by\ tensor}}
+\DoxyCodeLine{00096\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{enum}\ \{}
+\DoxyCodeLine{00097\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_a8a47ba81bdef28b5c479ee7928a7d123abe7e67b1f37873e602f2b20b9b42c6c8}{kTfLiteNoType}}\ =\ 0,}
+\DoxyCodeLine{00098\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_a8a47ba81bdef28b5c479ee7928a7d123a0abdf1d6cf1c5907891defe4ce746455}{kTfLiteFloat32}}\ =\ 1,}
+\DoxyCodeLine{00099\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_a8a47ba81bdef28b5c479ee7928a7d123a3be7bb6b2164f8d28936ed3c3649182a}{kTfLiteInt32}}\ =\ 2,}
+\DoxyCodeLine{00100\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_a8a47ba81bdef28b5c479ee7928a7d123ace4bd38da5d38da1014190421a4694a7}{kTfLiteUInt8}}\ =\ 3,}
+\DoxyCodeLine{00101\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_a8a47ba81bdef28b5c479ee7928a7d123a24d0572e25ccdf3230c792e3e9be39e2}{kTfLiteInt64}}\ =\ 4,}
+\DoxyCodeLine{00102\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_a8a47ba81bdef28b5c479ee7928a7d123a1ea3e0de087949be1c7e8474bc87e36c}{kTfLiteString}}\ =\ 5,}
+\DoxyCodeLine{00103\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_a8a47ba81bdef28b5c479ee7928a7d123a6e6693620d224d52e8e9e9d8e0ef672c}{kTfLiteBool}}\ =\ 6,}
+\DoxyCodeLine{00104\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_a8a47ba81bdef28b5c479ee7928a7d123a6142296f825a31497ceb1e829010dd0c}{kTfLiteInt16}}\ =\ 7,}
+\DoxyCodeLine{00105\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_a8a47ba81bdef28b5c479ee7928a7d123a847115957d3f53a52ab2ef4f4647f1fd}{kTfLiteComplex64}}\ =\ 8,}
+\DoxyCodeLine{00106\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_a8a47ba81bdef28b5c479ee7928a7d123aa5aabb7d65c4d50cda0658c6ecb4851c}{kTfLiteInt8}}\ =\ 9,}
+\DoxyCodeLine{00107\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_a8a47ba81bdef28b5c479ee7928a7d123a749000152a7ac14db91d2f67565e703a}{kTfLiteFloat16}}\ =\ 10,}
+\DoxyCodeLine{00108\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_a8a47ba81bdef28b5c479ee7928a7d123a9f62bc24782bfba6cc9923f535852b9e}{kTfLiteFloat64}}\ =\ 11,}
+\DoxyCodeLine{00109\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_a8a47ba81bdef28b5c479ee7928a7d123a20283b49cf3343f85a90e83594d73a4f}{kTfLiteComplex128}}\ =\ 12,}
+\DoxyCodeLine{00110\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_a8a47ba81bdef28b5c479ee7928a7d123a283eb70588fb34ba2d5c9b893f8606b7}{kTfLiteUInt64}}\ =\ 13,}
+\DoxyCodeLine{00111\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_a8a47ba81bdef28b5c479ee7928a7d123a186dd566ca028e77b290fec456a5fe1b}{kTfLiteResource}}\ =\ 14,}
+\DoxyCodeLine{00112\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_a8a47ba81bdef28b5c479ee7928a7d123a5029b0f7d9b917ab4d4e5e2dc3b3fd81}{kTfLiteVariant}}\ =\ 15,}
+\DoxyCodeLine{00113\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_a8a47ba81bdef28b5c479ee7928a7d123afb6ae1b7649966d13305730d19c8372c}{kTfLiteUInt32}}\ =\ 16,}
+\DoxyCodeLine{00114\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_a8a47ba81bdef28b5c479ee7928a7d123a0dfa7669ee1c2864ca208fe9ec39fca3}{kTfLiteUInt16}}\ =\ 17,}
+\DoxyCodeLine{00115\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_a8a47ba81bdef28b5c479ee7928a7d123a4e54c2a154168f98718766a230c244ee}{kTfLiteInt4}}\ =\ 18,}
+\DoxyCodeLine{00116\ \}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_a8a47ba81bdef28b5c479ee7928a7d123}{TfLiteType}};}
+\DoxyCodeLine{00117\ }
+\DoxyCodeLine{00118\ \textcolor{comment}{//\ Legacy.\ Will\ be\ deprecated\ in\ favor\ of\ TfLiteAffineQuantization.}}
+\DoxyCodeLine{00119\ \textcolor{comment}{//\ If\ per-\/layer\ quantization\ is\ specified\ this\ field\ will\ still\ be\ populated\ in}}
+\DoxyCodeLine{00120\ \textcolor{comment}{//\ addition\ to\ TfLiteAffineQuantization.}}
+\DoxyCodeLine{00121\ \textcolor{comment}{//\ Parameters\ for\ asymmetric\ quantization.\ Quantized\ values\ can\ be\ converted}}
+\DoxyCodeLine{00122\ \textcolor{comment}{//\ back\ to\ float\ using:}}
+\DoxyCodeLine{00123\ \textcolor{comment}{//\ \ \ \ \ real\_value\ =\ scale\ *\ (quantized\_value\ -\/\ zero\_point)}}
+\DoxyCodeLine{00124\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_tf_lite_quantization_params}{TfLiteQuantizationParams}}\ \{}
+\DoxyCodeLine{00125\ \ \ \textcolor{keywordtype}{float}\ \mbox{\hyperlink{struct_tf_lite_quantization_params_aedc85f69317ce1c27e6e88f886ea8af8}{scale}};}
+\DoxyCodeLine{00126\ \ \ int32\_t\ \mbox{\hyperlink{struct_tf_lite_quantization_params_a7bfb85a682ab431a6c0c609d3938ab6e}{zero\_point}};}
+\DoxyCodeLine{00127\ \}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_a2f4985064bbd713dc8463950de974eef}{TfLiteQuantizationParams}};}
+\DoxyCodeLine{00128\ }
+\DoxyCodeLine{00129\ \textcolor{comment}{//\ -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}}
+\DoxyCodeLine{00130\ \textcolor{comment}{//\ Opaque\ types\ used\ by\ c\_api.h,\ c\_api\_opaque.h\ and\ common.h.}}
+\DoxyCodeLine{00131\ }
+\DoxyCodeLine{00132\ \textcolor{comment}{//\ TfLiteOpaqueContext\ is\ an\ opaque\ version\ of\ TfLiteContext;}}
+\DoxyCodeLine{00133\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{group__c__api__types_gaa4ce7746ca46ee3e8021d61b30a4a278}{TfLiteOpaqueContext}}\ \mbox{\hyperlink{group__c__api__types_gaa4ce7746ca46ee3e8021d61b30a4a278}{TfLiteOpaqueContext}};}
+\DoxyCodeLine{00134\ }
+\DoxyCodeLine{00135\ \textcolor{comment}{//\ TfLiteOpaqueNode\ is\ an\ opaque\ version\ of\ TfLiteNode;}}
+\DoxyCodeLine{00136\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{group__c__api__types_gab12a07755992ecd4881d888a170c4c4b}{TfLiteOpaqueNode}}\ \mbox{\hyperlink{group__c__api__types_gab12a07755992ecd4881d888a170c4c4b}{TfLiteOpaqueNode}};}
+\DoxyCodeLine{00137\ }
+\DoxyCodeLine{00138\ \textcolor{comment}{//\ TfLiteOpaqueTensor\ is\ an\ opaque\ version\ of\ TfLiteTensor;}}
+\DoxyCodeLine{00139\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{group__c__api__types_gab8d233ce3c69ac5f291ecd5ae52b3a12}{TfLiteOpaqueTensor}}\ \mbox{\hyperlink{group__c__api__types_gab8d233ce3c69ac5f291ecd5ae52b3a12}{TfLiteOpaqueTensor}};}
+\DoxyCodeLine{00140\ }
+\DoxyCodeLine{00141\ \textcolor{comment}{//\ TfLiteDelegate:\ allows\ delegation\ of\ nodes\ to\ alternative\ backends.}}
+\DoxyCodeLine{00142\ \textcolor{comment}{//\ Forward\ declaration\ of\ concrete\ type\ declared\ in\ common.h.}}
+\DoxyCodeLine{00143\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_tf_lite_delegate}{TfLiteDelegate}}\ \mbox{\hyperlink{struct_tf_lite_delegate}{TfLiteDelegate}};}
+\DoxyCodeLine{00144\ }
+\DoxyCodeLine{00145\ \textcolor{comment}{//\ TfLiteOpaqueDelegateStruct:\ unconditionally\ opaque\ version\ of}}
+\DoxyCodeLine{00146\ \textcolor{comment}{//\ TfLiteDelegate;\ allows\ delegation\ of\ nodes\ to\ alternative\ backends.}}
+\DoxyCodeLine{00147\ \textcolor{comment}{//}}
+\DoxyCodeLine{00148\ \textcolor{comment}{//\ This\ is\ an\ abstract\ type\ that\ is\ intended\ to\ have\ the\ same}}
+\DoxyCodeLine{00149\ \textcolor{comment}{//\ role\ as\ TfLiteDelegate,\ but\ without\ exposing\ the\ implementation}}
+\DoxyCodeLine{00150\ \textcolor{comment}{//\ details\ of\ how\ delegates\ are\ implemented.}}
+\DoxyCodeLine{00151\ \textcolor{comment}{//\ WARNING:\ This\ is\ an\ experimental\ type\ and\ subject\ to\ change.}}
+\DoxyCodeLine{00152\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{group__c__api__types_gaeacdfb2509c8e128ad7814d76c841d2b}{TfLiteOpaqueDelegateStruct}}\ \mbox{\hyperlink{group__c__api__types_gaeacdfb2509c8e128ad7814d76c841d2b}{TfLiteOpaqueDelegateStruct}};}
+\DoxyCodeLine{00153\ }
+\DoxyCodeLine{00154\ \textcolor{comment}{//\ TfLiteOpaqueDelegate:\ conditionally\ opaque\ version\ of}}
+\DoxyCodeLine{00155\ \textcolor{comment}{//\ TfLiteDelegate;\ allows\ delegation\ of\ nodes\ to\ alternative\ backends.}}
+\DoxyCodeLine{00156\ \textcolor{comment}{//\ For\ TF\ Lite\ in\ Play\ Services,\ this\ is\ an\ opaque\ type,}}
+\DoxyCodeLine{00157\ \textcolor{comment}{//\ but\ for\ regular\ TF\ Lite,\ this\ is\ just\ a\ typedef\ for\ TfLiteDelegate.}}
+\DoxyCodeLine{00158\ \textcolor{comment}{//\ WARNING:\ This\ is\ an\ experimental\ type\ and\ subject\ to\ change.}}
+\DoxyCodeLine{00159\ \textcolor{preprocessor}{\#if\ TFLITE\_WITH\_STABLE\_ABI\ ||\ TFLITE\_USE\_OPAQUE\_DELEGATE}}
+\DoxyCodeLine{00160\ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{group__c__api__types_gaeacdfb2509c8e128ad7814d76c841d2b}{TfLiteOpaqueDelegateStruct}}\ \mbox{\hyperlink{group__c__api__types_gac2bc3e65b2b4dfe997134c006faa442f}{TfLiteOpaqueDelegate}};}
+\DoxyCodeLine{00161\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00162\ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{struct_tf_lite_delegate}{TfLiteDelegate}}\ \mbox{\hyperlink{group__c__api__types_gac2bc3e65b2b4dfe997134c006faa442f}{TfLiteOpaqueDelegate}};}
+\DoxyCodeLine{00163\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00164\ }
+\DoxyCodeLine{00165\ \textcolor{preprocessor}{\#ifdef\ \_\_cplusplus}}
+\DoxyCodeLine{00166\ \}\ \ \textcolor{comment}{//\ extern\ C}}
+\DoxyCodeLine{00167\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00168\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ TENSORFLOW\_LITE\_CORE\_C\_C\_API\_TYPES\_H\_}}
+
+\end{DoxyCode}

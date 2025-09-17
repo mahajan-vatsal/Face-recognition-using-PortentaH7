@@ -1,0 +1,131 @@
+\chapter{optimized\+\_\+kernel\+\_\+implementations}
+\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_3952fae331b4acfd9647a397f96b4a4e}{}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_3952fae331b4acfd9647a397f96b4a4e}\index{optimized\_kernel\_implementations@{optimized\_kernel\_implementations}}
+
+\begin{DoxyItemize}
+\item Summary
+\item High-\/\+Level Steps
+\begin{DoxyItemize}
+\item Why not Optimize the Reference Kernels
+\end{DoxyItemize}
+\item Software Architecture
+\begin{DoxyItemize}
+\item Hardware-\/specific NN library
+\item Optimized Kernels
+\item Build System Integration
+\item Testing and Continuous Integration
+\end{DoxyItemize}
+\end{DoxyItemize}\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_3952fae331b4acfd9647a397f96b4a4e_autotoc_md187}{}\doxysection{\texorpdfstring{Summary}{Summary}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_3952fae331b4acfd9647a397f96b4a4e_autotoc_md187}
+This guide describes the recommended high-\/level architecture and steps to add hardware-\/specific optimized kernels to Tf\+Lite Micro.
+
+The goal with these optimizations and the process that we recommend to getting them merged into the Tf\+Lite Micro codebase is to have a measurable and documented performance improvement on a benchmark of interest.
+
+Once the optimizations are merged, they will indeed be used for more than the benchmark but the context for why the optimizations were added is still very important.\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_3952fae331b4acfd9647a397f96b4a4e_autotoc_md188}{}\doxysection{\texorpdfstring{High-\/\+Level Steps}{High-\/\+Level Steps}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_3952fae331b4acfd9647a397f96b4a4e_autotoc_md188}
+
+\begin{DoxyEnumerate}
+\item Pick a benchmark that you would like to measure the performance for.
+\begin{DoxyItemize}
+\item Existing benchmarks are in the \href{../benchmarks}{\texttt{ benchmarks directory}}.
+\item If none of the existing benchmarks capture your use-\/case, then please create a github issue or start a thread on \href{mailto:micro@tensorflow.org}{\texttt{ micro@tensorflow.\+org}} to figure out how to add in a new benchmark.
+\item If adding a publicly-\/available benchmark to the TFLM codebase is determined to be infeasible, then a fall-\/back would be to have an internal benchmark that can be used to document the benefits of adding in the optimizations via PR descriptions.
+\item Adding optimized code without any associated benchmarks will need very strong justification and will most likely not be permitted.
+\end{DoxyItemize}
+\end{DoxyEnumerate}
+\begin{DoxyEnumerate}
+\item Do the groundwork and architecture needed to be able to add in optimizations for your target (more details in the software architecture section).
+\end{DoxyEnumerate}
+\begin{DoxyEnumerate}
+\item Create one pull request for each optimized kernel with the PR description clearly stating the commands that were used to measure the performance improvement.
+\begin{DoxyItemize}
+\item This context is important even if the toolchain is proprietary and there are currently a small number of users.
+\begin{DoxyItemize}
+\item See \href{https://github.com/tensorflow/tensorflow/pull/47098}{\texttt{ this PR}} as an example.
+\item At minimum the latency with and without the particular optimized kernel should be documented. \href{https://github.com/tensorflow/tensorflow/pull/46746}{\texttt{ Additional context}} may also be desirable.
+\end{DoxyItemize}
+\item Here is some \href{https://testing.googleblog.com/2017/09/code-health-providing-context-with.html}{\texttt{ general guidance}} on writing \href{https://google.github.io/eng-practices/review/developer/cl-descriptions.html}{\texttt{ good PR descriptions}}
+\end{DoxyItemize}
+\end{DoxyEnumerate}\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_3952fae331b4acfd9647a397f96b4a4e_autotoc_md189}{}\doxysubsection{\texorpdfstring{Why Not Optimize the Portable Reference Kernels?}{Why Not Optimize the Portable Reference Kernels?}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_3952fae331b4acfd9647a397f96b4a4e_autotoc_md189}
+We would like to explicitly point out (as have others) that the reference kernel implementations are not performant and there are plenty of opportunities to speed them up. This is by design and the reference kernels are meant to be a shared starting point to then be optimized in a target specific optimized kernel implementation.
+
+Two previous discussions on this topic are on \href{https://github.com/tensorflow/tensorflow/pull/42477}{\texttt{ PR \#42477}} and \href{https://github.com/tensorflow/tensorflow/pull/45227}{\texttt{ PR \#45227}}
+
+Our current point of view on this topic is that while optimizing shared reference code in a portable manner is attractive, we are making an explicit choice to not go down that path and instead rely on target-\/specific optimized implementations. The TFLM codebase has a growing list of optimized kernel implementations, and we are investing in making the process of adding new implementations smoother.\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_3952fae331b4acfd9647a397f96b4a4e_autotoc_md190}{}\doxysection{\texorpdfstring{Software Architecture}{Software Architecture}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_3952fae331b4acfd9647a397f96b4a4e_autotoc_md190}
+The optimized kernel architecture is composed of the following three modules\+:
+
+
+\begin{DoxyEnumerate}
+\item Hardware-\/specific NN library
+\end{DoxyEnumerate}
+\begin{DoxyEnumerate}
+\item Optimized Kernels
+\end{DoxyEnumerate}
+\begin{DoxyEnumerate}
+\item Build System Integration
+\end{DoxyEnumerate}\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_3952fae331b4acfd9647a397f96b4a4e_autotoc_md191}{}\doxysubsection{\texorpdfstring{Hardware-\/specific NN library}{Hardware-\/specific NN library}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_3952fae331b4acfd9647a397f96b4a4e_autotoc_md191}
+This library uses knowledge of the hardware and compiler to implement the underlying operations. Examples of this are \href{https://github.com/ARM-software/CMSIS_5/tree/develop/CMSIS/NN}{\texttt{ CMSIS-\/\+NN}} from ARM and \href{https://github.com/foss-xtensa/nnlib-hifi4}{\texttt{ NNLib}} from Cadence.
+
+The benefits of having this API separation are\+:
+
+
+\begin{DoxyEnumerate}
+\item The NN library does not need to follow the style guide of the rest of the TFLM code.
+\end{DoxyEnumerate}
+\begin{DoxyEnumerate}
+\item Releases of the NN library can be made independent of TFLM
+\end{DoxyEnumerate}
+\begin{DoxyEnumerate}
+\item The same NN library can be used and tested independent of TFLM.
+\end{DoxyEnumerate}
+\begin{DoxyEnumerate}
+\item The maintainers of the NN library have full control over the development process that they would like to follow.
+\end{DoxyEnumerate}\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_3952fae331b4acfd9647a397f96b4a4e_autotoc_md192}{}\doxysubsection{\texorpdfstring{Optimized Kernels}{Optimized Kernels}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_3952fae331b4acfd9647a397f96b4a4e_autotoc_md192}
+These will be (hopefully thin) wrappers that act as the glue between TFLM and the NN library.
+
+The goal here is to delegate as much work as possible to the NN library while still allowing the two APIs (TFLM and NN library) to be independent of each other. If there is a performance degradation due to this (for example, unnecessary memory copies) then we can evaluate those on a case-\/by-\/case basis.
+
+This code will be reviewed and merged in the TFLM github repository and must follow the development style of the TFLM codebase.
+
+Some amount of refactoring of the existing code may be needed to ensure that code is suitably shared between the reference and optimized kernels. There is currently no fixed recipe for this refactor and we will evaluate on a case-\/by-\/case basis during the PR review.
+
+For example, to add an optimized implementation for {\ttfamily fully\+\_\+conntected} for the Xtensa Fusion F1 the steps were\+:
+\begin{DoxyItemize}
+\item \href{https://github.com/tensorflow/tensorflow/pull/45464}{\texttt{ PR 1}}\+: refactor for reference fallbacks and a baseline latency.
+\item \href{https://github.com/tensorflow/tensorflow/pull/46242}{\texttt{ PR 2}}\+: refactor to share code between reference and optimized kernels.
+\item \href{https://github.com/tensorflow/tensorflow/pull/46411}{\texttt{ PR 3}}\+: add the code needed to use the optimized NN lib and document the latency improvement.
+\end{DoxyItemize}\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_3952fae331b4acfd9647a397f96b4a4e_autotoc_md193}{}\doxysubsection{\texorpdfstring{Build System Integration}{Build System Integration}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_3952fae331b4acfd9647a397f96b4a4e_autotoc_md193}
+This module is the least defined but we strongly recommend the following\+: 1. A single target makefile.\+inc for all the architectures that you would like to support along with optional target-\/specific \href{../cortex_m_corstone_300/system_setup.cc}{\texttt{ system\+\_\+setup.\+cc}}. See \href{../tools/make/targets/cortex_m_generic_makefile.inc}{\texttt{ cortex\+\_\+m\+\_\+generic\+\_\+makefile.\+inc}} and \href{../tools/make/targets/xtensa_makefile.inc}{\texttt{ xtensa\+\_\+makefile.\+inc}} as examples.
+
+
+\begin{DoxyEnumerate}
+\item A single {\ttfamily ext\+\_\+libs.\+inc} (and associated scripts) that downloads any external dependencies (including the NN library). For example\+:
+\begin{DoxyItemize}
+\item \href{../tools/make/ext_libs/cmsis_nn.inc}{\texttt{ cmsis\+\_\+nn.\+inc}} and \href{../tools/make/ext_libs/cmsis_download.sh}{\texttt{ cmsis\+\_\+download.\+sh}}
+\item \href{../tools/make/ext_libs/xtensa.inc}{\texttt{ xtensa.\+inc}} and \href{../tools/make/ext_libs/xtensa_download.sh}{\texttt{ xtensa\+\_\+download.\+sh}}
+\end{DoxyItemize}
+\end{DoxyEnumerate}
+\begin{DoxyEnumerate}
+\item The optimized kernels will then live in a kernels subdirectory (e.\+g. \href{../kernels/cmsis_nn}{\texttt{ kernels/cmsis\+\_\+nn}} and \href{../kernels/xtensa}{\texttt{ kernels/xtensa}})
+\end{DoxyEnumerate}
+
+Two development workflows that the TFLM team would like to encourage and support\+:
+
+
+\begin{DoxyEnumerate}
+\item Export static library + headers into target-\/specific development environment
+\begin{DoxyItemize}
+\item Build a static libtensorflow-\/microlite.\+a using the TFLM makefile with\+: {\ttfamily make -\/f tensorflow/lite/micro/tools/make/\+Makefile TARGET=\texorpdfstring{$<$}{<}target\texorpdfstring{$>$}{>} OPTIMIZED\+\_\+\+KERNEL\+\_\+\+DIR=\texorpdfstring{$<$}{<}optimize\+\_\+dir\texorpdfstring{$>$}{>} microlite}
+\item Use the static library and any TFLM headers as part of the overall application (with its own build system).
+\end{DoxyItemize}
+\end{DoxyEnumerate}
+\begin{DoxyEnumerate}
+\item Integrate TFLM with IDE\+:
+\begin{DoxyItemize}
+\item This has historically been done using the TFLM Makefile’s support for project generation.
+\item However, given the learning curve and high-\/maintenance overhead, we are moving away from supporting project generation via the Makefile and are encouraging future IDE integrations to be done outside of the TFLM Makefiles.
+\item The TFLM team is currently working through the details on this topic.
+\end{DoxyItemize}
+\end{DoxyEnumerate}\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_3952fae331b4acfd9647a397f96b4a4e_autotoc_md194}{}\doxysubsection{\texorpdfstring{Testing and Continuous Integration}{Testing and Continuous Integration}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_3952fae331b4acfd9647a397f96b4a4e_autotoc_md194}
+The kernel tests are the primary method of ensuring that the optimized kernel implementations are accurate.
+
+Currently, most of the tests require the optimizations to be bit-\/exact to the quantized reference implementation. We can revisit this requirement if it ends up having a high associated cost on the latency.
+
+We strongly encourage optimized kernel implementations to have an associated continuous build that runs through all the unit tests and publishes a build badge to the \href{../README.md\#community-supported-builds}{\texttt{ TFLM community supported builds}} table. Running the units tests once a day is often a good place to start. 

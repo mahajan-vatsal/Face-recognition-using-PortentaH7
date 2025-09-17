@@ -1,0 +1,17 @@
+\chapter{profiling}
+\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_2micro_2docs_2profiling}{}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_2micro_2docs_2profiling}\index{profiling@{profiling}}
+
+\begin{DoxyItemize}
+\item Profiling
+\begin{DoxyItemize}
+\item API
+\item Per-\/\+Op Profiling
+\item Subroutine Profiling
+\end{DoxyItemize}
+\end{DoxyItemize}\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_2micro_2docs_2profiling_autotoc_md217}{}\doxysection{\texorpdfstring{Profiling}{Profiling}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_2micro_2docs_2profiling_autotoc_md217}
+This doc outlines how to use the TFLite Micro profiler to gather information about per-\/op invoke duration and to use the profiler to identify bottlenecks from within operator kernels and other TFLite Micro routines.\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_2micro_2docs_2profiling_autotoc_md218}{}\doxysubsection{\texorpdfstring{API}{API}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_2micro_2docs_2profiling_autotoc_md218}
+The Micro\+Interpreter class constructor contains an optional profiler argument. This profiler must be an instance of the tflite\+::\+Profiler class, and should implement the Begin\+Event and End\+Event methods. There is a default implementation in \doxylink{micro__profiler_8cc}{tensorflow/lite/micro/micro\+\_\+profiler.\+cc} which can be used for most purposes.
+
+The best practice for profiling across multiple invocations is to reset or call {\ttfamily Clear\+Events()} in between invocations.\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_2micro_2docs_2profiling_autotoc_md219}{}\doxysubsection{\texorpdfstring{Per-\/\+Op Profiling}{Per-\/\+Op Profiling}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_2micro_2docs_2profiling_autotoc_md219}
+There is a feature in the Micro\+Interpreter to enable per-\/op profiling. To enable this, provide a Micro\+Profiler to the Micro\+Interpreter\textquotesingle{}s constructor then build with a non-\/release build to disable the NDEBUG define surrounding the Scoped\+Operator\+Profile within the Micro\+Interpreter.\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_2micro_2docs_2profiling_autotoc_md220}{}\doxysubsection{\texorpdfstring{Subroutine Profiling}{Subroutine Profiling}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_2micro_2docs_2profiling_autotoc_md220}
+In order to further dig into performance of specific routines, the Micro\+Profiler can be used directly from the TFLite\+Context or a new Micro\+Profiler can be created if the TFLite\+Context is not available where the profiling needs to happen. The Micro\+Profiler\textquotesingle{}s Begin\+Event and End\+Event can be called directly, or wrapped using a \href{../../lite/core/api/profiler.h}{\texttt{ Scoped\+Profile}}. 

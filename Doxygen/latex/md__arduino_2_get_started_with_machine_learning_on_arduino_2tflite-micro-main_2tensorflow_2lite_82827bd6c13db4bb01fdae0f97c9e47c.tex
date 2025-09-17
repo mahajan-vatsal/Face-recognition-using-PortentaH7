@@ -1,0 +1,50 @@
+\chapter{README}
+\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_82827bd6c13db4bb01fdae0f97c9e47c}{}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_82827bd6c13db4bb01fdae0f97c9e47c}\index{README@{README}}
+\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_82827bd6c13db4bb01fdae0f97c9e47c_autotoc_md145}{}\doxysection{\texorpdfstring{Running a fixed virtual platform based on Arm(\+R) Corstone(\+TM)-\/300 software}{Running a fixed virtual platform based on Arm(\+R) Corstone(\+TM)-\/300 software}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_82827bd6c13db4bb01fdae0f97c9e47c_autotoc_md145}
+This target makes use of a fixed virtual platform (FVP) based on Arm Corstone-\/300 software.
+\begin{DoxyItemize}
+\item \href{https://developer.arm.com/ip-products/subsystem/corstone/corstone-300}{\texttt{ More info about Arm Corstone-\/300}}
+\item \href{https://developer.arm.com/tools-and-software/simulation-models/fixed-virtual-platforms}{\texttt{ More info about FVPs}}
+\end{DoxyItemize}
+
+Building the Corstone-\/300 based target has the following dependencies\+:
+
+
+\begin{DoxyItemize}
+\item \href{https://review.mlplatform.org/admin/repos/ml/ethos-u/ethos-u-core-platform}{\texttt{ Arm Ethos-\/U Core Platform}}
+\begin{DoxyItemize}
+\item Arm Ethos-\/U Core Platform provides the linker file as well as UART and retarget functions.
+\end{DoxyItemize}
+\item \href{https://github.com/ARM-software/CMSIS_5}{\texttt{ CMSIS}}
+\begin{DoxyItemize}
+\item CMSIS provides startup functionality, e.\+g. for setting up interrupt handlers and clock speed.
+\end{DoxyItemize}
+\end{DoxyItemize}
+
+Both these repositories are downloaded automatically by the build process in TFLM.\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_82827bd6c13db4bb01fdae0f97c9e47c_autotoc_md146}{}\doxysection{\texorpdfstring{General build info}{General build info}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_82827bd6c13db4bb01fdae0f97c9e47c_autotoc_md146}
+You can compile the Corstone-\/300 target for multiple Cortex-\/M CPUs. See below.
+
+Required parameters\+:
+
+
+\begin{DoxyItemize}
+\item {\ttfamily TARGET}\+: cortex\+\_\+m\+\_\+corstone\+\_\+300
+\item {\ttfamily TARGET\+\_\+\+ARCH}\+: cortex-\/m\+XX. Replace XX with either of the options in the \href{https://github.com/tensorflow/tflite-micro/tree/main/tensorflow/lite/micro/tools/make/targets/cortex_m_corstone_300_makefile.inc}{\texttt{ Corstone-\/300 makefile}}
+\end{DoxyItemize}\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_82827bd6c13db4bb01fdae0f97c9e47c_autotoc_md147}{}\doxysection{\texorpdfstring{How to run}{How to run}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_82827bd6c13db4bb01fdae0f97c9e47c_autotoc_md147}
+Note that Corstone-\/300 emulates a Cortex-\/\+M55 system, but it is backwards compatible. This means one could run code compiled for e.\+g. a Cortex-\/\+M7.
+
+Some examples\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{make\ -\/f\ tensorflow/lite/micro/tools/make/Makefile\ CO\_PROCESSOR=ethos\_u\ TARGET=cortex\_m\_corstone\_300\ TARGET\_ARCH=cortex-\/m55\ test\_network\_tester\_test}
+\DoxyCodeLine{make\ -\/f\ tensorflow/lite/micro/tools/make/Makefile\ OPTIMIZED\_KERNEL\_DIR=cmsis\_nn\ TARGET=cortex\_m\_corstone\_300\ TARGET\_ARCH=cortex-\/m55\ test\_network\_tester\_test}
+\DoxyCodeLine{make\ -\/f\ tensorflow/lite/micro/tools/make/Makefile\ CO\_PROCESSOR=ethos\_u\ OPTIMIZED\_KERNEL\_DIR=cmsis\_nn\ TARGET=cortex\_m\_corstone\_300\ TARGET\_ARCH=cortex-\/m55\ test\_network\_tester\_test}
+\DoxyCodeLine{make\ -\/f\ tensorflow/lite/micro/tools/make/Makefile\ TARGET=cortex\_m\_corstone\_300\ TARGET\_ARCH=cortex-\/m55\ test\_network\_tester\_test}
+\DoxyCodeLine{make\ -\/f\ tensorflow/lite/micro/tools/make/Makefile\ TARGET=cortex\_m\_corstone\_300\ TARGET\_ARCH=cortex-\/m55\ test\_kernel\_fully\_connected\_test}
+\DoxyCodeLine{make\ -\/f\ tensorflow/lite/micro/tools/make/Makefile\ OPTIMIZED\_KERNEL\_DIR=cmsis\_nn\ TARGET=cortex\_m\_corstone\_300\ TARGET\_ARCH=cortex-\/m7+fp\ test\_kernel\_fully\_connected\_test}
+\DoxyCodeLine{make\ -\/f\ tensorflow/lite/micro/tools/make/Makefile\ TARGET=cortex\_m\_corstone\_300\ TARGET\_ARCH=cortex-\/m3\ test\_kernel\_fully\_connected\_test}
+\DoxyCodeLine{make\ -\/f\ tensorflow/lite/micro/tools/make/Makefile\ TARGET=cortex\_m\_corstone\_300\ TARGET\_ARCH=cortex-\/m55\ BUILD\_TYPE=release\_with\_logs\ TOOLCHAIN=armclang\ test\_network\_tester\_test}
+
+\end{DoxyCode}
+ 

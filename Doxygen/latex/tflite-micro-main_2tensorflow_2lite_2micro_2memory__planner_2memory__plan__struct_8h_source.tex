@@ -1,0 +1,79 @@
+\doxysection{memory\+\_\+plan\+\_\+struct.\+h}
+\hypertarget{tflite-micro-main_2tensorflow_2lite_2micro_2memory__planner_2memory__plan__struct_8h_source}{}\label{tflite-micro-main_2tensorflow_2lite_2micro_2memory__planner_2memory__plan__struct_8h_source}\index{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/main/tensorflow/lite/micro/memory\_planner/memory\_plan\_struct.h@{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/main/tensorflow/lite/micro/memory\_planner/memory\_plan\_struct.h}}
+\mbox{\hyperlink{tflite-micro-main_2tensorflow_2lite_2micro_2memory__planner_2memory__plan__struct_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{/*\ Copyright\ 2021\ The\ TensorFlow\ Authors.\ All\ Rights\ Reserved.}}
+\DoxyCodeLine{00002\ \textcolor{comment}{}}
+\DoxyCodeLine{00003\ \textcolor{comment}{Licensed\ under\ the\ Apache\ License,\ Version\ 2.0\ (the\ "{}License"{});}}
+\DoxyCodeLine{00004\ \textcolor{comment}{you\ may\ not\ use\ this\ file\ except\ in\ compliance\ with\ the\ License.}}
+\DoxyCodeLine{00005\ \textcolor{comment}{You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{00006\ \textcolor{comment}{}}
+\DoxyCodeLine{00007\ \textcolor{comment}{\ \ \ \ http://www.apache.org/licenses/LICENSE-\/2.0}}
+\DoxyCodeLine{00008\ \textcolor{comment}{}}
+\DoxyCodeLine{00009\ \textcolor{comment}{Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ software}}
+\DoxyCodeLine{00010\ \textcolor{comment}{distributed\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,}}
+\DoxyCodeLine{00011\ \textcolor{comment}{WITHOUT\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,\ either\ express\ or\ implied.}}
+\DoxyCodeLine{00012\ \textcolor{comment}{See\ the\ License\ for\ the\ specific\ language\ governing\ permissions\ and}}
+\DoxyCodeLine{00013\ \textcolor{comment}{limitations\ under\ the\ License.}}
+\DoxyCodeLine{00014\ \textcolor{comment}{==============================================================================*/}}
+\DoxyCodeLine{00015\ }
+\DoxyCodeLine{00016\ \textcolor{preprocessor}{\#ifndef\ TENSORFLOW\_LITE\_MICRO\_MEMORY\_PLANNER\_MEMORY\_PLAN\_STRUCT\_H\_}}
+\DoxyCodeLine{00017\ \textcolor{preprocessor}{\#define\ TENSORFLOW\_LITE\_MICRO\_MEMORY\_PLANNER\_MEMORY\_PLAN\_STRUCT\_H\_}}
+\DoxyCodeLine{00018\ }
+\DoxyCodeLine{00019\ \textcolor{preprocessor}{\#include\ <stddef.h>}}
+\DoxyCodeLine{00020\ \textcolor{preprocessor}{\#include\ <stdint.h>}}
+\DoxyCodeLine{00021\ }
+\DoxyCodeLine{00022\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/micro/micro\_utils.h"{}}}
+\DoxyCodeLine{00023\ }
+\DoxyCodeLine{00024\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacetflite}{tflite}}\ \{}
+\DoxyCodeLine{00025\ }
+\DoxyCodeLine{00026\ \textcolor{comment}{//\ This\ is\ an\ experimental\ feature\ and\ subjected\ to\ change.}}
+\DoxyCodeLine{00027\ \textcolor{comment}{//\ More\ description\ is\ available\ at}}
+\DoxyCodeLine{00028\ \textcolor{comment}{//\ tensorflow/lite/micro/docs/offline\_memory\_plan.md.}}
+\DoxyCodeLine{00029\ }
+\DoxyCodeLine{00030\ \textcolor{comment}{//\ Describes\ a\ buffer's\ layout\ inside\ an\ arena.\ This\ struct\ should\ be\ kept\ as}}
+\DoxyCodeLine{00031\ \textcolor{comment}{//\ small\ as\ possible\ for\ memory\ footprint\ sensitive\ applications\ and\ should\ use}}
+\DoxyCodeLine{00032\ \textcolor{comment}{//\ only\ primitive\ fields,\ making\ it\ easy\ to\ adjust\ offline.}}
+\DoxyCodeLine{00033\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structtflite_1_1_buffer_descriptor}{BufferDescriptor}}\ \{}
+\DoxyCodeLine{00034\ \ \ \textcolor{comment}{//\ Starting\ offset\ inside\ an\ arena\ for\ this\ buffer.}}
+\DoxyCodeLine{00035\ \ \ \textcolor{comment}{//\ Offset\ is\ the\ minimum\ information\ needed\ for\ the\ buffer.\ \ The\ user\ knows}}
+\DoxyCodeLine{00036\ \ \ \textcolor{comment}{//\ the\ model\ and\ the\ size\ of\ each\ buffer\ in\ order\ to\ lay\ out\ a\ valid\ buffer}}
+\DoxyCodeLine{00037\ \ \ \textcolor{comment}{//\ plan.}}
+\DoxyCodeLine{00038\ \ \ int32\_t\ \mbox{\hyperlink{structtflite_1_1_buffer_descriptor_a1f6f1a890d35a87410042969f5177757}{offset}};}
+\DoxyCodeLine{00039\ \};}
+\DoxyCodeLine{00040\ }
+\DoxyCodeLine{00041\ \textcolor{comment}{//\ A\ structure\ describing\ the\ lay\ out\ of\ buffers\ inside\ an\ arena.}}
+\DoxyCodeLine{00042\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structtflite_1_1_buffer_plan}{BufferPlan}}\ \{}
+\DoxyCodeLine{00043\ \ \ \textcolor{comment}{//\ Number\ of\ buffers\ described\ in\ this\ plan.}}
+\DoxyCodeLine{00044\ \ \ int32\_t\ \mbox{\hyperlink{structtflite_1_1_buffer_plan_a51a525e89de000d8fbb84a5e5933d0ed}{buffer\_count}};}
+\DoxyCodeLine{00045\ }
+\DoxyCodeLine{00046\ \ \ \textcolor{comment}{//\ Each\ element\ describes\ one\ buffer.}}
+\DoxyCodeLine{00047\ \ \ \textcolor{comment}{//\ Buffer\ index\ is\ implicit\ by\ the\ order\ of\ AddBuffer()\ call.}}
+\DoxyCodeLine{00048\ \ \ \textcolor{comment}{//\ Specifically,\ indices\ of\ activation\ tensors\ are\ 0\ …\ N-\/1\ where\ N\ is\ the}}
+\DoxyCodeLine{00049\ \ \ \textcolor{comment}{//\ number\ of\ activation\ tensors.}}
+\DoxyCodeLine{00050\ \ \ \textcolor{comment}{//\ The\ rest\ are\ based\ on\ the\ order\ of\ OP\ requests.}}
+\DoxyCodeLine{00051\ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{00052\ \ \ \textcolor{comment}{//\ This\ is\ a\ flexible\ array\ member\ and\ should\ ideally\ be}}
+\DoxyCodeLine{00053\ \ \ \textcolor{comment}{//\ arena\_entries[];\ However,\ in\ order\ to\ support\ a\ variety}}
+\DoxyCodeLine{00054\ \ \ \textcolor{comment}{//\ of\ compilers\ (and\ without\ needing\ to\ add\ ifdef's),\ we}}
+\DoxyCodeLine{00055\ \ \ \textcolor{comment}{//\ are\ implementing\ the\ flexible\ array\ member\ with\ an\ array\ of}}
+\DoxyCodeLine{00056\ \ \ \textcolor{comment}{//\ length\ 1\ as\ the\ last\ member\ of\ the\ struct.\ When\ the\ size\ of\ a\ BufferPlan}}
+\DoxyCodeLine{00057\ \ \ \textcolor{comment}{//\ is\ needed,\ use\ the\ provided\ SizeOfBufferPlan(buffer\_count)\ that}}
+\DoxyCodeLine{00058\ \ \ \textcolor{comment}{//\ accounts\ for\ this\ implemenatation\ caveat.}}
+\DoxyCodeLine{00059\ \ \ \mbox{\hyperlink{structtflite_1_1_buffer_descriptor}{BufferDescriptor}}\ \mbox{\hyperlink{structtflite_1_1_buffer_plan_ab0c050f6cb458b38da43c160c7e4cb21}{buffer\_plan\_entries}}[1];}
+\DoxyCodeLine{00060\ \};}
+\DoxyCodeLine{00061\ }
+\DoxyCodeLine{00062\ \textcolor{comment}{//\ Returns\ size\ of\ a\ BufferPlan\ given\ a\ buffer\ count.\ This\ size\ is\ compile\ time}}
+\DoxyCodeLine{00063\ \textcolor{comment}{//\ known\ if\ buffer\_count\ is\ a\ compile\ time\ constant.}}
+\DoxyCodeLine{00064\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{namespacetflite_ae68ae6f9c5f01030fc41db01ce0fdcfe}{SizeOfBufferPlan}}(int32\_t\ buffer\_count)\ \{}
+\DoxyCodeLine{00065\ \ \ \textcolor{comment}{//\ Minus\ 1\ because\ a\ BufferPlan\ struct\ have\ a\ BufferDescriptor\ already.}}
+\DoxyCodeLine{00066\ \ \ \textcolor{comment}{//\ Max\ to\ provide\ a\ lower\ bound\ for\ the\ corner\ case\ of\ buffer\_count\ =\ 0.}}
+\DoxyCodeLine{00067\ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{structtflite_1_1_buffer_plan}{BufferPlan}})\ +}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{structtflite_1_1_buffer_descriptor}{BufferDescriptor}})\ *\ \mbox{\hyperlink{namespacetflite_ad32516463d82cc5309397109f086d398}{Max}}(buffer\_count\ -\/\ 1,\ 0);}
+\DoxyCodeLine{00069\ \}}
+\DoxyCodeLine{00070\ }
+\DoxyCodeLine{00071\ \}\ \ \textcolor{comment}{//\ namespace\ tflite}}
+\DoxyCodeLine{00072\ }
+\DoxyCodeLine{00073\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ TENSORFLOW\_LITE\_MICRO\_MEMORY\_PLANNER\_MEMORY\_PLAN\_STRUCT\_H\_}}
+
+\end{DoxyCode}

@@ -1,0 +1,86 @@
+\doxysection{ei\+\_\+logging.\+h}
+\hypertarget{ei__logging_8h_source}{}\label{ei__logging_8h_source}\index{Face\_Access\_inferencing/src/edge-\/impulse-\/sdk/porting/ei\_logging.h@{Face\_Access\_inferencing/src/edge-\/impulse-\/sdk/porting/ei\_logging.h}}
+\mbox{\hyperlink{ei__logging_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{00002\ \textcolor{comment}{\ *\ Copyright\ (c)\ 2022\ EdgeImpulse\ Inc.}}
+\DoxyCodeLine{00003\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00004\ \textcolor{comment}{\ *\ Licensed\ under\ the\ Apache\ License,\ Version\ 2.0\ (the\ "{}License"{});}}
+\DoxyCodeLine{00005\ \textcolor{comment}{\ *\ you\ may\ not\ use\ this\ file\ except\ in\ compliance\ with\ the\ License.}}
+\DoxyCodeLine{00006\ \textcolor{comment}{\ *\ You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{00007\ \textcolor{comment}{\ *\ http://www.apache.org/licenses/LICENSE-\/2.0}}
+\DoxyCodeLine{00008\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00009\ \textcolor{comment}{\ *\ Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,}}
+\DoxyCodeLine{00010\ \textcolor{comment}{\ *\ software\ distributed\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS}}
+\DoxyCodeLine{00011\ \textcolor{comment}{\ *\ IS"{}\ BASIS,\ WITHOUT\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,\ either}}
+\DoxyCodeLine{00012\ \textcolor{comment}{\ *\ express\ or\ implied.\ See\ the\ License\ for\ the\ specific\ language}}
+\DoxyCodeLine{00013\ \textcolor{comment}{\ *\ governing\ permissions\ and\ limitations\ under\ the\ License.}}
+\DoxyCodeLine{00014\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00015\ \textcolor{comment}{\ *\ SPDX-\/License-\/Identifier:\ Apache-\/2.0}}
+\DoxyCodeLine{00016\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{00017\ }
+\DoxyCodeLine{00018\ \textcolor{preprocessor}{\#ifndef\ \_EI\_LOGGING\_H\_}}
+\DoxyCodeLine{00019\ \textcolor{preprocessor}{\#define\ \_EI\_LOGGING\_H\_}}
+\DoxyCodeLine{00020\ }
+\DoxyCodeLine{00021\ \textcolor{preprocessor}{\#include\ <stdint.h>}}
+\DoxyCodeLine{00022\ \textcolor{preprocessor}{\#include\ <stdarg.h>}}
+\DoxyCodeLine{00023\ }
+\DoxyCodeLine{00024\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{ei__classifier__porting_8h}{ei\_classifier\_porting.h}}"{}}}
+\DoxyCodeLine{00025\ }
+\DoxyCodeLine{00026\ \textcolor{preprocessor}{\#define\ EI\_LOG\_LEVEL\_NONE\ 0\ }}
+\DoxyCodeLine{00027\ \textcolor{preprocessor}{\#define\ EI\_LOG\_LEVEL\_ERROR\ 1\ }}
+\DoxyCodeLine{00028\ \textcolor{preprocessor}{\#define\ EI\_LOG\_LEVEL\_WARNING\ 2\ }}
+\DoxyCodeLine{00029\ \textcolor{preprocessor}{\#define\ EI\_LOG\_LEVEL\_INFO\ 3\ }}
+\DoxyCodeLine{00030\ \textcolor{preprocessor}{\#define\ EI\_LOG\_LEVEL\_DEBUG\ 4\ }}
+\DoxyCodeLine{00032\ \textcolor{comment}{//\ if\ we\ do\ not\ want\ ANY\ logging,\ setting\ EI\_LOG\_LEVEL\ to\ EI\_LOG\_LEVEL\_NONE}}
+\DoxyCodeLine{00033\ \textcolor{comment}{//\ will\ not\ generate\ any\ code\ according\ to}}
+\DoxyCodeLine{00034\ }
+\DoxyCodeLine{00035\ \textcolor{preprocessor}{\#define\ EI\_LOGE(format,\ ...)\ (void)0}}
+\DoxyCodeLine{00036\ \textcolor{preprocessor}{\#define\ EI\_LOGW(format,\ ...)\ (void)0}}
+\DoxyCodeLine{00037\ \textcolor{preprocessor}{\#define\ EI\_LOGI(format,\ ...)\ (void)0}}
+\DoxyCodeLine{00038\ \textcolor{preprocessor}{\#define\ EI\_LOGD(format,\ ...)\ (void)0}}
+\DoxyCodeLine{00039\ }
+\DoxyCodeLine{00040\ \textcolor{preprocessor}{\#ifndef\ EI\_LOG\_LEVEL}}
+\DoxyCodeLine{00041\ \textcolor{preprocessor}{\ \ \ \ \#define\ EI\_LOG\_LEVEL\ EI\_LOG\_LEVEL\_INFO}}
+\DoxyCodeLine{00042\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00043\ }
+\DoxyCodeLine{00044\ \mbox{\hyperlink{ei__logging_8h_ae65fe4907570cfe4e44c8bb708684d4a}{\_\_attribute\_\_}}((unused))\ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *debug\_msgs[]\ =}
+\DoxyCodeLine{00045\ \{}
+\DoxyCodeLine{00046\ \ \ \ \ \textcolor{stringliteral}{"{}NONE"{}},\ \textcolor{comment}{//\ this\ one\ will\ never\ show}}
+\DoxyCodeLine{00047\ \ \ \ \ \textcolor{stringliteral}{"{}ERR"{}},}
+\DoxyCodeLine{00048\ \ \ \ \ \textcolor{stringliteral}{"{}WARNING"{}},}
+\DoxyCodeLine{00049\ \ \ \ \ \textcolor{stringliteral}{"{}INFO"{}},}
+\DoxyCodeLine{00050\ \ \ \ \ \textcolor{stringliteral}{"{}DEBUG"{}}}
+\DoxyCodeLine{00051\ \};}
+\DoxyCodeLine{00052\ }
+\DoxyCodeLine{00053\ \textcolor{preprocessor}{\#if\ EI\_LOG\_LEVEL\ >=\ EI\_LOG\_LEVEL\_ERROR}}
+\DoxyCodeLine{00054\ \textcolor{preprocessor}{\ \ \ \ \#ifdef\ EI\_LOGE}}
+\DoxyCodeLine{00055\ \textcolor{preprocessor}{\ \ \ \ \#undef\ EI\_LOGE}}
+\DoxyCodeLine{00056\ \textcolor{preprocessor}{\ \ \ \ \#endif\ }\textcolor{comment}{//\ EI\_LOGE}}
+\DoxyCodeLine{00057\ \textcolor{preprocessor}{\ \ \ \ \#define\ EI\_LOGE(format,\ ...)\ ei\_printf("{}\%s:\ "{},debug\_msgs[EI\_LOG\_LEVEL\_ERROR]);\ ei\_printf(format,\ \#\#\_\_VA\_ARGS\_\_);}}
+\DoxyCodeLine{00058\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00059\ }
+\DoxyCodeLine{00060\ \textcolor{preprocessor}{\#if\ EI\_LOG\_LEVEL\ >=\ EI\_LOG\_LEVEL\_WARNING}}
+\DoxyCodeLine{00061\ \textcolor{preprocessor}{\ \ \ \ \#ifdef\ EI\_LOGW}}
+\DoxyCodeLine{00062\ \textcolor{preprocessor}{\ \ \ \ \#undef\ EI\_LOGW}}
+\DoxyCodeLine{00063\ \textcolor{preprocessor}{\ \ \ \ \#endif\ }\textcolor{comment}{//\ EI\_LOGW}}
+\DoxyCodeLine{00064\ \textcolor{preprocessor}{\ \ \ \ \#define\ EI\_LOGW(format,\ ...)\ ei\_printf("{}\%s:\ "{},debug\_msgs[EI\_LOG\_LEVEL\_WARNING]);\ ei\_printf(format,\ \#\#\_\_VA\_ARGS\_\_);}}
+\DoxyCodeLine{00065\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00066\ }
+\DoxyCodeLine{00067\ \textcolor{preprocessor}{\#if\ EI\_LOG\_LEVEL\ >=\ EI\_LOG\_LEVEL\_INFO}}
+\DoxyCodeLine{00068\ \textcolor{preprocessor}{\ \ \ \ \#ifdef\ EI\_LOGI}}
+\DoxyCodeLine{00069\ \textcolor{preprocessor}{\ \ \ \ \#undef\ EI\_LOGI}}
+\DoxyCodeLine{00070\ \textcolor{preprocessor}{\ \ \ \ \#endif\ }\textcolor{comment}{//\ EI\_LOGI}}
+\DoxyCodeLine{00071\ \textcolor{preprocessor}{\ \ \ \ \#define\ EI\_LOGI(format,\ ...)\ ei\_printf("{}\%s:\ "{},debug\_msgs[EI\_LOG\_LEVEL\_INFO]);\ ei\_printf(format,\ \#\#\_\_VA\_ARGS\_\_);}}
+\DoxyCodeLine{00072\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00073\ }
+\DoxyCodeLine{00074\ \textcolor{preprocessor}{\#if\ EI\_LOG\_LEVEL\ >=\ EI\_LOG\_LEVEL\_DEBUG}}
+\DoxyCodeLine{00075\ \textcolor{preprocessor}{\ \ \ \ \#ifdef\ EI\_LOGD}}
+\DoxyCodeLine{00076\ \textcolor{preprocessor}{\ \ \ \ \#undef\ EI\_LOGD}}
+\DoxyCodeLine{00077\ \textcolor{preprocessor}{\ \ \ \ \#endif\ }\textcolor{comment}{//\ EI\_LOGD}}
+\DoxyCodeLine{00078\ \textcolor{preprocessor}{\ \ \ \ \#define\ EI\_LOGD(format,\ ...)\ ei\_printf("{}\%s:\ "{},debug\_msgs[EI\_LOG\_LEVEL\_DEBUG]);\ ei\_printf(format,\ \#\#\_\_VA\_ARGS\_\_);}}
+\DoxyCodeLine{00079\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00080\ }
+\DoxyCodeLine{00081\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ \_EI\_LOGGING\_H\_}}
+
+\end{DoxyCode}

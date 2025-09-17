@@ -1,0 +1,66 @@
+\chapter{README}
+\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_0ba4459073c33ccb7906653606a33922}{}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_0ba4459073c33ccb7906653606a33922}\index{README@{README}}
+\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_0ba4459073c33ccb7906653606a33922_autotoc_md330}{}\doxysection{\texorpdfstring{Info}{Info}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_0ba4459073c33ccb7906653606a33922_autotoc_md330}
+Arm(\+R) Ethos(\+TM)-\/U is a new class of machine learning processors, called a micro\+NPU, specifically designed to accelerate ML inference in area-\/constrained embedded and IoT devices. This readme briefly describes how to integrate Ethos-\/U related hardware and software into TFLM. See also \href{https://review.mlplatform.org/plugins/gitiles/ml/ethos-u/ml-embedded-evaluation-kit}{\texttt{ Ethos-\/U ML Evaluation kit examples}}.
+
+To enable the Ethos-\/U software stack, add {\ttfamily CO\+\_\+\+PROCESSOR=ethos\+\_\+u} to the make command. Use ETHOSU\+\_\+\+ARCH to specify the architecture. See examples below.\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_0ba4459073c33ccb7906653606a33922_autotoc_md331}{}\doxysubsection{\texorpdfstring{Requirements\+:}{Requirements\+:}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_0ba4459073c33ccb7906653606a33922_autotoc_md331}
+
+\begin{DoxyItemize}
+\item Armclang 6.\+14 or later
+\item GCC 10.\+2.\+1 or later
+\end{DoxyItemize}\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_0ba4459073c33ccb7906653606a33922_autotoc_md332}{}\doxysubsection{\texorpdfstring{Ethos-\/U custom operator}{Ethos-\/U custom operator}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_0ba4459073c33ccb7906653606a33922_autotoc_md332}
+The TFLM runtime will dispatch workloads to Ethos-\/U when it encounters an Ethos-\/U custom op in the tflite file. See an ASCII art example below. The Ethos-\/U custom op is added by a tool called Ethos-\/U Vela and contains information the Ethos-\/U hardware need to execute the workload. More info in the \href{https://review.mlplatform.org/plugins/gitiles/ml/ethos-u/ethos-u-vela}{\texttt{ Vela repository}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \ |\ tensor0}
+\DoxyCodeLine{\ \ \ \ \ |}
+\DoxyCodeLine{\ \ \ \ \ v}
+\DoxyCodeLine{+-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/+}
+\DoxyCodeLine{|\ ethos-\/u\ \ \ \ |}
+\DoxyCodeLine{|\ custom\ op\ \ |}
+\DoxyCodeLine{+-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/+}
+\DoxyCodeLine{\ \ \ \ \ +}
+\DoxyCodeLine{\ \ \ \ \ |}
+\DoxyCodeLine{\ \ \ \ \ |\ tensor1}
+\DoxyCodeLine{\ \ \ \ \ |}
+\DoxyCodeLine{\ \ \ \ \ v}
+\DoxyCodeLine{+-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/+}
+\DoxyCodeLine{|\ transpose\ |}
+\DoxyCodeLine{|\ \ \ \ \ \ \ \ \ \ \ |}
+\DoxyCodeLine{+-\/-\/-\/-\/|-\/-\/-\/-\/-\/-\/+}
+\DoxyCodeLine{\ \ \ \ \ |}
+\DoxyCodeLine{\ \ \ \ \ |\ tensor2}
+\DoxyCodeLine{\ \ \ \ \ |}
+\DoxyCodeLine{\ \ \ \ \ v}
+
+\end{DoxyCode}
+
+
+Note that the {\ttfamily ethousu\+\_\+init()} API of the Ethos-\/U driver need to be called at startup, before calling the TFLM API. More info in the \href{https://review.mlplatform.org/plugins/gitiles/ml/ethos-u/ethos-u-core-driver}{\texttt{ Ethos-\/U driver repo}}.
+
+For even more info regarding Vela and Ethos-\/U, checkout \href{https://review.mlplatform.org/plugins/gitiles/ml/ethos-u/ethos-u/+/refs/heads/master}{\texttt{ Ethos-\/U landing page}}.\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_0ba4459073c33ccb7906653606a33922_autotoc_md333}{}\doxysection{\texorpdfstring{Some examples of compiling a binary and running a network with Ethos-\/U support.}{Some examples of compiling a binary and running a network with Ethos-\/U support.}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_0ba4459073c33ccb7906653606a33922_autotoc_md333}
+In order to run a test with Ethos-\/\+U55 enabled, a platform with corresponding hardware support is required. One such platform is the fixed virtual platform (FVP) based on Arm Corstone-\/300 software. See \href{https://github.com/tensorflow/tflite-micro/tree/main/tensorflow/lite/micro/cortex_m_corstone_300/README.md}{\texttt{ Corstone-\/300 readme}} for more info.
+
+On top of that the .tflite model needs to be modified according subchapter "{}\+Ethos-\/\+U custom operator"{} above.
+
+The log level of the Ethos-\/U driver can be set in the build command. For example\+: ETHOSU\+\_\+\+LOG\+\_\+\+SEVERITY=ETHOSU\+\_\+\+LOG\+\_\+\+INFO.\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_0ba4459073c33ccb7906653606a33922_autotoc_md334}{}\doxysubsection{\texorpdfstring{Example using network tester}{Example using network tester}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_0ba4459073c33ccb7906653606a33922_autotoc_md334}
+See \doxylink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_2mib9d7cd905ae72f1ec691d4a35976bad1}{tensorflow/lite/micro/examples/network\+\_\+tester/\+README.\+md} for more info.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{make\ -\/f\ tensorflow/lite/micro/tools/make/Makefile\ network\_tester\_test\ CO\_PROCESSOR=ethos\_u\ ETHOSU\_ARCH=u55\ TARGET=cortex\_m\_generic\ TARGET\_ARCH=cortex-\/m55\ microlite}
+
+\end{DoxyCode}
+
+
+For the Arm Corstone-\/300 target, ETHOSU\+\_\+\+ARCH is defined in \doxylink{cortex__m__corstone__300__makefile_8inc}{cortex\+\_\+m\+\_\+corstone\+\_\+300\+\_\+makefile.\+inc} so it doesn\textquotesingle{}t need to be defined on the command line.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{make\ -\/f\ tensorflow/lite/micro/tools/make/Makefile\ network\_tester\_test\ CO\_PROCESSOR=ethos\_u\ TARGET=cortex\_m\_corstone\_300\ TARGET\_ARCH=cortex-\/m55\ test\_network\_tester\_test\ NETWORK\_MODEL=path/to/network\_model.h\ INPUT\_DATA=path/to/input\_data.h\ OUTPUT\_DATA=path/to/expected\_output\_data.h}
+\DoxyCodeLine{}
+\DoxyCodeLine{make\ -\/f\ tensorflow/lite/micro/tools/make/Makefile\ network\_tester\_test\ CO\_PROCESSOR=ethos\_u\ TARGET=cortex\_m\_corstone\_300\ TARGET\_ARCH=cortex-\/m55\ test\_network\_tester\_test}
+
+\end{DoxyCode}
+ 

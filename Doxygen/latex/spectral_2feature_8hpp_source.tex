@@ -1,0 +1,672 @@
+\doxysection{feature.\+hpp}
+\hypertarget{spectral_2feature_8hpp_source}{}\label{spectral_2feature_8hpp_source}\index{Face\_Access\_inferencing/src/edge-\/impulse-\/sdk/dsp/spectral/feature.hpp@{Face\_Access\_inferencing/src/edge-\/impulse-\/sdk/dsp/spectral/feature.hpp}}
+\mbox{\hyperlink{spectral_2feature_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{00002\ \textcolor{comment}{\ *\ Copyright\ (c)\ 2024\ EdgeImpulse\ Inc.}}
+\DoxyCodeLine{00003\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00004\ \textcolor{comment}{\ *\ Generated\ by\ Edge\ Impulse\ and\ licensed\ under\ the\ applicable\ Edge\ Impulse}}
+\DoxyCodeLine{00005\ \textcolor{comment}{\ *\ Terms\ of\ Service.\ Community\ and\ Professional\ Terms\ of\ Service}}
+\DoxyCodeLine{00006\ \textcolor{comment}{\ *\ (https://docs.edgeimpulse.com/page/terms-\/of-\/service)\ or\ Enterprise\ Terms\ of}}
+\DoxyCodeLine{00007\ \textcolor{comment}{\ *\ Service\ (https://docs.edgeimpulse.com/page/enterprise-\/terms-\/of-\/service),}}
+\DoxyCodeLine{00008\ \textcolor{comment}{\ *\ according\ to\ your\ product\ plan\ subscription\ (the\ “License”).}}
+\DoxyCodeLine{00009\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00010\ \textcolor{comment}{\ *\ This\ software,\ documentation\ and\ other\ associated\ files\ (collectively\ referred}}
+\DoxyCodeLine{00011\ \textcolor{comment}{\ *\ to\ as\ the\ “Software”)\ is\ a\ single\ SDK\ variation\ generated\ by\ the\ Edge\ Impulse}}
+\DoxyCodeLine{00012\ \textcolor{comment}{\ *\ platform\ and\ requires\ an\ active\ paid\ Edge\ Impulse\ subscription\ to\ use\ this}}
+\DoxyCodeLine{00013\ \textcolor{comment}{\ *\ Software\ for\ any\ purpose.}}
+\DoxyCodeLine{00014\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00015\ \textcolor{comment}{\ *\ You\ may\ NOT\ use\ this\ Software\ unless\ you\ have\ an\ active\ Edge\ Impulse\ subscription}}
+\DoxyCodeLine{00016\ \textcolor{comment}{\ *\ that\ meets\ the\ eligibility\ requirements\ for\ the\ applicable\ License,\ subject\ to}}
+\DoxyCodeLine{00017\ \textcolor{comment}{\ *\ your\ full\ and\ continued\ compliance\ with\ the\ terms\ and\ conditions\ of\ the\ License,}}
+\DoxyCodeLine{00018\ \textcolor{comment}{\ *\ including\ without\ limitation\ any\ usage\ restrictions\ under\ the\ applicable\ License.}}
+\DoxyCodeLine{00019\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00020\ \textcolor{comment}{\ *\ If\ you\ do\ not\ have\ an\ active\ Edge\ Impulse\ product\ plan\ subscription,\ or\ if\ use}}
+\DoxyCodeLine{00021\ \textcolor{comment}{\ *\ of\ this\ Software\ exceeds\ the\ usage\ limitations\ of\ your\ Edge\ Impulse\ product\ plan}}
+\DoxyCodeLine{00022\ \textcolor{comment}{\ *\ subscription,\ you\ are\ not\ permitted\ to\ use\ this\ Software\ and\ must\ immediately}}
+\DoxyCodeLine{00023\ \textcolor{comment}{\ *\ delete\ and\ erase\ all\ copies\ of\ this\ Software\ within\ your\ control\ or\ possession.}}
+\DoxyCodeLine{00024\ \textcolor{comment}{\ *\ Edge\ Impulse\ reserves\ all\ rights\ and\ remedies\ available\ to\ enforce\ its\ rights.}}
+\DoxyCodeLine{00025\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00026\ \textcolor{comment}{\ *\ Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ the\ Software\ is}}
+\DoxyCodeLine{00027\ \textcolor{comment}{\ *\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,\ WITHOUT\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,}}
+\DoxyCodeLine{00028\ \textcolor{comment}{\ *\ either\ express\ or\ implied.\ See\ the\ License\ for\ the\ specific\ language\ governing}}
+\DoxyCodeLine{00029\ \textcolor{comment}{\ *\ permissions,\ disclaimers\ and\ limitations\ under\ the\ License.}}
+\DoxyCodeLine{00030\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{00031\ \textcolor{preprocessor}{\#ifndef\ \_EIDSP\_SPECTRAL\_FEATURE\_H\_}}
+\DoxyCodeLine{00032\ \textcolor{preprocessor}{\#define\ \_EIDSP\_SPECTRAL\_FEATURE\_H\_}}
+\DoxyCodeLine{00033\ }
+\DoxyCodeLine{00034\ \textcolor{preprocessor}{\#include\ <stdint.h>}}
+\DoxyCodeLine{00035\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{spectral_2processing_8hpp}{processing.hpp}}"{}}}
+\DoxyCodeLine{00036\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{wavelet_8hpp}{wavelet.hpp}}"{}}}
+\DoxyCodeLine{00037\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{signal_8hpp}{signal.hpp}}"{}}}
+\DoxyCodeLine{00038\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{ei__utils_8h}{edge-\/impulse-\/sdk/dsp/ei\_utils.h}}"{}}}
+\DoxyCodeLine{00039\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{model__metadata_8h}{model-\/parameters/model\_metadata.h}}"{}}}
+\DoxyCodeLine{00040\ }
+\DoxyCodeLine{00041\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespaceei}{ei}}\ \{}
+\DoxyCodeLine{00042\ \textcolor{keyword}{namespace\ }spectral\ \{}
+\DoxyCodeLine{00043\ }
+\DoxyCodeLine{00044\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{enum}\ \{}
+\DoxyCodeLine{00045\ \ \ \ \ \mbox{\hyperlink{namespaceei_1_1spectral_a8c99d642ea97ab012fab6c3846fc876ba332ddad398be3cef334da6ff186519bd}{filter\_none}}\ =\ 0,}
+\DoxyCodeLine{00046\ \ \ \ \ \mbox{\hyperlink{namespaceei_1_1spectral_a8c99d642ea97ab012fab6c3846fc876ba7637aa02b84ad4c387f2b1ff7e816b23}{filter\_lowpass}}\ =\ 1,}
+\DoxyCodeLine{00047\ \ \ \ \ \mbox{\hyperlink{namespaceei_1_1spectral_a8c99d642ea97ab012fab6c3846fc876babca23efebe0c4a890e88451a40f36b9a}{filter\_highpass}}\ =\ 2}
+\DoxyCodeLine{00048\ \}\ \mbox{\hyperlink{namespaceei_1_1spectral_a8c99d642ea97ab012fab6c3846fc876b}{filter\_t}};}
+\DoxyCodeLine{00049\ }
+\DoxyCodeLine{00050\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classei_1_1spectral_1_1feature}{feature}}\ \{}
+\DoxyCodeLine{00051\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00052\ }
+\DoxyCodeLine{00068\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{classei_1_1spectral_1_1feature_a1efa9ba2917878e928b1c2ffacc89bc4}{spectral\_analysis}}(}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structei__matrix}{matrix\_t}}\ *out\_features,}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structei__matrix}{matrix\_t}}\ *\mbox{\hyperlink{ei__run__dsp_8h_a43dfa20ba0ba40e614f1a384d9912eb2}{input\_matrix}},}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}\ sampling\_freq,}
+\DoxyCodeLine{00072\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespaceei_1_1spectral_a8c99d642ea97ab012fab6c3846fc876b}{filter\_t}}\ filter\_type,}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}\ filter\_cutoff,}
+\DoxyCodeLine{00074\ \ \ \ \ \ \ \ \ uint8\_t\ filter\_order,}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \ \ uint16\_t\ \mbox{\hyperlink{irfft_8cc_abe2bad6726f6194f0b5165fe4b37a65f}{fft\_length}},}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ uint8\_t\ fft\_peaks,}
+\DoxyCodeLine{00077\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}\ fft\_peaks\_threshold,}
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structei__matrix}{matrix\_t}}\ *edges\_matrix\_in}
+\DoxyCodeLine{00079\ \ \ \ \ )\ \{}
+\DoxyCodeLine{00080\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (out\_features-\/>\mbox{\hyperlink{structei__matrix_a263c997028804ca14b749f64eeb3fe84}{rows}}\ !=\ \mbox{\hyperlink{ei__run__dsp_8h_a43dfa20ba0ba40e614f1a384d9912eb2}{input\_matrix}}-\/>\mbox{\hyperlink{structei__matrix_a263c997028804ca14b749f64eeb3fe84}{rows}})\ \{}
+\DoxyCodeLine{00081\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{config_8hpp_a6a2e91879ad7a904747f26b218ada23a}{EIDSP\_ERR}}(\mbox{\hyperlink{namespaceei_a35329cd4e57031263ba0a94c8d3959baa38ee0f868403ad45472a6e330d9af02f}{EIDSP\_MATRIX\_SIZE\_MISMATCH}});}
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00083\ }
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (out\_features-\/>\mbox{\hyperlink{structei__matrix_a71fe3190b5ec3ab128461bd7903d3221}{cols}}\ !=\ \mbox{\hyperlink{classei_1_1spectral_1_1feature_ad3a97b9a25c0ceb93efb2d4406b93b2e}{calculate\_spectral\_buffer\_size}}(\textcolor{keyword}{true},\ fft\_peaks,\ edges\_matrix\_in-\/>\mbox{\hyperlink{structei__matrix_a263c997028804ca14b749f64eeb3fe84}{rows}}))\ \{}
+\DoxyCodeLine{00085\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{config_8hpp_a6a2e91879ad7a904747f26b218ada23a}{EIDSP\_ERR}}(\mbox{\hyperlink{namespaceei_a35329cd4e57031263ba0a94c8d3959baa38ee0f868403ad45472a6e330d9af02f}{EIDSP\_MATRIX\_SIZE\_MISMATCH}});}
+\DoxyCodeLine{00086\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00087\ }
+\DoxyCodeLine{00088\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (edges\_matrix\_in-\/>\mbox{\hyperlink{structei__matrix_a71fe3190b5ec3ab128461bd7903d3221}{cols}}\ !=\ 1)\ \{}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{config_8hpp_a6a2e91879ad7a904747f26b218ada23a}{EIDSP\_ERR}}(\mbox{\hyperlink{namespaceei_a35329cd4e57031263ba0a94c8d3959baa38ee0f868403ad45472a6e330d9af02f}{EIDSP\_MATRIX\_SIZE\_MISMATCH}});}
+\DoxyCodeLine{00090\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00091\ }
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{ei__run__dsp_8h_a6baa346e44f4c2158d2be4f9b77b8203}{ret}};}
+\DoxyCodeLine{00093\ }
+\DoxyCodeLine{00094\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ axes\ =\ \mbox{\hyperlink{ei__run__dsp_8h_a43dfa20ba0ba40e614f1a384d9912eb2}{input\_matrix}}-\/>\mbox{\hyperlink{structei__matrix_a263c997028804ca14b749f64eeb3fe84}{rows}};}
+\DoxyCodeLine{00095\ }
+\DoxyCodeLine{00096\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__utils_8h_a3856e4de29f29e853f85608223a3aa80}{EI\_TRY}}(processing::subtract\_mean(\mbox{\hyperlink{ei__run__dsp_8h_a43dfa20ba0ba40e614f1a384d9912eb2}{input\_matrix}})\ );}
+\DoxyCodeLine{00097\ }
+\DoxyCodeLine{00098\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ apply\ filter}}
+\DoxyCodeLine{00099\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (filter\_type\ ==\ \mbox{\hyperlink{namespaceei_1_1spectral_a8c99d642ea97ab012fab6c3846fc876ba7637aa02b84ad4c387f2b1ff7e816b23}{filter\_lowpass}})\ \{}
+\DoxyCodeLine{00100\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__dsp_8h_a6baa346e44f4c2158d2be4f9b77b8203}{ret}}\ =\ spectral::processing::butterworth\_lowpass\_filter(}
+\DoxyCodeLine{00101\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__dsp_8h_a43dfa20ba0ba40e614f1a384d9912eb2}{input\_matrix}},\ sampling\_freq,\ filter\_cutoff,\ filter\_order);}
+\DoxyCodeLine{00102\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{ei__run__dsp_8h_a6baa346e44f4c2158d2be4f9b77b8203}{ret}}\ !=\ \mbox{\hyperlink{namespaceei_a35329cd4e57031263ba0a94c8d3959baa58f9da92fe1aff29466bdd4aa2a7b361}{EIDSP\_OK}})\ \{}
+\DoxyCodeLine{00103\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{config_8hpp_a6a2e91879ad7a904747f26b218ada23a}{EIDSP\_ERR}}(\mbox{\hyperlink{namespaceei_a35329cd4e57031263ba0a94c8d3959baa38ee0f868403ad45472a6e330d9af02f}{EIDSP\_MATRIX\_SIZE\_MISMATCH}});}
+\DoxyCodeLine{00104\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00105\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00106\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (filter\_type\ ==\ \mbox{\hyperlink{namespaceei_1_1spectral_a8c99d642ea97ab012fab6c3846fc876babca23efebe0c4a890e88451a40f36b9a}{filter\_highpass}})\ \{}
+\DoxyCodeLine{00107\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__dsp_8h_a6baa346e44f4c2158d2be4f9b77b8203}{ret}}\ =\ spectral::processing::butterworth\_highpass\_filter(}
+\DoxyCodeLine{00108\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__dsp_8h_a43dfa20ba0ba40e614f1a384d9912eb2}{input\_matrix}},\ sampling\_freq,\ filter\_cutoff,\ filter\_order);}
+\DoxyCodeLine{00109\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{ei__run__dsp_8h_a6baa346e44f4c2158d2be4f9b77b8203}{ret}}\ !=\ \mbox{\hyperlink{namespaceei_a35329cd4e57031263ba0a94c8d3959baa58f9da92fe1aff29466bdd4aa2a7b361}{EIDSP\_OK}})\ \{}
+\DoxyCodeLine{00110\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{config_8hpp_a6a2e91879ad7a904747f26b218ada23a}{EIDSP\_ERR}}(\mbox{\hyperlink{namespaceei_a35329cd4e57031263ba0a94c8d3959baa38ee0f868403ad45472a6e330d9af02f}{EIDSP\_MATRIX\_SIZE\_MISMATCH}});}
+\DoxyCodeLine{00111\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00112\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00113\ }
+\DoxyCodeLine{00114\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ calculate\ RMS}}
+\DoxyCodeLine{00115\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{memory_8hpp_a605d3e24f2bb57fb1133dd21553727d2}{EI\_DSP\_MATRIX}}(rms\_matrix,\ axes,\ 1);}
+\DoxyCodeLine{00116\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__dsp_8h_a6baa346e44f4c2158d2be4f9b77b8203}{ret}}\ =\ \mbox{\hyperlink{classei_1_1numpy_a21a0bd0115ac137dfd3bce9c0a1ddae3}{numpy::rms}}(\mbox{\hyperlink{ei__run__dsp_8h_a43dfa20ba0ba40e614f1a384d9912eb2}{input\_matrix}},\ \&rms\_matrix);}
+\DoxyCodeLine{00117\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{ei__run__dsp_8h_a6baa346e44f4c2158d2be4f9b77b8203}{ret}}\ !=\ \mbox{\hyperlink{namespaceei_a35329cd4e57031263ba0a94c8d3959baa58f9da92fe1aff29466bdd4aa2a7b361}{EIDSP\_OK}})\ \{}
+\DoxyCodeLine{00118\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{config_8hpp_a6a2e91879ad7a904747f26b218ada23a}{EIDSP\_ERR}}(\mbox{\hyperlink{namespaceei_a35329cd4e57031263ba0a94c8d3959baa38ee0f868403ad45472a6e330d9af02f}{EIDSP\_MATRIX\_SIZE\_MISMATCH}});}
+\DoxyCodeLine{00119\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00120\ }
+\DoxyCodeLine{00121\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ find\ peaks\ in\ FFT}}
+\DoxyCodeLine{00122\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{memory_8hpp_a605d3e24f2bb57fb1133dd21553727d2}{EI\_DSP\_MATRIX}}(peaks\_matrix,\ axes,\ fft\_peaks\ *\ 2);}
+\DoxyCodeLine{00123\ }
+\DoxyCodeLine{00124\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ row\ =\ 0;\ row\ <\ \mbox{\hyperlink{ei__run__dsp_8h_a43dfa20ba0ba40e614f1a384d9912eb2}{input\_matrix}}-\/>\mbox{\hyperlink{structei__matrix_a263c997028804ca14b749f64eeb3fe84}{rows}};\ row++)\ \{}
+\DoxyCodeLine{00125\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ per\ axis\ code}}
+\DoxyCodeLine{00126\ }
+\DoxyCodeLine{00127\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ get\ a\ slice\ of\ the\ current\ axis}}
+\DoxyCodeLine{00128\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{memory_8hpp_ae1f9a9363fff430d79250a4704b8067b}{EI\_DSP\_MATRIX\_B}}(axis\_matrix,\ 1,\ \mbox{\hyperlink{ei__run__dsp_8h_a43dfa20ba0ba40e614f1a384d9912eb2}{input\_matrix}}-\/>\mbox{\hyperlink{structei__matrix_a71fe3190b5ec3ab128461bd7903d3221}{cols}},\ \mbox{\hyperlink{ei__run__dsp_8h_a43dfa20ba0ba40e614f1a384d9912eb2}{input\_matrix}}-\/>\mbox{\hyperlink{structei__matrix_a5412b64a3551881269b8c1493f0da17a}{buffer}}\ +\ (row\ *\ \mbox{\hyperlink{ei__run__dsp_8h_a43dfa20ba0ba40e614f1a384d9912eb2}{input\_matrix}}-\/>\mbox{\hyperlink{structei__matrix_a71fe3190b5ec3ab128461bd7903d3221}{cols}}));}
+\DoxyCodeLine{00129\ }
+\DoxyCodeLine{00130\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ calculate\ FFT}}
+\DoxyCodeLine{00131\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{memory_8hpp_a605d3e24f2bb57fb1133dd21553727d2}{EI\_DSP\_MATRIX}}(fft\_matrix,\ 1,\ \mbox{\hyperlink{irfft_8cc_abe2bad6726f6194f0b5165fe4b37a65f}{fft\_length}}\ /\ 2\ +\ 1);}
+\DoxyCodeLine{00132\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__dsp_8h_a6baa346e44f4c2158d2be4f9b77b8203}{ret}}\ =\ \mbox{\hyperlink{classei_1_1numpy_aa6a741375b3bc15a1f5906360b16645c}{numpy::rfft}}(axis\_matrix.buffer,\ axis\_matrix.cols,\ fft\_matrix.buffer,\ fft\_matrix.cols,\ \mbox{\hyperlink{irfft_8cc_abe2bad6726f6194f0b5165fe4b37a65f}{fft\_length}});}
+\DoxyCodeLine{00133\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{ei__run__dsp_8h_a6baa346e44f4c2158d2be4f9b77b8203}{ret}}\ !=\ \mbox{\hyperlink{namespaceei_a35329cd4e57031263ba0a94c8d3959baa58f9da92fe1aff29466bdd4aa2a7b361}{EIDSP\_OK}})\ \{}
+\DoxyCodeLine{00134\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{config_8hpp_a6a2e91879ad7a904747f26b218ada23a}{EIDSP\_ERR}}(\mbox{\hyperlink{namespaceei_a35329cd4e57031263ba0a94c8d3959baa38ee0f868403ad45472a6e330d9af02f}{EIDSP\_MATRIX\_SIZE\_MISMATCH}});}
+\DoxyCodeLine{00135\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00136\ }
+\DoxyCodeLine{00137\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ multiply\ by\ 2/N}}
+\DoxyCodeLine{00138\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classei_1_1numpy_a780e556d0c5dc4948320ad0ab1630666}{numpy::scale}}(\&fft\_matrix,\ (2.0f\ /\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{float}\textcolor{keyword}{>}(\mbox{\hyperlink{irfft_8cc_abe2bad6726f6194f0b5165fe4b37a65f}{fft\_length}})));}
+\DoxyCodeLine{00139\ }
+\DoxyCodeLine{00140\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ we're\ now\ using\ the\ FFT\ matrix\ to\ calculate\ peaks\ etc.}}
+\DoxyCodeLine{00141\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{memory_8hpp_a605d3e24f2bb57fb1133dd21553727d2}{EI\_DSP\_MATRIX}}(peaks\_matrix,\ fft\_peaks,\ 2);}
+\DoxyCodeLine{00142\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__dsp_8h_a6baa346e44f4c2158d2be4f9b77b8203}{ret}}\ =\ spectral::processing::find\_fft\_peaks(\&fft\_matrix,\ \&peaks\_matrix,}
+\DoxyCodeLine{00143\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ sampling\_freq,\ fft\_peaks\_threshold,\ \mbox{\hyperlink{irfft_8cc_abe2bad6726f6194f0b5165fe4b37a65f}{fft\_length}});}
+\DoxyCodeLine{00144\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{ei__run__dsp_8h_a6baa346e44f4c2158d2be4f9b77b8203}{ret}}\ !=\ \mbox{\hyperlink{namespaceei_a35329cd4e57031263ba0a94c8d3959baa58f9da92fe1aff29466bdd4aa2a7b361}{EIDSP\_OK}})\ \{}
+\DoxyCodeLine{00145\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{config_8hpp_a6a2e91879ad7a904747f26b218ada23a}{EIDSP\_ERR}}(\mbox{\hyperlink{namespaceei_a35329cd4e57031263ba0a94c8d3959baa38ee0f868403ad45472a6e330d9af02f}{EIDSP\_MATRIX\_SIZE\_MISMATCH}});}
+\DoxyCodeLine{00146\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00147\ }
+\DoxyCodeLine{00148\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ calculate\ periodogram\ for\ spectral\ power\ buckets}}
+\DoxyCodeLine{00149\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{memory_8hpp_a605d3e24f2bb57fb1133dd21553727d2}{EI\_DSP\_MATRIX}}(period\_fft\_matrix,\ 1,\ \mbox{\hyperlink{irfft_8cc_abe2bad6726f6194f0b5165fe4b37a65f}{fft\_length}}\ /\ 2\ +\ 1);}
+\DoxyCodeLine{00150\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{memory_8hpp_a605d3e24f2bb57fb1133dd21553727d2}{EI\_DSP\_MATRIX}}(period\_freq\_matrix,\ 1,\ \mbox{\hyperlink{irfft_8cc_abe2bad6726f6194f0b5165fe4b37a65f}{fft\_length}}\ /\ 2\ +\ 1);}
+\DoxyCodeLine{00151\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__dsp_8h_a6baa346e44f4c2158d2be4f9b77b8203}{ret}}\ =\ spectral::processing::periodogram(\&axis\_matrix,}
+\DoxyCodeLine{00152\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&period\_fft\_matrix,\ \&period\_freq\_matrix,\ sampling\_freq,\ \mbox{\hyperlink{irfft_8cc_abe2bad6726f6194f0b5165fe4b37a65f}{fft\_length}});}
+\DoxyCodeLine{00153\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{ei__run__dsp_8h_a6baa346e44f4c2158d2be4f9b77b8203}{ret}}\ !=\ \mbox{\hyperlink{namespaceei_a35329cd4e57031263ba0a94c8d3959baa58f9da92fe1aff29466bdd4aa2a7b361}{EIDSP\_OK}})\ \{}
+\DoxyCodeLine{00154\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{config_8hpp_a6a2e91879ad7a904747f26b218ada23a}{EIDSP\_ERR}}(\mbox{\hyperlink{ei__run__dsp_8h_a6baa346e44f4c2158d2be4f9b77b8203}{ret}});}
+\DoxyCodeLine{00155\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00156\ }
+\DoxyCodeLine{00157\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{memory_8hpp_a605d3e24f2bb57fb1133dd21553727d2}{EI\_DSP\_MATRIX}}(edges\_matrix\_out,\ edges\_matrix\_in-\/>\mbox{\hyperlink{structei__matrix_a263c997028804ca14b749f64eeb3fe84}{rows}}\ -\/\ 1,\ 1);}
+\DoxyCodeLine{00158\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__dsp_8h_a6baa346e44f4c2158d2be4f9b77b8203}{ret}}\ =\ spectral::processing::spectral\_power\_edges(}
+\DoxyCodeLine{00159\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&period\_fft\_matrix,}
+\DoxyCodeLine{00160\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&period\_freq\_matrix,}
+\DoxyCodeLine{00161\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ edges\_matrix\_in,}
+\DoxyCodeLine{00162\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&edges\_matrix\_out,}
+\DoxyCodeLine{00163\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ sampling\_freq);}
+\DoxyCodeLine{00164\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{ei__run__dsp_8h_a6baa346e44f4c2158d2be4f9b77b8203}{ret}}\ !=\ \mbox{\hyperlink{namespaceei_a35329cd4e57031263ba0a94c8d3959baa58f9da92fe1aff29466bdd4aa2a7b361}{EIDSP\_OK}})\ \{}
+\DoxyCodeLine{00165\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{config_8hpp_a6a2e91879ad7a904747f26b218ada23a}{EIDSP\_ERR}}(\mbox{\hyperlink{ei__run__dsp_8h_a6baa346e44f4c2158d2be4f9b77b8203}{ret}});}
+\DoxyCodeLine{00166\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00167\ }
+\DoxyCodeLine{00168\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}\ *features\_row\ =\ out\_features-\/>\mbox{\hyperlink{structei__matrix_a5412b64a3551881269b8c1493f0da17a}{buffer}}\ +\ (row\ *\ out\_features-\/>\mbox{\hyperlink{structei__matrix_a71fe3190b5ec3ab128461bd7903d3221}{cols}});}
+\DoxyCodeLine{00169\ }
+\DoxyCodeLine{00170\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ fx\ =\ 0;}
+\DoxyCodeLine{00171\ }
+\DoxyCodeLine{00172\ \ \ \ \ \ \ \ \ \ \ \ \ features\_row[fx++]\ =\ rms\_matrix.buffer[row];}
+\DoxyCodeLine{00173\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ peak\_row\ =\ 0;\ peak\_row\ <\ peaks\_matrix.rows;\ peak\_row++)\ \{}
+\DoxyCodeLine{00174\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ features\_row[fx++]\ =\ peaks\_matrix.buffer[peak\_row\ *\ peaks\_matrix.cols\ +\ 0];}
+\DoxyCodeLine{00175\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ features\_row[fx++]\ =\ peaks\_matrix.buffer[peak\_row\ *\ peaks\_matrix.cols\ +\ 1];}
+\DoxyCodeLine{00176\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00177\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ edge\_row\ =\ 0;\ edge\_row\ <\ edges\_matrix\_out.rows;\ edge\_row++)\ \{}
+\DoxyCodeLine{00178\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ features\_row[fx++]\ =\ edges\_matrix\_out.buffer[edge\_row\ *\ edges\_matrix\_out.cols]\ /\ 10.0f;}
+\DoxyCodeLine{00179\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00180\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00181\ }
+\DoxyCodeLine{00182\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespaceei_a35329cd4e57031263ba0a94c8d3959baa58f9da92fe1aff29466bdd4aa2a7b361}{EIDSP\_OK}};}
+\DoxyCodeLine{00183\ \ \ \ \ \}}
+\DoxyCodeLine{00184\ }
+\DoxyCodeLine{00185\ }
+\DoxyCodeLine{00192\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{classei_1_1spectral_1_1feature_ad3a97b9a25c0ceb93efb2d4406b93b2e}{calculate\_spectral\_buffer\_size}}(}
+\DoxyCodeLine{00193\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ rms,\ \textcolor{keywordtype}{size\_t}\ peaks\_count,\ \textcolor{keywordtype}{size\_t}\ spectral\_edges\_count)}
+\DoxyCodeLine{00194\ \ \ \ \ \{}
+\DoxyCodeLine{00195\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ count\ =\ 0;}
+\DoxyCodeLine{00196\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (rms)\ count++;}
+\DoxyCodeLine{00197\ \ \ \ \ \ \ \ \ count\ +=\ (peaks\_count\ *\ 2);}
+\DoxyCodeLine{00198\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (spectral\_edges\_count\ >\ 0)\ \{}
+\DoxyCodeLine{00199\ \ \ \ \ \ \ \ \ \ \ \ \ count\ +=\ (spectral\_edges\_count\ -\/\ 1);}
+\DoxyCodeLine{00200\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00201\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ count;}
+\DoxyCodeLine{00202\ \ \ \ \ \}}
+\DoxyCodeLine{00203\ }
+\DoxyCodeLine{00204\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{classei_1_1spectral_1_1feature_ab16dd9310ad021ea33fc582f6887142a}{extract\_spectral\_analysis\_features\_v1}}(}
+\DoxyCodeLine{00205\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structei__matrix}{matrix\_t}}\ *\mbox{\hyperlink{ei__run__dsp_8h_a43dfa20ba0ba40e614f1a384d9912eb2}{input\_matrix}},}
+\DoxyCodeLine{00206\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structei__matrix}{matrix\_t}}\ *\mbox{\hyperlink{ei__run__dsp_8h_a3ba015549c47e712909a20cde87dfe4f}{output\_matrix}},}
+\DoxyCodeLine{00207\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structei__dsp__config__spectral__analysis__t}{ei\_dsp\_config\_spectral\_analysis\_t}}\ *\mbox{\hyperlink{ei__run__dsp_8h_a0819d397f9fba7b345b75fef1c1f782a}{config\_ptr}},}
+\DoxyCodeLine{00208\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{float}\ sampling\_freq)}
+\DoxyCodeLine{00209\ \ \ \ \ \{}
+\DoxyCodeLine{00210\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ scale\ the\ signal}}
+\DoxyCodeLine{00211\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{ei__run__dsp_8h_a6baa346e44f4c2158d2be4f9b77b8203}{ret}}\ =\ \mbox{\hyperlink{classei_1_1numpy_a780e556d0c5dc4948320ad0ab1630666}{numpy::scale}}(\mbox{\hyperlink{ei__run__dsp_8h_a43dfa20ba0ba40e614f1a384d9912eb2}{input\_matrix}},\ \mbox{\hyperlink{ei__run__dsp_8h_a0819d397f9fba7b345b75fef1c1f782a}{config\_ptr}}-\/>scale\_axes);}
+\DoxyCodeLine{00212\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{ei__run__dsp_8h_a6baa346e44f4c2158d2be4f9b77b8203}{ret}}\ !=\ \mbox{\hyperlink{namespaceei_a35329cd4e57031263ba0a94c8d3959baa58f9da92fe1aff29466bdd4aa2a7b361}{EIDSP\_OK}})\ \{}
+\DoxyCodeLine{00213\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}ERR:\ Failed\ to\ scale\ signal\ (\%d)\(\backslash\)n"{}},\ \mbox{\hyperlink{ei__run__dsp_8h_a6baa346e44f4c2158d2be4f9b77b8203}{ret}});}
+\DoxyCodeLine{00214\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{config_8hpp_a6a2e91879ad7a904747f26b218ada23a}{EIDSP\_ERR}}(\mbox{\hyperlink{ei__run__dsp_8h_a6baa346e44f4c2158d2be4f9b77b8203}{ret}});}
+\DoxyCodeLine{00215\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00216\ }
+\DoxyCodeLine{00217\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ transpose\ the\ matrix\ so\ we\ have\ one\ row\ per\ axis\ (nifty!)}}
+\DoxyCodeLine{00218\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__dsp_8h_a6baa346e44f4c2158d2be4f9b77b8203}{ret}}\ =\ \mbox{\hyperlink{classei_1_1numpy_a520e4180b78706b654b44823d6cab8a2}{numpy::transpose}}(\mbox{\hyperlink{ei__run__dsp_8h_a43dfa20ba0ba40e614f1a384d9912eb2}{input\_matrix}});}
+\DoxyCodeLine{00219\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{ei__run__dsp_8h_a6baa346e44f4c2158d2be4f9b77b8203}{ret}}\ !=\ \mbox{\hyperlink{namespaceei_a35329cd4e57031263ba0a94c8d3959baa58f9da92fe1aff29466bdd4aa2a7b361}{EIDSP\_OK}})\ \{}
+\DoxyCodeLine{00220\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}ERR:\ Failed\ to\ transpose\ matrix\ (\%d)\(\backslash\)n"{}},\ \mbox{\hyperlink{ei__run__dsp_8h_a6baa346e44f4c2158d2be4f9b77b8203}{ret}});}
+\DoxyCodeLine{00221\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{config_8hpp_a6a2e91879ad7a904747f26b218ada23a}{EIDSP\_ERR}}(\mbox{\hyperlink{ei__run__dsp_8h_a6baa346e44f4c2158d2be4f9b77b8203}{ret}});}
+\DoxyCodeLine{00222\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00223\ }
+\DoxyCodeLine{00224\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ the\ spectral\ edges\ that\ we\ want\ to\ calculate}}
+\DoxyCodeLine{00225\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structei__matrix}{matrix\_t}}\ edges\_matrix\_in(64,\ 1);}
+\DoxyCodeLine{00226\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ edge\_matrix\_ix\ =\ 0;}
+\DoxyCodeLine{00227\ }
+\DoxyCodeLine{00228\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ spectral\_str[128]\ =\ \{\ 0\ \};}
+\DoxyCodeLine{00229\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (strlen(\mbox{\hyperlink{ei__run__dsp_8h_a0819d397f9fba7b345b75fef1c1f782a}{config\_ptr}}-\/>spectral\_power\_edges)\ >\ \textcolor{keyword}{sizeof}(spectral\_str)\ -\/\ 1)\ \{}
+\DoxyCodeLine{00230\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{config_8hpp_a6a2e91879ad7a904747f26b218ada23a}{EIDSP\_ERR}}(\mbox{\hyperlink{namespaceei_a35329cd4e57031263ba0a94c8d3959baab0da6aced7406605ad572f6780b1f207}{EIDSP\_PARAMETER\_INVALID}});}
+\DoxyCodeLine{00231\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00232\ \ \ \ \ \ \ \ \ memcpy(}
+\DoxyCodeLine{00233\ \ \ \ \ \ \ \ \ \ \ \ \ spectral\_str,}
+\DoxyCodeLine{00234\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__dsp_8h_a0819d397f9fba7b345b75fef1c1f782a}{config\_ptr}}-\/>spectral\_power\_edges,}
+\DoxyCodeLine{00235\ \ \ \ \ \ \ \ \ \ \ \ \ strlen(\mbox{\hyperlink{ei__run__dsp_8h_a0819d397f9fba7b345b75fef1c1f782a}{config\_ptr}}-\/>spectral\_power\_edges));}
+\DoxyCodeLine{00236\ }
+\DoxyCodeLine{00237\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ convert\ spectral\_power\_edges\ (string)\ into\ float\ array}}
+\DoxyCodeLine{00238\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ *spectral\_ptr\ =\ spectral\_str;}
+\DoxyCodeLine{00239\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (spectral\_ptr\ !=\ NULL)\ \{}
+\DoxyCodeLine{00240\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ ((*spectral\_ptr)\ ==\ \textcolor{charliteral}{'\ '})\ \{}
+\DoxyCodeLine{00241\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ spectral\_ptr++;}
+\DoxyCodeLine{00242\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00243\ }
+\DoxyCodeLine{00244\ \ \ \ \ \ \ \ \ \ \ \ \ edges\_matrix\_in.\mbox{\hyperlink{structei__matrix_a5412b64a3551881269b8c1493f0da17a}{buffer}}[edge\_matrix\_ix++]\ =\ atof(spectral\_ptr);}
+\DoxyCodeLine{00245\ }
+\DoxyCodeLine{00246\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ find\ next\ (spectral)\ delimiter\ (or\ '\(\backslash\)0'\ character)}}
+\DoxyCodeLine{00247\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ ((*spectral\_ptr\ !=\ \textcolor{charliteral}{','}))\ \{}
+\DoxyCodeLine{00248\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ spectral\_ptr++;}
+\DoxyCodeLine{00249\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (*spectral\_ptr\ ==\ \textcolor{charliteral}{'\(\backslash\)0'})}
+\DoxyCodeLine{00250\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00251\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00252\ }
+\DoxyCodeLine{00253\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (*spectral\_ptr\ ==\ \textcolor{charliteral}{'\(\backslash\)0'})\ \{}
+\DoxyCodeLine{00254\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ spectral\_ptr\ =\ NULL;}
+\DoxyCodeLine{00255\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00256\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00257\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ spectral\_ptr++;}
+\DoxyCodeLine{00258\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00259\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00260\ \ \ \ \ \ \ \ \ edges\_matrix\_in.\mbox{\hyperlink{structei__matrix_a263c997028804ca14b749f64eeb3fe84}{rows}}\ =\ edge\_matrix\_ix;}
+\DoxyCodeLine{00261\ }
+\DoxyCodeLine{00262\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ calculate\ how\ much\ room\ we\ need\ for\ the\ output\ matrix}}
+\DoxyCodeLine{00263\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ output\_matrix\_cols\ =\ \mbox{\hyperlink{classei_1_1spectral_1_1feature_ad3a97b9a25c0ceb93efb2d4406b93b2e}{spectral::feature::calculate\_spectral\_buffer\_size}}(}
+\DoxyCodeLine{00264\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{true},}
+\DoxyCodeLine{00265\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__dsp_8h_a0819d397f9fba7b345b75fef1c1f782a}{config\_ptr}}-\/>spectral\_peaks\_count,}
+\DoxyCodeLine{00266\ \ \ \ \ \ \ \ \ \ \ \ \ edges\_matrix\_in.\mbox{\hyperlink{structei__matrix_a263c997028804ca14b749f64eeb3fe84}{rows}});}
+\DoxyCodeLine{00267\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ ei\_printf("{}output\_matrix\_size\ \%hux\%zu\(\backslash\)n"{},\ input\_matrix.rows,\ output\_matrix\_cols);}}
+\DoxyCodeLine{00268\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{ei__run__dsp_8h_a3ba015549c47e712909a20cde87dfe4f}{output\_matrix}}-\/>\mbox{\hyperlink{structei__matrix_a71fe3190b5ec3ab128461bd7903d3221}{cols}}\ *\ \mbox{\hyperlink{ei__run__dsp_8h_a3ba015549c47e712909a20cde87dfe4f}{output\_matrix}}-\/>\mbox{\hyperlink{structei__matrix_a263c997028804ca14b749f64eeb3fe84}{rows}}\ !=}
+\DoxyCodeLine{00269\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static\_cast<}uint32\_t\textcolor{keyword}{>}(output\_matrix\_cols\ *\ \mbox{\hyperlink{ei__run__dsp_8h_a0819d397f9fba7b345b75fef1c1f782a}{config\_ptr}}-\/>axes))\ \{}
+\DoxyCodeLine{00270\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{config_8hpp_a6a2e91879ad7a904747f26b218ada23a}{EIDSP\_ERR}}(\mbox{\hyperlink{namespaceei_a35329cd4e57031263ba0a94c8d3959baa38ee0f868403ad45472a6e330d9af02f}{EIDSP\_MATRIX\_SIZE\_MISMATCH}});}
+\DoxyCodeLine{00271\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00272\ }
+\DoxyCodeLine{00273\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__dsp_8h_a3ba015549c47e712909a20cde87dfe4f}{output\_matrix}}-\/>\mbox{\hyperlink{structei__matrix_a71fe3190b5ec3ab128461bd7903d3221}{cols}}\ =\ output\_matrix\_cols;}
+\DoxyCodeLine{00274\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__dsp_8h_a3ba015549c47e712909a20cde87dfe4f}{output\_matrix}}-\/>\mbox{\hyperlink{structei__matrix_a263c997028804ca14b749f64eeb3fe84}{rows}}\ =\ \mbox{\hyperlink{ei__run__dsp_8h_a0819d397f9fba7b345b75fef1c1f782a}{config\_ptr}}-\/>axes;}
+\DoxyCodeLine{00275\ }
+\DoxyCodeLine{00276\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespaceei_1_1spectral_a8c99d642ea97ab012fab6c3846fc876b}{spectral::filter\_t}}\ filter\_type;}
+\DoxyCodeLine{00277\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (strcmp(\mbox{\hyperlink{ei__run__dsp_8h_a0819d397f9fba7b345b75fef1c1f782a}{config\_ptr}}-\/>filter\_type,\ \textcolor{stringliteral}{"{}low"{}})\ ==\ 0)\ \{}
+\DoxyCodeLine{00278\ \ \ \ \ \ \ \ \ \ \ \ \ filter\_type\ =\ \mbox{\hyperlink{namespaceei_1_1spectral_a8c99d642ea97ab012fab6c3846fc876ba7637aa02b84ad4c387f2b1ff7e816b23}{spectral::filter\_lowpass}};}
+\DoxyCodeLine{00279\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00280\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (strcmp(\mbox{\hyperlink{ei__run__dsp_8h_a0819d397f9fba7b345b75fef1c1f782a}{config\_ptr}}-\/>filter\_type,\ \textcolor{stringliteral}{"{}high"{}})\ ==\ 0)\ \{}
+\DoxyCodeLine{00281\ \ \ \ \ \ \ \ \ \ \ \ \ filter\_type\ =\ \mbox{\hyperlink{namespaceei_1_1spectral_a8c99d642ea97ab012fab6c3846fc876babca23efebe0c4a890e88451a40f36b9a}{spectral::filter\_highpass}};}
+\DoxyCodeLine{00282\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00283\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00284\ \ \ \ \ \ \ \ \ \ \ \ \ filter\_type\ =\ \mbox{\hyperlink{namespaceei_1_1spectral_a8c99d642ea97ab012fab6c3846fc876ba332ddad398be3cef334da6ff186519bd}{spectral::filter\_none}};}
+\DoxyCodeLine{00285\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00286\ }
+\DoxyCodeLine{00287\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__dsp_8h_a6baa346e44f4c2158d2be4f9b77b8203}{ret}}\ =\ \mbox{\hyperlink{classei_1_1spectral_1_1feature_a1efa9ba2917878e928b1c2ffacc89bc4}{spectral::feature::spectral\_analysis}}(}
+\DoxyCodeLine{00288\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__dsp_8h_a3ba015549c47e712909a20cde87dfe4f}{output\_matrix}},}
+\DoxyCodeLine{00289\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__dsp_8h_a43dfa20ba0ba40e614f1a384d9912eb2}{input\_matrix}},}
+\DoxyCodeLine{00290\ \ \ \ \ \ \ \ \ \ \ \ \ sampling\_freq,}
+\DoxyCodeLine{00291\ \ \ \ \ \ \ \ \ \ \ \ \ filter\_type,}
+\DoxyCodeLine{00292\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__dsp_8h_a0819d397f9fba7b345b75fef1c1f782a}{config\_ptr}}-\/>filter\_cutoff,}
+\DoxyCodeLine{00293\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__dsp_8h_a0819d397f9fba7b345b75fef1c1f782a}{config\_ptr}}-\/>filter\_order,}
+\DoxyCodeLine{00294\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__dsp_8h_a0819d397f9fba7b345b75fef1c1f782a}{config\_ptr}}-\/>fft\_length,}
+\DoxyCodeLine{00295\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__dsp_8h_a0819d397f9fba7b345b75fef1c1f782a}{config\_ptr}}-\/>spectral\_peaks\_count,}
+\DoxyCodeLine{00296\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__dsp_8h_a0819d397f9fba7b345b75fef1c1f782a}{config\_ptr}}-\/>spectral\_peaks\_threshold,}
+\DoxyCodeLine{00297\ \ \ \ \ \ \ \ \ \ \ \ \ \&edges\_matrix\_in);}
+\DoxyCodeLine{00298\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{ei__run__dsp_8h_a6baa346e44f4c2158d2be4f9b77b8203}{ret}}\ !=\ \mbox{\hyperlink{namespaceei_a35329cd4e57031263ba0a94c8d3959baa58f9da92fe1aff29466bdd4aa2a7b361}{EIDSP\_OK}})\ \{}
+\DoxyCodeLine{00299\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}ERR:\ Failed\ to\ calculate\ spectral\ features\ (\%d)\(\backslash\)n"{}},\ \mbox{\hyperlink{ei__run__dsp_8h_a6baa346e44f4c2158d2be4f9b77b8203}{ret}});}
+\DoxyCodeLine{00300\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{config_8hpp_a6a2e91879ad7a904747f26b218ada23a}{EIDSP\_ERR}}(\mbox{\hyperlink{ei__run__dsp_8h_a6baa346e44f4c2158d2be4f9b77b8203}{ret}});}
+\DoxyCodeLine{00301\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00302\ }
+\DoxyCodeLine{00303\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ flatten\ again}}
+\DoxyCodeLine{00304\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__dsp_8h_a3ba015549c47e712909a20cde87dfe4f}{output\_matrix}}-\/>\mbox{\hyperlink{structei__matrix_a71fe3190b5ec3ab128461bd7903d3221}{cols}}\ =\ \mbox{\hyperlink{ei__run__dsp_8h_a0819d397f9fba7b345b75fef1c1f782a}{config\_ptr}}-\/>axes\ *\ output\_matrix\_cols;}
+\DoxyCodeLine{00305\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__dsp_8h_a3ba015549c47e712909a20cde87dfe4f}{output\_matrix}}-\/>\mbox{\hyperlink{structei__matrix_a263c997028804ca14b749f64eeb3fe84}{rows}}\ =\ 1;}
+\DoxyCodeLine{00306\ }
+\DoxyCodeLine{00307\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespaceei_a35329cd4e57031263ba0a94c8d3959baa58f9da92fe1aff29466bdd4aa2a7b361}{EIDSP\_OK}};}
+\DoxyCodeLine{00308\ \ \ \ \ \}}
+\DoxyCodeLine{00309\ }
+\DoxyCodeLine{00310\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classei_1_1spectral_1_1feature_afcaed82678456329fe12c216e85f0654}{get\_start\_stop\_bin}}(}
+\DoxyCodeLine{00311\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}\ sampling\_freq,}
+\DoxyCodeLine{00312\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{irfft_8cc_abe2bad6726f6194f0b5165fe4b37a65f}{fft\_length}},}
+\DoxyCodeLine{00313\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}\ filter\_cutoff,}
+\DoxyCodeLine{00314\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ *start\_bin,}
+\DoxyCodeLine{00315\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ *stop\_bin,}
+\DoxyCodeLine{00316\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ is\_high\_pass)}
+\DoxyCodeLine{00317\ \ \ \ \ \{}
+\DoxyCodeLine{00318\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ we\ want\ to\ find\ n\ such\ that\ fcutoff\ <\ sample\_f\ /\ fft\ *\ n\ (\ or\ >\ for\ high\ pass\ )}}
+\DoxyCodeLine{00319\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ also,\ +\ -\/\ half\ bin\ width\ (sample\_f/(fft*2))\ for\ high\ /\ low\ pass}}
+\DoxyCodeLine{00320\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (filter\_cutoff\ >\ sampling\_freq\ /\ 2)\ \{}
+\DoxyCodeLine{00321\ \ \ \ \ \ \ \ \ \ \ \ \ filter\_cutoff\ =\ sampling\_freq\ /\ 2;}
+\DoxyCodeLine{00322\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00323\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}\ bin\ =\ filter\_cutoff\ *\ \mbox{\hyperlink{irfft_8cc_abe2bad6726f6194f0b5165fe4b37a65f}{fft\_length}}\ /\ sampling\_freq;}
+\DoxyCodeLine{00324\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (is\_high\_pass)\ \{}
+\DoxyCodeLine{00325\ \ \ \ \ \ \ \ \ \ \ \ \ *start\_bin\ =\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{size\_t}\textcolor{keyword}{>}(bin\ -\/\ 0.5)\ +\ 1;\ \textcolor{comment}{//\ add\ one\ b/c\ we\ want\ to\ always\ round\ up}}
+\DoxyCodeLine{00326\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ don't\ use\ the\ DC\ bin\ b/c\ it's\ zero}}
+\DoxyCodeLine{00327\ \ \ \ \ \ \ \ \ \ \ \ \ *start\_bin\ =\ *start\_bin\ ==\ 0\ ?\ 1\ :\ *start\_bin;}
+\DoxyCodeLine{00328\ \ \ \ \ \ \ \ \ \ \ \ \ *stop\_bin\ =\ \mbox{\hyperlink{irfft_8cc_abe2bad6726f6194f0b5165fe4b37a65f}{fft\_length}}\ /\ 2\ +\ 1;\ \textcolor{comment}{//\ go\ one\ past}}
+\DoxyCodeLine{00329\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00330\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00331\ \ \ \ \ \ \ \ \ \ \ \ \ *start\_bin\ =\ 1;}
+\DoxyCodeLine{00332\ \ \ \ \ \ \ \ \ \ \ \ \ *stop\_bin\ =\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{size\_t}\textcolor{keyword}{>}(bin\ +\ 0.5)\ +\ 1;\ \textcolor{comment}{//\ go\ one\ past}}
+\DoxyCodeLine{00333\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00334\ \ \ \ \ \}}
+\DoxyCodeLine{00335\ }
+\DoxyCodeLine{00341\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{classei_1_1spectral_1_1feature_abd3658f1e0cc954c393533f213ec6187}{extract\_spec\_features}}(}
+\DoxyCodeLine{00342\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structei__matrix}{matrix\_t}}\ *\mbox{\hyperlink{ei__run__dsp_8h_a43dfa20ba0ba40e614f1a384d9912eb2}{input\_matrix}},}
+\DoxyCodeLine{00343\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structei__matrix}{matrix\_t}}\ *\mbox{\hyperlink{ei__run__dsp_8h_a3ba015549c47e712909a20cde87dfe4f}{output\_matrix}},}
+\DoxyCodeLine{00344\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structei__dsp__config__spectral__analysis__t}{ei\_dsp\_config\_spectral\_analysis\_t}}\ *\mbox{\hyperlink{micro_2kernels_2filter__bank_8cc_ac0f32fd234a078ace764ae2fc15c41a0}{config}},}
+\DoxyCodeLine{00345\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{float}\ sampling\_freq,}
+\DoxyCodeLine{00346\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{bool}\ remove\_mean\ =\ \textcolor{keyword}{true},}
+\DoxyCodeLine{00347\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{bool}\ transpose\_and\_scale\_input\ =\ \textcolor{keyword}{true})}
+\DoxyCodeLine{00348\ \ \ \ \ \{}
+\DoxyCodeLine{00349\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (transpose\_and\_scale\_input)\ \{}
+\DoxyCodeLine{00350\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ transpose\ the\ matrix\ so\ we\ have\ one\ row\ per\ axis}}
+\DoxyCodeLine{00351\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classei_1_1numpy_aa37a40f6a63f70f2c9bdda012b765c2f}{numpy::transpose\_in\_place}}(\mbox{\hyperlink{ei__run__dsp_8h_a43dfa20ba0ba40e614f1a384d9912eb2}{input\_matrix}});}
+\DoxyCodeLine{00352\ }
+\DoxyCodeLine{00353\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ func\ tests\ for\ scale\ of\ 1\ and\ does\ a\ no\ op\ in\ that\ case}}
+\DoxyCodeLine{00354\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__utils_8h_a3856e4de29f29e853f85608223a3aa80}{EI\_TRY}}(\mbox{\hyperlink{classei_1_1numpy_a780e556d0c5dc4948320ad0ab1630666}{numpy::scale}}(\mbox{\hyperlink{ei__run__dsp_8h_a43dfa20ba0ba40e614f1a384d9912eb2}{input\_matrix}},\ \mbox{\hyperlink{micro_2kernels_2filter__bank_8cc_ac0f32fd234a078ace764ae2fc15c41a0}{config}}-\/>scale\_axes));}
+\DoxyCodeLine{00355\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00356\ }
+\DoxyCodeLine{00357\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ do\_filter\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00358\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ is\_high\_pass;}
+\DoxyCodeLine{00359\ }
+\DoxyCodeLine{00360\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ apply\ filter,\ if\ enabled}}
+\DoxyCodeLine{00361\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ "{}zero"{}\ order\ filter\ allowed.\ \ will\ still\ remove\ unwanted\ fft\ bins\ later}}
+\DoxyCodeLine{00362\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (strcmp(\mbox{\hyperlink{micro_2kernels_2filter__bank_8cc_ac0f32fd234a078ace764ae2fc15c41a0}{config}}-\/>filter\_type,\ \textcolor{stringliteral}{"{}low"{}})\ ==\ 0)\ \{}
+\DoxyCodeLine{00363\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{micro_2kernels_2filter__bank_8cc_ac0f32fd234a078ace764ae2fc15c41a0}{config}}-\/>filter\_order\ )\ \{}
+\DoxyCodeLine{00364\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__utils_8h_a3856e4de29f29e853f85608223a3aa80}{EI\_TRY}}(spectral::processing::butterworth\_lowpass\_filter(}
+\DoxyCodeLine{00365\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__dsp_8h_a43dfa20ba0ba40e614f1a384d9912eb2}{input\_matrix}},}
+\DoxyCodeLine{00366\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ sampling\_freq,}
+\DoxyCodeLine{00367\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{micro_2kernels_2filter__bank_8cc_ac0f32fd234a078ace764ae2fc15c41a0}{config}}-\/>filter\_cutoff,}
+\DoxyCodeLine{00368\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{micro_2kernels_2filter__bank_8cc_ac0f32fd234a078ace764ae2fc15c41a0}{config}}-\/>filter\_order));}
+\DoxyCodeLine{00369\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00370\ \ \ \ \ \ \ \ \ \ \ \ \ do\_filter\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00371\ \ \ \ \ \ \ \ \ \ \ \ \ is\_high\_pass\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00372\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00373\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (strcmp(\mbox{\hyperlink{micro_2kernels_2filter__bank_8cc_ac0f32fd234a078ace764ae2fc15c41a0}{config}}-\/>filter\_type,\ \textcolor{stringliteral}{"{}high"{}})\ ==\ 0)\ \{}
+\DoxyCodeLine{00374\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{micro_2kernels_2filter__bank_8cc_ac0f32fd234a078ace764ae2fc15c41a0}{config}}-\/>filter\_order\ )\ \{}
+\DoxyCodeLine{00375\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__utils_8h_a3856e4de29f29e853f85608223a3aa80}{EI\_TRY}}(spectral::processing::butterworth\_highpass\_filter(}
+\DoxyCodeLine{00376\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__dsp_8h_a43dfa20ba0ba40e614f1a384d9912eb2}{input\_matrix}},}
+\DoxyCodeLine{00377\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ sampling\_freq,}
+\DoxyCodeLine{00378\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{micro_2kernels_2filter__bank_8cc_ac0f32fd234a078ace764ae2fc15c41a0}{config}}-\/>filter\_cutoff,}
+\DoxyCodeLine{00379\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{micro_2kernels_2filter__bank_8cc_ac0f32fd234a078ace764ae2fc15c41a0}{config}}-\/>filter\_order));}
+\DoxyCodeLine{00380\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00381\ \ \ \ \ \ \ \ \ \ \ \ \ do\_filter\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00382\ \ \ \ \ \ \ \ \ \ \ \ \ is\_high\_pass\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00383\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00384\ }
+\DoxyCodeLine{00385\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (remove\_mean)\{}
+\DoxyCodeLine{00386\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__utils_8h_a3856e4de29f29e853f85608223a3aa80}{EI\_TRY}}(processing::subtract\_mean(\mbox{\hyperlink{ei__run__dsp_8h_a43dfa20ba0ba40e614f1a384d9912eb2}{input\_matrix}}));}
+\DoxyCodeLine{00387\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00388\ }
+\DoxyCodeLine{00389\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Figure\ bins\ we\ remove\ based\ on\ filter\ cutoff}}
+\DoxyCodeLine{00390\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ start\_bin,\ stop\_bin;}
+\DoxyCodeLine{00391\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (do\_filter)\ \{}
+\DoxyCodeLine{00392\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classei_1_1spectral_1_1feature_afcaed82678456329fe12c216e85f0654}{get\_start\_stop\_bin}}(}
+\DoxyCodeLine{00393\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ sampling\_freq,}
+\DoxyCodeLine{00394\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{micro_2kernels_2filter__bank_8cc_ac0f32fd234a078ace764ae2fc15c41a0}{config}}-\/>fft\_length,}
+\DoxyCodeLine{00395\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{micro_2kernels_2filter__bank_8cc_ac0f32fd234a078ace764ae2fc15c41a0}{config}}-\/>filter\_cutoff,}
+\DoxyCodeLine{00396\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&start\_bin,}
+\DoxyCodeLine{00397\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&stop\_bin,}
+\DoxyCodeLine{00398\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ is\_high\_pass);}
+\DoxyCodeLine{00399\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00400\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00401\ \ \ \ \ \ \ \ \ \ \ \ \ start\_bin\ =\ 1;}
+\DoxyCodeLine{00402\ \ \ \ \ \ \ \ \ \ \ \ \ stop\_bin\ =\ \mbox{\hyperlink{micro_2kernels_2filter__bank_8cc_ac0f32fd234a078ace764ae2fc15c41a0}{config}}-\/>fft\_length\ /\ 2\ +\ 1;}
+\DoxyCodeLine{00403\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00404\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ num\_bins\ =\ stop\_bin\ -\/\ start\_bin;}
+\DoxyCodeLine{00405\ }
+\DoxyCodeLine{00406\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}\ *feature\_out\ =\ \mbox{\hyperlink{ei__run__dsp_8h_a3ba015549c47e712909a20cde87dfe4f}{output\_matrix}}-\/>\mbox{\hyperlink{structei__matrix_a5412b64a3551881269b8c1493f0da17a}{buffer}};}
+\DoxyCodeLine{00407\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{float}\ *feature\_out\_ori\ =\ feature\_out;}
+\DoxyCodeLine{00408\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ row\ =\ 0;\ row\ <\ \mbox{\hyperlink{ei__run__dsp_8h_a43dfa20ba0ba40e614f1a384d9912eb2}{input\_matrix}}-\/>\mbox{\hyperlink{structei__matrix_a263c997028804ca14b749f64eeb3fe84}{rows}};\ row++)\ \{}
+\DoxyCodeLine{00409\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}\ *data\_window\ =\ \mbox{\hyperlink{ei__run__dsp_8h_a43dfa20ba0ba40e614f1a384d9912eb2}{input\_matrix}}-\/>get\_row\_ptr(row);}
+\DoxyCodeLine{00410\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ data\_size\ =\ \mbox{\hyperlink{ei__run__dsp_8h_a43dfa20ba0ba40e614f1a384d9912eb2}{input\_matrix}}-\/>\mbox{\hyperlink{structei__matrix_a71fe3190b5ec3ab128461bd7903d3221}{cols}};}
+\DoxyCodeLine{00411\ }
+\DoxyCodeLine{00412\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structei__matrix}{matrix\_t}}\ rms\_in\_matrix(1,\ data\_size,\ data\_window);}
+\DoxyCodeLine{00413\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structei__matrix}{matrix\_t}}\ rms\_out\_matrix(1,\ 1,\ feature\_out);}
+\DoxyCodeLine{00414\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__utils_8h_a3856e4de29f29e853f85608223a3aa80}{EI\_TRY}}(\mbox{\hyperlink{classei_1_1numpy_a21a0bd0115ac137dfd3bce9c0a1ddae3}{numpy::rms}}(\&rms\_in\_matrix,\ \&rms\_out\_matrix));}
+\DoxyCodeLine{00415\ }
+\DoxyCodeLine{00416\ \ \ \ \ \ \ \ \ \ \ \ \ feature\_out++;}
+\DoxyCodeLine{00417\ }
+\DoxyCodeLine{00418\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Standard\ Deviation}}
+\DoxyCodeLine{00419\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}\ stddev\ =\ *(feature\_out-\/1);\ \textcolor{comment}{//=\ sqrt(numpy::variance(data\_window,\ data\_size));}}
+\DoxyCodeLine{00420\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (stddev\ ==\ 0.0f)\ \{}
+\DoxyCodeLine{00421\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ stddev\ =\ 1e-\/10f;}
+\DoxyCodeLine{00422\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00423\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Don't\ add\ std\ dev\ as\ a\ feature\ b/c\ it's\ the\ same\ as\ RMS}}
+\DoxyCodeLine{00424\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Skew\ and\ Kurtosis\ w/\ shortcut:}}
+\DoxyCodeLine{00425\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ See\ definition\ at\ https://en.wikipedia.org/wiki/Skewness}}
+\DoxyCodeLine{00426\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ See\ definition\ at\ https://en.wikipedia.org/wiki/Kurtosis}}
+\DoxyCodeLine{00427\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Substitute\ 0\ for\ mean\ (b/c\ it\ is\ subtracted\ out\ above)}}
+\DoxyCodeLine{00428\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Skew\ becomes:\ mean(X\string^3)\ /\ stddev\string^3}}
+\DoxyCodeLine{00429\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Kurtosis\ becomes:\ mean(X\string^4)\ /\ stddev\string^4}}
+\DoxyCodeLine{00430\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Note,\ this\ is\ the\ Fisher\ definition\ of\ Kurtosis,\ so\ subtract\ 3}}
+\DoxyCodeLine{00431\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ (see\ https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.kurtosis.html)}}
+\DoxyCodeLine{00432\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}\ s\_sum\ =\ 0;}
+\DoxyCodeLine{00433\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}\ k\_sum\ =\ 0;}
+\DoxyCodeLine{00434\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}\ \mbox{\hyperlink{nicla__sense__fusion_8ino_ae6219c1117781a1dbbb7839946bca32c}{temp}};}
+\DoxyCodeLine{00435\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ data\_size;\ i++)\ \{}
+\DoxyCodeLine{00436\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{nicla__sense__fusion_8ino_ae6219c1117781a1dbbb7839946bca32c}{temp}}\ =\ data\_window[i]\ *\ data\_window[i]\ *\ data\_window[i];}
+\DoxyCodeLine{00437\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ s\_sum\ +=\ \mbox{\hyperlink{nicla__sense__fusion_8ino_ae6219c1117781a1dbbb7839946bca32c}{temp}};}
+\DoxyCodeLine{00438\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ k\_sum\ +=\ \mbox{\hyperlink{nicla__sense__fusion_8ino_ae6219c1117781a1dbbb7839946bca32c}{temp}}\ *\ data\_window[i];}
+\DoxyCodeLine{00439\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00440\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Skewness\ out}}
+\DoxyCodeLine{00441\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{nicla__sense__fusion_8ino_ae6219c1117781a1dbbb7839946bca32c}{temp}}\ =\ stddev\ *\ stddev\ *\ stddev;}
+\DoxyCodeLine{00442\ \ \ \ \ \ \ \ \ \ \ \ \ *feature\_out++\ =\ (s\_sum\ /\ data\_size)\ /\ \mbox{\hyperlink{nicla__sense__fusion_8ino_ae6219c1117781a1dbbb7839946bca32c}{temp}};}
+\DoxyCodeLine{00443\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Kurtosis\ out}}
+\DoxyCodeLine{00444\ \ \ \ \ \ \ \ \ \ \ \ \ *feature\_out++\ =\ ((k\_sum\ /\ data\_size)\ /\ (\mbox{\hyperlink{nicla__sense__fusion_8ino_ae6219c1117781a1dbbb7839946bca32c}{temp}}\ *\ stddev))\ -\/\ 3;}
+\DoxyCodeLine{00445\ }
+\DoxyCodeLine{00446\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{micro_2kernels_2filter__bank_8cc_ac0f32fd234a078ace764ae2fc15c41a0}{config}}-\/>implementation\_version\ ==\ 4)\ \{}
+\DoxyCodeLine{00447\ }
+\DoxyCodeLine{00448\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ fft\_out\_size\ =\ \mbox{\hyperlink{micro_2kernels_2filter__bank_8cc_ac0f32fd234a078ace764ae2fc15c41a0}{config}}-\/>fft\_length\ /\ 2\ +\ 1;}
+\DoxyCodeLine{00449\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__vector_8h_a127d3f2f8a2f0f47e13d28aea38916f4}{ei\_vector<float>}}\ fft\_out(fft\_out\_size);}
+\DoxyCodeLine{00450\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__utils_8h_a3856e4de29f29e853f85608223a3aa80}{EI\_TRY}}(\mbox{\hyperlink{classei_1_1numpy_a9300fcc421b20ddca679475444bfd8e5}{numpy::welch\_max\_hold}}(}
+\DoxyCodeLine{00451\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ data\_window,}
+\DoxyCodeLine{00452\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ data\_size,}
+\DoxyCodeLine{00453\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ fft\_out.data(),}
+\DoxyCodeLine{00454\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0,}
+\DoxyCodeLine{00455\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ fft\_out\_size,}
+\DoxyCodeLine{00456\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{micro_2kernels_2filter__bank_8cc_ac0f32fd234a078ace764ae2fc15c41a0}{config}}-\/>fft\_length,}
+\DoxyCodeLine{00457\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{micro_2kernels_2filter__bank_8cc_ac0f32fd234a078ace764ae2fc15c41a0}{config}}-\/>do\_fft\_overlap));}
+\DoxyCodeLine{00458\ }
+\DoxyCodeLine{00459\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structei__matrix}{matrix\_t}}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a6150e0515f7202e2fb518f7206ed97dc}{x}}(1,\ fft\_out.size(),\ \textcolor{keyword}{const\_cast<}\textcolor{keywordtype}{float}\ *\textcolor{keyword}{>}(fft\_out.data()));}
+\DoxyCodeLine{00460\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structei__matrix}{matrix\_t}}\ out(1,\ 1);}
+\DoxyCodeLine{00461\ }
+\DoxyCodeLine{00462\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ *feature\_out++\ =\ (\mbox{\hyperlink{classei_1_1numpy_a469c70f2f6a04dc960b3d1a26187a200}{numpy::skew}}(\&\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a6150e0515f7202e2fb518f7206ed97dc}{x}},\ \&out)\ ==\ \mbox{\hyperlink{namespaceei_a35329cd4e57031263ba0a94c8d3959baa58f9da92fe1aff29466bdd4aa2a7b361}{EIDSP\_OK}})\ ?\ (out.get\_row\_ptr(0)[0])\ :\ 0.0f;}
+\DoxyCodeLine{00463\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ *feature\_out++\ =\ (\mbox{\hyperlink{classei_1_1numpy_aa9c534b5aa9e48d720e099865bbd51f5}{numpy::kurtosis}}(\&\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a6150e0515f7202e2fb518f7206ed97dc}{x}},\ \&out)\ ==\ \mbox{\hyperlink{namespaceei_a35329cd4e57031263ba0a94c8d3959baa58f9da92fe1aff29466bdd4aa2a7b361}{EIDSP\_OK}})\ ?\ (out.get\_row\_ptr(0)[0])\ :\ 0.0f;}
+\DoxyCodeLine{00464\ }
+\DoxyCodeLine{00465\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ start\_bin;\ i\ <\ stop\_bin;\ i++)\ \{}
+\DoxyCodeLine{00466\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ feature\_out[i\ -\/\ start\_bin]\ =\ fft\_out[i];}
+\DoxyCodeLine{00467\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00468\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00469\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__utils_8h_a3856e4de29f29e853f85608223a3aa80}{EI\_TRY}}(\mbox{\hyperlink{classei_1_1numpy_a9300fcc421b20ddca679475444bfd8e5}{numpy::welch\_max\_hold}}(}
+\DoxyCodeLine{00470\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ data\_window,}
+\DoxyCodeLine{00471\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ data\_size,}
+\DoxyCodeLine{00472\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ feature\_out,}
+\DoxyCodeLine{00473\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ start\_bin,}
+\DoxyCodeLine{00474\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ stop\_bin,}
+\DoxyCodeLine{00475\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{micro_2kernels_2filter__bank_8cc_ac0f32fd234a078ace764ae2fc15c41a0}{config}}-\/>fft\_length,}
+\DoxyCodeLine{00476\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{micro_2kernels_2filter__bank_8cc_ac0f32fd234a078ace764ae2fc15c41a0}{config}}-\/>do\_fft\_overlap));}
+\DoxyCodeLine{00477\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00478\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{micro_2kernels_2filter__bank_8cc_ac0f32fd234a078ace764ae2fc15c41a0}{config}}-\/>do\_log)\ \{}
+\DoxyCodeLine{00479\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classei_1_1numpy_a47aada25724b4d407b8ac3b75496f0c3}{numpy::zero\_handling}}(feature\_out,\ num\_bins);}
+\DoxyCodeLine{00480\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structei__matrix}{ei\_matrix}}\ \mbox{\hyperlink{nicla__sense__fusion_8ino_ae6219c1117781a1dbbb7839946bca32c}{temp}}(num\_bins,\ 1,\ feature\_out);}
+\DoxyCodeLine{00481\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classei_1_1numpy_a43db53acb1bbc59d2e962f4a078e804f}{numpy::log10}}(\&\mbox{\hyperlink{nicla__sense__fusion_8ino_ae6219c1117781a1dbbb7839946bca32c}{temp}});}
+\DoxyCodeLine{00482\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00483\ \ \ \ \ \ \ \ \ \ \ \ \ feature\_out\ +=\ num\_bins;}
+\DoxyCodeLine{00484\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00485\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ num\_features\ =\ feature\_out\ -\/\ feature\_out\_ori;}
+\DoxyCodeLine{00486\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ num\_features;}
+\DoxyCodeLine{00487\ \ \ \ \ \}}
+\DoxyCodeLine{00488\ }
+\DoxyCodeLine{00489\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{classei_1_1spectral_1_1feature_ac5ec55d6786ecb7fafe2b0047f359bea}{extract\_spectral\_analysis\_features\_v2}}(}
+\DoxyCodeLine{00490\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structei__matrix}{matrix\_t}}\ *\mbox{\hyperlink{ei__run__dsp_8h_a43dfa20ba0ba40e614f1a384d9912eb2}{input\_matrix}},}
+\DoxyCodeLine{00491\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structei__matrix}{matrix\_t}}\ *\mbox{\hyperlink{ei__run__dsp_8h_a3ba015549c47e712909a20cde87dfe4f}{output\_matrix}},}
+\DoxyCodeLine{00492\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structei__dsp__config__spectral__analysis__t}{ei\_dsp\_config\_spectral\_analysis\_t}}\ *\mbox{\hyperlink{micro_2kernels_2filter__bank_8cc_ac0f32fd234a078ace764ae2fc15c41a0}{config}},}
+\DoxyCodeLine{00493\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{float}\ sampling\_freq)}
+\DoxyCodeLine{00494\ \ \ \ \ \{}
+\DoxyCodeLine{00495\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ n\_features\ =}
+\DoxyCodeLine{00496\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classei_1_1spectral_1_1feature_abd3658f1e0cc954c393533f213ec6187}{extract\_spec\_features}}(\mbox{\hyperlink{ei__run__dsp_8h_a43dfa20ba0ba40e614f1a384d9912eb2}{input\_matrix}},\ \mbox{\hyperlink{ei__run__dsp_8h_a3ba015549c47e712909a20cde87dfe4f}{output\_matrix}},\ \mbox{\hyperlink{micro_2kernels_2filter__bank_8cc_ac0f32fd234a078ace764ae2fc15c41a0}{config}},\ sampling\_freq);}
+\DoxyCodeLine{00497\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ n\_features\ ==\ \mbox{\hyperlink{ei__run__dsp_8h_a3ba015549c47e712909a20cde87dfe4f}{output\_matrix}}-\/>\mbox{\hyperlink{structei__matrix_a71fe3190b5ec3ab128461bd7903d3221}{cols}}\ ?\ \mbox{\hyperlink{namespaceei_a35329cd4e57031263ba0a94c8d3959baa58f9da92fe1aff29466bdd4aa2a7b361}{EIDSP\_OK}}\ :\ \mbox{\hyperlink{namespaceei_a35329cd4e57031263ba0a94c8d3959baa38ee0f868403ad45472a6e330d9af02f}{EIDSP\_MATRIX\_SIZE\_MISMATCH}};}
+\DoxyCodeLine{00498\ \ \ \ \ \}}
+\DoxyCodeLine{00499\ }
+\DoxyCodeLine{00500\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{classei_1_1spectral_1_1feature_abfd79af79f20e14f37b5ed551da366c8}{extract\_spectral\_analysis\_features\_v3}}(}
+\DoxyCodeLine{00501\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structei__matrix}{matrix\_t}}\ *\mbox{\hyperlink{ei__run__dsp_8h_a43dfa20ba0ba40e614f1a384d9912eb2}{input\_matrix}},}
+\DoxyCodeLine{00502\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structei__matrix}{matrix\_t}}\ *\mbox{\hyperlink{ei__run__dsp_8h_a3ba015549c47e712909a20cde87dfe4f}{output\_matrix}},}
+\DoxyCodeLine{00503\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structei__dsp__config__spectral__analysis__t}{ei\_dsp\_config\_spectral\_analysis\_t}}\ *\mbox{\hyperlink{micro_2kernels_2filter__bank_8cc_ac0f32fd234a078ace764ae2fc15c41a0}{config}},}
+\DoxyCodeLine{00504\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{float}\ sampling\_freq)}
+\DoxyCodeLine{00505\ \ \ \ \ \{}
+\DoxyCodeLine{00506\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (strcmp(\mbox{\hyperlink{micro_2kernels_2filter__bank_8cc_ac0f32fd234a078ace764ae2fc15c41a0}{config}}-\/>analysis\_type,\ \textcolor{stringliteral}{"{}Wavelet"{}})\ ==\ 0)\ \{}
+\DoxyCodeLine{00507\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classei_1_1spectral_1_1wavelet_a678b41a3a3885636f7e49897d84d4e17}{wavelet::extract\_wavelet\_features}}(\mbox{\hyperlink{ei__run__dsp_8h_a43dfa20ba0ba40e614f1a384d9912eb2}{input\_matrix}},\ \mbox{\hyperlink{ei__run__dsp_8h_a3ba015549c47e712909a20cde87dfe4f}{output\_matrix}},\ \mbox{\hyperlink{micro_2kernels_2filter__bank_8cc_ac0f32fd234a078ace764ae2fc15c41a0}{config}},\ sampling\_freq);}
+\DoxyCodeLine{00508\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00509\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classei_1_1spectral_1_1feature_ac5ec55d6786ecb7fafe2b0047f359bea}{extract\_spectral\_analysis\_features\_v2}}(\mbox{\hyperlink{ei__run__dsp_8h_a43dfa20ba0ba40e614f1a384d9912eb2}{input\_matrix}},\ \mbox{\hyperlink{ei__run__dsp_8h_a3ba015549c47e712909a20cde87dfe4f}{output\_matrix}},\ \mbox{\hyperlink{micro_2kernels_2filter__bank_8cc_ac0f32fd234a078ace764ae2fc15c41a0}{config}},\ sampling\_freq);}
+\DoxyCodeLine{00510\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00511\ \ \ \ \ \}}
+\DoxyCodeLine{00512\ }
+\DoxyCodeLine{00513\ \ \ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{ei__vector_8h_a127d3f2f8a2f0f47e13d28aea38916f4}{ei\_vector<int>}}\ \mbox{\hyperlink{classei_1_1spectral_1_1feature_a720d5be9cf93e75f5031e430f8cfb856}{get\_ratio\_combo}}(\textcolor{keywordtype}{int}\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_acab531abaa74a7e664e3986f2522b33a}{r}})}
+\DoxyCodeLine{00514\ \ \ \ \ \{}
+\DoxyCodeLine{00515\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_acab531abaa74a7e664e3986f2522b33a}{r}}\ ==\ 1\ ||\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_acab531abaa74a7e664e3986f2522b33a}{r}}\ ==\ 3\ ||\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_acab531abaa74a7e664e3986f2522b33a}{r}}\ ==\ 10)\ \{}
+\DoxyCodeLine{00516\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \{\mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_acab531abaa74a7e664e3986f2522b33a}{r}}\};}
+\DoxyCodeLine{00517\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_acab531abaa74a7e664e3986f2522b33a}{r}}\ ==\ 30)\ \{}
+\DoxyCodeLine{00518\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \{3,\ 10\};}
+\DoxyCodeLine{00519\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_acab531abaa74a7e664e3986f2522b33a}{r}}\ ==\ 100)\ \{}
+\DoxyCodeLine{00520\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \{10,\ 10\};}
+\DoxyCodeLine{00521\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_acab531abaa74a7e664e3986f2522b33a}{r}}\ ==\ 1000)\ \{}
+\DoxyCodeLine{00522\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \{10,\ 10,\ 10\};}
+\DoxyCodeLine{00523\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00524\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__aligned__malloc_8h_a95cd4fa643ce672b347744b35c5b7056}{assert}}(0);}
+\DoxyCodeLine{00525\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00526\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \{0\};\ \textcolor{comment}{//\ to\ make\ linter\ happy}}
+\DoxyCodeLine{00527\ \ \ \ \ \}}
+\DoxyCodeLine{00528\ }
+\DoxyCodeLine{00529\ \ \ \ \ \textcolor{comment}{//\ can\ do\ in-\/place\ or\ out-\/of-\/place}}
+\DoxyCodeLine{00530\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{classei_1_1spectral_1_1feature_ac9d66ac0c8bc32aa27f4fa80d0dd9e8a}{\_decimate}}(\mbox{\hyperlink{structei__matrix}{matrix\_t}}\ *\mbox{\hyperlink{ei__run__dsp_8h_a43dfa20ba0ba40e614f1a384d9912eb2}{input\_matrix}},\ \mbox{\hyperlink{structei__matrix}{matrix\_t}}\ *\mbox{\hyperlink{ei__run__dsp_8h_a3ba015549c47e712909a20cde87dfe4f}{output\_matrix}},\ \textcolor{keywordtype}{size\_t}\ ratio)}
+\DoxyCodeLine{00531\ \ \ \ \ \{}
+\DoxyCodeLine{00532\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ generated\ by\ build\_sav4\_header\ in\ prepare.py}}
+\DoxyCodeLine{00533\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{float}\ sos\_deci\_3[]\ =\ \{}
+\DoxyCodeLine{00534\ \ \ \ \ \ \ \ \ \ \ \ \ 3.4799547399084973e-\/05f,\ 6.959909479816995e-\/05f,\ 3.4799547399084973e-\/05f,\ 1.0f,\ -\/1.416907422639627f,\ 0.5204552955670066f,\ 1.0f,\ 2.0f,\ 1.0f,\ 1.0f,\ -\/1.3342748248687593f,\ 0.594631953081447f,\ 1.0f,\ 2.0f,\ 1.0f,\ 1.0f,\ -\/1.237675162600336f,\ 0.7259326611233617f,\ 1.0f,\ 2.0f,\ 1.0f,\ 1.0f,\ -\/1.2180861262950025f,\ 0.8987833581253264\};}
+\DoxyCodeLine{00535\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{float}\ sos\_zi\_deci\_3[]\ =\ \{\ 0.0013094887094341828f,\ -\/0.0006648423946383296f,}
+\DoxyCodeLine{00536\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0.0193087012128479f,\ \ \ \ -\/0.010936639208493802f,}
+\DoxyCodeLine{00537\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0.1485445305451165f,\ \ \ \ -\/0.10217301649013415f,}
+\DoxyCodeLine{00538\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0.8250625539381586f,\ \ \ \ -\/0.7244268881025758\ \};}
+\DoxyCodeLine{00539\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{float}\ sos\_deci\_10[]\ =\ \{\ 3.5863243209995215e-\/09f,}
+\DoxyCodeLine{00540\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 7.172648641999043e-\/09f,}
+\DoxyCodeLine{00541\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 3.5863243209995215e-\/09f,}
+\DoxyCodeLine{00542\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 1.0f,}
+\DoxyCodeLine{00543\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/1.8204968644767618f,}
+\DoxyCodeLine{00544\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0.8308597403796137f,}
+\DoxyCodeLine{00545\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 1.0f,}
+\DoxyCodeLine{00546\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 2.0f,}
+\DoxyCodeLine{00547\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 1.0f,}
+\DoxyCodeLine{00548\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 1.0f,}
+\DoxyCodeLine{00549\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/1.8289505620176847f,}
+\DoxyCodeLine{00550\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0.8553173710387741f,}
+\DoxyCodeLine{00551\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 1.0f,}
+\DoxyCodeLine{00552\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 2.0f,}
+\DoxyCodeLine{00553\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 1.0f,}
+\DoxyCodeLine{00554\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 1.0f,}
+\DoxyCodeLine{00555\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/1.8517334482627625f,}
+\DoxyCodeLine{00556\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0.9015161055713813f,}
+\DoxyCodeLine{00557\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 1.0f,}
+\DoxyCodeLine{00558\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 2.0f,}
+\DoxyCodeLine{00559\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 1.0f,}
+\DoxyCodeLine{00560\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 1.0f,}
+\DoxyCodeLine{00561\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/1.8965395961864169f,}
+\DoxyCodeLine{00562\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0.9644245584642932\ \};}
+\DoxyCodeLine{00563\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{float}\ sos\_zi\_deci\_10[]\ =\ \{\ 1.38071060429997e-\/06f,\ \ \ -\/1.146570262401316e-\/06f,}
+\DoxyCodeLine{00564\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0.00020862168862901534f,\ -\/0.0001782374705409433f,}
+\DoxyCodeLine{00565\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0.016663820918116152f,\ \ \ -\/0.015002020730727955f,}
+\DoxyCodeLine{00566\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0.9773862470492868f,\ \ \ \ \ -\/0.9420150059170858\ \};}
+\DoxyCodeLine{00567\ }
+\DoxyCodeLine{00568\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__aligned__malloc_8h_a95cd4fa643ce672b347744b35c5b7056}{assert}}(ratio\ ==\ 3\ ||\ ratio\ ==\ 10);}
+\DoxyCodeLine{00569\ }
+\DoxyCodeLine{00570\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}*\ sos\ =\ ratio\ ==\ 3\ ?\ sos\_deci\_3\ :\ sos\_deci\_10;}
+\DoxyCodeLine{00571\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}*\ sos\_zi\ =\ ratio\ ==\ 3\ ?\ sos\_zi\_deci\_3\ :\ sos\_zi\_deci\_10;}
+\DoxyCodeLine{00572\ }
+\DoxyCodeLine{00573\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ out\_size\ =\ \mbox{\hyperlink{classei_1_1signal_abe80e2202fa9792dd3a980d3c5157cd3}{signal::get\_decimated\_size}}(\mbox{\hyperlink{ei__run__dsp_8h_a43dfa20ba0ba40e614f1a384d9912eb2}{input\_matrix}}-\/>\mbox{\hyperlink{structei__matrix_a71fe3190b5ec3ab128461bd7903d3221}{cols}},\ ratio);}
+\DoxyCodeLine{00574\ }
+\DoxyCodeLine{00575\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ row\ =\ 0;\ row\ <\ \mbox{\hyperlink{ei__run__dsp_8h_a43dfa20ba0ba40e614f1a384d9912eb2}{input\_matrix}}-\/>\mbox{\hyperlink{structei__matrix_a263c997028804ca14b749f64eeb3fe84}{rows}};\ row++)\ \{}
+\DoxyCodeLine{00576\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{float}\ *\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a6150e0515f7202e2fb518f7206ed97dc}{x}}\ =\ \mbox{\hyperlink{ei__run__dsp_8h_a43dfa20ba0ba40e614f1a384d9912eb2}{input\_matrix}}-\/>get\_row\_ptr(row);}
+\DoxyCodeLine{00577\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}\ *\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_aa4f0d3eebc3c443f9be81bf48561a217}{y}}\ =\ \mbox{\hyperlink{ei__run__dsp_8h_a3ba015549c47e712909a20cde87dfe4f}{output\_matrix}}-\/>get\_row\_ptr(row);}
+\DoxyCodeLine{00578\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structei_1_1signal_1_1sosfilt}{signal::sosfilt}}\ sosfilt(sos,\ sos\_zi,\ 4);}
+\DoxyCodeLine{00579\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classei_1_1signal_a5374fe7e18838d844fd0d381af435df0}{signal::decimate\_simple}}(}
+\DoxyCodeLine{00580\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a6150e0515f7202e2fb518f7206ed97dc}{x}},}
+\DoxyCodeLine{00581\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__dsp_8h_a43dfa20ba0ba40e614f1a384d9912eb2}{input\_matrix}}-\/>\mbox{\hyperlink{structei__matrix_a71fe3190b5ec3ab128461bd7903d3221}{cols}},}
+\DoxyCodeLine{00582\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_aa4f0d3eebc3c443f9be81bf48561a217}{y}},}
+\DoxyCodeLine{00583\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__dsp_8h_a3ba015549c47e712909a20cde87dfe4f}{output\_matrix}}-\/>\mbox{\hyperlink{structei__matrix_a71fe3190b5ec3ab128461bd7903d3221}{cols}},}
+\DoxyCodeLine{00584\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ratio,}
+\DoxyCodeLine{00585\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ sosfilt);}
+\DoxyCodeLine{00586\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00587\ }
+\DoxyCodeLine{00588\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ out\_size;}
+\DoxyCodeLine{00589\ \ \ \ \ \}}
+\DoxyCodeLine{00590\ }
+\DoxyCodeLine{00591\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{classei_1_1spectral_1_1feature_a8b861a0a2e02045ec0b3a8778558a4c7}{extract\_spectral\_analysis\_features\_v4}}(}
+\DoxyCodeLine{00592\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structei__matrix}{matrix\_t}}\ *\mbox{\hyperlink{ei__run__dsp_8h_a43dfa20ba0ba40e614f1a384d9912eb2}{input\_matrix}},}
+\DoxyCodeLine{00593\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structei__matrix}{matrix\_t}}\ *\mbox{\hyperlink{ei__run__dsp_8h_a3ba015549c47e712909a20cde87dfe4f}{output\_matrix}},}
+\DoxyCodeLine{00594\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structei__dsp__config__spectral__analysis__t}{ei\_dsp\_config\_spectral\_analysis\_t}}\ *config\_p,}
+\DoxyCodeLine{00595\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{float}\ sampling\_freq)}
+\DoxyCodeLine{00596\ \ \ \ \ \{}
+\DoxyCodeLine{00597\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ config\_copy\ =\ *config\_p;}
+\DoxyCodeLine{00598\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{micro_2kernels_2filter__bank_8cc_ac0f32fd234a078ace764ae2fc15c41a0}{config}}\ =\ \&config\_copy;}
+\DoxyCodeLine{00599\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (strcmp(\mbox{\hyperlink{micro_2kernels_2filter__bank_8cc_ac0f32fd234a078ace764ae2fc15c41a0}{config}}-\/>analysis\_type,\ \textcolor{stringliteral}{"{}Wavelet"{}})\ ==\ 0)\ \{}
+\DoxyCodeLine{00600\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classei_1_1spectral_1_1wavelet_a678b41a3a3885636f7e49897d84d4e17}{wavelet::extract\_wavelet\_features}}(\mbox{\hyperlink{ei__run__dsp_8h_a43dfa20ba0ba40e614f1a384d9912eb2}{input\_matrix}},\ \mbox{\hyperlink{ei__run__dsp_8h_a3ba015549c47e712909a20cde87dfe4f}{output\_matrix}},\ \mbox{\hyperlink{micro_2kernels_2filter__bank_8cc_ac0f32fd234a078ace764ae2fc15c41a0}{config}},\ sampling\_freq);}
+\DoxyCodeLine{00601\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00602\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{micro_2kernels_2filter__bank_8cc_ac0f32fd234a078ace764ae2fc15c41a0}{config}}-\/>extra\_low\_freq\ ==\ \textcolor{keyword}{false}\ \&\&\ \mbox{\hyperlink{micro_2kernels_2filter__bank_8cc_ac0f32fd234a078ace764ae2fc15c41a0}{config}}-\/>input\_decimation\_ratio\ ==\ 1)\ \{}
+\DoxyCodeLine{00603\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ n\_features\ =}
+\DoxyCodeLine{00604\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classei_1_1spectral_1_1feature_abd3658f1e0cc954c393533f213ec6187}{extract\_spec\_features}}(\mbox{\hyperlink{ei__run__dsp_8h_a43dfa20ba0ba40e614f1a384d9912eb2}{input\_matrix}},\ \mbox{\hyperlink{ei__run__dsp_8h_a3ba015549c47e712909a20cde87dfe4f}{output\_matrix}},\ \mbox{\hyperlink{micro_2kernels_2filter__bank_8cc_ac0f32fd234a078ace764ae2fc15c41a0}{config}},\ sampling\_freq);}
+\DoxyCodeLine{00605\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ n\_features\ ==\ \mbox{\hyperlink{ei__run__dsp_8h_a3ba015549c47e712909a20cde87dfe4f}{output\_matrix}}-\/>\mbox{\hyperlink{structei__matrix_a71fe3190b5ec3ab128461bd7903d3221}{cols}}\ ?\ \mbox{\hyperlink{namespaceei_a35329cd4e57031263ba0a94c8d3959baa58f9da92fe1aff29466bdd4aa2a7b361}{EIDSP\_OK}}\ :\ \mbox{\hyperlink{namespaceei_a35329cd4e57031263ba0a94c8d3959baa38ee0f868403ad45472a6e330d9af02f}{EIDSP\_MATRIX\_SIZE\_MISMATCH}};}
+\DoxyCodeLine{00606\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00607\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00608\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classei_1_1numpy_aa37a40f6a63f70f2c9bdda012b765c2f}{numpy::transpose\_in\_place}}(\mbox{\hyperlink{ei__run__dsp_8h_a43dfa20ba0ba40e614f1a384d9912eb2}{input\_matrix}});}
+\DoxyCodeLine{00609\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__utils_8h_a3856e4de29f29e853f85608223a3aa80}{EI\_TRY}}(\mbox{\hyperlink{classei_1_1numpy_a780e556d0c5dc4948320ad0ab1630666}{numpy::scale}}(\mbox{\hyperlink{ei__run__dsp_8h_a43dfa20ba0ba40e614f1a384d9912eb2}{input\_matrix}},\ \mbox{\hyperlink{micro_2kernels_2filter__bank_8cc_ac0f32fd234a078ace764ae2fc15c41a0}{config}}-\/>scale\_axes));}
+\DoxyCodeLine{00610\ }
+\DoxyCodeLine{00611\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{micro_2kernels_2filter__bank_8cc_ac0f32fd234a078ace764ae2fc15c41a0}{config}}-\/>input\_decimation\_ratio\ >\ 1)\ \{}
+\DoxyCodeLine{00612\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__vector_8h_a127d3f2f8a2f0f47e13d28aea38916f4}{ei\_vector<int>}}\ ratio\_combo\ =\ \mbox{\hyperlink{classei_1_1spectral_1_1feature_a720d5be9cf93e75f5031e430f8cfb856}{get\_ratio\_combo}}(\mbox{\hyperlink{micro_2kernels_2filter__bank_8cc_ac0f32fd234a078ace764ae2fc15c41a0}{config}}-\/>input\_decimation\_ratio);}
+\DoxyCodeLine{00613\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ out\_size\ =\ \mbox{\hyperlink{ei__run__dsp_8h_a43dfa20ba0ba40e614f1a384d9912eb2}{input\_matrix}}-\/>\mbox{\hyperlink{structei__matrix_a71fe3190b5ec3ab128461bd7903d3221}{cols}};}
+\DoxyCodeLine{00614\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_acab531abaa74a7e664e3986f2522b33a}{r}}\ :\ ratio\_combo)\ \{}
+\DoxyCodeLine{00615\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ out\_size\ =\ \mbox{\hyperlink{classei_1_1spectral_1_1feature_ac9d66ac0c8bc32aa27f4fa80d0dd9e8a}{\_decimate}}(\mbox{\hyperlink{ei__run__dsp_8h_a43dfa20ba0ba40e614f1a384d9912eb2}{input\_matrix}},\ \mbox{\hyperlink{ei__run__dsp_8h_a43dfa20ba0ba40e614f1a384d9912eb2}{input\_matrix}},\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_acab531abaa74a7e664e3986f2522b33a}{r}});}
+\DoxyCodeLine{00616\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00617\ }
+\DoxyCodeLine{00618\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ rearrange\ input\ matrix\ to\ be\ in\ the\ right\ shape\ after\ decimation}}
+\DoxyCodeLine{00619\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}*\ out\ =\ \mbox{\hyperlink{ei__run__dsp_8h_a43dfa20ba0ba40e614f1a384d9912eb2}{input\_matrix}}-\/>get\_row\_ptr(0)\ +\ out\_size;}
+\DoxyCodeLine{00620\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(uint32\_t\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_acab531abaa74a7e664e3986f2522b33a}{r}}\ =\ 1;\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_acab531abaa74a7e664e3986f2522b33a}{r}}\ <\ \mbox{\hyperlink{ei__run__dsp_8h_a43dfa20ba0ba40e614f1a384d9912eb2}{input\_matrix}}-\/>\mbox{\hyperlink{structei__matrix_a263c997028804ca14b749f64eeb3fe84}{rows}};\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_acab531abaa74a7e664e3986f2522b33a}{r}}++)\ \{}
+\DoxyCodeLine{00621\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}\ *row\ =\ \mbox{\hyperlink{ei__run__dsp_8h_a43dfa20ba0ba40e614f1a384d9912eb2}{input\_matrix}}-\/>get\_row\_ptr(\mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_acab531abaa74a7e664e3986f2522b33a}{r}});}
+\DoxyCodeLine{00622\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keywordtype}{size\_t}\ c\ =\ 0;\ c\ <\ out\_size;\ c++)\ \{}
+\DoxyCodeLine{00623\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ *out++\ =\ row[c];}
+\DoxyCodeLine{00624\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00625\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00626\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__dsp_8h_a43dfa20ba0ba40e614f1a384d9912eb2}{input\_matrix}}-\/>\mbox{\hyperlink{structei__matrix_a71fe3190b5ec3ab128461bd7903d3221}{cols}}\ =\ out\_size;}
+\DoxyCodeLine{00627\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00628\ }
+\DoxyCodeLine{00629\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}\ new\_sampling\_freq\ =\ sampling\_freq\ /\ \mbox{\hyperlink{micro_2kernels_2filter__bank_8cc_ac0f32fd234a078ace764ae2fc15c41a0}{config}}-\/>input\_decimation\_ratio;}
+\DoxyCodeLine{00630\ }
+\DoxyCodeLine{00631\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ filter\ here,\ before\ decimating,\ instead\ of\ inside\ extract\_spec\_features}}
+\DoxyCodeLine{00632\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (strcmp(\mbox{\hyperlink{micro_2kernels_2filter__bank_8cc_ac0f32fd234a078ace764ae2fc15c41a0}{config}}-\/>filter\_type,\ \textcolor{stringliteral}{"{}low"{}})\ ==\ 0)\ \{}
+\DoxyCodeLine{00633\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{micro_2kernels_2filter__bank_8cc_ac0f32fd234a078ace764ae2fc15c41a0}{config}}-\/>filter\_order\ )\ \{}
+\DoxyCodeLine{00634\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__utils_8h_a3856e4de29f29e853f85608223a3aa80}{EI\_TRY}}(spectral::processing::butterworth\_lowpass\_filter(}
+\DoxyCodeLine{00635\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__dsp_8h_a43dfa20ba0ba40e614f1a384d9912eb2}{input\_matrix}},}
+\DoxyCodeLine{00636\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ new\_sampling\_freq,}
+\DoxyCodeLine{00637\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{micro_2kernels_2filter__bank_8cc_ac0f32fd234a078ace764ae2fc15c41a0}{config}}-\/>filter\_cutoff,}
+\DoxyCodeLine{00638\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{micro_2kernels_2filter__bank_8cc_ac0f32fd234a078ace764ae2fc15c41a0}{config}}-\/>filter\_order));}
+\DoxyCodeLine{00639\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00640\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00641\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (strcmp(\mbox{\hyperlink{micro_2kernels_2filter__bank_8cc_ac0f32fd234a078ace764ae2fc15c41a0}{config}}-\/>filter\_type,\ \textcolor{stringliteral}{"{}high"{}})\ ==\ 0)\ \{}
+\DoxyCodeLine{00642\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{micro_2kernels_2filter__bank_8cc_ac0f32fd234a078ace764ae2fc15c41a0}{config}}-\/>filter\_order\ )\ \{}
+\DoxyCodeLine{00643\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__utils_8h_a3856e4de29f29e853f85608223a3aa80}{EI\_TRY}}(spectral::processing::butterworth\_highpass\_filter(}
+\DoxyCodeLine{00644\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__dsp_8h_a43dfa20ba0ba40e614f1a384d9912eb2}{input\_matrix}},}
+\DoxyCodeLine{00645\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ new\_sampling\_freq,}
+\DoxyCodeLine{00646\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{micro_2kernels_2filter__bank_8cc_ac0f32fd234a078ace764ae2fc15c41a0}{config}}-\/>filter\_cutoff,}
+\DoxyCodeLine{00647\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{micro_2kernels_2filter__bank_8cc_ac0f32fd234a078ace764ae2fc15c41a0}{config}}-\/>filter\_order));}
+\DoxyCodeLine{00648\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00649\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00650\ \ \ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00651\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ set\ the\ filter\ order\ to\ 0,\ so\ that\ we\ won't\ double\ filter}}
+\DoxyCodeLine{00652\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{micro_2kernels_2filter__bank_8cc_ac0f32fd234a078ace764ae2fc15c41a0}{config}}-\/>filter\_order\ =\ 0;}
+\DoxyCodeLine{00653\ }
+\DoxyCodeLine{00654\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ do\ this\ before\ extract\_spec\_features\ because\ extract\_spec\_features\ modifies\ the\ matrix}}
+\DoxyCodeLine{00655\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{size\_t}\ decimation\ =\ 10;}
+\DoxyCodeLine{00656\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ decimated\_size\ =}
+\DoxyCodeLine{00657\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classei_1_1signal_abe80e2202fa9792dd3a980d3c5157cd3}{signal::get\_decimated\_size}}(\mbox{\hyperlink{ei__run__dsp_8h_a43dfa20ba0ba40e614f1a384d9912eb2}{input\_matrix}}-\/>\mbox{\hyperlink{structei__matrix_a71fe3190b5ec3ab128461bd7903d3221}{cols}},\ decimation);}
+\DoxyCodeLine{00658\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structei__matrix}{matrix\_t}}\ lf\_signal(\mbox{\hyperlink{ei__run__dsp_8h_a43dfa20ba0ba40e614f1a384d9912eb2}{input\_matrix}}-\/>\mbox{\hyperlink{structei__matrix_a263c997028804ca14b749f64eeb3fe84}{rows}},\ decimated\_size);}
+\DoxyCodeLine{00659\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classei_1_1spectral_1_1feature_ac9d66ac0c8bc32aa27f4fa80d0dd9e8a}{\_decimate}}(\mbox{\hyperlink{ei__run__dsp_8h_a43dfa20ba0ba40e614f1a384d9912eb2}{input\_matrix}},\ \&lf\_signal,\ decimation);}
+\DoxyCodeLine{00660\ }
+\DoxyCodeLine{00661\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ n\_features\ =\ \mbox{\hyperlink{classei_1_1spectral_1_1feature_abd3658f1e0cc954c393533f213ec6187}{extract\_spec\_features}}(}
+\DoxyCodeLine{00662\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__dsp_8h_a43dfa20ba0ba40e614f1a384d9912eb2}{input\_matrix}},}
+\DoxyCodeLine{00663\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__dsp_8h_a3ba015549c47e712909a20cde87dfe4f}{output\_matrix}},}
+\DoxyCodeLine{00664\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{micro_2kernels_2filter__bank_8cc_ac0f32fd234a078ace764ae2fc15c41a0}{config}},}
+\DoxyCodeLine{00665\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ new\_sampling\_freq,}
+\DoxyCodeLine{00666\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{true},}
+\DoxyCodeLine{00667\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{false});}
+\DoxyCodeLine{00668\ }
+\DoxyCodeLine{00669\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (n\_features\ >\ 0\ \&\&\ \mbox{\hyperlink{micro_2kernels_2filter__bank_8cc_ac0f32fd234a078ace764ae2fc15c41a0}{config}}-\/>extra\_low\_freq)\ \{}
+\DoxyCodeLine{00670\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ disable\ filtering\ post\ decimation}}
+\DoxyCodeLine{00671\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structei__matrix}{matrix\_t}}\ lf\_features(1,\ \mbox{\hyperlink{ei__run__dsp_8h_a3ba015549c47e712909a20cde87dfe4f}{output\_matrix}}-\/>\mbox{\hyperlink{structei__matrix_a263c997028804ca14b749f64eeb3fe84}{rows}}\ *\ \mbox{\hyperlink{ei__run__dsp_8h_a3ba015549c47e712909a20cde87dfe4f}{output\_matrix}}-\/>\mbox{\hyperlink{structei__matrix_a71fe3190b5ec3ab128461bd7903d3221}{cols}}\ -\/\ n\_features,}
+\DoxyCodeLine{00672\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__dsp_8h_a3ba015549c47e712909a20cde87dfe4f}{output\_matrix}}-\/>\mbox{\hyperlink{structei__matrix_a5412b64a3551881269b8c1493f0da17a}{buffer}}\ +\ n\_features);}
+\DoxyCodeLine{00673\ }
+\DoxyCodeLine{00674\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ n\_features\ +=\ \mbox{\hyperlink{classei_1_1spectral_1_1feature_abd3658f1e0cc954c393533f213ec6187}{extract\_spec\_features}}(}
+\DoxyCodeLine{00675\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&lf\_signal,}
+\DoxyCodeLine{00676\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&lf\_features,}
+\DoxyCodeLine{00677\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{micro_2kernels_2filter__bank_8cc_ac0f32fd234a078ace764ae2fc15c41a0}{config}},}
+\DoxyCodeLine{00678\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ new\_sampling\_freq\ /\ decimation,}
+\DoxyCodeLine{00679\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{true},}
+\DoxyCodeLine{00680\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{false});}
+\DoxyCodeLine{00681\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00682\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ n\_features\ ==\ \mbox{\hyperlink{ei__run__dsp_8h_a3ba015549c47e712909a20cde87dfe4f}{output\_matrix}}-\/>\mbox{\hyperlink{structei__matrix_a71fe3190b5ec3ab128461bd7903d3221}{cols}}\ ?\ \mbox{\hyperlink{namespaceei_a35329cd4e57031263ba0a94c8d3959baa58f9da92fe1aff29466bdd4aa2a7b361}{EIDSP\_OK}}\ :\ \mbox{\hyperlink{namespaceei_a35329cd4e57031263ba0a94c8d3959baa38ee0f868403ad45472a6e330d9af02f}{EIDSP\_MATRIX\_SIZE\_MISMATCH}};}
+\DoxyCodeLine{00683\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00684\ \ \ \ \ \}}
+\DoxyCodeLine{00685\ \};}
+\DoxyCodeLine{00686\ }
+\DoxyCodeLine{00687\ \}\ \textcolor{comment}{//\ namespace\ spectral}}
+\DoxyCodeLine{00688\ \}\ \textcolor{comment}{//\ namespace\ ei}}
+\DoxyCodeLine{00689\ }
+\DoxyCodeLine{00690\ }
+\DoxyCodeLine{00691\ }
+\DoxyCodeLine{00692\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ \_EIDSP\_SPECTRAL\_FEATURE\_H\_}}
+
+\end{DoxyCode}

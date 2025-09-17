@@ -1,0 +1,51 @@
+\chapter{Audio "{}frontend"{} library for feature generation}
+\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_f7399ad2fa8457378b0d65e95ad5ab86}{}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_f7399ad2fa8457378b0d65e95ad5ab86}\index{Audio "{}frontend"{} library for feature generation@{Audio ""frontend"" library for feature generation}}
+\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_f7399ad2fa8457378b0d65e95ad5ab86_autotoc_md134}%
+\Hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_f7399ad2fa8457378b0d65e95ad5ab86_autotoc_md134}%
+
+
+A feature generation library (also called frontend) that receives raw audio input, and produces filter banks (a vector of values).
+
+The raw audio input is expected to be 16-\/bit PCM features, with a configurable sample rate. More specifically the audio signal goes through a pre-\/emphasis filter (optionally); then gets sliced into (potentially overlapping) frames and a window function is applied to each frame; afterwards, we do a Fourier transform on each frame (or more specifically a Short-\/\+Time Fourier Transform) and calculate the power spectrum; and subsequently compute the filter banks.
+
+By default the library is configured with a set of defaults to perform the different processing tasks. This takes place with the frontend\+\_\+util.\+c function\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ ++}
+\DoxyCodeLine{\textcolor{keywordtype}{void}\ \mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2experimental_2microfrontend_2lib_2frontend__util_8c_a0c379d0ca422f75955d5e858d425f402}{FrontendFillConfigWithDefaults}}(\textcolor{keyword}{struct}\ \mbox{\hyperlink{struct_frontend_config}{FrontendConfig}}*\ \mbox{\hyperlink{micro_2kernels_2filter__bank_8cc_ac0f32fd234a078ace764ae2fc15c41a0}{config}})}
+
+\end{DoxyCode}
+
+
+A single invocation looks like\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ ++}
+\DoxyCodeLine{\textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_frontend_config}{FrontendConfig}}\ frontend\_config;}
+\DoxyCodeLine{\mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2experimental_2microfrontend_2lib_2frontend__util_8c_a0c379d0ca422f75955d5e858d425f402}{FrontendFillConfigWithDefaults}}(\&frontend\_config);}
+\DoxyCodeLine{\textcolor{keywordtype}{int}\ sample\_rate\ =\ 16000;}
+\DoxyCodeLine{\mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2experimental_2microfrontend_2lib_2frontend__util_8c_a25df327f8b459abea8d196f6eca39750}{FrontendPopulateState}}(\&frontend\_config,\ \&frontend\_state,\ sample\_rate);}
+\DoxyCodeLine{int16\_t*\ audio\_data\ =\ ;\ \ \textcolor{comment}{//\ PCM\ audio\ samples\ at\ 16KHz.}}
+\DoxyCodeLine{\textcolor{keywordtype}{size\_t}\ audio\_size\ =\ ;\ \ \textcolor{comment}{//\ Number\ of\ audio\ samples.}}
+\DoxyCodeLine{\textcolor{keywordtype}{size\_t}\ num\_samples\_read;\ \ \textcolor{comment}{//\ How\ many\ samples\ were\ processed.}}
+\DoxyCodeLine{\textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_frontend_output}{FrontendOutput}}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbcd3bbe90c4644d53fde1ce4e312f437_a7a2a916a8059078c2d7a05f46c7126fd}{output}}\ =}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2experimental_2microfrontend_2lib_2frontend_8c_a4bbbbbf228c4e487ee454b5a60fd305f}{FrontendProcessSamples}}(}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \&frontend\_state,\ audio\_data,\ audio\_size,\ \&num\_samples\_read);}
+\DoxyCodeLine{\textcolor{keywordflow}{for}\ (i\ =\ 0;\ i\ <\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbcd3bbe90c4644d53fde1ce4e312f437_a7a2a916a8059078c2d7a05f46c7126fd}{output}}.size;\ ++i)\ \{}
+\DoxyCodeLine{\ \ printf(\textcolor{stringliteral}{"{}\%d\ "{}},\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbcd3bbe90c4644d53fde1ce4e312f437_a7a2a916a8059078c2d7a05f46c7126fd}{output}}.values[i]);\ \ \textcolor{comment}{//\ Print\ the\ feature\ vector.}}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+
+
+Something to note in the above example is that the frontend consumes as many samples needed from the audio data to produce a single feature vector (according to the frontend configuration). If not enough samples were available to generate a feature vector, the returned size will be 0 and the values pointer will be {\ttfamily NULL}.
+
+An example of how to use the frontend is provided in frontend\+\_\+main.\+cc and its binary frontend\+\_\+main. This example, expects a path to a file containing {\ttfamily int16} PCM features at a sample rate of 16KHz, and upon execution will printing out the coefficients according to the frontend default configuration.\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_f7399ad2fa8457378b0d65e95ad5ab86_autotoc_md135}{}\doxysection{\texorpdfstring{Extra features}{Extra features}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_f7399ad2fa8457378b0d65e95ad5ab86_autotoc_md135}
+Extra features of this frontend library include a noise reduction module, as well as a gain control module.
+
+{\bfseries{Noise cancellation}}. Removes stationary noise from each channel of the signal using a low pass filter.
+
+{\bfseries{Gain control}}. A novel automatic gain control based dynamic compression to replace the widely used static (such as log or root) compression. Disabled by default.\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_f7399ad2fa8457378b0d65e95ad5ab86_autotoc_md136}{}\doxysection{\texorpdfstring{Memory map}{Memory map}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_f7399ad2fa8457378b0d65e95ad5ab86_autotoc_md136}
+The binary frontend\+\_\+memmap\+\_\+main shows a sample usage of how to avoid all the initialization code in your application, by first running "{}frontend\+\_\+generate\+\_\+memmap"{} to create a header/source file that uses a baked in frontend state. This command could be automated as part of your build process, or you can just use the output directly. 

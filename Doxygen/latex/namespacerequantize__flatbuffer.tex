@@ -1,0 +1,142 @@
+\doxysection{requantize\+\_\+flatbuffer Namespace Reference}
+\hypertarget{namespacerequantize__flatbuffer}{}\label{namespacerequantize__flatbuffer}\index{requantize\_flatbuffer@{requantize\_flatbuffer}}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{classrequantize__flatbuffer_1_1_requantizer}{Requantizer}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{namespacerequantize__flatbuffer_ac91c8716e55c2a370191eba18f1753ce}{main}} (\+\_\+)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{namespacerequantize__flatbuffer_a92b0891ff8aaa4770308582542ee0cfb}{FLAGS}} = flags.\+FLAGS
+\item 
+\mbox{\hyperlink{namespacerequantize__flatbuffer_a3291dc50524136e9a5a5220026c4c186}{default}}
+\item 
+\mbox{\hyperlink{namespacerequantize__flatbuffer_a48873755b914a75e79cfce65d772d2ad}{help}}
+\item 
+dict \mbox{\hyperlink{namespacerequantize__flatbuffer_ab356b62b6e1791b94e214d5a6e72bb34}{\+\_\+\+COMPLEX\+\_\+\+OP\+\_\+\+REQUANTIZE\+\_\+\+REGISTRATION}}
+\item 
+list \mbox{\hyperlink{namespacerequantize__flatbuffer_a93914ce9674ff724fa508649e3b12578}{\+\_\+\+TESTED\+\_\+\+SIMPLE\+\_\+\+OPS}}
+\item 
+\mbox{\hyperlink{namespacerequantize__flatbuffer_abbc82152ac07f36bd7b0ae227dcd1ba2}{\+\_\+\+SUPPORTED\+\_\+\+OPS}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\begin{DoxyVerb}An experimental tool to requantize a int8 activation, int8 weight LSTM based model to int16 activation, int8 weight
+
+Steps: 
+1. Convert the trained model to int8 using the TFLite converter. See https://www.tensorflow.org/lite/performance/post_training_quantization#full_integer_quantization
+2. Use this tool to requantize the int8 model to int16.
+3. Check if the requantized model match the expectation (e.g., read the conversion printout, perform inference tests)
+
+The conversion process: 
+1. Requantize the ops specified in _COMPLEX_OP_REQUANTIZE_REGISTRATION using the registered function. Bias type conversion (int32 to int64) only happens here. 
+2. Requantize all non-constant tensors with int8 type to int16 (and fix the quantization parameters)
+
+Run:
+bazel build tensorflow/lite/micro/tools:requantize_flatbuffer
+bazel-bin/tensorflow/lite/micro/tools/requantize_flatbuffer --int8_model_path=".tflite file path"` --save_path="save path"
+
+CAVEAT: 
+1. Use this tool ONLY for models that contain the LSTM layer. All other models should use the standard tflite conversion process.
+2. This is an experimental tool. ALWAYS check if the converted model matches your expectation
+3. Add the custom op requantization function for complex ops (e.g., convolution). 
+4. We assume ops not in _COMPLEX_OP_REQUANTIZE_REGISTRATION only have activation tensors (i.e. no weights and bias). Check the quantized model performance if you add additional ops to _TESTED_SIMPLE_OPS \end{DoxyVerb}
+ 
+
+\doxysubsection{Function Documentation}
+\Hypertarget{namespacerequantize__flatbuffer_ac91c8716e55c2a370191eba18f1753ce}\index{requantize\_flatbuffer@{requantize\_flatbuffer}!main@{main}}
+\index{main@{main}!requantize\_flatbuffer@{requantize\_flatbuffer}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily \label{namespacerequantize__flatbuffer_ac91c8716e55c2a370191eba18f1753ce} 
+requantize\+\_\+flatbuffer.\+main (\begin{DoxyParamCaption}\item[{}]{\+\_\+}{}\end{DoxyParamCaption})}
+
+
+
+\doxysubsection{Variable Documentation}
+\Hypertarget{namespacerequantize__flatbuffer_ab356b62b6e1791b94e214d5a6e72bb34}\index{requantize\_flatbuffer@{requantize\_flatbuffer}!\_COMPLEX\_OP\_REQUANTIZE\_REGISTRATION@{\_COMPLEX\_OP\_REQUANTIZE\_REGISTRATION}}
+\index{\_COMPLEX\_OP\_REQUANTIZE\_REGISTRATION@{\_COMPLEX\_OP\_REQUANTIZE\_REGISTRATION}!requantize\_flatbuffer@{requantize\_flatbuffer}}
+\doxysubsubsection{\texorpdfstring{\_COMPLEX\_OP\_REQUANTIZE\_REGISTRATION}{\_COMPLEX\_OP\_REQUANTIZE\_REGISTRATION}}
+{\footnotesize\ttfamily \label{namespacerequantize__flatbuffer_ab356b62b6e1791b94e214d5a6e72bb34} 
+dict requantize\+\_\+flatbuffer.\+\_\+\+COMPLEX\+\_\+\+OP\+\_\+\+REQUANTIZE\+\_\+\+REGISTRATION\hspace{0.3cm}{\ttfamily [protected]}}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ =\ \ \{}
+\DoxyCodeLine{00002\ \ \ \ \ schema\_py\_generated.BuiltinOperator.FULLY\_CONNECTED:}
+\DoxyCodeLine{00003\ \ \ \ \ requantize\_flatbuffer\_utils.requantize\_fully\_connected,}
+\DoxyCodeLine{00004\ \ \ \ \ schema\_py\_generated.BuiltinOperator.UNIDIRECTIONAL\_SEQUENCE\_LSTM:}
+\DoxyCodeLine{00005\ \ \ \ \ requantize\_flatbuffer\_utils.requantize\_unidirectional\_sequence\_lstm,}
+\DoxyCodeLine{00006\ \ \ \ \ schema\_py\_generated.BuiltinOperator.SOFTMAX:}
+\DoxyCodeLine{00007\ \ \ \ \ requantize\_flatbuffer\_utils.requantize\_softmax,}
+\DoxyCodeLine{00008\ \ \ \ \ schema\_py\_generated.BuiltinOperator.CONV\_2D:}
+\DoxyCodeLine{00009\ \ \ \ \ requantize\_flatbuffer\_utils.requantize\_fully\_connected,}
+\DoxyCodeLine{00010\ \ \ \ \ schema\_py\_generated.BuiltinOperator.DEPTHWISE\_CONV\_2D:}
+\DoxyCodeLine{00011\ \ \ \ \ requantize\_flatbuffer\_utils.requantize\_fully\_connected,}
+\DoxyCodeLine{00012\ \ \ \ \ schema\_py\_generated.BuiltinOperator.TRANSPOSE\_CONV:}
+\DoxyCodeLine{00013\ \ \ \ \ requantize\_flatbuffer\_utils.requantize\_transpose\_conv,}
+\DoxyCodeLine{00014\ \}}
+
+\end{DoxyCode}
+\Hypertarget{namespacerequantize__flatbuffer_abbc82152ac07f36bd7b0ae227dcd1ba2}\index{requantize\_flatbuffer@{requantize\_flatbuffer}!\_SUPPORTED\_OPS@{\_SUPPORTED\_OPS}}
+\index{\_SUPPORTED\_OPS@{\_SUPPORTED\_OPS}!requantize\_flatbuffer@{requantize\_flatbuffer}}
+\doxysubsubsection{\texorpdfstring{\_SUPPORTED\_OPS}{\_SUPPORTED\_OPS}}
+{\footnotesize\ttfamily \label{namespacerequantize__flatbuffer_abbc82152ac07f36bd7b0ae227dcd1ba2} 
+requantize\+\_\+flatbuffer.\+\_\+\+SUPPORTED\+\_\+\+OPS\hspace{0.3cm}{\ttfamily [protected]}}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ =\ \ set(}
+\DoxyCodeLine{00002\ \ \ \ \ list(\_COMPLEX\_OP\_REQUANTIZE\_REGISTRATION.keys())\ +\ \_TESTED\_SIMPLE\_OPS)}
+
+\end{DoxyCode}
+\Hypertarget{namespacerequantize__flatbuffer_a93914ce9674ff724fa508649e3b12578}\index{requantize\_flatbuffer@{requantize\_flatbuffer}!\_TESTED\_SIMPLE\_OPS@{\_TESTED\_SIMPLE\_OPS}}
+\index{\_TESTED\_SIMPLE\_OPS@{\_TESTED\_SIMPLE\_OPS}!requantize\_flatbuffer@{requantize\_flatbuffer}}
+\doxysubsubsection{\texorpdfstring{\_TESTED\_SIMPLE\_OPS}{\_TESTED\_SIMPLE\_OPS}}
+{\footnotesize\ttfamily \label{namespacerequantize__flatbuffer_a93914ce9674ff724fa508649e3b12578} 
+list requantize\+\_\+flatbuffer.\+\_\+\+TESTED\+\_\+\+SIMPLE\+\_\+\+OPS\hspace{0.3cm}{\ttfamily [protected]}}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ =\ \ [}
+\DoxyCodeLine{00002\ \ \ \ \ schema\_py\_generated.BuiltinOperator.ADD,}
+\DoxyCodeLine{00003\ \ \ \ \ schema\_py\_generated.BuiltinOperator.CONCATENATION,}
+\DoxyCodeLine{00004\ \ \ \ \ schema\_py\_generated.BuiltinOperator.DEQUANTIZE,}
+\DoxyCodeLine{00005\ \ \ \ \ schema\_py\_generated.BuiltinOperator.LEAKY\_RELU,}
+\DoxyCodeLine{00006\ \ \ \ \ schema\_py\_generated.BuiltinOperator.LOGISTIC,}
+\DoxyCodeLine{00007\ \ \ \ \ schema\_py\_generated.BuiltinOperator.MEAN,}
+\DoxyCodeLine{00008\ \ \ \ \ schema\_py\_generated.BuiltinOperator.MUL,}
+\DoxyCodeLine{00009\ \ \ \ \ schema\_py\_generated.BuiltinOperator.PAD,}
+\DoxyCodeLine{00010\ \ \ \ \ schema\_py\_generated.BuiltinOperator.QUANTIZE,}
+\DoxyCodeLine{00011\ \ \ \ \ schema\_py\_generated.BuiltinOperator.RESHAPE,}
+\DoxyCodeLine{00012\ \ \ \ \ schema\_py\_generated.BuiltinOperator.RSQRT,}
+\DoxyCodeLine{00013\ \ \ \ \ schema\_py\_generated.BuiltinOperator.SQUARED\_DIFFERENCE,}
+\DoxyCodeLine{00014\ \ \ \ \ schema\_py\_generated.BuiltinOperator.STRIDED\_SLICE,}
+\DoxyCodeLine{00015\ \ \ \ \ schema\_py\_generated.BuiltinOperator.SUB,}
+\DoxyCodeLine{00016\ ]}
+
+\end{DoxyCode}
+\Hypertarget{namespacerequantize__flatbuffer_a3291dc50524136e9a5a5220026c4c186}\index{requantize\_flatbuffer@{requantize\_flatbuffer}!default@{default}}
+\index{default@{default}!requantize\_flatbuffer@{requantize\_flatbuffer}}
+\doxysubsubsection{\texorpdfstring{default}{default}}
+{\footnotesize\ttfamily \label{namespacerequantize__flatbuffer_a3291dc50524136e9a5a5220026c4c186} 
+requantize\+\_\+flatbuffer.\+default}
+
+\Hypertarget{namespacerequantize__flatbuffer_a92b0891ff8aaa4770308582542ee0cfb}\index{requantize\_flatbuffer@{requantize\_flatbuffer}!FLAGS@{FLAGS}}
+\index{FLAGS@{FLAGS}!requantize\_flatbuffer@{requantize\_flatbuffer}}
+\doxysubsubsection{\texorpdfstring{FLAGS}{FLAGS}}
+{\footnotesize\ttfamily \label{namespacerequantize__flatbuffer_a92b0891ff8aaa4770308582542ee0cfb} 
+requantize\+\_\+flatbuffer.\+FLAGS = flags.\+FLAGS}
+
+\Hypertarget{namespacerequantize__flatbuffer_a48873755b914a75e79cfce65d772d2ad}\index{requantize\_flatbuffer@{requantize\_flatbuffer}!help@{help}}
+\index{help@{help}!requantize\_flatbuffer@{requantize\_flatbuffer}}
+\doxysubsubsection{\texorpdfstring{help}{help}}
+{\footnotesize\ttfamily \label{namespacerequantize__flatbuffer_a48873755b914a75e79cfce65d772d2ad} 
+requantize\+\_\+flatbuffer.\+help}
+

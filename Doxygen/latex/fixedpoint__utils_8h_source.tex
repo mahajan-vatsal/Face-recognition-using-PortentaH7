@@ -1,0 +1,145 @@
+\doxysection{fixedpoint\+\_\+utils.\+h}
+\hypertarget{fixedpoint__utils_8h_source}{}\label{fixedpoint__utils_8h_source}\index{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/main/tensorflow/lite/micro/kernels/xtensa/hifimini/fixedpoint\_utils.h@{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/main/tensorflow/lite/micro/kernels/xtensa/hifimini/fixedpoint\_utils.h}}
+\mbox{\hyperlink{fixedpoint__utils_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{/*\ Copyright\ 2023\ The\ TensorFlow\ Authors.\ All\ Rights\ Reserved.}}
+\DoxyCodeLine{00002\ \textcolor{comment}{}}
+\DoxyCodeLine{00003\ \textcolor{comment}{Licensed\ under\ the\ Apache\ License,\ Version\ 2.0\ (the\ "{}License"{});}}
+\DoxyCodeLine{00004\ \textcolor{comment}{you\ may\ not\ use\ this\ file\ except\ in\ compliance\ with\ the\ License.}}
+\DoxyCodeLine{00005\ \textcolor{comment}{You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{00006\ \textcolor{comment}{}}
+\DoxyCodeLine{00007\ \textcolor{comment}{\ \ \ \ http://www.apache.org/licenses/LICENSE-\/2.0}}
+\DoxyCodeLine{00008\ \textcolor{comment}{}}
+\DoxyCodeLine{00009\ \textcolor{comment}{Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ software}}
+\DoxyCodeLine{00010\ \textcolor{comment}{distributed\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,}}
+\DoxyCodeLine{00011\ \textcolor{comment}{WITHOUT\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,\ either\ express\ or\ implied.}}
+\DoxyCodeLine{00012\ \textcolor{comment}{See\ the\ License\ for\ the\ specific\ language\ governing\ permissions\ and}}
+\DoxyCodeLine{00013\ \textcolor{comment}{limitations\ under\ the\ License.}}
+\DoxyCodeLine{00014\ \textcolor{comment}{==============================================================================*/}}
+\DoxyCodeLine{00015\ }
+\DoxyCodeLine{00016\ \textcolor{preprocessor}{\#ifndef\ TENSORFLOW\_LITE\_MICRO\_KERNELS\_XTENSA\_HIFIMINI\_FIXEDPOINT\_UTILS\_H\_}}
+\DoxyCodeLine{00017\ \textcolor{preprocessor}{\#define\ TENSORFLOW\_LITE\_MICRO\_KERNELS\_XTENSA\_HIFIMINI\_FIXEDPOINT\_UTILS\_H\_}}
+\DoxyCodeLine{00018\ }
+\DoxyCodeLine{00019\ \textcolor{preprocessor}{\#if\ defined(HIFIMINI)}}
+\DoxyCodeLine{00020\ \textcolor{preprocessor}{\#include\ <xtensa/tie/xt\_hifi2.h>}}
+\DoxyCodeLine{00021\ }
+\DoxyCodeLine{00022\ \textcolor{preprocessor}{\#include\ <algorithm>}}
+\DoxyCodeLine{00023\ \textcolor{preprocessor}{\#include\ <cmath>}}
+\DoxyCodeLine{00024\ \textcolor{preprocessor}{\#include\ <cstdint>}}
+\DoxyCodeLine{00025\ }
+\DoxyCodeLine{00026\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/kernels/internal/compatibility.h"{}}}
+\DoxyCodeLine{00027\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{xtensa_8h}{tensorflow/lite/micro/kernels/xtensa/xtensa.h}}"{}}}
+\DoxyCodeLine{00028\ }
+\DoxyCodeLine{00029\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacetflite}{tflite}}\ \{}
+\DoxyCodeLine{00030\ }
+\DoxyCodeLine{00031\ \textcolor{comment}{//\ INT24\ MIN/MAX}}
+\DoxyCodeLine{00032\ \textcolor{preprocessor}{\#define\ INT24\_MIN\ -\/8388608}}
+\DoxyCodeLine{00033\ \textcolor{preprocessor}{\#define\ INT24\_MAX\ 8388607}}
+\DoxyCodeLine{00034\ }
+\DoxyCodeLine{00035\ \textcolor{comment}{//\ Multiply\ 24bit\ value\ by\ a\ quantized\ multiplier\ (w/\ shift)\ and\ returns\ a\ 48bit}}
+\DoxyCodeLine{00036\ \textcolor{comment}{//\ aligned\ value\ in\ the\ QR\ register.}}
+\DoxyCodeLine{00037\ \textcolor{keyword}{inline}\ ae\_q56s\ \mbox{\hyperlink{namespacetflite_a8bf8cda01e9429a8a204886334ce9d24}{MultiplyByQuantizedMultiplier}}(ae\_p24x2s\ x\_24x2,}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ int32\_t\ quantized\_multiplier,}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{wm8960__regs_8h_ace4e4903c356d90d7a0e7548fc1e8b50}{shift}})\ \{}
+\DoxyCodeLine{00040\ \ \ \textcolor{comment}{//\ A\ value\ with\ 1\ sign\ bit,\ N\ integer\ bits\ and\ M\ fractional\ bits\ is}}
+\DoxyCodeLine{00041\ \ \ \textcolor{comment}{//\ represented\ as\ QN+1.M\ since\ the\ sign\ bit\ is\ included\ in\ the\ integer\ bits.}}
+\DoxyCodeLine{00042\ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{00043\ \ \ \textcolor{comment}{//\ The\ Q\ notation\ in\ this\ method\ explains\ the\ values\ represented\ in\ each}}
+\DoxyCodeLine{00044\ \ \ \textcolor{comment}{//\ variable,\ along\ with\ an\ implicit\ division\ since\ the\ quantized\_multiplier}}
+\DoxyCodeLine{00045\ \ \ \textcolor{comment}{//\ represents\ a\ value\ between\ 0.5\ and\ 1.0\ (Q1.X-\/1\ where\ X\ is\ the\ bit\ precision}}
+\DoxyCodeLine{00046\ \ \ \textcolor{comment}{//\ of\ the\ type).}}
+\DoxyCodeLine{00047\ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{00048\ \ \ \textcolor{comment}{//\ Load\ the\ quantized\ multiplier\ into\ the\ PR\ register.}}
+\DoxyCodeLine{00049\ \ \ \textcolor{comment}{//\ NOTE:\ This\ method\ assumes\ that\ this\ param\ has\ been\ calculated\ for\ 24bit}}
+\DoxyCodeLine{00050\ \ \ \textcolor{comment}{//\ space\ -\/\ not\ 32bits.}}
+\DoxyCodeLine{00051\ \ \ \textcolor{comment}{//\ Q32.0\ /\ 2\string^23\ -\/>\ Q24.0\ /\ 2\string^23\ representing\ a\ Q1.23\ multiplier.}}
+\DoxyCodeLine{00052\ \ \ ae\_p24x2s\ quantized\_multiplier\_24x2\ =\ AE\_MOVPA24(quantized\_multiplier);}
+\DoxyCodeLine{00053\ \ \ \textcolor{comment}{//\ Shift\ right\ by\ 23\ -\/\ 16\ bits\ minus\ the\ specified\ shift.\ \ This\ is\ because\ we}}
+\DoxyCodeLine{00054\ \ \ \textcolor{comment}{//\ keep\ 16\ fractional\ bits\ until\ the\ end\ to\ perform\ rounding.\ \ Subtract\ shift}}
+\DoxyCodeLine{00055\ \ \ \textcolor{comment}{//\ since\ shift\ is\ a\ left\ shift,\ and\ the\ 23-\/16\ is\ a\ right\ shift.}}
+\DoxyCodeLine{00056\ \ \ \textcolor{keywordtype}{int}\ shift\_amount\ =\ 7\ -\/\ \mbox{\hyperlink{wm8960__regs_8h_ace4e4903c356d90d7a0e7548fc1e8b50}{shift}};}
+\DoxyCodeLine{00057\ }
+\DoxyCodeLine{00058\ \ \ \textcolor{comment}{//\ Find\ the\ product\ of\ x\ and\ the\ quantized\_multiplier.}}
+\DoxyCodeLine{00059\ \ \ \textcolor{comment}{//\ Q24.0\ /\ 2\string^23\ *\ Q24.0\ =\ Q48.0\ /\ 2\string^23}}
+\DoxyCodeLine{00060\ \ \ \textcolor{comment}{//\ Q48.0\ /\ 2\string^23\ >>\ 7\ =\ Q48.0\ /\ 2\string^16}}
+\DoxyCodeLine{00061\ \ \ ae\_q56s\ result\_56\ =\ AE\_MULP24S\_HH(x\_24x2,\ quantized\_multiplier\_24x2);}
+\DoxyCodeLine{00062\ }
+\DoxyCodeLine{00063\ \ \ \textcolor{comment}{//\ Shift\ right\ if\ shift\ amount\ is\ positive,\ left\ if\ shift\ amount\ is\ negative.}}
+\DoxyCodeLine{00064\ \ \ \textcolor{keywordflow}{if}\ (shift\_amount\ >=\ 0)\ \{}
+\DoxyCodeLine{00065\ \ \ \ \ result\_56\ =\ AE\_Q56S\_SRA(result\_56,\ shift\_amount);}
+\DoxyCodeLine{00066\ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00067\ \ \ \ \ result\_56\ =\ AE\_Q56S\_SLA(result\_56,\ -\/shift\_amount);}
+\DoxyCodeLine{00068\ \ \ \}}
+\DoxyCodeLine{00069\ }
+\DoxyCodeLine{00070\ \ \ \textcolor{comment}{//\ Round\ off\ the\ bottom\ 16\ bits.}}
+\DoxyCodeLine{00071\ \ \ \textcolor{comment}{//\ Q48.0\ /\ 2\string^16\ -\/>\ Q32.0\ aligned\ to\ 48\ bits.}}
+\DoxyCodeLine{00072\ \ \ result\_56\ =\ AE\_ROUNDSQ32SYM(result\_56);}
+\DoxyCodeLine{00073\ \ \ \textcolor{keywordflow}{return}\ result\_56;}
+\DoxyCodeLine{00074\ \}}
+\DoxyCodeLine{00075\ }
+\DoxyCodeLine{00076\ \textcolor{comment}{//\ Multiply\ 32bit\ value\ by\ a\ quantized\ multiplier\ (w/\ shift)\ and\ returns\ a\ 48bit}}
+\DoxyCodeLine{00077\ \textcolor{comment}{//\ aligned\ value\ in\ the\ QR\ register.}}
+\DoxyCodeLine{00078\ \textcolor{keyword}{inline}\ ae\_q56s\ MultiplyByQuantizedMultiplierResult48Bit(}
+\DoxyCodeLine{00079\ \ \ \ \ int32\_t\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a6150e0515f7202e2fb518f7206ed97dc}{x}},\ int32\_t\ quantized\_multiplier,\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{wm8960__regs_8h_ace4e4903c356d90d7a0e7548fc1e8b50}{shift}})\ \{}
+\DoxyCodeLine{00080\ \ \ \textcolor{comment}{//\ Convert\ x\ into\ a\ 2x24bit\ PR\ register\ file.\ If\ x\ is\ outside\ the\ numerical}}
+\DoxyCodeLine{00081\ \ \ \textcolor{comment}{//\ limits\ of\ a\ 24bit\ integer,\ the\ "{}fractional"{}\ or\ lower\ 8bits\ are\ discarded.}}
+\DoxyCodeLine{00082\ \ \ \textcolor{comment}{//\ If\ x\ is\ within\ the\ range\ of\ a\ 24\ bit\ integer,\ the\ "{}signed"{}\ or\ upper\ 8bits}}
+\DoxyCodeLine{00083\ \ \ \textcolor{comment}{//\ are\ discarded.}}
+\DoxyCodeLine{00084\ \ \ ae\_p24x2s\ x\_24x2;}
+\DoxyCodeLine{00085\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a6150e0515f7202e2fb518f7206ed97dc}{x}}\ >\ INT24\_MIN\ \&\&\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a6150e0515f7202e2fb518f7206ed97dc}{x}}\ <\ INT24\_MAX)\ \{}
+\DoxyCodeLine{00086\ \ \ \ \ x\_24x2\ =\ AE\_MOVPA24(\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a6150e0515f7202e2fb518f7206ed97dc}{x}});}
+\DoxyCodeLine{00087\ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00088\ \ \ \ \ x\_24x2\ =\ \textcolor{keyword}{static\_cast<}ae\_p24s\textcolor{keyword}{>}(*\textcolor{keyword}{reinterpret\_cast<}ae\_p24f*\textcolor{keyword}{>}(\&\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a6150e0515f7202e2fb518f7206ed97dc}{x}}));}
+\DoxyCodeLine{00089\ \ \ \ \ \mbox{\hyperlink{wm8960__regs_8h_ace4e4903c356d90d7a0e7548fc1e8b50}{shift}}\ +=\ 8;}
+\DoxyCodeLine{00090\ \ \ \}}
+\DoxyCodeLine{00091\ }
+\DoxyCodeLine{00092\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacetflite_a8bf8cda01e9429a8a204886334ce9d24}{MultiplyByQuantizedMultiplier}}(x\_24x2,\ quantized\_multiplier,\ \mbox{\hyperlink{wm8960__regs_8h_ace4e4903c356d90d7a0e7548fc1e8b50}{shift}});}
+\DoxyCodeLine{00093\ \}}
+\DoxyCodeLine{00094\ }
+\DoxyCodeLine{00095\ \textcolor{comment}{//\ Calculate\ quantization\ params\ for\ 24bit\ runtimes.}}
+\DoxyCodeLine{00096\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ QuantizeMultiplierForInt24(\textcolor{keywordtype}{float}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srceb17155221795f6c84adc198b18f61e2_aa48e56822ed6e4a79d6c8c3b688ca8d3}{multiplier}},}
+\DoxyCodeLine{00097\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ int32\_t*\ quantized\_multiplier,}
+\DoxyCodeLine{00098\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}*\ \mbox{\hyperlink{wm8960__regs_8h_ace4e4903c356d90d7a0e7548fc1e8b50}{shift}})\ \{}
+\DoxyCodeLine{00099\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srceb17155221795f6c84adc198b18f61e2_aa48e56822ed6e4a79d6c8c3b688ca8d3}{multiplier}}\ ==\ 0.0f)\ \{}
+\DoxyCodeLine{00100\ \ \ \ \ *quantized\_multiplier\ =\ 0;}
+\DoxyCodeLine{00101\ \ \ \ \ *\mbox{\hyperlink{wm8960__regs_8h_ace4e4903c356d90d7a0e7548fc1e8b50}{shift}}\ =\ 0;}
+\DoxyCodeLine{00102\ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00103\ \ \ \}}
+\DoxyCodeLine{00104\ }
+\DoxyCodeLine{00105\ \ \ \textcolor{comment}{//\ Special\ cased\ to\ 24bit:}}
+\DoxyCodeLine{00106\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{float}\ q\ =\ std::frexp(\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srceb17155221795f6c84adc198b18f61e2_aa48e56822ed6e4a79d6c8c3b688ca8d3}{multiplier}},\ \mbox{\hyperlink{wm8960__regs_8h_ace4e4903c356d90d7a0e7548fc1e8b50}{shift}});}
+\DoxyCodeLine{00107\ \ \ \textcolor{keyword}{auto}\ q\_fixed\ =\ \textcolor{keyword}{static\_cast<}int64\_t\textcolor{keyword}{>}(std::round(q\ *\ (1\ <<\ 23)));}
+\DoxyCodeLine{00108\ }
+\DoxyCodeLine{00109\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src82599f02174ce2f1c2fd003f3eee8b73_aaca4d53a5e11a3b8d46c29588bc1ce62}{TFLITE\_CHECK}}(q\_fixed\ <=\ (1\ <<\ 23));}
+\DoxyCodeLine{00110\ \ \ \textcolor{keywordflow}{if}\ (q\_fixed\ ==\ (1\ <<\ 23))\ \{}
+\DoxyCodeLine{00111\ \ \ \ \ q\_fixed\ /=\ 2;}
+\DoxyCodeLine{00112\ \ \ \ \ ++*\mbox{\hyperlink{wm8960__regs_8h_ace4e4903c356d90d7a0e7548fc1e8b50}{shift}};}
+\DoxyCodeLine{00113\ \ \ \}}
+\DoxyCodeLine{00114\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src82599f02174ce2f1c2fd003f3eee8b73_ace9cd769315c29ddbc38accac7c00720}{TFLITE\_CHECK\_LE}}(q\_fixed,\ INT24\_MAX);}
+\DoxyCodeLine{00115\ }
+\DoxyCodeLine{00116\ \ \ \textcolor{comment}{//\ Ensure\ shift\ does\ not\ exceed\ 24-\/bit\ range.}}
+\DoxyCodeLine{00117\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src82599f02174ce2f1c2fd003f3eee8b73_ace9cd769315c29ddbc38accac7c00720}{TFLITE\_CHECK\_LE}}(*\mbox{\hyperlink{wm8960__regs_8h_ace4e4903c356d90d7a0e7548fc1e8b50}{shift}},\ 23);}
+\DoxyCodeLine{00118\ \ \ \textcolor{keywordflow}{if}\ (*\mbox{\hyperlink{wm8960__regs_8h_ace4e4903c356d90d7a0e7548fc1e8b50}{shift}}\ <\ -\/23)\ \{}
+\DoxyCodeLine{00119\ \ \ \ \ *\mbox{\hyperlink{wm8960__regs_8h_ace4e4903c356d90d7a0e7548fc1e8b50}{shift}}\ =\ 0;}
+\DoxyCodeLine{00120\ \ \ \ \ q\_fixed\ =\ 0;}
+\DoxyCodeLine{00121\ \ \ \}}
+\DoxyCodeLine{00122\ \ \ *quantized\_multiplier\ =\ \textcolor{keyword}{static\_cast<}int32\_t\textcolor{keyword}{>}(q\_fixed);}
+\DoxyCodeLine{00123\ \}}
+\DoxyCodeLine{00124\ }
+\DoxyCodeLine{00125\ \textcolor{comment}{//\ Convert\ a\ floating\ point\ number\ to\ a\ Q\ representation\ for\ 24\ bit\ integers.}}
+\DoxyCodeLine{00126\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{int}\ CreateQConstantForInt24(\textcolor{keywordtype}{int}\ integer\_bits,\ \textcolor{keywordtype}{float}\ f)\ \{}
+\DoxyCodeLine{00127\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{float}\ min\_bounds\ =\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{float}\textcolor{keyword}{>}(INT24\_MIN);}
+\DoxyCodeLine{00128\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{float}\ max\_bounds\ =\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{float}\textcolor{keyword}{>}(INT24\_MAX);}
+\DoxyCodeLine{00129\ }
+\DoxyCodeLine{00130\ \ \ \textcolor{keywordtype}{int}\ fractional\_bits\ =\ 23\ -\/\ integer\_bits;}
+\DoxyCodeLine{00131\ \ \ \textcolor{keywordtype}{float}\ raw\ =\ std::round(f\ *\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{float}\textcolor{keyword}{>}(1\ <<\ fractional\_bits));}
+\DoxyCodeLine{00132\ \ \ raw\ =\ std::max(raw,\ min\_bounds);}
+\DoxyCodeLine{00133\ \ \ raw\ =\ std::min(raw,\ max\_bounds);}
+\DoxyCodeLine{00134\ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{int}\textcolor{keyword}{>}(raw);}
+\DoxyCodeLine{00135\ \}}
+\DoxyCodeLine{00136\ }
+\DoxyCodeLine{00137\ \}\ \ \textcolor{comment}{//\ namespace\ tflite}}
+\DoxyCodeLine{00138\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ defined(HIFIMINI)}}
+\DoxyCodeLine{00139\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ TENSORFLOW\_LITE\_MICRO\_KERNELS\_XTENSA\_HIFIMINI\_FIXEDPOINT\_UTILS\_H\_}}
+
+\end{DoxyCode}

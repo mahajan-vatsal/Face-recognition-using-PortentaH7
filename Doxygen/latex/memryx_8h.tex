@@ -1,0 +1,197 @@
+\doxysection{Face\+\_\+\+Access\+\_\+inferencing/src/edge-\/impulse-\/sdk/classifier/inferencing\+\_\+engines/memryx.h File Reference}
+\hypertarget{memryx_8h}{}\label{memryx_8h}\index{Face\_Access\_inferencing/src/edge-\/impulse-\/sdk/classifier/inferencing\_engines/memryx.h@{Face\_Access\_inferencing/src/edge-\/impulse-\/sdk/classifier/inferencing\_engines/memryx.h}}
+{\ttfamily \#include "{}model-\/parameters/model\+\_\+metadata.\+h"{}}\newline
+{\ttfamily \#include "{}edge-\/impulse-\/sdk/porting/ei\+\_\+classifier\+\_\+porting.\+h"{}}\newline
+{\ttfamily \#include "{}edge-\/impulse-\/sdk/classifier/ei\+\_\+fill\+\_\+result\+\_\+struct.\+h"{}}\newline
+{\ttfamily \#include "{}tensorflow-\/lite/tensorflow/lite/kernels/internal/reference/softmax.\+h"{}}\newline
+{\ttfamily \#include $<$vector$>$}\newline
+{\ttfamily \#include $<$fstream$>$}\newline
+{\ttfamily \#include $<$sstream$>$}\newline
+{\ttfamily \#include $<$iomanip$>$}\newline
+{\ttfamily \#include $<$limits$>$}\newline
+{\ttfamily \#include $<$math.\+h$>$}\newline
+{\ttfamily \#include "{}memx/memx.\+h"{}}\newline
+{\ttfamily \#include "{}memryx-\/model/memryx-\/model.\+h"{}}\newline
+{\ttfamily \#include "{}utils/model\+\_\+header\+\_\+utils.\+h"{}}\newline
+Include dependency graph for memryx.\+h\+:
+% FIG 0
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{memryx_8h_a75e11aca5267a0e34c93b7a980f4332d}{EI\+\_\+\+CLASSIFIER\+\_\+\+USE\+\_\+\+MEMRYX\+\_\+\+HARDWARE}}~1
+\begin{DoxyCompactList}\small\item\em we are forcing SOFTWARE inference (simulation), beacuse use of hardware is not ready \end{DoxyCompactList}\item 
+\#define \mbox{\hyperlink{memryx_8h_ac9e451bb412cbb07ad5ea9d740dd5be8}{EI\+\_\+\+CLASSIFIER\+\_\+\+USE\+\_\+\+MEMRYX\+\_\+\+CHIPS\+\_\+\+COUNT}}~1
+\begin{DoxyCompactList}\small\item\em Memryx accelerator can leverage up to four MX3 chips for inference. Specify here the number of chips to be used for acceleration, e.\+g. set to 4 in order to use all four chips of the M3X board. \end{DoxyCompactList}\item 
+\#define \mbox{\hyperlink{memryx_8h_a3cfebd549863458fb380b96360dae650}{MX\+\_\+\+SIM\+\_\+\+RES\+\_\+\+OUTPUTS}}~0
+\item 
+\#define \mbox{\hyperlink{memryx_8h_a4453076ee40084ef82f1c32f3a1062f7}{MX\+\_\+\+SIM\+\_\+\+RES\+\_\+\+LATENCY}}~1
+\item 
+\#define \mbox{\hyperlink{memryx_8h_a7c45d6f19c13d9133933f4eeb3bb52b1}{MX\+\_\+\+SIM\+\_\+\+RES\+\_\+\+FPS}}~2
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{memryx_8h_a55cbccd650cd3ad4829c996c54fb7f6a}{init\+\_\+memryx}} (bool \mbox{\hyperlink{ei__fill__result__struct_8h_a881f62341b5a41a3c5707268bd537be1}{debug}}, const \mbox{\hyperlink{ei__model__types_8h_a936cf405a057a578f2bc7b540ccafe57}{ei\+\_\+impulse\+\_\+t}} \texorpdfstring{$\ast$}{*}impulse)
+\item 
+\mbox{\hyperlink{group__ei__returntypes_gad9580b47a6cd5e74cfc31a03bdfecebe}{EI\+\_\+\+IMPULSE\+\_\+\+ERROR}} \mbox{\hyperlink{memryx_8h_a945f35e39a49bfe4e1194edaf89571cd}{run\+\_\+nn\+\_\+inference}} (const \mbox{\hyperlink{ei__model__types_8h_a936cf405a057a578f2bc7b540ccafe57}{ei\+\_\+impulse\+\_\+t}} \texorpdfstring{$\ast$}{*}impulse, \mbox{\hyperlink{structei__feature__t}{ei\+\_\+feature\+\_\+t}} \texorpdfstring{$\ast$}{*}fmatrix, uint32\+\_\+t learn\+\_\+block\+\_\+index, uint32\+\_\+t \texorpdfstring{$\ast$}{*}input\+\_\+block\+\_\+ids, uint32\+\_\+t input\+\_\+block\+\_\+ids\+\_\+size, \mbox{\hyperlink{structei__impulse__result__t}{ei\+\_\+impulse\+\_\+result\+\_\+t}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}}, void \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{ei__run__dsp_8h_a0819d397f9fba7b345b75fef1c1f782a}{config\+\_\+ptr}}, bool \mbox{\hyperlink{ei__fill__result__struct_8h_a881f62341b5a41a3c5707268bd537be1}{debug}}=false)
+\begin{DoxyCompactList}\small\item\em Do neural network inferencing over the processed feature matrix. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+std\+::stringstream \mbox{\hyperlink{memryx_8h_a385b0bd18814f0f7ad3e2606c5f30f25}{engine\+\_\+info}}
+\item 
+static bool \mbox{\hyperlink{memryx_8h_a15d883bed3f1e33b7cd9e616109c3bb5}{memryx\+\_\+initialized}} = false
+\item 
+const uint8\+\_\+t \mbox{\hyperlink{memryx_8h_a1aaf75a7cb1e9c4ffbe7d65987c8a85b}{flow\+\_\+id}} = 0
+\item 
+const uint8\+\_\+t \mbox{\hyperlink{memryx_8h_a782806bdc54c49a8d4799435919ef839}{model\+\_\+id}} = 0
+\item 
+const uint8\+\_\+t \mbox{\hyperlink{memryx_8h_a71589072c5bdb712cd495762ef03d600}{group\+\_\+id}} = 0
+\item 
+const int \mbox{\hyperlink{memryx_8h_a654210ae605a61110cf5a8a0c9f2d72c}{timeout}} = 0
+\item 
+int \mbox{\hyperlink{memryx_8h_ad4879bc41636502a72fde90f74fba7b4}{argmax}} = 0
+\item 
+static \mbox{\hyperlink{classtflite_1_1_runtime_shape}{tflite\+::\+Runtime\+Shape}} \mbox{\hyperlink{memryx_8h_a52cd3949eba004f3b8791be094e50549}{softmax\+\_\+shape}}
+\item 
+static \mbox{\hyperlink{structtflite_1_1_softmax_params}{tflite\+::\+Softmax\+Params}} \mbox{\hyperlink{memryx_8h_aa32eba6b3164559e24b544f632e08fb6}{dummy\+\_\+params}}
+\item 
+static bool \mbox{\hyperlink{memryx_8h_aa4949de33718984eb9eba135672c60b9}{verbose\+\_\+debug}} = 0
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{memryx_8h_ac9e451bb412cbb07ad5ea9d740dd5be8}\index{memryx.h@{memryx.h}!EI\_CLASSIFIER\_USE\_MEMRYX\_CHIPS\_COUNT@{EI\_CLASSIFIER\_USE\_MEMRYX\_CHIPS\_COUNT}}
+\index{EI\_CLASSIFIER\_USE\_MEMRYX\_CHIPS\_COUNT@{EI\_CLASSIFIER\_USE\_MEMRYX\_CHIPS\_COUNT}!memryx.h@{memryx.h}}
+\doxysubsubsection{\texorpdfstring{EI\_CLASSIFIER\_USE\_MEMRYX\_CHIPS\_COUNT}{EI\_CLASSIFIER\_USE\_MEMRYX\_CHIPS\_COUNT}}
+{\footnotesize\ttfamily \label{memryx_8h_ac9e451bb412cbb07ad5ea9d740dd5be8} 
+\#define EI\+\_\+\+CLASSIFIER\+\_\+\+USE\+\_\+\+MEMRYX\+\_\+\+CHIPS\+\_\+\+COUNT~1}
+
+
+
+Memryx accelerator can leverage up to four MX3 chips for inference. Specify here the number of chips to be used for acceleration, e.\+g. set to 4 in order to use all four chips of the M3X board. 
+
+\Hypertarget{memryx_8h_a75e11aca5267a0e34c93b7a980f4332d}\index{memryx.h@{memryx.h}!EI\_CLASSIFIER\_USE\_MEMRYX\_HARDWARE@{EI\_CLASSIFIER\_USE\_MEMRYX\_HARDWARE}}
+\index{EI\_CLASSIFIER\_USE\_MEMRYX\_HARDWARE@{EI\_CLASSIFIER\_USE\_MEMRYX\_HARDWARE}!memryx.h@{memryx.h}}
+\doxysubsubsection{\texorpdfstring{EI\_CLASSIFIER\_USE\_MEMRYX\_HARDWARE}{EI\_CLASSIFIER\_USE\_MEMRYX\_HARDWARE}}
+{\footnotesize\ttfamily \label{memryx_8h_a75e11aca5267a0e34c93b7a980f4332d} 
+\#define EI\+\_\+\+CLASSIFIER\+\_\+\+USE\+\_\+\+MEMRYX\+\_\+\+HARDWARE~1}
+
+
+
+we are forcing SOFTWARE inference (simulation), beacuse use of hardware is not ready 
+
+\Hypertarget{memryx_8h_a7c45d6f19c13d9133933f4eeb3bb52b1}\index{memryx.h@{memryx.h}!MX\_SIM\_RES\_FPS@{MX\_SIM\_RES\_FPS}}
+\index{MX\_SIM\_RES\_FPS@{MX\_SIM\_RES\_FPS}!memryx.h@{memryx.h}}
+\doxysubsubsection{\texorpdfstring{MX\_SIM\_RES\_FPS}{MX\_SIM\_RES\_FPS}}
+{\footnotesize\ttfamily \label{memryx_8h_a7c45d6f19c13d9133933f4eeb3bb52b1} 
+\#define MX\+\_\+\+SIM\+\_\+\+RES\+\_\+\+FPS~2}
+
+\Hypertarget{memryx_8h_a4453076ee40084ef82f1c32f3a1062f7}\index{memryx.h@{memryx.h}!MX\_SIM\_RES\_LATENCY@{MX\_SIM\_RES\_LATENCY}}
+\index{MX\_SIM\_RES\_LATENCY@{MX\_SIM\_RES\_LATENCY}!memryx.h@{memryx.h}}
+\doxysubsubsection{\texorpdfstring{MX\_SIM\_RES\_LATENCY}{MX\_SIM\_RES\_LATENCY}}
+{\footnotesize\ttfamily \label{memryx_8h_a4453076ee40084ef82f1c32f3a1062f7} 
+\#define MX\+\_\+\+SIM\+\_\+\+RES\+\_\+\+LATENCY~1}
+
+\Hypertarget{memryx_8h_a3cfebd549863458fb380b96360dae650}\index{memryx.h@{memryx.h}!MX\_SIM\_RES\_OUTPUTS@{MX\_SIM\_RES\_OUTPUTS}}
+\index{MX\_SIM\_RES\_OUTPUTS@{MX\_SIM\_RES\_OUTPUTS}!memryx.h@{memryx.h}}
+\doxysubsubsection{\texorpdfstring{MX\_SIM\_RES\_OUTPUTS}{MX\_SIM\_RES\_OUTPUTS}}
+{\footnotesize\ttfamily \label{memryx_8h_a3cfebd549863458fb380b96360dae650} 
+\#define MX\+\_\+\+SIM\+\_\+\+RES\+\_\+\+OUTPUTS~0}
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{memryx_8h_a55cbccd650cd3ad4829c996c54fb7f6a}\index{memryx.h@{memryx.h}!init\_memryx@{init\_memryx}}
+\index{init\_memryx@{init\_memryx}!memryx.h@{memryx.h}}
+\doxysubsubsection{\texorpdfstring{init\_memryx()}{init\_memryx()}}
+{\footnotesize\ttfamily \label{memryx_8h_a55cbccd650cd3ad4829c996c54fb7f6a} 
+bool init\+\_\+memryx (\begin{DoxyParamCaption}\item[{bool}]{debug}{, }\item[{const \mbox{\hyperlink{ei__model__types_8h_a936cf405a057a578f2bc7b540ccafe57}{ei\+\_\+impulse\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{impulse}{}\end{DoxyParamCaption})}
+
+\Hypertarget{memryx_8h_a945f35e39a49bfe4e1194edaf89571cd}\index{memryx.h@{memryx.h}!run\_nn\_inference@{run\_nn\_inference}}
+\index{run\_nn\_inference@{run\_nn\_inference}!memryx.h@{memryx.h}}
+\doxysubsubsection{\texorpdfstring{run\_nn\_inference()}{run\_nn\_inference()}}
+{\footnotesize\ttfamily \label{memryx_8h_a945f35e39a49bfe4e1194edaf89571cd} 
+\mbox{\hyperlink{group__ei__returntypes_gad9580b47a6cd5e74cfc31a03bdfecebe}{EI\+\_\+\+IMPULSE\+\_\+\+ERROR}} run\+\_\+nn\+\_\+inference (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{ei__model__types_8h_a936cf405a057a578f2bc7b540ccafe57}{ei\+\_\+impulse\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{impulse}{, }\item[{\mbox{\hyperlink{structei__feature__t}{ei\+\_\+feature\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{fmatrix}{, }\item[{uint32\+\_\+t}]{learn\+\_\+block\+\_\+index}{, }\item[{uint32\+\_\+t \texorpdfstring{$\ast$}{*}}]{input\+\_\+block\+\_\+ids}{, }\item[{uint32\+\_\+t}]{input\+\_\+block\+\_\+ids\+\_\+size}{, }\item[{\mbox{\hyperlink{structei__impulse__result__t}{ei\+\_\+impulse\+\_\+result\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{result}{, }\item[{void \texorpdfstring{$\ast$}{*}}]{config\+\_\+ptr}{, }\item[{bool}]{debug}{ = {\ttfamily false}}\end{DoxyParamCaption})}
+
+
+
+Do neural network inferencing over the processed feature matrix. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+ & {\em impulse} & Struct describing impulse architecture \\
+\hline
+ & {\em fmatrix} & Processed matrix \\
+\hline
+ & {\em result} & Output classifier results \\
+\hline
+\mbox{\texttt{ in}}  & {\em debug} & Debug output enable\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The ei impulse error. 
+\end{DoxyReturn}
+
+
+\doxysubsection{Variable Documentation}
+\Hypertarget{memryx_8h_ad4879bc41636502a72fde90f74fba7b4}\index{memryx.h@{memryx.h}!argmax@{argmax}}
+\index{argmax@{argmax}!memryx.h@{memryx.h}}
+\doxysubsubsection{\texorpdfstring{argmax}{argmax}}
+{\footnotesize\ttfamily \label{memryx_8h_ad4879bc41636502a72fde90f74fba7b4} 
+int argmax = 0}
+
+\Hypertarget{memryx_8h_aa32eba6b3164559e24b544f632e08fb6}\index{memryx.h@{memryx.h}!dummy\_params@{dummy\_params}}
+\index{dummy\_params@{dummy\_params}!memryx.h@{memryx.h}}
+\doxysubsubsection{\texorpdfstring{dummy\_params}{dummy\_params}}
+{\footnotesize\ttfamily \label{memryx_8h_aa32eba6b3164559e24b544f632e08fb6} 
+\mbox{\hyperlink{structtflite_1_1_softmax_params}{tflite\+::\+Softmax\+Params}} dummy\+\_\+params\hspace{0.3cm}{\ttfamily [static]}}
+
+\Hypertarget{memryx_8h_a385b0bd18814f0f7ad3e2606c5f30f25}\index{memryx.h@{memryx.h}!engine\_info@{engine\_info}}
+\index{engine\_info@{engine\_info}!memryx.h@{memryx.h}}
+\doxysubsubsection{\texorpdfstring{engine\_info}{engine\_info}}
+{\footnotesize\ttfamily \label{memryx_8h_a385b0bd18814f0f7ad3e2606c5f30f25} 
+std\+::stringstream engine\+\_\+info}
+
+\Hypertarget{memryx_8h_a1aaf75a7cb1e9c4ffbe7d65987c8a85b}\index{memryx.h@{memryx.h}!flow\_id@{flow\_id}}
+\index{flow\_id@{flow\_id}!memryx.h@{memryx.h}}
+\doxysubsubsection{\texorpdfstring{flow\_id}{flow\_id}}
+{\footnotesize\ttfamily \label{memryx_8h_a1aaf75a7cb1e9c4ffbe7d65987c8a85b} 
+const uint8\+\_\+t flow\+\_\+id = 0}
+
+\Hypertarget{memryx_8h_a71589072c5bdb712cd495762ef03d600}\index{memryx.h@{memryx.h}!group\_id@{group\_id}}
+\index{group\_id@{group\_id}!memryx.h@{memryx.h}}
+\doxysubsubsection{\texorpdfstring{group\_id}{group\_id}}
+{\footnotesize\ttfamily \label{memryx_8h_a71589072c5bdb712cd495762ef03d600} 
+const uint8\+\_\+t group\+\_\+id = 0}
+
+\Hypertarget{memryx_8h_a15d883bed3f1e33b7cd9e616109c3bb5}\index{memryx.h@{memryx.h}!memryx\_initialized@{memryx\_initialized}}
+\index{memryx\_initialized@{memryx\_initialized}!memryx.h@{memryx.h}}
+\doxysubsubsection{\texorpdfstring{memryx\_initialized}{memryx\_initialized}}
+{\footnotesize\ttfamily \label{memryx_8h_a15d883bed3f1e33b7cd9e616109c3bb5} 
+bool memryx\+\_\+initialized = false\hspace{0.3cm}{\ttfamily [static]}}
+
+\Hypertarget{memryx_8h_a782806bdc54c49a8d4799435919ef839}\index{memryx.h@{memryx.h}!model\_id@{model\_id}}
+\index{model\_id@{model\_id}!memryx.h@{memryx.h}}
+\doxysubsubsection{\texorpdfstring{model\_id}{model\_id}}
+{\footnotesize\ttfamily \label{memryx_8h_a782806bdc54c49a8d4799435919ef839} 
+const uint8\+\_\+t model\+\_\+id = 0}
+
+\Hypertarget{memryx_8h_a52cd3949eba004f3b8791be094e50549}\index{memryx.h@{memryx.h}!softmax\_shape@{softmax\_shape}}
+\index{softmax\_shape@{softmax\_shape}!memryx.h@{memryx.h}}
+\doxysubsubsection{\texorpdfstring{softmax\_shape}{softmax\_shape}}
+{\footnotesize\ttfamily \label{memryx_8h_a52cd3949eba004f3b8791be094e50549} 
+\mbox{\hyperlink{classtflite_1_1_runtime_shape}{tflite\+::\+Runtime\+Shape}} softmax\+\_\+shape\hspace{0.3cm}{\ttfamily [static]}}
+
+\Hypertarget{memryx_8h_a654210ae605a61110cf5a8a0c9f2d72c}\index{memryx.h@{memryx.h}!timeout@{timeout}}
+\index{timeout@{timeout}!memryx.h@{memryx.h}}
+\doxysubsubsection{\texorpdfstring{timeout}{timeout}}
+{\footnotesize\ttfamily \label{memryx_8h_a654210ae605a61110cf5a8a0c9f2d72c} 
+const int timeout = 0}
+
+\Hypertarget{memryx_8h_aa4949de33718984eb9eba135672c60b9}\index{memryx.h@{memryx.h}!verbose\_debug@{verbose\_debug}}
+\index{verbose\_debug@{verbose\_debug}!memryx.h@{memryx.h}}
+\doxysubsubsection{\texorpdfstring{verbose\_debug}{verbose\_debug}}
+{\footnotesize\ttfamily \label{memryx_8h_aa4949de33718984eb9eba135672c60b9} 
+bool verbose\+\_\+debug = 0\hspace{0.3cm}{\ttfamily [static]}}
+

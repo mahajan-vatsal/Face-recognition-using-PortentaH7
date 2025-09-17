@@ -1,0 +1,199 @@
+\chapter{Building Tensor\+Flow Lite for Microcontrollers for Synopsys Design\+Ware ARC VPX and EM/\+HS Processors}
+\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_90035dd6df7ebb51e6279ab9a9dc6b93}{}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_90035dd6df7ebb51e6279ab9a9dc6b93}\index{Building TensorFlow Lite for Microcontrollers for Synopsys DesignWare ARC VPX and EM/HS Processors@{Building TensorFlow Lite for Microcontrollers for Synopsys DesignWare ARC VPX and EM/HS Processors}}
+\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_90035dd6df7ebb51e6279ab9a9dc6b93_autotoc_md342}%
+\Hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_90035dd6df7ebb51e6279ab9a9dc6b93_autotoc_md342}%
+\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_90035dd6df7ebb51e6279ab9a9dc6b93_autotoc_md343}{}\doxysection{\texorpdfstring{Maintainers}{Maintainers}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_90035dd6df7ebb51e6279ab9a9dc6b93_autotoc_md343}
+
+\begin{DoxyItemize}
+\item \href{https://github.com/dzakhar}{\texttt{ dzakhar}}
+\item \href{https://github.com/JaccovG}{\texttt{ JaccovG}}
+\item \href{https://github.com/gerbauz}{\texttt{ gerbauz}}
+\end{DoxyItemize}\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_90035dd6df7ebb51e6279ab9a9dc6b93_autotoc_md344}{}\doxysection{\texorpdfstring{Introduction}{Introduction}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_90035dd6df7ebb51e6279ab9a9dc6b93_autotoc_md344}
+This document contains the general information on building and running Tensor\+Flow Lite Micro for targets based on the Synopsys ARC VPX and EM/\+HS Processors.\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_90035dd6df7ebb51e6279ab9a9dc6b93_autotoc_md345}{}\doxysection{\texorpdfstring{Table of Contents}{Table of Contents}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_90035dd6df7ebb51e6279ab9a9dc6b93_autotoc_md345}
+
+\begin{DoxyItemize}
+\item Install the Synopsys Design\+Ware ARC Meta\+Ware Development Toolkit
+\item ARC EM Software Development Platform (ARC EM SDP)
+\item Using Emb\+ARC MLI Library 2.0 (experimental feature)
+\item Model Adaptation Tool (experimental feature)
+\item Custom ARC EM/\+HS/\+VPX Platform
+\end{DoxyItemize}\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_90035dd6df7ebb51e6279ab9a9dc6b93_autotoc_md346}{}\doxysection{\texorpdfstring{Install the Synopsys Design\+Ware ARC Meta\+Ware Development Toolkit}{Install the Synopsys Design\+Ware ARC Meta\+Ware Development Toolkit}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_90035dd6df7ebb51e6279ab9a9dc6b93_autotoc_md346}
+The Synopsys Design\+Ware ARC Meta\+Ware Development Toolkit (MWDT) is required to build and run Tensorflow Lite Micro applications for all ARC VPX and EM/\+HS targets.
+
+To license MWDT, please see further details \href{https://www.synopsys.com/dw/ipdir.php?ds=sw_metaware}{\texttt{ here}}
+
+To request an evaluation version of MWDT, please use the \href{https://eval.synopsys.com/}{\texttt{ Synopsys Eval Portal}} and follow the link for the Meta\+Ware Development Toolkit (Important\+: Do not confuse this with Meta\+Ware EV Development Toolkit or Meta\+Ware Lite options also available on this page)
+
+Run the downloaded installer and follow the instructions to set up the toolchain on your platform.
+
+Tensor\+Flow Lite for Microcontrollers builds are divided into two phases\+: Application Project Generation and Application Project Building/\+Running. The former phase requires \texorpdfstring{$\ast$}{*}nix environment while the latter does not.
+
+For basic project generation targeting ARC EM Software Development Platform, Meta\+Ware is NOT required for the Project Generation Phase. However, it is required in case the following\+: -\/ For project generation for custom (not EM SDP) targets -\/ To build microlib target library with all required TFLM objects for external use
+
+Please consider the above when choosing whether to install Windows or Linux or both versions of MWDT\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_90035dd6df7ebb51e6279ab9a9dc6b93_autotoc_md347}{}\doxysection{\texorpdfstring{ARC EM Software Development Platform (ARC EM SDP)}{ARC EM Software Development Platform (ARC EM SDP)}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_90035dd6df7ebb51e6279ab9a9dc6b93_autotoc_md347}
+This section describes how to deploy on an \href{https://www.synopsys.com/dw/ipdir.php?ds=arc-em-software-development-platform}{\texttt{ ARC EM SDP board}}\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_90035dd6df7ebb51e6279ab9a9dc6b93_autotoc_md348}{}\doxysubsection{\texorpdfstring{Initial Setup}{Initial Setup}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_90035dd6df7ebb51e6279ab9a9dc6b93_autotoc_md348}
+To use the EM SDP, you need the following hardware and software\+:\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_90035dd6df7ebb51e6279ab9a9dc6b93_autotoc_md349}{}\doxysubsubsection{\texorpdfstring{ARC EM SDP}{ARC EM SDP}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_90035dd6df7ebb51e6279ab9a9dc6b93_autotoc_md349}
+More information on the platform, including ordering information, can be found \href{https://www.synopsys.com/dw/ipdir.php?ds=arc-em-software-development-platform}{\texttt{ here}}.\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_90035dd6df7ebb51e6279ab9a9dc6b93_autotoc_md350}{}\doxysubsubsection{\texorpdfstring{Meta\+Ware Development Toolkit}{Meta\+Ware Development Toolkit}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_90035dd6df7ebb51e6279ab9a9dc6b93_autotoc_md350}
+See Install the Synopsys Design\+Ware ARC Meta\+Ware Development Toolkit section for instructions on toolchain installation.\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_90035dd6df7ebb51e6279ab9a9dc6b93_autotoc_md351}{}\doxysubsubsection{\texorpdfstring{Digilent Adept 2 System Software Package}{Digilent Adept 2 System Software Package}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_90035dd6df7ebb51e6279ab9a9dc6b93_autotoc_md351}
+If you wish to use the Meta\+Ware Debugger to debug your code, you need to also install the Digilent Adept 2 software, which includes the necessary drivers for connecting to the targets. This is available from official \href{https://reference.digilentinc.com/reference/software/adept/start?redirect=1\#software_downloads}{\texttt{ Digilent site}}. You should install the “\+System” component, and Runtime. Utilities and SDK are NOT required.
+
+Digilent installation is NOT required if you plan to deploy to EM SDP via the SD card instead of using the debugger.\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_90035dd6df7ebb51e6279ab9a9dc6b93_autotoc_md352}{}\doxysubsubsection{\texorpdfstring{Make Tool}{Make Tool}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_90035dd6df7ebb51e6279ab9a9dc6b93_autotoc_md352}
+A `\textquotesingle{}make'\`{} tool is required for both phases of deploying Tensorflow Lite Micro applications on ARC EM SDP\+:
+\begin{DoxyEnumerate}
+\item Test binaries generation.
+\item TFLM static library generation.
+\end{DoxyEnumerate}
+
+For the first phase you need an environment and make tool compatible with Tensorflow Lite for Micro build system. At the moment of this writing, this requires make \texorpdfstring{$>$}{>}=3.\+82 and a \texorpdfstring{$\ast$}{*}nix-\/like environment which supports shell and native commands for file manipulations. MWDT toolkit is not required for this phase.
+
+For the second phase, requirements are less strict. The gmake version delivered with Meta\+Ware Development Toolkit is sufficient. There are no shell and \texorpdfstring{$\ast$}{*}nix command dependencies, so Windows can be used\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_90035dd6df7ebb51e6279ab9a9dc6b93_autotoc_md353}{}\doxysubsubsection{\texorpdfstring{Serial Terminal Emulation Application}{Serial Terminal Emulation Application}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_90035dd6df7ebb51e6279ab9a9dc6b93_autotoc_md353}
+The Debug UART port of the EM SDP is used to print application output. The USB connection provides both the debug channel and RS232 transport. You can use any terminal emulation program (like \href{https://www.putty.org/}{\texttt{ Pu\+TTY}}) to view UART output from the EM SDP.\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_90035dd6df7ebb51e6279ab9a9dc6b93_autotoc_md354}{}\doxysubsubsection{\texorpdfstring{micro\+SD Card}{micro\+SD Card}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_90035dd6df7ebb51e6279ab9a9dc6b93_autotoc_md354}
+If you want to self-\/boot your application (start it independently from a debugger connection), you also need a micro\+SD card with a minimum size of 512 MB and a way to write to the card from your development host. Note that the card must be formatted as FAT32 with default cluster size (but less than 32 Kbytes)\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_90035dd6df7ebb51e6279ab9a9dc6b93_autotoc_md355}{}\doxysubsection{\texorpdfstring{Connect the Board}{Connect the Board}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_90035dd6df7ebb51e6279ab9a9dc6b93_autotoc_md355}
+
+\begin{DoxyEnumerate}
+\item Make sure Boot switches of the board (S3) are configured in the next way\+:
+\end{DoxyEnumerate}
+
+\tabulinesep=1mm
+\begin{longtabu}spread 0pt [c]{*{2}{|X[-1]}|}
+\hline
+\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ Switch \#   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ Switch position    }\\\cline{1-2}
+\endfirsthead
+\hline
+\endfoot
+\hline
+\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ Switch \#   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ Switch position    }\\\cline{1-2}
+\endhead
+\PBS\centering 1   &\PBS\centering Low (0)    \\\cline{1-2}
+\PBS\centering 2   &\PBS\centering Low (0)    \\\cline{1-2}
+\PBS\centering 3   &\PBS\centering High (1)    \\\cline{1-2}
+\PBS\centering 4   &\PBS\centering Low (0)   \\\cline{1-2}
+\end{longtabu}
+
+
+
+\begin{DoxyEnumerate}
+\item Connect the power supply included in the product package to the ARC EM SDP.
+\item Connect the USB cable to connector J10 on the ARC EM SDP (near the RST and CFG buttons) and to an available USB port on your development host.
+\item Determine the COM port assigned to the USB Serial Port (on Windows, using Device Manager is an easy way to do this)
+\item Execute the serial terminal application you installed in the previous step and open the serial connection with the early defined COM port (speed 115200 baud; 8 bits; 1 stop bit; no parity).
+\item Push the CFG button on the board. After a few seconds you should see the boot log in the terminal which begins as follows\+:
+\end{DoxyEnumerate}
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{U-\/Boot\ <Versioning\ info>}
+\DoxyCodeLine{}
+\DoxyCodeLine{CPU:\ \ \ ARC\ EM11D\ v5.0\ at\ 40\ MHz}
+\DoxyCodeLine{Subsys:ARC\ Data\ Fusion\ IP\ Subsystem}
+\DoxyCodeLine{Model:\ snps,emsdp}
+\DoxyCodeLine{Board:\ ARC\ EM\ Software\ Development\ Platform\ v1.0}
+\DoxyCodeLine{…}
+
+\end{DoxyCode}
+\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_90035dd6df7ebb51e6279ab9a9dc6b93_autotoc_md356}{}\doxysubsection{\texorpdfstring{Generate TFLM as Static Library for ARC EM SDP}{Generate TFLM as Static Library for ARC EM SDP}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_90035dd6df7ebb51e6279ab9a9dc6b93_autotoc_md356}
+If you want to use Tensor\+Flow Lite Micro framework in your own application, you need to generate TFLM as a static library. Next command can be used to generate TFLM library for ARC EM SDP\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{make\ -\/f\ tensorflow/lite/micro/tools/make/Makefile\ clean}
+\DoxyCodeLine{make\ -\/f\ tensorflow/lite/micro/tools/make/Makefile\ TARGET=arc\_emsdp\ \(\backslash\)\ }
+\DoxyCodeLine{TARGET\_ARCH=arc\ \(\backslash\)}
+\DoxyCodeLine{OPTIMIZED\_KERNEL\_DIR=arc\_mli\ \(\backslash\)}
+\DoxyCodeLine{microlite}
+
+\end{DoxyCode}
+
+
+Generated library {\itshape libtensorflow-\/microlite.\+a} can be found in {\itshape gen/\{target\}/lib}.\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_90035dd6df7ebb51e6279ab9a9dc6b93_autotoc_md357}{}\doxysubsection{\texorpdfstring{Example Applications for ARC EM SDP}{Example Applications for ARC EM SDP}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_90035dd6df7ebb51e6279ab9a9dc6b93_autotoc_md357}
+Example applications can be found on ARC examples repository.\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_90035dd6df7ebb51e6279ab9a9dc6b93_autotoc_md358}{}\doxysection{\texorpdfstring{Using Emb\+ARC MLI Library 2.\+0 (experimental feature)}{Using Emb\+ARC MLI Library 2.\+0 (experimental feature)}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_90035dd6df7ebb51e6279ab9a9dc6b93_autotoc_md358}
+This section describes how to build TFLM using \href{https://github.com/foss-for-synopsys-dwc-arc-processors/embarc_mli/tree/Release_2.0_EA}{\texttt{ emb\+ARC MLI Library 2.\+0}}.
+
+The Emb\+ARC MLI Library 2.\+0 can be used to build TFLM library and run applications (especially for VPX processors).
+
+Because of difference in weights layout, TFLM models must be pre-\/adapted using a Model Adaptation Tool. For native TFLM examples (person detection, micro speech) Model Adaptation Tool is applied automatically when MLI 2.\+0 is used, so there is no need to run it maually.
+
+To use the emb\+ARC MLI Library 2.\+0 in all cases (including native examples), you will also need extra dependencies for the Model Adaptation Tool. Please check the Model Adaptation Tool section for more information.
+
+To build TFLM using the emb\+ARC MLI Library 2.\+0, add the following tag to the command\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{ARC\_TAGS=mli20\_experimental}
+
+\end{DoxyCode}
+ Also, some of configurations may require custom BUILD\+\_\+\+LIB. Please, check MLI Library 2.\+0 \href{https://github.com/foss-for-synopsys-dwc-arc-processors/embarc_mli/tree/Release_2.0_EA\#build-configuration-options}{\texttt{ documentation}} for more details. Following option can be added\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{BUILD\_LIB\_DIR=<path\_to\_buildlib>}
+
+\end{DoxyCode}
+ Example of command to build TFLM lib for VPX5\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{make\ -\/f\ tensorflow/lite/micro/tools/make/Makefile\ \(\backslash\)}
+\DoxyCodeLine{TARGET=arc\_custom\ \(\backslash\)}
+\DoxyCodeLine{TCF=<path\_to\_tcf\_file>\ \(\backslash\)}
+\DoxyCodeLine{BUILD\_LIB\_DIR=vpx5\_integer\_full\ \(\backslash\)}
+\DoxyCodeLine{ARC\_TAGS=mli20\_experimental\ microlite}
+
+\end{DoxyCode}
+ \hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_90035dd6df7ebb51e6279ab9a9dc6b93_autotoc_md359}{}\doxysection{\texorpdfstring{Model Adaptation Tool (experimental feature)}{Model Adaptation Tool (experimental feature)}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_90035dd6df7ebb51e6279ab9a9dc6b93_autotoc_md359}
+Models in TFLM format need to be pre-\/adapted before being used with MLI 2.\+0 due to differences in weights\textquotesingle{} tensor layout in some kernels. Adaptation is done automatically during TFLM project generation, but requires Tensor\+Flow to be installed.
+
+To use the Model Adaptation Tool, you need the following tools in addition to common requirments\+:
+\begin{DoxyItemize}
+\item \href{https://www.python.org/downloads/}{\texttt{ Python}} 3.\+7 or higher
+\item \href{https://www.tensorflow.org/install/pip}{\texttt{ Tensor\+Flow for Python}} version 2.\+5 or higher
+\end{DoxyItemize}
+
+If you want to use your own model, exported from Tensor\+Flow in {\bfseries{.tflite}} or {\bfseries{.cc}} format, you will need to adapt it manually using the Model Adaptation Tool from the current folder, using the following command\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{python\ adaptation\_tool.py\ <path\_to\_input\_model\_file>\ \(\backslash\)}
+\DoxyCodeLine{<path\_to\_adapted\_model\_file>}
+
+\end{DoxyCode}
+\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_90035dd6df7ebb51e6279ab9a9dc6b93_autotoc_md360}{}\doxysection{\texorpdfstring{Custom ARC EM/\+HS/\+VPX Platform}{Custom ARC EM/\+HS/\+VPX Platform}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_90035dd6df7ebb51e6279ab9a9dc6b93_autotoc_md360}
+This section describes how to deploy on a Custom ARC VPX or EM/\+HS platform defined only by a TCF (Tool onfiguration File, created at CPU configuration time) and optional LCF (Linker Command File). In this case, the real hardware is unknown, and applications can be run only in the n\+SIM simulator included with the Meta\+Ware toolkit.
+
+VPX support is presented as an experimental feature of supporting emb\+ARC MLI Library version 2.\+0 and model adaptation. Read more about emb\+ARC MLI Library 2.\+0 support in the related section.\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_90035dd6df7ebb51e6279ab9a9dc6b93_autotoc_md361}{}\doxysubsection{\texorpdfstring{Initial Setup}{Initial Setup}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_90035dd6df7ebb51e6279ab9a9dc6b93_autotoc_md361}
+To use a custom ARC EM/\+HS/\+VPX platform, you need the following \+:
+\begin{DoxyItemize}
+\item Synopsys Meta\+Ware Development Toolkit version 2019.\+12 or higher (2021.\+06 or higher for MLI Library 2.\+0)
+\item Make tool (make or gmake)
+\item CMake 3.\+18 or higher\textbackslash{} If you are using the Model Adaptation Tool, you will also need to install\+:
+\item \href{https://www.python.org/downloads/}{\texttt{ Python}} 3.\+7 or higher
+\item \href{https://www.tensorflow.org/install/pip}{\texttt{ Tensor\+Flow for Python}} version 2.\+5 or higher
+\end{DoxyItemize}
+
+See Install the Synopsys Design\+Ware ARC Meta\+Ware Development Toolkit section for instructions on toolchain installation. See Meta\+Ware Development Toolkit and Make Tool sections for instructions on toolchain installation and comments about make versions.\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_90035dd6df7ebb51e6279ab9a9dc6b93_autotoc_md362}{}\doxysubsection{\texorpdfstring{Generate TFLM as Static Library}{Generate TFLM as Static Library}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_90035dd6df7ebb51e6279ab9a9dc6b93_autotoc_md362}
+If you want to use Tensor\+Flow Lite Micro framework in your own application, you need to generate TFLM as a static library. Next command can be used to generate TFLM library\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{make\ -\/f\ tensorflow/lite/micro/tools/make/Makefile\ clean}
+\DoxyCodeLine{make\ -\/f\ tensorflow/lite/micro/tools/make/Makefile\ \(\backslash\)}
+\DoxyCodeLine{TARGET\_ARCH=arc\ \(\backslash\)}
+\DoxyCodeLine{TARGET=arc\_custom\ \(\backslash\)}
+\DoxyCodeLine{OPTIMIZED\_KERNEL\_DIR=arc\_mli\ \(\backslash\)}
+\DoxyCodeLine{TCF\_FILE=<path\_to\_tcf\_file>\ \(\backslash\)}
+\DoxyCodeLine{LCF\_FILE=<path\_to\_lcf\_file>\ \(\backslash\)}
+\DoxyCodeLine{microlite}
+
+\end{DoxyCode}
+ For MLI Library 2.\+0 (experimental feature)\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{make\ -\/f\ tensorflow/lite/micro/tools/make/Makefile\ clean}
+\DoxyCodeLine{make\ -\/f\ tensorflow/lite/micro/tools/make/Makefile\ \(\backslash\)}
+\DoxyCodeLine{TARGET\_ARCH=arc\ \(\backslash\)}
+\DoxyCodeLine{TARGET=arc\_custom\ \(\backslash\)}
+\DoxyCodeLine{OPTIMIZED\_KERNEL\_DIR=arc\_mli\ \(\backslash\)}
+\DoxyCodeLine{ARC\_TAGS=mli20\_experimental\ \(\backslash\)}
+\DoxyCodeLine{BUILD\_LIB\_DIR=<path\_to\_buildlib>\ \(\backslash\)}
+\DoxyCodeLine{TCF\_FILE=<path\_to\_tcf\_file>\ \(\backslash\)}
+\DoxyCodeLine{microlite}
+
+\end{DoxyCode}
+
+
+Generated library {\itshape libtensorflow-\/microlite.\+a} can be found in {\itshape gen/\{target\}/lib}.\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_90035dd6df7ebb51e6279ab9a9dc6b93_autotoc_md363}{}\doxysubsection{\texorpdfstring{Example Applications for ARC EM/\+HS/\+VPX custom configuration.}{Example Applications for ARC EM/\+HS/\+VPX custom configuration.}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_90035dd6df7ebb51e6279ab9a9dc6b93_autotoc_md363}
+Example applications can be found on ARC examples repository.\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_90035dd6df7ebb51e6279ab9a9dc6b93_autotoc_md364}{}\doxysection{\texorpdfstring{License}{License}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_90035dd6df7ebb51e6279ab9a9dc6b93_autotoc_md364}
+Tensor\+Flow\textquotesingle{}s code is covered by the Apache2 License included in the repository, and third-\/party dependencies are covered by their respective licenses, in the third\+\_\+party folder of this package. 

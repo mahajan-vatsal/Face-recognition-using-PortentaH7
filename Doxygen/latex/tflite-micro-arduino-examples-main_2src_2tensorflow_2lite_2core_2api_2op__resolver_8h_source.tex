@@ -1,0 +1,119 @@
+\doxysection{op\+\_\+resolver.\+h}
+\hypertarget{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2core_2api_2op__resolver_8h_source}{}\label{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2core_2api_2op__resolver_8h_source}\index{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/arduino-\/examples-\/main/src/tensorflow/lite/core/api/op\_resolver.h@{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/arduino-\/examples-\/main/src/tensorflow/lite/core/api/op\_resolver.h}}
+\mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2core_2api_2op__resolver_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{/*\ Copyright\ 2018\ The\ TensorFlow\ Authors.\ All\ Rights\ Reserved.}}
+\DoxyCodeLine{00002\ \textcolor{comment}{}}
+\DoxyCodeLine{00003\ \textcolor{comment}{Licensed\ under\ the\ Apache\ License,\ Version\ 2.0\ (the\ "{}License"{});}}
+\DoxyCodeLine{00004\ \textcolor{comment}{you\ may\ not\ use\ this\ file\ except\ in\ compliance\ with\ the\ License.}}
+\DoxyCodeLine{00005\ \textcolor{comment}{You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{00006\ \textcolor{comment}{}}
+\DoxyCodeLine{00007\ \textcolor{comment}{\ \ \ \ http://www.apache.org/licenses/LICENSE-\/2.0}}
+\DoxyCodeLine{00008\ \textcolor{comment}{}}
+\DoxyCodeLine{00009\ \textcolor{comment}{Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ software}}
+\DoxyCodeLine{00010\ \textcolor{comment}{distributed\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,}}
+\DoxyCodeLine{00011\ \textcolor{comment}{WITHOUT\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,\ either\ express\ or\ implied.}}
+\DoxyCodeLine{00012\ \textcolor{comment}{See\ the\ License\ for\ the\ specific\ language\ governing\ permissions\ and}}
+\DoxyCodeLine{00013\ \textcolor{comment}{limitations\ under\ the\ License.}}
+\DoxyCodeLine{00014\ \textcolor{comment}{==============================================================================*/}}
+\DoxyCodeLine{00015\ \textcolor{preprocessor}{\#ifndef\ TENSORFLOW\_LITE\_CORE\_API\_OP\_RESOLVER\_H\_}}
+\DoxyCodeLine{00016\ \textcolor{preprocessor}{\#define\ TENSORFLOW\_LITE\_CORE\_API\_OP\_RESOLVER\_H\_}}
+\DoxyCodeLine{00017\ }
+\DoxyCodeLine{00018\ \textcolor{preprocessor}{\#include\ <functional>}}
+\DoxyCodeLine{00019\ \textcolor{preprocessor}{\#include\ <memory>}}
+\DoxyCodeLine{00020\ \textcolor{preprocessor}{\#include\ <vector>}}
+\DoxyCodeLine{00021\ }
+\DoxyCodeLine{00022\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/core/api/error\_reporter.h"{}}}
+\DoxyCodeLine{00023\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/core/c/common.h"{}}}
+\DoxyCodeLine{00024\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/schema/schema\_generated.h"{}}}
+\DoxyCodeLine{00025\ }
+\DoxyCodeLine{00026\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacetflite}{tflite}}\ \{}
+\DoxyCodeLine{00027\ }
+\DoxyCodeLine{00031\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classtflite_1_1_op_resolver}{OpResolver}}\ \{}
+\DoxyCodeLine{00032\ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00034\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_tf_lite_registration}{TfLiteRegistration}}*\ \mbox{\hyperlink{classtflite_1_1_op_resolver_afea37d177191ecdb7f4216f1f097d27b}{FindOp}}(\mbox{\hyperlink{namespacetflite_ab29efbedf49bccb2d2259fd931ba06ac}{tflite::BuiltinOperator}}\ op,}
+\DoxyCodeLine{00035\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ version)\ \textcolor{keyword}{const}\ =\ 0;}
+\DoxyCodeLine{00037\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_tf_lite_registration}{TfLiteRegistration}}*\ \mbox{\hyperlink{classtflite_1_1_op_resolver_aeef01bd6315b411f08b7303c58e65f8a}{FindOp}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ op,}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ version)\ \textcolor{keyword}{const}\ =\ 0;}
+\DoxyCodeLine{00039\ }
+\DoxyCodeLine{00040\ \ \ \textcolor{comment}{//\ Represents\ a\ sequence\ of\ delegates.}}
+\DoxyCodeLine{00041\ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classtflite_1_1_op_resolver_a0065e6a4d1f71c3b8cfbd8e704022fcc}{TfLiteDelegatePtrVector}}\ =}
+\DoxyCodeLine{00042\ \ \ \ \ \ \ std::vector<std::unique\_ptr<\mbox{\hyperlink{group__c__api__types_ga792f1fcdea49b08878248dd0553294c0}{TfLiteDelegate}},\ void\ (*)(\mbox{\hyperlink{struct_tf_lite_delegate}{TfLiteDelegate}}*)>>;}
+\DoxyCodeLine{00043\ }
+\DoxyCodeLine{00044\ \ \ \textcolor{comment}{//\ Returns\ optional\ delegates\ for\ resolving\ and\ handling\ ops\ in\ the\ flatbuffer}}
+\DoxyCodeLine{00045\ \ \ \textcolor{comment}{//\ model.\ This\ may\ be\ used\ in\ addition\ to\ the\ standard\ TfLiteRegistration}}
+\DoxyCodeLine{00046\ \ \ \textcolor{comment}{//\ lookup\ for\ graph\ resolution.}}
+\DoxyCodeLine{00047\ \ \ \textcolor{comment}{//\ WARNING:\ This\ API\ is\ deprecated,\ GetDelegateCreators\ is\ preferred.}}
+\DoxyCodeLine{00048\ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{classtflite_1_1_op_resolver_a0065e6a4d1f71c3b8cfbd8e704022fcc}{TfLiteDelegatePtrVector}}\ \mbox{\hyperlink{classtflite_1_1_op_resolver_a4aee8510e32311d69989fc8a16889935}{GetDelegates}}(\textcolor{keywordtype}{int}\ num\_threads)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{00049\ \ \ \ \ \textcolor{keywordflow}{return}\ \{\};}
+\DoxyCodeLine{00050\ \ \ \}}
+\DoxyCodeLine{00051\ }
+\DoxyCodeLine{00052\ \ \ \textcolor{comment}{//\ Represents\ a\ function\ that\ creates\ a\ TfLite\ delegate\ instance.}}
+\DoxyCodeLine{00053\ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classtflite_1_1_op_resolver_acb5faeaef3290135f6f79e0974fd5d25}{TfLiteDelegateCreator}}\ =}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ std::function<std::unique\_ptr<TfLiteDelegate,\ void\ (*)(TfLiteDelegate*)>(}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_tf_lite_context}{TfLiteContext}}*\ \textcolor{comment}{/*context*/})>;}
+\DoxyCodeLine{00056\ }
+\DoxyCodeLine{00057\ \ \ \textcolor{comment}{//\ Represents\ a\ sequence\ of\ delegate\ creator\ functions.}}
+\DoxyCodeLine{00058\ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classtflite_1_1_op_resolver_a2d5bec0cb807de14a895b7f887447fb8}{TfLiteDelegateCreators}}\ =\ std::vector<TfLiteDelegateCreator>;}
+\DoxyCodeLine{00059\ }
+\DoxyCodeLine{00060\ \ \ \textcolor{comment}{//\ Returns\ a\ vector\ of\ delegate\ creators\ to\ create\ optional\ delegates\ for}}
+\DoxyCodeLine{00061\ \ \ \textcolor{comment}{//\ resolving\ and\ handling\ ops\ in\ the\ flatbuffer\ model.\ This\ may\ be\ used\ in}}
+\DoxyCodeLine{00062\ \ \ \textcolor{comment}{//\ addition\ to\ the\ standard\ TfLiteRegistration\ lookup\ for\ graph\ resolution.}}
+\DoxyCodeLine{00063\ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{00064\ \ \ \textcolor{comment}{//\ Note\ that\ this\ method\ is\ not\ used\ (will\ not\ be\ called)\ if\ you\ are\ using}}
+\DoxyCodeLine{00065\ \ \ \textcolor{comment}{//\ TF\ Lite\ in\ Google\ Play\ Services;\ the\ GetOpaqueDelegateCreators\ method}}
+\DoxyCodeLine{00066\ \ \ \textcolor{comment}{//\ (see\ below)\ is\ used\ for\ that\ case.}}
+\DoxyCodeLine{00067\ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{classtflite_1_1_op_resolver_a2d5bec0cb807de14a895b7f887447fb8}{TfLiteDelegateCreators}}\ \mbox{\hyperlink{classtflite_1_1_op_resolver_a698ac5c6d5b23e063b195dc4b114be04}{GetDelegateCreators}}()\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ \{\};\ \}}
+\DoxyCodeLine{00068\ }
+\DoxyCodeLine{00069\ \ \ \textcolor{comment}{//\ TODO(b/202712825):\ it\ would\ be\ nice\ if\ we\ could\ avoid\ the\ need\ for\ separate}}
+\DoxyCodeLine{00070\ \ \ \textcolor{comment}{//\ "{}opaque"{}\ types\ \&\ methods\ for\ use\ only\ with\ TF\ Lite\ in\ Google\ Play\ Services.}}
+\DoxyCodeLine{00071\ }
+\DoxyCodeLine{00072\ \ \ \textcolor{comment}{//\ Represents\ an\ opaque\ delegate\ instance.}}
+\DoxyCodeLine{00073\ \ \ \textcolor{comment}{//\ WARNING:\ Experimental\ interface,\ subject\ to\ change.}}
+\DoxyCodeLine{00074\ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classtflite_1_1_op_resolver_af30e2a434ab5ff6d72db4204e334fe8d}{TfLiteOpaqueDelegatePtr}}\ =}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ std::unique\_ptr<\mbox{\hyperlink{group__c__api__types_gac2bc3e65b2b4dfe997134c006faa442f}{TfLiteOpaqueDelegate}},\ void\ (*)(\mbox{\hyperlink{struct_tf_lite_delegate}{TfLiteOpaqueDelegate}}*)>;}
+\DoxyCodeLine{00076\ }
+\DoxyCodeLine{00077\ \ \ \textcolor{comment}{//\ Represents\ a\ function\ that\ creates\ an\ opaque\ delegate\ instance.}}
+\DoxyCodeLine{00078\ \ \ \textcolor{comment}{//\ WARNING:\ Experimental\ interface,\ subject\ to\ change.}}
+\DoxyCodeLine{00079\ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classtflite_1_1_op_resolver_a08d6fbc294707c7614adf43f30f08843}{TfLiteOpaqueDelegateCreator}}\ =}
+\DoxyCodeLine{00080\ \ \ \ \ \ \ std::function<\mbox{\hyperlink{classtflite_1_1_op_resolver_af30e2a434ab5ff6d72db4204e334fe8d}{TfLiteOpaqueDelegatePtr}}(\textcolor{keywordtype}{int}\ \textcolor{comment}{/*num\_threads*/})>;}
+\DoxyCodeLine{00081\ }
+\DoxyCodeLine{00082\ \ \ \textcolor{comment}{//\ Represents\ a\ sequence\ of\ opaque\ delegate\ creator\ functions.}}
+\DoxyCodeLine{00083\ \ \ \textcolor{comment}{//\ WARNING:\ Experimental\ interface,\ subject\ to\ change.}}
+\DoxyCodeLine{00084\ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classtflite_1_1_op_resolver_abd7047114847917c8f5aa748a0c07322}{TfLiteOpaqueDelegateCreators}}\ =\ std::vector<TfLiteOpaqueDelegateCreator>;}
+\DoxyCodeLine{00085\ }
+\DoxyCodeLine{00086\ \ \ \textcolor{comment}{//\ Returns\ a\ vector\ of\ opaque\ delegate\ creators\ to\ create\ optional\ opaque}}
+\DoxyCodeLine{00087\ \ \ \textcolor{comment}{//\ delegates\ for\ resolving\ and\ handling\ ops\ in\ the\ flatbuffer\ model.\ This\ may}}
+\DoxyCodeLine{00088\ \ \ \textcolor{comment}{//\ be\ used\ in\ addition\ to\ the\ standard\ TfLiteRegistration\ lookup\ for\ graph}}
+\DoxyCodeLine{00089\ \ \ \textcolor{comment}{//\ resolution.}}
+\DoxyCodeLine{00090\ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{00091\ \ \ \textcolor{comment}{//\ Note\ that\ this\ method\ will\ be\ called\ only\ if\ you\ are\ using\ TF\ Lite\ in}}
+\DoxyCodeLine{00092\ \ \ \textcolor{comment}{//\ Google\ Play\ Services;\ if\ you\ are\ using\ regular\ TF\ Lite,\ GetDelegateCreators}}
+\DoxyCodeLine{00093\ \ \ \textcolor{comment}{//\ (see\ above)\ is\ used\ instead.}}
+\DoxyCodeLine{00094\ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{00095\ \ \ \textcolor{comment}{//\ WARNING:\ Experimental\ interface,\ subject\ to\ change.}}
+\DoxyCodeLine{00096\ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{classtflite_1_1_op_resolver_abd7047114847917c8f5aa748a0c07322}{TfLiteOpaqueDelegateCreators}}\ \mbox{\hyperlink{classtflite_1_1_op_resolver_a162f1a0d24ad2630899f3ecbd66f4f49}{GetOpaqueDelegateCreators}}()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{00097\ \ \ \ \ \textcolor{keywordflow}{return}\ \{\};}
+\DoxyCodeLine{00098\ \ \ \}}
+\DoxyCodeLine{00099\ }
+\DoxyCodeLine{00100\ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{classtflite_1_1_op_resolver_a0c77e42f61545356cdf059b77b5fc25b}{\string~OpResolver}}()\ \{\}}
+\DoxyCodeLine{00101\ }
+\DoxyCodeLine{00102\ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{00114\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classtflite_1_1_op_resolver_a74b749cbec4c7f1d8705224f57981b0f}{MayContainUserDefinedOps}}()\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};\ \}}
+\DoxyCodeLine{00115\ }
+\DoxyCodeLine{00116\ \ \ \textcolor{keyword}{friend}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classtflite_1_1_op_resolver_a72ae12430feb03200693bec429a0ecae}{OpResolverInternal}};}
+\DoxyCodeLine{00117\ \};}
+\DoxyCodeLine{00118\ }
+\DoxyCodeLine{00119\ \textcolor{comment}{//\ Handles\ the\ logic\ for\ converting\ between\ an\ OperatorCode\ structure\ extracted}}
+\DoxyCodeLine{00120\ \textcolor{comment}{//\ from\ a\ flatbuffer\ and\ information\ about\ a\ registered\ operator}}
+\DoxyCodeLine{00121\ \textcolor{comment}{//\ implementation.}}
+\DoxyCodeLine{00122\ \mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2core_2c_2c__api__types_8h_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_af8154a8f9b2b80e90f3a4fc76e0256f7}{GetRegistrationFromOpCode}}(\textcolor{keyword}{const}\ OperatorCode*\ opcode,}
+\DoxyCodeLine{00123\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classtflite_1_1_op_resolver}{OpResolver}}\&\ op\_resolver,}
+\DoxyCodeLine{00124\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classtflite_1_1_error_reporter}{ErrorReporter}}*\ error\_reporter,}
+\DoxyCodeLine{00125\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_tf_lite_registration}{TfLiteRegistration}}**\ registration);}
+\DoxyCodeLine{00126\ }
+\DoxyCodeLine{00127\ \}\ \ \textcolor{comment}{//\ namespace\ tflite}}
+\DoxyCodeLine{00128\ }
+\DoxyCodeLine{00129\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ TENSORFLOW\_LITE\_CORE\_API\_OP\_RESOLVER\_H\_}}
+
+\end{DoxyCode}

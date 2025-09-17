@@ -1,0 +1,86 @@
+\chapter{Emb\+ARC MLI Library Based Optimizations of Tensor\+Flow Lite Micro Kernels for ARC Platforms.}
+\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_bc7081c56241608e42aaae661289058f}{}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_bc7081c56241608e42aaae661289058f}\index{EmbARC MLI Library Based Optimizations of TensorFlow Lite Micro Kernels for ARC Platforms.@{EmbARC MLI Library Based Optimizations of TensorFlow Lite Micro Kernels for ARC Platforms.}}
+\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_bc7081c56241608e42aaae661289058f_autotoc_md319}%
+\Hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_bc7081c56241608e42aaae661289058f_autotoc_md319}%
+\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_bc7081c56241608e42aaae661289058f_autotoc_md320}{}\doxysection{\texorpdfstring{Maintainers}{Maintainers}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_bc7081c56241608e42aaae661289058f_autotoc_md320}
+
+\begin{DoxyItemize}
+\item \href{https://github.com/dzakhar}{\texttt{ dzakhar}}
+\item \href{https://github.com/JaccovG}{\texttt{ JaccovG}}
+\item \href{https://github.com/gerbauz}{\texttt{ gerbauz}}
+\end{DoxyItemize}\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_bc7081c56241608e42aaae661289058f_autotoc_md321}{}\doxysection{\texorpdfstring{Introduction}{Introduction}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_bc7081c56241608e42aaae661289058f_autotoc_md321}
+This folder contains kernel implementations which use optimized \href{https://github.com/foss-for-synopsys-dwc-arc-processors/embarc_mli}{\texttt{ emb\+ARC MLI Library}}. It allows acceleration of inference operations which use int8 (asymmetric quantization).\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_bc7081c56241608e42aaae661289058f_autotoc_md322}{}\doxysection{\texorpdfstring{Usage}{Usage}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_bc7081c56241608e42aaae661289058f_autotoc_md322}
+emb\+ARC MLI Library is used to speed up execution of some kernels for asymmetrically quantized layers and can be applied with the option {\ttfamily OPTIMIZED\+\_\+\+KERNEL\+\_\+\+DIR=arc\+\_\+mli}. This means that usual library generation for ARC specific target implies usage of emb\+ARC MLI.
+
+For example\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{make\ -\/f\ tensorflow/lite/micro/tools/make/Makefile\ clean}
+\DoxyCodeLine{make\ -\/f\ tensorflow/lite/micro/tools/make/Makefile\ TARGET=arc\_emsdp\ \(\backslash\)}
+\DoxyCodeLine{OPTIMIZED\_KERNEL\_DIR=arc\_mli\ TARGET\_ARCH=arc\ \(\backslash\)}
+\DoxyCodeLine{microlite}
+
+\end{DoxyCode}
+
+
+In case MLI implementation can’t be used, kernels in this folder fallback to TFLM reference implementations. For applications which may not benefit from MLI library, TF Lite Micro library can be generated without these implementations {\bfseries{removing}} {\ttfamily OPTIMIZED\+\_\+\+KERNEL\+\_\+\+DIR=arc\+\_\+mli} in the command line, which can reduce overall code size\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{make\ -\/f\ tensorflow/lite/micro/tools/make/Makefile\ clean}
+\DoxyCodeLine{make\ -\/f\ tensorflow/lite/micro/tools/make/Makefile\ TARGET=arc\_emsdp\ \(\backslash\)}
+\DoxyCodeLine{TARGET\_ARCH=arc\ \(\backslash\)}
+\DoxyCodeLine{microlite}
+
+\end{DoxyCode}
+ \DoxyHorRuler{0}
+ \hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_bc7081c56241608e42aaae661289058f_autotoc_md324}{}\doxysubsection{\texorpdfstring{Optional (experimental features)\+:}{Optional (experimental features)\+:}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_bc7081c56241608e42aaae661289058f_autotoc_md324}
+TFLM can be built using \href{https://github.com/foss-for-synopsys-dwc-arc-processors/embarc_mli/tree/Release_2.0_EA}{\texttt{ emb\+ARC MLI Library 2.\+0}} as an experimental feature. To build TFLM using the emb\+ARC MLI Library 2.\+0, add the following tag to the command\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{ARC\_TAGS=mli20\_experimental}
+
+\end{DoxyCode}
+ In this case, generated projectes will be in $<$tcf\+\_\+file\+\_\+basename$>$\+\_\+mli20\+\_\+arc\+\_\+default folder.
+
+Some of configurations may require a custom run-\/time library specified using the BUILD\+\_\+\+LIB\+\_\+\+DIR option. Please, check MLI Library 2.\+0 \href{https://github.com/foss-for-synopsys-dwc-arc-processors/embarc_mli/tree/Release_2.0_EA\#build-configuration-options}{\texttt{ documentation}} for more details. The following option can be added\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{BUILD\_LIB\_DIR=<path\_to\_buildlib>}
+
+\end{DoxyCode}
+ \hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_bc7081c56241608e42aaae661289058f_autotoc_md325}{}\doxysection{\texorpdfstring{Limitations}{Limitations}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_bc7081c56241608e42aaae661289058f_autotoc_md325}
+Currently, the MLI Library provides optimized implementation only for int8 (asymmetric) versions of the following kernels\+:
+\begin{DoxyEnumerate}
+\item Convolution 2D – Per axis quantization only, {\ttfamily dilation\+\_\+ratio==1}
+\item Depthwise Convolution 2D – Per axis quantization only, {\ttfamily dilation\+\_\+ratio==1}
+\item Average Pooling
+\item Max Pooling
+\item Fully Connected
+\end{DoxyEnumerate}\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_bc7081c56241608e42aaae661289058f_autotoc_md326}{}\doxysection{\texorpdfstring{Scratch Buffers and Slicing}{Scratch Buffers and Slicing}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_bc7081c56241608e42aaae661289058f_autotoc_md326}
+The following information applies only for ARC EM SDP, VPX and other targets with XY or VCCM memory. emb\+ARC MLI uses specific optimizations which assumes node operands are in XY, VCCM memory and/or DCCM (Data Closely Coupled Memory). As operands might be quite big and may not fit in available XY or VCCM memory, special slicing logic is applied which allows kernel calculations to be split into multiple parts. For this reason, internal static buffers are allocated in these X, Y, VCCM and DCCM memory banks and used to execute sub-\/calculations.
+
+All this is performed automatically and invisible to the user. Half of the DCCM memory bank and the full XY banks or 3/4 of VCCM bank are occupied for MLI specific needs. If the user needs space in XY or VCCM memory for other tasks, these arrays can be reduced by setting specific sizes. For this, add the following option to build command replacing \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$<$}{<}size\mbox{[}a\texorpdfstring{$\vert$}{|}b\texorpdfstring{$\vert$}{|}c\mbox{]}\texorpdfstring{$>$}{>}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*} with required values\+:
+
+{\bfseries{For EM\+:}} 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{EXT\_CFLAGS="{}-\/DSCRATCH\_MEM\_Z\_SIZE=<size\_a>\ -\/DSCRATCH\_MEM\_X\_SIZE=<size\_b>\ -\/DSCRATCH\_MEM\_Y\_SIZE=<size\_c>"{}}
+
+\end{DoxyCode}
+ {\bfseries{For VPX\+:}} 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{EXT\_CFLAGS="{}-\/DSCRATCH\_MEM\_VEC\_SIZE=<size\_a>"{}}
+
+\end{DoxyCode}
+
+
+For example, to reduce sizes of arrays placed in DCCM and XCCM to 32k and 8k respectively, use next command\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{make\ -\/f\ tensorflow/lite/micro/tools/make/Makefile\ <...>\ \(\backslash\)}
+\DoxyCodeLine{EXT\_CFLAGS="{}-\/DSCRATCH\_MEM\_Z\_SIZE=32*1024\ -\/DSCRATCH\_MEM\_X\_SIZE=8*1024"{}\ \(\backslash\)}
+\DoxyCodeLine{microlite}
+
+\end{DoxyCode}
+\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_bc7081c56241608e42aaae661289058f_autotoc_md327}{}\doxysection{\texorpdfstring{License}{License}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_bc7081c56241608e42aaae661289058f_autotoc_md327}
+Tensor\+Flow\textquotesingle{}s code is covered by the Apache2 License included in the repository, and third party dependencies are covered by their respective licenses, in the third\+\_\+party folder of this package. 

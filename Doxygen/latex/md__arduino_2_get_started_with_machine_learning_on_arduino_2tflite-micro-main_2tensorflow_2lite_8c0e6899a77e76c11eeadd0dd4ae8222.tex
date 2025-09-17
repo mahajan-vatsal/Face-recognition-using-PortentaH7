@@ -1,0 +1,57 @@
+\chapter{offline\+\_\+memory\+\_\+plan}
+\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_8c0e6899a77e76c11eeadd0dd4ae8222}{}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_8c0e6899a77e76c11eeadd0dd4ae8222}\index{offline\_memory\_plan@{offline\_memory\_plan}}
+
+\begin{DoxyItemize}
+\item Offline Memory Plan
+\begin{DoxyItemize}
+\item Background and Motivation
+\item Usage
+\end{DoxyItemize}
+\end{DoxyItemize}\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_8c0e6899a77e76c11eeadd0dd4ae8222_autotoc_md178}{}\doxysection{\texorpdfstring{Offline Memory Plan Via Nonpersistent\+Memory\+Planner\+Shim}{Offline Memory Plan Via Nonpersistent\+Memory\+Planner\+Shim}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_8c0e6899a77e76c11eeadd0dd4ae8222_autotoc_md178}
+This doc outline how to use the Non\+Persistent\+Memory\+Planner\+Shim class to work with a external tooling that can plan the offset of each non persistent buffer for the Model within the TFLM arena.
+
+This is an experimental feature right now and subjected to change. Comments are welcome!\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_8c0e6899a77e76c11eeadd0dd4ae8222_autotoc_md179}{}\doxysubsection{\texorpdfstring{Background and Motivation}{Background and Motivation}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_8c0e6899a77e76c11eeadd0dd4ae8222_autotoc_md179}
+The \href{memory_management.md\#offline-planned-tensor-allocations}{\texttt{ (memory management page)}} describes a way to specify the offset of each non persistent buffer in a flatbuffer model file. This document describe an alternative that allows the offset of each non persistent buffer for the Model within the TFLM arena to be specified by a C++ struct. The approach in this document is an early stage exploration of what the next version of offline memory planning in TFLM might look like.
+
+If the Non\+Persistent\+Memory\+Planner\+Shim is used, then the final binary does not have any of the symbols associated with the Greedy\+Memory\+Planner which results in a reduced memory footprint.
+
+Additionally, the offline planning of the non-\/persistent buffers can be used to have a more efficient utilization compared to the Greedy\+Memory\+Planner.\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_8c0e6899a77e76c11eeadd0dd4ae8222_autotoc_md180}{}\doxysubsection{\texorpdfstring{Usage}{Usage}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_8c0e6899a77e76c11eeadd0dd4ae8222_autotoc_md180}
+The more effecient memory plan above can be represented by the following C++ struct
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keyword}{const}\ \textcolor{keyword}{struct\ }BufferPlan\ kOfflineNonPersistentBufferPlan\ =\ \{}
+\DoxyCodeLine{\ \ .buffer\_count\ =\ 9,}
+\DoxyCodeLine{\ \ .buffer\_plan\_entries\ =\ \{}
+\DoxyCodeLine{\ \ \ \ [0]\ =\ \{\ .offset\ =\ 0\ \},}
+\DoxyCodeLine{\ \ \ \ [1]\ =\ \{\ .offset\ =\ 400\ \},}
+\DoxyCodeLine{\ \ \ \ [2]\ =\ \{\ .offset\ =\ 801\ \},}
+\DoxyCodeLine{\ \ \ \ [3]\ =\ \{\ .offset\ =\ 400\ \},}
+\DoxyCodeLine{\ \ \ \ [4]\ =\ \{\ .offset\ =\ 811\ \},}
+\DoxyCodeLine{\ \ \ \ [5]\ =\ \{\ .offset\ =\ 601\ \},}
+\DoxyCodeLine{\ \ \ \ [6]\ =\ \{\ .offset\ =\ 814\ \},}
+\DoxyCodeLine{\ \ \ \ [7]\ =\ \{\ .offset\ =\ 601\ \},}
+\DoxyCodeLine{\ \ \ \ [8]\ =\ \{\ .offset\ =\ 801\ \},}
+\DoxyCodeLine{\ \ \ \}}
+\DoxyCodeLine{\};}
+
+\end{DoxyCode}
+
+
+Then you can create a Non\+Persistent\+Buffer\+Planner\+Shim and provide it to the Interpreter such as below
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{comment}{//\ The\ arena\ includes\ both\ persistent\ buffers\ and\ non-\/persistent\ buffers.\ }}
+\DoxyCodeLine{\textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{int}\ kArenaSize\ =\ 2*1048;}
+\DoxyCodeLine{uint8\_t\ \mbox{\hyperlink{network__tester__test_8cc_abf99e32bec994276b2bcf77385c93365}{tensor\_arena}}[kArenaSize];}
+\DoxyCodeLine{}
+\DoxyCodeLine{\mbox{\hyperlink{classtflite_1_1_non_persistent_memory_planner_shim}{tflite::NonPersistentMemoryPlannerShim}}\ planner(\&kOfflineNonPersistentBufferPlan);}
+\DoxyCodeLine{}
+\DoxyCodeLine{\mbox{\hyperlink{classtflite_1_1_micro_allocator}{tflite::MicroAllocator}}\ *\ allocator\ =\ \mbox{\hyperlink{classtflite_1_1_micro_allocator_a48bf21c87345607dcfd2b76c481b6eb5}{tflite::MicroAllocator::Create}}(}
+\DoxyCodeLine{\ \ \mbox{\hyperlink{network__tester__test_8cc_abf99e32bec994276b2bcf77385c93365}{tensor\_arena}},\ arena\_size,\ \&planner);}
+\DoxyCodeLine{}
+\DoxyCodeLine{\mbox{\hyperlink{classtflite_1_1_micro_interpreter}{tflite::MicroInterpreter}}\ \mbox{\hyperlink{_inference_allocate_tensor_8cpp_a0d8f3bb5211083760f7c593d57adb17d}{interpreter}}(\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2model_8h_ae142afd8c2e2c711c1c62440deebe03c}{model}},\ op\_resolver,\ allocator);}
+
+\end{DoxyCode}
+ 

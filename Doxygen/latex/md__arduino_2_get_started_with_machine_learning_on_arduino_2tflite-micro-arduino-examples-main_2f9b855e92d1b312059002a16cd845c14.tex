@@ -1,0 +1,186 @@
+\chapter{Test-\/\+Over-\/\+Serial support module}
+\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2f9b855e92d1b312059002a16cd845c14}{}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2f9b855e92d1b312059002a16cd845c14}\index{Test-\/Over-\/Serial support module@{Test-\/Over-\/Serial support module}}
+\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2f9b855e92d1b312059002a16cd845c14_autotoc_md53}%
+\Hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2f9b855e92d1b312059002a16cd845c14_autotoc_md53}%
+
+
+This support module allows for testing of \href{https://www.tensorflow.org/lite/microcontrollers}{\texttt{ Tensorflow Lite Micro}} (TFLM) Arduino \href{/examples}{\texttt{ examples}} without the use of board specific peripherals (cameras, microphones, etc). All data necessary to conduct an inference operation by the example application is supplied over the Arduino serial interface.
+
+Currently supported TFLM example applications are\+:
+\begin{DoxyItemize}
+\item person\+\_\+detection
+\item micro\+\_\+speech
+\end{DoxyItemize}\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2f9b855e92d1b312059002a16cd845c14_autotoc_md54}{}\doxysection{\texorpdfstring{Table of contents}{Table of contents}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2f9b855e92d1b312059002a16cd845c14_autotoc_md54}
+
+\begin{DoxyItemize}
+\item Overview
+\item Required serial interface support
+\item Commands
+\item C++ API
+\begin{DoxyItemize}
+\item Input handler callback
+\end{DoxyItemize}
+\item Testing with test\+\_\+over\+\_\+serial.py script
+\begin{DoxyItemize}
+\item Linux and Modem\+Manager
+\item Example test configuration data
+\end{DoxyItemize}
+\end{DoxyItemize}\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2f9b855e92d1b312059002a16cd845c14_autotoc_md55}{}\doxysection{\texorpdfstring{Overview}{Overview}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2f9b855e92d1b312059002a16cd845c14_autotoc_md55}
+The Arduino TFLM example application executes the normal inference operation using data from the board specific peripherals. When commanded over the serial interface to enter test mode, normal inference operations are halted. The example application remains in test mode awaiting data to arrive over the serial interface. When sufficient data is available, an inference operation is run. The example application then remains in test mode awaiting the next set of data from the serial interface.
+
+This module does not interfere with the example application sending output to the serial interface. Thus the application can continue to have debug or other output. This module will consume all serial input once test mode is active.\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2f9b855e92d1b312059002a16cd845c14_autotoc_md56}{}\doxysection{\texorpdfstring{Required serial interface support}{Required serial interface support}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2f9b855e92d1b312059002a16cd845c14_autotoc_md56}
+For the Test-\/\+Over-\/\+Serial module to work, serial interface access is required using a light-\/weight API. The header file \href{/src/tensorflow/lite/micro/system_setup.h}{\texttt{ system\+\_\+setup.\+h}} declares the API, and \href{/src/tensorflow/lite/micro/system_setup.cpp}{\texttt{ system\+\_\+setup.\+cpp}} provides the board specific implementation of the API.
+
+Each line (command or data or response) sent over the serial interface must be newline (`'~\newline
+\textquotesingle{}\`{}) terminated.
+
+No 3rd party Arduino libraries are required to use the Test-\/\+Over-\/\+Serial support module.\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2f9b855e92d1b312059002a16cd845c14_autotoc_md57}{}\doxysection{\texorpdfstring{Commands}{Commands}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2f9b855e92d1b312059002a16cd845c14_autotoc_md57}
+The Test-\/\+Over-\/\+Serial support module recognizes to the following commands received over the serial interface\+:
+\begin{DoxyItemize}
+\item {\bfseries{!\+TEST}} Notification that the test mode has started. The application should cease all inference operations and await test data. The response to this command is {\bfseries{!\+OK TEST {\itshape max-\/binary-\/data-\/per-\/line}}}.
+\begin{DoxyItemize}
+\item The {\ttfamily max-\/binary-\/data-\/per-\/line} parameter is the maximum number of bytes of binary data to base-\/64 encode per line sent over the serial interface
+\end{DoxyItemize}
+\item {\bfseries{!\+DATA {\itshape data-\/type} ~{\itshape binary-\/data-\/size}}} Notification of the start of the data transfer. When all data is received, the {\bfseries{!\+OK DATA {\itshape data-\/type} ~{\itshape binary-\/data-\/size}}} response is sent. After each line of data received, the {\bfseries{!\+DATA\+\_\+\+ACK {\itshape bytes-\/received}}} response is sent. Binary data must be base-\/64 encoded before being sent over the serial interface.
+\begin{DoxyItemize}
+\item The {\ttfamily binary-\/data-\/size} parameter is always in units of bytes
+\item The {\ttfamily data-\/type} parameter specifies the type of data (audio, image, etc.)
+\item The {\ttfamily bytes-\/received} parameter is the number of bytes of base-\/64 decoded binary data received
+\end{DoxyItemize}
+\end{DoxyItemize}
+
+Any failure condition detected by the module is responded to by sending {\bfseries{!\+FAIL {\itshape command-\/that-\/failed}}}.\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2f9b855e92d1b312059002a16cd845c14_autotoc_md58}{}\doxysection{\texorpdfstring{C++ API}{C++ API}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2f9b855e92d1b312059002a16cd845c14_autotoc_md58}
+An example application can make use of the Test-\/\+Over-\/\+Serial module through the \href{/src/test_over_serial/test_over_serial.h}{\texttt{ C++ API}}\+:
+\begin{DoxyItemize}
+\item {\ttfamily Test\+Over\+Serial\& Instance(const Test\+Data\+Type data\+\_\+type)} Returns an instance of the {\ttfamily Test\+Over\+Serial} class. This class is a singleton.
+\begin{DoxyItemize}
+\item {\ttfamily data\+\_\+type} is the type of data the application wants to receive (audio, image, etc.)
+\end{DoxyItemize}
+\item {\ttfamily bool Is\+Test\+Mode(void)} Returns {\ttfamily true} if the {\ttfamily !\+TEST} command has been received.
+\item {\ttfamily void Process\+Input(const Input\+Handler\texorpdfstring{$\ast$}{*})} The serial interface input processor. All commands and data received over the serial interface are responded to by this routine. When receiving data, for each line received, the {\ttfamily Input\+Handler} callback is executed.
+\end{DoxyItemize}\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2f9b855e92d1b312059002a16cd845c14_autotoc_md59}{}\doxysubsection{\texorpdfstring{Input handler callback}{Input handler callback}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2f9b855e92d1b312059002a16cd845c14_autotoc_md59}
+The {\ttfamily Input\+Handler} callback is used for application specific handling of received data. A single parameter is passed to the callback, a pointer to the following data structure\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{struct\ InputBuffer\ \{}
+\DoxyCodeLine{\ \ DataPtr\ data;\ \ \ //\ input\ buffer\ pointer}
+\DoxyCodeLine{\ \ size\_t\ length;\ \ //\ input\ buffer\ length}
+\DoxyCodeLine{\ \ size\_t\ offset;\ \ //\ offset\ from\ start\ of\ input}
+\DoxyCodeLine{\ \ size\_t\ total;\ \ \ //\ total\ data\ that\ will\ be\ transferred}
+\DoxyCodeLine{\};}
+
+\end{DoxyCode}
+ All members of this data structure will have values in units of the {\ttfamily data-\/type}. For example, 16-\/bit mono audio data will consist of 2 bytes per audio {\ttfamily sample}. The units of all values in the data structure would therefore be a count of {\ttfamily sample(s)}, not bytes.
+
+The input buffer data will have been base-\/64 decoded prior to the {\ttfamily Input\+Handler} callback being executed.
+
+The {\ttfamily Input\+Handler} callback must return {\ttfamily true} to allow data transfer to continue. Returning {\ttfamily false} will abort the data transfer and a {\ttfamily !\+FAIL DATA...} response will be sent to the serial interface.\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2f9b855e92d1b312059002a16cd845c14_autotoc_md60}{}\doxysection{\texorpdfstring{Testing with test\+\_\+over\+\_\+serial.\+py script}{Testing with test\+\_\+over\+\_\+serial.\+py script}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2f9b855e92d1b312059002a16cd845c14_autotoc_md60}
+The \href{/scripts/test_over_serial.py}{\texttt{ test\+\_\+over\+\_\+serial.\+py}} script is provided for automated testing of the supported Arduino example applications.
+
+Only the {\ttfamily -\/-\/example} option is required, which specifies which example application to test. The {\ttfamily -\/-\/verbose} option controls the amount of output seen. The {\ttfamily -\/-\/verbose} values can be\+:
+\begin{DoxyItemize}
+\item {\ttfamily all} See all output including any output sent by the Arduino application
+\item {\ttfamily test} Restrict output to just the test results
+\end{DoxyItemize}
+
+Example command line (must be run from the top of the tflite-\/micro-\/arduino-\/examples repository directory)\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{tflite-\/micro-\/arduino-\/examples\$\ python3\ scripts/test\_over\_serial.py\ -\/-\/example\ person\_detection\ -\/-\/verbose\ test}
+\DoxyCodeLine{10:21:03.746946\ \ Test\ start:}
+\DoxyCodeLine{10:21:04.016295\ \ Test\ \#1\ for\ label\ <person>\ file\ <person.bmp>}
+\DoxyCodeLine{10:21:05.280497\ \ Test\ \#1\ FAILED}
+\DoxyCodeLine{10:21:05.280648\ \ Waiting\ 4.0s\ before\ next\ test}
+\DoxyCodeLine{10:21:09.288489\ \ Test\ \#2\ for\ label\ <no\ person>\ file\ <no\_person.bmp>}
+\DoxyCodeLine{10:21:10.550045\ \ Test\ \#2\ PASSED}
+\DoxyCodeLine{10:21:10.550116\ \ Waiting\ 4.0s\ before\ next\ test}
+\DoxyCodeLine{10:21:14.556783\ \ Test\ \#3\ for\ label\ <person>\ file\ <person.bmp>}
+\DoxyCodeLine{10:21:16.328190\ \ Test\ \#3\ PASSED}
+\DoxyCodeLine{10:21:16.328250\ \ Waiting\ 4.0s\ before\ next\ test}
+\DoxyCodeLine{10:21:20.334084\ \ Test\ \#4\ for\ label\ <no\ person>\ file\ <no\_person.bmp>}
+\DoxyCodeLine{10:21:22.115927\ \ Test\ \#4\ PASSED}
+\DoxyCodeLine{10:21:22.222481\ \ Test\ end:\ total\ 4\ completed\ 4\ passed\ 3\ failed\ 1}
+
+\end{DoxyCode}
+ \hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2f9b855e92d1b312059002a16cd845c14_autotoc_md61}{}\doxysubsection{\texorpdfstring{Linux and {\ttfamily Modem\+Manager}}{Linux and {\ttfamily Modem\+Manager}}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2f9b855e92d1b312059002a16cd845c14_autotoc_md61}
+If {\ttfamily !\+TEST} command timeouts are seen when running the test script, it may be that {\ttfamily Modem\+Manager} is interfering with the serial interface. {\ttfamily Modem\+Manager} will need to be disabled or removed.
+
+To disable (Ubuntu Linux)\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{systemctl\ disable\ ModemManager.service}
+\DoxyCodeLine{systemctl\ stop\ ModemManager.service}
+
+\end{DoxyCode}
+
+
+To remove (Ubuntu Linux)\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{sudo\ apt-\/get\ purge\ modemmanager}
+
+\end{DoxyCode}
+\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2f9b855e92d1b312059002a16cd845c14_autotoc_md62}{}\doxysubsection{\texorpdfstring{Example test configuration data}{Example test configuration data}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2f9b855e92d1b312059002a16cd845c14_autotoc_md62}
+The test script relies on configuration data in a JSON compatible form. The default configuration file name is {\ttfamily serial\+\_\+test\+\_\+config.\+json} and must be located within the {\ttfamily data} sub-\/directory of the example source code. An example configuration\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\{}
+\DoxyCodeLine{\ \ \ \ "{}data\ type"{}:\ "{}image-\/grayscale"{},}
+\DoxyCodeLine{\ \ \ \ "{}delay\ after"{}:\ 4.0,}
+\DoxyCodeLine{\ \ \ \ "{}test\ data"{}:\ [}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ "{}file\ name"{}:\ "{}examples/person\_detection/data/person.bmp"{},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ "{}label"{}:\ "{}person"{},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ "{}regex"{}:\ "{}Person\ score:\ (\(\backslash\)\(\backslash\)d+\(\backslash\)\(\backslash\).\(\backslash\)\(\backslash\)d+)\%\ No\ person\ score:\ (\(\backslash\)\(\backslash\)d+\(\backslash\)\(\backslash\).\(\backslash\)\(\backslash\)d+)\%"{},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ "{}expr"{}:\ "{}groups[1]\ >\ groups[2]"{},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ "{}qqvga\ size"{}:\ false}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ "{}file\ name"{}:\ "{}examples/person\_detection/data/no\_person.bmp"{},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ "{}label"{}:\ "{}no\ person"{},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ "{}regex"{}:\ "{}Person\ score:\ (\(\backslash\)\(\backslash\)d+\(\backslash\)\(\backslash\).\(\backslash\)\(\backslash\)d+)\%\ No\ person\ score:\ (\(\backslash\)\(\backslash\)d+\(\backslash\)\(\backslash\).\(\backslash\)\(\backslash\)d+)\%"{},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ "{}expr"{}:\ "{}groups[1]\ <\ groups[2]"{},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ "{}qqvga\ size"{}:\ false}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ "{}file\ name"{}:\ "{}examples/person\_detection/data/person.bmp"{},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ "{}label"{}:\ "{}person"{},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ "{}regex"{}:\ "{}Person\ score:\ (\(\backslash\)\(\backslash\)d+\(\backslash\)\(\backslash\).\(\backslash\)\(\backslash\)d+)\%\ No\ person\ score:\ (\(\backslash\)\(\backslash\)d+\(\backslash\)\(\backslash\).\(\backslash\)\(\backslash\)d+)\%"{},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ "{}expr"{}:\ "{}groups[1]\ >\ groups[2]"{},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ "{}qqvga\ size"{}:\ true}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ "{}file\ name"{}:\ "{}examples/person\_detection/data/no\_person.bmp"{},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ "{}label"{}:\ "{}no\ person"{},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ "{}regex"{}:\ "{}Person\ score:\ (\(\backslash\)\(\backslash\)d+\(\backslash\)\(\backslash\).\(\backslash\)\(\backslash\)d+)\%\ No\ person\ score:\ (\(\backslash\)\(\backslash\)d+\(\backslash\)\(\backslash\).\(\backslash\)\(\backslash\)d+)\%"{},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ "{}expr"{}:\ "{}groups[1]\ <\ groups[2]"{},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ "{}qqvga\ size"{}:\ true}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\ \ \ \ ]}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+
+
+The configuration fields are as follows\+:
+\begin{DoxyItemize}
+\item {\ttfamily data type} One of the following values\+:
+\begin{DoxyItemize}
+\item {\ttfamily image-\/grayscale}
+\item {\ttfamily audio-\/pcm-\/16khz-\/mono-\/s16}
+\item {\ttfamily raw-\/int8}
+\item {\ttfamily raw-\/float}
+\end{DoxyItemize}
+\item {\ttfamily delay after} Float value setting the number of seconds to delay after each test
+\item {\ttfamily test data} Array of {\ttfamily test-\/data-\/element(s)}
+\end{DoxyItemize}
+
+The {\ttfamily test-\/data-\/element} fields are as follows\+:
+\begin{DoxyItemize}
+\item {\ttfamily file name} Name of the data file to be sent to the serial interface. This file should reside within the {\ttfamily data} sub-\/directory of the example source code.
+\item {\ttfamily label} The prediction label the model inference should produce
+\item {\ttfamily regex} A \href{https://docs.python.org/3/library/re.html}{\texttt{ regular-\/expression}} that captures portions of the Arduino application output
+\item {\ttfamily expr} A Python expression that evaluates to a boolean. The expression should return {\ttfamily True} if all test conditions have been met. The expression has two variables available\+:
+\begin{DoxyItemize}
+\item {\ttfamily groups} A list of strings and/or floats matching the {\ttfamily regex} capture(s).
+\item {\ttfamily label} A string containing the prediction label
+\end{DoxyItemize}
+\item {\ttfamily qqvga size} (Image element only) If {\ttfamily true} then resize the image data to QQVGA (160x120) dimensions. Otherwise, the image data is resized to fit the model tensor dimensions.
+\end{DoxyItemize}
+
+All fields in the configuration data are {\bfseries{required}}. 

@@ -1,0 +1,339 @@
+\doxysection{portable\+\_\+tensor\+\_\+utils.\+h}
+\hypertarget{tflite-micro-main_2tensorflow_2lite_2kernels_2internal_2reference_2portable__tensor__utils_8h_source}{}\label{tflite-micro-main_2tensorflow_2lite_2kernels_2internal_2reference_2portable__tensor__utils_8h_source}\index{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/main/tensorflow/lite/kernels/internal/reference/portable\_tensor\_utils.h@{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/main/tensorflow/lite/kernels/internal/reference/portable\_tensor\_utils.h}}
+\mbox{\hyperlink{tflite-micro-main_2tensorflow_2lite_2kernels_2internal_2reference_2portable__tensor__utils_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{/*\ Copyright\ 2017\ The\ TensorFlow\ Authors.\ All\ Rights\ Reserved.}}
+\DoxyCodeLine{00002\ \textcolor{comment}{}}
+\DoxyCodeLine{00003\ \textcolor{comment}{Licensed\ under\ the\ Apache\ License,\ Version\ 2.0\ (the\ "{}License"{});}}
+\DoxyCodeLine{00004\ \textcolor{comment}{you\ may\ not\ use\ this\ file\ except\ in\ compliance\ with\ the\ License.}}
+\DoxyCodeLine{00005\ \textcolor{comment}{You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{00006\ \textcolor{comment}{}}
+\DoxyCodeLine{00007\ \textcolor{comment}{\ \ \ \ http://www.apache.org/licenses/LICENSE-\/2.0}}
+\DoxyCodeLine{00008\ \textcolor{comment}{}}
+\DoxyCodeLine{00009\ \textcolor{comment}{Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ software}}
+\DoxyCodeLine{00010\ \textcolor{comment}{distributed\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,}}
+\DoxyCodeLine{00011\ \textcolor{comment}{WITHOUT\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,\ either\ express\ or\ implied.}}
+\DoxyCodeLine{00012\ \textcolor{comment}{See\ the\ License\ for\ the\ specific\ language\ governing\ permissions\ and}}
+\DoxyCodeLine{00013\ \textcolor{comment}{limitations\ under\ the\ License.}}
+\DoxyCodeLine{00014\ \textcolor{comment}{==============================================================================*/}}
+\DoxyCodeLine{00015\ \textcolor{preprocessor}{\#ifndef\ TENSORFLOW\_LITE\_KERNELS\_INTERNAL\_REFERENCE\_PORTABLE\_TENSOR\_UTILS\_H\_}}
+\DoxyCodeLine{00016\ \textcolor{preprocessor}{\#define\ TENSORFLOW\_LITE\_KERNELS\_INTERNAL\_REFERENCE\_PORTABLE\_TENSOR\_UTILS\_H\_}}
+\DoxyCodeLine{00017\ }
+\DoxyCodeLine{00018\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/kernels/internal/reference/portable\_tensor\_utils\_impl.h"{}}}
+\DoxyCodeLine{00019\ }
+\DoxyCodeLine{00020\ \textcolor{preprocessor}{\#if\ defined(\_MSC\_VER)}}
+\DoxyCodeLine{00021\ \textcolor{preprocessor}{\#define\ \_\_restrict\_\_\ \_\_restrict}}
+\DoxyCodeLine{00022\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00023\ }
+\DoxyCodeLine{00024\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacetflite}{tflite}}\ \{}
+\DoxyCodeLine{00025\ \textcolor{keyword}{namespace\ }tensor\_utils\ \{}
+\DoxyCodeLine{00026\ }
+\DoxyCodeLine{00027\ \textcolor{comment}{//\ Check\ if\ all\ entries\ of\ a\ vector\ are\ zero\ for\ float.}}
+\DoxyCodeLine{00028\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_a1f49fa548503159cd9a4ca681bf2c978}{IsZeroVector}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{float}*\ vector,\ \textcolor{keywordtype}{int}\ v\_size)\ \{}
+\DoxyCodeLine{00029\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_a80d7590338f255ddd289ca3b994ff54f}{PortableIsZeroVector}}(vector,\ v\_size);}
+\DoxyCodeLine{00030\ \}}
+\DoxyCodeLine{00031\ }
+\DoxyCodeLine{00032\ \textcolor{comment}{//\ Check\ if\ all\ entries\ of\ a\ vector\ are\ zero\ for\ int8\_t.}}
+\DoxyCodeLine{00033\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_a1f49fa548503159cd9a4ca681bf2c978}{IsZeroVector}}(\textcolor{keyword}{const}\ int8\_t*\ vector,\ \textcolor{keywordtype}{int}\ v\_size)\ \{}
+\DoxyCodeLine{00034\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_a80d7590338f255ddd289ca3b994ff54f}{PortableIsZeroVector}}(vector,\ v\_size);}
+\DoxyCodeLine{00035\ \}}
+\DoxyCodeLine{00036\ }
+\DoxyCodeLine{00037\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_ad6f6cd2bf307d9d709470b6ee892aa4d}{SymmetricQuantizeFloats}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{float}*\ values,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{hello__world__model_8cc_a439227feff9d7f55384e8780cfc2eb82}{size}},}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ int8\_t*\ quantized\_values,\ \textcolor{keywordtype}{float}*\ min,\ \textcolor{keywordtype}{float}*\ max,}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}*\ scaling\_factor)\ \{}
+\DoxyCodeLine{00040\ \ \ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_a504b15fb94b1f1d531a1a2e5e855875f}{PortableSymmetricQuantizeFloats}}(values,\ \mbox{\hyperlink{hello__world__model_8cc_a439227feff9d7f55384e8780cfc2eb82}{size}},\ quantized\_values,\ min,\ max,}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ scaling\_factor);}
+\DoxyCodeLine{00042\ \}}
+\DoxyCodeLine{00043\ }
+\DoxyCodeLine{00044\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_ad6f6cd2bf307d9d709470b6ee892aa4d}{SymmetricQuantizeFloats}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{float}*\ values,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{hello__world__model_8cc_a439227feff9d7f55384e8780cfc2eb82}{size}},}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ int8\_t*\ quantized\_values,\ \textcolor{keywordtype}{float}\ min\_value,}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}\ max\_value,\ \textcolor{keywordtype}{float}*\ scaling\_factor)\ \{}
+\DoxyCodeLine{00047\ \ \ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_a504b15fb94b1f1d531a1a2e5e855875f}{PortableSymmetricQuantizeFloats}}(values,\ \mbox{\hyperlink{hello__world__model_8cc_a439227feff9d7f55384e8780cfc2eb82}{size}},\ quantized\_values,\ min\_value,}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ max\_value,\ scaling\_factor);}
+\DoxyCodeLine{00049\ \}}
+\DoxyCodeLine{00050\ }
+\DoxyCodeLine{00051\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_aaca4048cfd0807a5ddb517474f3178d7}{AsymmetricQuantizeFloats}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{float}*\ values,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{hello__world__model_8cc_a439227feff9d7f55384e8780cfc2eb82}{size}},}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ int8\_t*\ quantized\_values,\ \textcolor{keywordtype}{float}*\ scaling\_factor,}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ int32\_t*\ \mbox{\hyperlink{mirror__pad_8cpp_aed7ea92f45bd273dde380a45ddced592}{offset}})\ \{}
+\DoxyCodeLine{00054\ \ \ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_a62ef09f8465417946c1f1caf685ba51d}{PortableAsymmetricQuantizeFloats}}(values,\ \mbox{\hyperlink{hello__world__model_8cc_a439227feff9d7f55384e8780cfc2eb82}{size}},\ quantized\_values,}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ scaling\_factor,\ \mbox{\hyperlink{mirror__pad_8cpp_aed7ea92f45bd273dde380a45ddced592}{offset}});}
+\DoxyCodeLine{00056\ \}}
+\DoxyCodeLine{00057\ }
+\DoxyCodeLine{00058\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_a7fa83cbe789fcec252e1f8fad0dded14}{MatrixBatchVectorMultiplyAccumulate}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{float}*\ matrix,\ \textcolor{keywordtype}{int}\ m\_rows,}
+\DoxyCodeLine{00059\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ m\_cols,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{float}*\ vector,}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ n\_batch,\ \textcolor{keywordtype}{float}*\ result)\ \{}
+\DoxyCodeLine{00061\ \ \ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_aad3fc54df79d61d7a03961f8cfff45d1}{PortableMatrixBatchVectorMultiplyAccumulate}}(matrix,\ m\_rows,\ m\_cols,\ vector,}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ n\_batch,\ result);}
+\DoxyCodeLine{00063\ \}}
+\DoxyCodeLine{00064\ }
+\DoxyCodeLine{00065\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_a7fa83cbe789fcec252e1f8fad0dded14}{MatrixBatchVectorMultiplyAccumulate}}(\textcolor{keyword}{const}\ int8\_t*\ \_\_restrict\_\_\ matrix,}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ m\_rows,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ m\_cols,}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ int8\_t*\ \_\_restrict\_\_\ vector,}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{float}*\ scaling\_factors,}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ n\_batch,}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}*\ \_\_restrict\_\_\ result)\ \{}
+\DoxyCodeLine{00071\ \ \ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_aad3fc54df79d61d7a03961f8cfff45d1}{PortableMatrixBatchVectorMultiplyAccumulate}}(matrix,\ m\_rows,\ m\_cols,\ vector,}
+\DoxyCodeLine{00072\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ scaling\_factors,\ n\_batch,\ result);}
+\DoxyCodeLine{00073\ \}}
+\DoxyCodeLine{00074\ }
+\DoxyCodeLine{00075\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_a7fa83cbe789fcec252e1f8fad0dded14}{MatrixBatchVectorMultiplyAccumulate}}(}
+\DoxyCodeLine{00076\ \ \ \ \ \textcolor{keyword}{const}\ int8\_t*\ \_\_restrict\_\_\ matrix,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ m\_rows,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ m\_cols,}
+\DoxyCodeLine{00077\ \ \ \ \ \textcolor{keyword}{const}\ int8\_t*\ \_\_restrict\_\_\ vectors,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{float}*\ scaling\_factors,}
+\DoxyCodeLine{00078\ \ \ \ \ \textcolor{keywordtype}{int}\ n\_batch,\ \textcolor{keywordtype}{float}*\ \_\_restrict\_\_\ result,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{float}*\ per\_channel\_scale,}
+\DoxyCodeLine{00079\ \ \ \ \ \textcolor{keyword}{const}\ int32\_t*\ \mbox{\hyperlink{add__n_8cpp_ad4670fdc658d0517928e6b2c10b2259d}{input\_offset}},\ int32\_t*\ scratch,\ int32\_t*\ row\_sums,}
+\DoxyCodeLine{00080\ \ \ \ \ \textcolor{keywordtype}{bool}*\ \mbox{\hyperlink{xtensa_2unidirectional__sequence__lstm_8cc_a58b1f1cca64a5f505e2170a29e471ae9}{compute\_row\_sums}},\ CpuBackendContext*\ context)\ \{}
+\DoxyCodeLine{00081\ \ \ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_aad3fc54df79d61d7a03961f8cfff45d1}{PortableMatrixBatchVectorMultiplyAccumulate}}(}
+\DoxyCodeLine{00082\ \ \ \ \ \ \ matrix,\ m\_rows,\ m\_cols,\ vectors,\ scaling\_factors,\ n\_batch,\ result,}
+\DoxyCodeLine{00083\ \ \ \ \ \ \ per\_channel\_scale,\ \mbox{\hyperlink{add__n_8cpp_ad4670fdc658d0517928e6b2c10b2259d}{input\_offset}},\ scratch,\ row\_sums,\ \mbox{\hyperlink{xtensa_2unidirectional__sequence__lstm_8cc_a58b1f1cca64a5f505e2170a29e471ae9}{compute\_row\_sums}},}
+\DoxyCodeLine{00084\ \ \ \ \ \ \ context);}
+\DoxyCodeLine{00085\ \}}
+\DoxyCodeLine{00086\ }
+\DoxyCodeLine{00087\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_a7fa83cbe789fcec252e1f8fad0dded14}{MatrixBatchVectorMultiplyAccumulate}}(\textcolor{keyword}{const}\ int8\_t*\ \_\_restrict\_\_\ matrix,}
+\DoxyCodeLine{00088\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ m\_rows,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ m\_cols,}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ int8\_t*\ \_\_restrict\_\_\ vector,}
+\DoxyCodeLine{00090\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{float}*\ scaling\_factors,}
+\DoxyCodeLine{00091\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ n\_batch,\ int32\_t*\ scratch,}
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}*\ \_\_restrict\_\_\ result,}
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ CpuBackendContext*\ context)\ \{}
+\DoxyCodeLine{00094\ \ \ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_aad3fc54df79d61d7a03961f8cfff45d1}{PortableMatrixBatchVectorMultiplyAccumulate}}(matrix,\ m\_rows,\ m\_cols,\ vector,}
+\DoxyCodeLine{00095\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ scaling\_factors,\ n\_batch,\ result);}
+\DoxyCodeLine{00096\ \}}
+\DoxyCodeLine{00097\ }
+\DoxyCodeLine{00098\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_ac03f033f390956884a385cbfe69e81ee}{SparseMatrixBatchVectorMultiplyAccumulate1x4}}(}
+\DoxyCodeLine{00099\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{float}*\ \_\_restrict\_\_\ matrix,\ \textcolor{keyword}{const}\ int32\_t*\ \_\_restrict\_\_\ segments,}
+\DoxyCodeLine{00100\ \ \ \ \ \textcolor{keyword}{const}\ int32\_t*\ \_\_restrict\_\_\ indices,\ \textcolor{keywordtype}{int}\ m\_rows,\ \textcolor{keywordtype}{int}\ m\_cols,}
+\DoxyCodeLine{00101\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{float}*\ \_\_restrict\_\_\ vector,\ \textcolor{keywordtype}{int}\ n\_batch,\ \textcolor{keywordtype}{float}*\ \_\_restrict\_\_\ result)\ \{}
+\DoxyCodeLine{00102\ \ \ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_a3c08fa39802b03a3921ea51b69c479ab}{PortableSparseMatrixBatchVectorMultiplyAccumulate1x4}}(}
+\DoxyCodeLine{00103\ \ \ \ \ \ \ matrix,\ segments,\ indices,\ m\_rows,\ m\_cols,\ vector,\ n\_batch,\ result);}
+\DoxyCodeLine{00104\ \}}
+\DoxyCodeLine{00105\ }
+\DoxyCodeLine{00106\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_a246aaabdf1fa73214eabbd1953d2647b}{SparseMatrixBatchVectorMultiplyAccumulate}}(}
+\DoxyCodeLine{00107\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{float}*\ \_\_restrict\_\_\ matrix,\ \textcolor{keyword}{const}\ uint8\_t*\ \_\_restrict\_\_\ ledger,}
+\DoxyCodeLine{00108\ \ \ \ \ \textcolor{keywordtype}{int}\ m\_rows,\ \textcolor{keywordtype}{int}\ m\_cols,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{float}*\ \_\_restrict\_\_\ vector,\ \textcolor{keywordtype}{int}\ n\_batch,}
+\DoxyCodeLine{00109\ \ \ \ \ \textcolor{keywordtype}{float}*\ \_\_restrict\_\_\ result)\ \{}
+\DoxyCodeLine{00110\ \ \ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_aa4fa18007e3f0febe6fb75111db58dc4}{PortableSparseMatrixBatchVectorMultiplyAccumulate}}(}
+\DoxyCodeLine{00111\ \ \ \ \ \ \ matrix,\ ledger,\ m\_rows,\ m\_cols,\ vector,\ n\_batch,\ result);}
+\DoxyCodeLine{00112\ \}}
+\DoxyCodeLine{00113\ }
+\DoxyCodeLine{00114\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_a3687fefe4c0a7e3d9215f9fb2715a5b9}{SparseMatrixBatchVectorMultiplyAccumulate1x16}}(}
+\DoxyCodeLine{00115\ \ \ \ \ \textcolor{keyword}{const}\ int8\_t*\ \_\_restrict\_\_\ matrix,\ \textcolor{keyword}{const}\ int32\_t*\ \_\_restrict\_\_\ segments,}
+\DoxyCodeLine{00116\ \ \ \ \ \textcolor{keyword}{const}\ int32\_t*\ \_\_restrict\_\_\ indices,\ \textcolor{keywordtype}{int}\ m\_rows,\ \textcolor{keywordtype}{int}\ m\_cols,}
+\DoxyCodeLine{00117\ \ \ \ \ \textcolor{keyword}{const}\ int8\_t*\ \_\_restrict\_\_\ vector,\ \textcolor{keyword}{const}\ int32\_t*\ \_\_restrict\_\_\ bias\_vector,}
+\DoxyCodeLine{00118\ \ \ \ \ \textcolor{keywordtype}{int}\ n\_batch,\ \textcolor{keyword}{const}\ int32\_t\ \mbox{\hyperlink{add__n_8cpp_ad4670fdc658d0517928e6b2c10b2259d}{input\_offset}},\ \textcolor{keyword}{const}\ int32\_t\ \mbox{\hyperlink{add__n_8cpp_a23e9f0626e0fdd28687b85e5065f904a}{output\_multiplier}},}
+\DoxyCodeLine{00119\ \ \ \ \ \textcolor{keyword}{const}\ int32\_t\ \mbox{\hyperlink{add__n_8cpp_a239169c76410c3a81fd9cba67cc0bc8f}{output\_shift}},\ \textcolor{keyword}{const}\ int32\_t\ \mbox{\hyperlink{add__n_8cpp_ab1dde269b1116cc98371e23a97740a58}{output\_offset}},}
+\DoxyCodeLine{00120\ \ \ \ \ \textcolor{keyword}{const}\ int32\_t\ \mbox{\hyperlink{add__n_8cpp_a2e6a27b448848b3057c45363e04b7d0d}{output\_activation\_min}},\ \textcolor{keyword}{const}\ int32\_t\ \mbox{\hyperlink{add__n_8cpp_aa889d7b51a3f84357d44f05993ac08a1}{output\_activation\_max}},}
+\DoxyCodeLine{00121\ }
+\DoxyCodeLine{00122\ \ \ \ \ int8\_t*\ \_\_restrict\_\_\ result)\ \{}
+\DoxyCodeLine{00123\ \ \ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_ad0673783a2ffa6b81d27d7938e5f6322}{PortableSparseMatrixBatchVectorMultiplyAccumulate1x16}}(}
+\DoxyCodeLine{00124\ \ \ \ \ \ \ matrix,\ segments,\ indices,\ m\_rows,\ m\_cols,\ vector,\ bias\_vector,\ n\_batch,}
+\DoxyCodeLine{00125\ \ \ \ \ \ \ \mbox{\hyperlink{add__n_8cpp_ad4670fdc658d0517928e6b2c10b2259d}{input\_offset}},\ \mbox{\hyperlink{add__n_8cpp_a23e9f0626e0fdd28687b85e5065f904a}{output\_multiplier}},\ \mbox{\hyperlink{add__n_8cpp_a239169c76410c3a81fd9cba67cc0bc8f}{output\_shift}},\ \mbox{\hyperlink{add__n_8cpp_ab1dde269b1116cc98371e23a97740a58}{output\_offset}},}
+\DoxyCodeLine{00126\ \ \ \ \ \ \ \mbox{\hyperlink{add__n_8cpp_a2e6a27b448848b3057c45363e04b7d0d}{output\_activation\_min}},\ \mbox{\hyperlink{add__n_8cpp_aa889d7b51a3f84357d44f05993ac08a1}{output\_activation\_max}},\ result);}
+\DoxyCodeLine{00127\ \}}
+\DoxyCodeLine{00128\ }
+\DoxyCodeLine{00129\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_a246aaabdf1fa73214eabbd1953d2647b}{SparseMatrixBatchVectorMultiplyAccumulate}}(}
+\DoxyCodeLine{00130\ \ \ \ \ \textcolor{keyword}{const}\ int8\_t*\ \_\_restrict\_\_\ matrix,\ \textcolor{keyword}{const}\ uint8\_t*\ ledger,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ m\_rows,}
+\DoxyCodeLine{00131\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ m\_cols,\ \textcolor{keyword}{const}\ int8\_t*\ \_\_restrict\_\_\ vectors,}
+\DoxyCodeLine{00132\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{float}*\ scaling\_factors,\ \textcolor{keywordtype}{int}\ n\_batch,\ \textcolor{keywordtype}{float}*\ \_\_restrict\_\_\ result)\ \{}
+\DoxyCodeLine{00133\ \ \ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_aa4fa18007e3f0febe6fb75111db58dc4}{PortableSparseMatrixBatchVectorMultiplyAccumulate}}(}
+\DoxyCodeLine{00134\ \ \ \ \ \ \ matrix,\ ledger,\ m\_rows,\ m\_cols,\ vectors,\ scaling\_factors,\ n\_batch,}
+\DoxyCodeLine{00135\ \ \ \ \ \ \ result);}
+\DoxyCodeLine{00136\ \}}
+\DoxyCodeLine{00137\ }
+\DoxyCodeLine{00138\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_a7fa83cbe789fcec252e1f8fad0dded14}{MatrixBatchVectorMultiplyAccumulate}}(}
+\DoxyCodeLine{00139\ \ \ \ \ \textcolor{keyword}{const}\ int8\_t*\ \mbox{\hyperlink{squeeze_8cpp_a9cebfb3d6ddd692fbdd268cf4b9ad024}{input}},\ \textcolor{keyword}{const}\ int32\_t*\ bias,}
+\DoxyCodeLine{00140\ \ \ \ \ \textcolor{keyword}{const}\ int8\_t*\ input\_to\_gate\_weights,\ int32\_t\ \mbox{\hyperlink{elementwise_8cpp_aa48e56822ed6e4a79d6c8c3b688ca8d3}{multiplier}},\ int32\_t\ \mbox{\hyperlink{wm8960__regs_8h_ace4e4903c356d90d7a0e7548fc1e8b50}{shift}},}
+\DoxyCodeLine{00141\ \ \ \ \ int32\_t\ n\_batch,\ int32\_t\ n\_input,\ int32\_t\ n\_output,\ int32\_t\ output\_zp,}
+\DoxyCodeLine{00142\ \ \ \ \ int32\_t*\ scratch,\ int16\_t*\ \mbox{\hyperlink{maximum__minimum_8cpp_a7a2a916a8059078c2d7a05f46c7126fd}{output}},\ CpuBackendContext*\ context)\ \{}
+\DoxyCodeLine{00143\ \ \ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_aad3fc54df79d61d7a03961f8cfff45d1}{PortableMatrixBatchVectorMultiplyAccumulate}}(}
+\DoxyCodeLine{00144\ \ \ \ \ \ \ \mbox{\hyperlink{squeeze_8cpp_a9cebfb3d6ddd692fbdd268cf4b9ad024}{input}},\ bias,\ input\_to\_gate\_weights,\ \mbox{\hyperlink{elementwise_8cpp_aa48e56822ed6e4a79d6c8c3b688ca8d3}{multiplier}},\ \mbox{\hyperlink{wm8960__regs_8h_ace4e4903c356d90d7a0e7548fc1e8b50}{shift}},\ n\_batch,\ n\_input,}
+\DoxyCodeLine{00145\ \ \ \ \ \ \ n\_output,\ output\_zp,\ scratch,\ \mbox{\hyperlink{maximum__minimum_8cpp_a7a2a916a8059078c2d7a05f46c7126fd}{output}},\ context);}
+\DoxyCodeLine{00146\ \}}
+\DoxyCodeLine{00147\ }
+\DoxyCodeLine{00148\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_a7fa83cbe789fcec252e1f8fad0dded14}{MatrixBatchVectorMultiplyAccumulate}}(}
+\DoxyCodeLine{00149\ \ \ \ \ \textcolor{keyword}{const}\ int8\_t*\ \mbox{\hyperlink{squeeze_8cpp_a9cebfb3d6ddd692fbdd268cf4b9ad024}{input}},\ \textcolor{keyword}{const}\ int32\_t*\ bias,}
+\DoxyCodeLine{00150\ \ \ \ \ \textcolor{keyword}{const}\ int8\_t*\ input\_to\_gate\_weights,\ int32\_t\ \mbox{\hyperlink{elementwise_8cpp_aa48e56822ed6e4a79d6c8c3b688ca8d3}{multiplier}},\ int32\_t\ \mbox{\hyperlink{wm8960__regs_8h_ace4e4903c356d90d7a0e7548fc1e8b50}{shift}},}
+\DoxyCodeLine{00151\ \ \ \ \ int32\_t\ n\_batch,\ int32\_t\ n\_input,\ int32\_t\ n\_output,\ int32\_t\ output\_zp,}
+\DoxyCodeLine{00152\ \ \ \ \ int32\_t*\ scratch,\ int8\_t*\ \mbox{\hyperlink{maximum__minimum_8cpp_a7a2a916a8059078c2d7a05f46c7126fd}{output}},\ CpuBackendContext*\ context)\ \{}
+\DoxyCodeLine{00153\ \ \ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_aad3fc54df79d61d7a03961f8cfff45d1}{PortableMatrixBatchVectorMultiplyAccumulate}}(}
+\DoxyCodeLine{00154\ \ \ \ \ \ \ \mbox{\hyperlink{squeeze_8cpp_a9cebfb3d6ddd692fbdd268cf4b9ad024}{input}},\ bias,\ input\_to\_gate\_weights,\ \mbox{\hyperlink{elementwise_8cpp_aa48e56822ed6e4a79d6c8c3b688ca8d3}{multiplier}},\ \mbox{\hyperlink{wm8960__regs_8h_ace4e4903c356d90d7a0e7548fc1e8b50}{shift}},\ n\_batch,\ n\_input,}
+\DoxyCodeLine{00155\ \ \ \ \ \ \ n\_output,\ output\_zp,\ scratch,\ \mbox{\hyperlink{maximum__minimum_8cpp_a7a2a916a8059078c2d7a05f46c7126fd}{output}},\ context);}
+\DoxyCodeLine{00156\ \}}
+\DoxyCodeLine{00157\ }
+\DoxyCodeLine{00158\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_aa6ec4142f3565c0a51dfc30afc04faed}{MatrixScalarMultiplyAccumulate}}(\textcolor{keyword}{const}\ int8\_t*\ matrix,\ int32\_t\ scalar,}
+\DoxyCodeLine{00159\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ int32\_t\ n\_row,\ int32\_t\ n\_col,}
+\DoxyCodeLine{00160\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ int32\_t*\ \mbox{\hyperlink{maximum__minimum_8cpp_a7a2a916a8059078c2d7a05f46c7126fd}{output}})\ \{}
+\DoxyCodeLine{00161\ \ \ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_a3be19abeb52ba605e04b55e67e881128}{PortableMatrixScalarMultiplyAccumulate}}(matrix,\ scalar,\ n\_row,\ n\_col,\ \mbox{\hyperlink{maximum__minimum_8cpp_a7a2a916a8059078c2d7a05f46c7126fd}{output}});}
+\DoxyCodeLine{00162\ \}}
+\DoxyCodeLine{00163\ }
+\DoxyCodeLine{00164\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_a5c3050bdbd554b288d59a1f909e3034c}{MatrixBatchVectorMultiply}}(\textcolor{keyword}{const}\ int8\_t*\ \mbox{\hyperlink{squeeze_8cpp_a9cebfb3d6ddd692fbdd268cf4b9ad024}{input}},\ int32\_t\ input\_zeropoint,}
+\DoxyCodeLine{00165\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ int8\_t*\ input\_to\_gate\_weights,}
+\DoxyCodeLine{00166\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ int32\_t\ input\_to\_gate\_effective\_scale\_a,}
+\DoxyCodeLine{00167\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ int32\_t\ input\_to\_gate\_effective\_scale\_b,}
+\DoxyCodeLine{00168\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ int32\_t\ n\_batch,\ int32\_t\ n\_input,\ int32\_t\ n\_cell,}
+\DoxyCodeLine{00169\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ int8\_t*\ gate\_output,\ int8\_t\ gate\_output\_zp)\ \{}
+\DoxyCodeLine{00170\ \ \ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_a5af6dafb0c9a6144df3117ec6ba43357}{PortableMatrixBatchVectorMultiply}}(}
+\DoxyCodeLine{00171\ \ \ \ \ \ \ \mbox{\hyperlink{squeeze_8cpp_a9cebfb3d6ddd692fbdd268cf4b9ad024}{input}},\ input\_zeropoint,\ input\_to\_gate\_weights,}
+\DoxyCodeLine{00172\ \ \ \ \ \ \ input\_to\_gate\_effective\_scale\_a,\ input\_to\_gate\_effective\_scale\_b,\ n\_batch,}
+\DoxyCodeLine{00173\ \ \ \ \ \ \ n\_input,\ n\_cell,\ gate\_output,\ gate\_output\_zp);}
+\DoxyCodeLine{00174\ \}}
+\DoxyCodeLine{00175\ }
+\DoxyCodeLine{00176\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_a5c3050bdbd554b288d59a1f909e3034c}{MatrixBatchVectorMultiply}}(\textcolor{keyword}{const}\ int16\_t*\ hidden,}
+\DoxyCodeLine{00177\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ int8\_t*\ hidden\_to\_output\_weights,}
+\DoxyCodeLine{00178\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ int32\_t\ proj\_effective\_scale\_a,}
+\DoxyCodeLine{00179\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ int32\_t\ proj\_effective\_scale\_b,}
+\DoxyCodeLine{00180\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ int32\_t*\ gate\_bias,\ int32\_t\ n\_batch,}
+\DoxyCodeLine{00181\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ int32\_t\ n\_hidden,\ int32\_t\ n\_output,}
+\DoxyCodeLine{00182\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ int32\_t\ output\_zp,\ int8\_t*\ proj\_output)\ \{}
+\DoxyCodeLine{00183\ \ \ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_a5af6dafb0c9a6144df3117ec6ba43357}{PortableMatrixBatchVectorMultiply}}(hidden,\ hidden\_to\_output\_weights,}
+\DoxyCodeLine{00184\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ proj\_effective\_scale\_a,}
+\DoxyCodeLine{00185\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ proj\_effective\_scale\_b,\ gate\_bias,\ n\_batch,}
+\DoxyCodeLine{00186\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ n\_hidden,\ n\_output,\ output\_zp,\ proj\_output);}
+\DoxyCodeLine{00187\ \}}
+\DoxyCodeLine{00188\ }
+\DoxyCodeLine{00189\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_ae3a437253dc60babd7f063cddb2f56a4}{ApplyLayerNorm}}(\textcolor{keyword}{const}\ int16\_t*\ \mbox{\hyperlink{squeeze_8cpp_a9cebfb3d6ddd692fbdd268cf4b9ad024}{input}},\ \textcolor{keyword}{const}\ int16\_t*\ layer\_norm\_weights,}
+\DoxyCodeLine{00190\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ int32\_t*\ bias,\ int32\_t\ layer\_norm\_scale\_a,}
+\DoxyCodeLine{00191\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ int32\_t\ layer\_norm\_scale\_b,\ int32\_t\ variance\_limit,}
+\DoxyCodeLine{00192\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ n\_batch,\ \textcolor{keywordtype}{int}\ n\_input,\ int16\_t*\ \mbox{\hyperlink{maximum__minimum_8cpp_a7a2a916a8059078c2d7a05f46c7126fd}{output}})\ \{}
+\DoxyCodeLine{00193\ \ \ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_abd1b21dc9c439301233dc27f3c7ac384}{PortableApplyLayerNorm}}(\mbox{\hyperlink{squeeze_8cpp_a9cebfb3d6ddd692fbdd268cf4b9ad024}{input}},\ layer\_norm\_weights,\ bias,\ layer\_norm\_scale\_a,}
+\DoxyCodeLine{00194\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ layer\_norm\_scale\_b,\ variance\_limit,\ n\_batch,\ n\_input,}
+\DoxyCodeLine{00195\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{maximum__minimum_8cpp_a7a2a916a8059078c2d7a05f46c7126fd}{output}});}
+\DoxyCodeLine{00196\ \}}
+\DoxyCodeLine{00197\ }
+\DoxyCodeLine{00198\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_a67bc3bb5ec7593bd567afa6973cffd38}{ApplyLayerNormFloat}}(\textcolor{keyword}{const}\ int16\_t*\ \mbox{\hyperlink{squeeze_8cpp_a9cebfb3d6ddd692fbdd268cf4b9ad024}{input}},}
+\DoxyCodeLine{00199\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ int16\_t*\ layer\_norm\_weights,}
+\DoxyCodeLine{00200\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ int32\_t\ layer\_norm\_scale\_a,\ int32\_t\ layer\_norm\_scale\_b,}
+\DoxyCodeLine{00201\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ int32\_t*\ bias,\ \textcolor{keywordtype}{int}\ n\_batch,\ \textcolor{keywordtype}{int}\ n\_input,}
+\DoxyCodeLine{00202\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ int16\_t*\ \mbox{\hyperlink{maximum__minimum_8cpp_a7a2a916a8059078c2d7a05f46c7126fd}{output}})\ \{}
+\DoxyCodeLine{00203\ \ \ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_ac5d3c6ff25893321c74f864ab28f9ce3}{PortableApplyLayerNormFloat}}(\mbox{\hyperlink{squeeze_8cpp_a9cebfb3d6ddd692fbdd268cf4b9ad024}{input}},\ layer\_norm\_weights,\ layer\_norm\_scale\_a,}
+\DoxyCodeLine{00204\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ layer\_norm\_scale\_b,\ bias,\ n\_batch,\ n\_input,}
+\DoxyCodeLine{00205\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{maximum__minimum_8cpp_a7a2a916a8059078c2d7a05f46c7126fd}{output}});}
+\DoxyCodeLine{00206\ \}}
+\DoxyCodeLine{00207\ }
+\DoxyCodeLine{00208\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_ae8baef2267c575bc54ee5697a7a7277d}{ApplySigmoid}}(\textcolor{keyword}{const}\ int16\_t*\ \mbox{\hyperlink{squeeze_8cpp_a9cebfb3d6ddd692fbdd268cf4b9ad024}{input}},\ int32\_t\ n\_batch,\ int32\_t\ n\_input,}
+\DoxyCodeLine{00209\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ int16\_t*\ \mbox{\hyperlink{maximum__minimum_8cpp_a7a2a916a8059078c2d7a05f46c7126fd}{output}})\ \{}
+\DoxyCodeLine{00210\ \ \ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_a21e39bdcd3cafe1918a415257a541191}{PortableApplySigmoid}}(\mbox{\hyperlink{squeeze_8cpp_a9cebfb3d6ddd692fbdd268cf4b9ad024}{input}},\ n\_batch,\ n\_input,\ \mbox{\hyperlink{maximum__minimum_8cpp_a7a2a916a8059078c2d7a05f46c7126fd}{output}});}
+\DoxyCodeLine{00211\ \}}
+\DoxyCodeLine{00212\ }
+\DoxyCodeLine{00213\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_a670f91eba70d2d51dc385fc9f11c6c88}{ApplySigmoidFloat}}(\textcolor{keyword}{const}\ int16\_t*\ \mbox{\hyperlink{squeeze_8cpp_a9cebfb3d6ddd692fbdd268cf4b9ad024}{input}},\ int32\_t\ n\_batch,\ int32\_t\ n\_input,}
+\DoxyCodeLine{00214\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ int16\_t*\ \mbox{\hyperlink{maximum__minimum_8cpp_a7a2a916a8059078c2d7a05f46c7126fd}{output}})\ \{}
+\DoxyCodeLine{00215\ \ \ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_aeba93152340d2099c03c1b17fb191076}{PortableApplySigmoidFloat}}(\mbox{\hyperlink{squeeze_8cpp_a9cebfb3d6ddd692fbdd268cf4b9ad024}{input}},\ n\_batch,\ n\_input,\ \mbox{\hyperlink{maximum__minimum_8cpp_a7a2a916a8059078c2d7a05f46c7126fd}{output}});}
+\DoxyCodeLine{00216\ \}}
+\DoxyCodeLine{00217\ }
+\DoxyCodeLine{00218\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_af5224fd4d02e02759666a101f7ad9b56}{ApplyTanh}}(int32\_t\ integer\_bits,\ \textcolor{keyword}{const}\ int16\_t*\ \mbox{\hyperlink{squeeze_8cpp_a9cebfb3d6ddd692fbdd268cf4b9ad024}{input}},\ int32\_t\ n\_batch,}
+\DoxyCodeLine{00219\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ int32\_t\ n\_input,\ int16\_t*\ \mbox{\hyperlink{maximum__minimum_8cpp_a7a2a916a8059078c2d7a05f46c7126fd}{output}})\ \{}
+\DoxyCodeLine{00220\ \ \ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_a93086bd3a4b5e78fb0f00a6efde31854}{PortableApplyTanh}}(integer\_bits,\ \mbox{\hyperlink{squeeze_8cpp_a9cebfb3d6ddd692fbdd268cf4b9ad024}{input}},\ n\_batch,\ n\_input,\ \mbox{\hyperlink{maximum__minimum_8cpp_a7a2a916a8059078c2d7a05f46c7126fd}{output}});}
+\DoxyCodeLine{00221\ \}}
+\DoxyCodeLine{00222\ }
+\DoxyCodeLine{00223\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_ad409d55a899099431b20de28fbd10ab0}{ApplyTanhFloat}}(\textcolor{keyword}{const}\ int16\_t*\ \mbox{\hyperlink{squeeze_8cpp_a9cebfb3d6ddd692fbdd268cf4b9ad024}{input}},\ int32\_t\ n\_batch,\ int32\_t\ n\_input,}
+\DoxyCodeLine{00224\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ int32\_t\ integer\_bits,\ int16\_t*\ \mbox{\hyperlink{maximum__minimum_8cpp_a7a2a916a8059078c2d7a05f46c7126fd}{output}})\ \{}
+\DoxyCodeLine{00225\ \ \ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_a23b1e5cadf9e65ea3676ed1c68837613}{PortableApplyTanhFloat}}(\mbox{\hyperlink{squeeze_8cpp_a9cebfb3d6ddd692fbdd268cf4b9ad024}{input}},\ n\_batch,\ n\_input,\ integer\_bits,\ \mbox{\hyperlink{maximum__minimum_8cpp_a7a2a916a8059078c2d7a05f46c7126fd}{output}});}
+\DoxyCodeLine{00226\ \}}
+\DoxyCodeLine{00227\ }
+\DoxyCodeLine{00228\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_a00b791515d2acb7d88f09cfd9cddd2bf}{CwiseMul}}(\textcolor{keyword}{const}\ int16\_t*\ input\_1,\ \textcolor{keyword}{const}\ int16\_t*\ input\_2,\ \textcolor{keywordtype}{int}\ n\_batch,}
+\DoxyCodeLine{00229\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ n\_input,\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{wm8960__regs_8h_ace4e4903c356d90d7a0e7548fc1e8b50}{shift}},\ int16\_t*\ \mbox{\hyperlink{maximum__minimum_8cpp_a7a2a916a8059078c2d7a05f46c7126fd}{output}})\ \{}
+\DoxyCodeLine{00230\ \ \ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_afb345869d60b5f6ff234b1c57d916b6f}{PortableCwiseMul}}(input\_1,\ input\_2,\ n\_batch,\ n\_input,\ \mbox{\hyperlink{wm8960__regs_8h_ace4e4903c356d90d7a0e7548fc1e8b50}{shift}},\ \mbox{\hyperlink{maximum__minimum_8cpp_a7a2a916a8059078c2d7a05f46c7126fd}{output}});}
+\DoxyCodeLine{00231\ \}}
+\DoxyCodeLine{00232\ }
+\DoxyCodeLine{00233\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_a00b791515d2acb7d88f09cfd9cddd2bf}{CwiseMul}}(\textcolor{keyword}{const}\ int16\_t*\ input\_1,\ \textcolor{keyword}{const}\ int16\_t*\ input\_2,}
+\DoxyCodeLine{00234\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ int32\_t\ \mbox{\hyperlink{elementwise_8cpp_aa48e56822ed6e4a79d6c8c3b688ca8d3}{multiplier}},\ int32\_t\ \mbox{\hyperlink{wm8960__regs_8h_ace4e4903c356d90d7a0e7548fc1e8b50}{shift}},\ int32\_t\ n\_batch,}
+\DoxyCodeLine{00235\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ int32\_t\ n\_input,\ int32\_t\ output\_zp,\ int8\_t*\ \mbox{\hyperlink{maximum__minimum_8cpp_a7a2a916a8059078c2d7a05f46c7126fd}{output}})\ \{}
+\DoxyCodeLine{00236\ \ \ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_afb345869d60b5f6ff234b1c57d916b6f}{PortableCwiseMul}}(input\_1,\ input\_2,\ \mbox{\hyperlink{elementwise_8cpp_aa48e56822ed6e4a79d6c8c3b688ca8d3}{multiplier}},\ \mbox{\hyperlink{wm8960__regs_8h_ace4e4903c356d90d7a0e7548fc1e8b50}{shift}},\ n\_batch,\ n\_input,}
+\DoxyCodeLine{00237\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ output\_zp,\ \mbox{\hyperlink{maximum__minimum_8cpp_a7a2a916a8059078c2d7a05f46c7126fd}{output}});}
+\DoxyCodeLine{00238\ \}}
+\DoxyCodeLine{00239\ }
+\DoxyCodeLine{00240\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_a2e9fbef0ca0139e4da07d28b1fb70b88}{CwiseAdd}}(\textcolor{keyword}{const}\ int16\_t*\ input\_1,\ \textcolor{keyword}{const}\ int16\_t*\ input\_2,\ \textcolor{keywordtype}{int}\ n\_batch,}
+\DoxyCodeLine{00241\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ n\_input,\ int16\_t*\ \mbox{\hyperlink{maximum__minimum_8cpp_a7a2a916a8059078c2d7a05f46c7126fd}{output}})\ \{}
+\DoxyCodeLine{00242\ \ \ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_a83798e813e901137ca6c7e7a891877a4}{PortableCwiseAdd}}(input\_1,\ input\_2,\ n\_batch,\ n\_input,\ \mbox{\hyperlink{maximum__minimum_8cpp_a7a2a916a8059078c2d7a05f46c7126fd}{output}});}
+\DoxyCodeLine{00243\ \}}
+\DoxyCodeLine{00244\ }
+\DoxyCodeLine{00245\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_a270fcc4f2976c9fbfd85ec3ef5fbea4d}{CwiseClipping}}(\textcolor{keywordtype}{float}*\ vector,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ v\_size,}
+\DoxyCodeLine{00246\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{float}\ clipping\_value)\ \{}
+\DoxyCodeLine{00247\ \ \ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_a78a8d18212f7f22fd427465718a9c5a3}{PortableCwiseClipping}}(vector,\ v\_size,\ clipping\_value);}
+\DoxyCodeLine{00248\ \}}
+\DoxyCodeLine{00249\ }
+\DoxyCodeLine{00250\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_a270fcc4f2976c9fbfd85ec3ef5fbea4d}{CwiseClipping}}(int16\_t*\ vector,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ v\_size,}
+\DoxyCodeLine{00251\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ int16\_t\ clipping\_value)\ \{}
+\DoxyCodeLine{00252\ \ \ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_a78a8d18212f7f22fd427465718a9c5a3}{PortableCwiseClipping}}(vector,\ v\_size,\ clipping\_value);}
+\DoxyCodeLine{00253\ \}}
+\DoxyCodeLine{00254\ }
+\DoxyCodeLine{00255\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_a270fcc4f2976c9fbfd85ec3ef5fbea4d}{CwiseClipping}}(int8\_t*\ vector,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ v\_size,}
+\DoxyCodeLine{00256\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ int8\_t\ clipping\_value)\ \{}
+\DoxyCodeLine{00257\ \ \ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_a78a8d18212f7f22fd427465718a9c5a3}{PortableCwiseClipping}}(vector,\ v\_size,\ clipping\_value);}
+\DoxyCodeLine{00258\ \}}
+\DoxyCodeLine{00259\ }
+\DoxyCodeLine{00260\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_acd7492f35f64a6801fedf426f5f6a4fd}{VectorBatchVectorCwiseProductAccumulate}}(\textcolor{keyword}{const}\ int16\_t*\ vector,\ \textcolor{keywordtype}{int}\ v\_size,}
+\DoxyCodeLine{00261\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ int16\_t*\ batch\_vector,}
+\DoxyCodeLine{00262\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ n\_batch,\ int32\_t\ \mbox{\hyperlink{elementwise_8cpp_aa48e56822ed6e4a79d6c8c3b688ca8d3}{multiplier}},}
+\DoxyCodeLine{00263\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{wm8960__regs_8h_ace4e4903c356d90d7a0e7548fc1e8b50}{shift}},\ int16\_t*\ result)\ \{}
+\DoxyCodeLine{00264\ \ \ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_ac3201936c0323031a788b063ca89f1d6}{PortableVectorBatchVectorCwiseProductAccumulate}}(}
+\DoxyCodeLine{00265\ \ \ \ \ \ \ vector,\ v\_size,\ batch\_vector,\ n\_batch,\ \mbox{\hyperlink{elementwise_8cpp_aa48e56822ed6e4a79d6c8c3b688ca8d3}{multiplier}},\ \mbox{\hyperlink{wm8960__regs_8h_ace4e4903c356d90d7a0e7548fc1e8b50}{shift}},\ result);}
+\DoxyCodeLine{00266\ \}}
+\DoxyCodeLine{00267\ }
+\DoxyCodeLine{00268\ \textcolor{keywordtype}{float}\ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_a40dd958ab0746e89e6bfe23cf4a4c6d0}{VectorVectorDotProduct}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{float}*\ vector1,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{float}*\ vector2,}
+\DoxyCodeLine{00269\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ v\_size)\ \{}
+\DoxyCodeLine{00270\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_ab1d820af0a7e773f505b095fa9d0bd6c}{PortableVectorVectorDotProduct}}(vector1,\ vector2,\ v\_size);}
+\DoxyCodeLine{00271\ \}}
+\DoxyCodeLine{00272\ }
+\DoxyCodeLine{00273\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_a0a308694788d08a58efcd1371084f54f}{BatchVectorBatchVectorDotProduct}}(\textcolor{keyword}{const}\ int16\_t*\ vector1,}
+\DoxyCodeLine{00274\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ int16\_t*\ vector2,\ \textcolor{keywordtype}{int}\ v\_size,}
+\DoxyCodeLine{00275\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ n\_batch,\ int32\_t*\ result)\ \{}
+\DoxyCodeLine{00276\ \ \ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_a219350673f50e49d4629dc853636718b}{PortableBatchVectorBatchVectorDotProduct}}(vector1,\ vector2,\ v\_size,\ n\_batch,}
+\DoxyCodeLine{00277\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ result);}
+\DoxyCodeLine{00278\ \}}
+\DoxyCodeLine{00279\ }
+\DoxyCodeLine{00280\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_ad9f5c03e42698153f0ab3979c8b98523}{Sub1Vector}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{float}*\ vector,\ \textcolor{keywordtype}{int}\ v\_size,\ \textcolor{keywordtype}{float}*\ result)\ \{}
+\DoxyCodeLine{00281\ \ \ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_a3d3a101d2ea648e358421da0f1079127}{PortableSub1Vector}}(vector,\ v\_size,\ result);}
+\DoxyCodeLine{00282\ \}}
+\DoxyCodeLine{00283\ }
+\DoxyCodeLine{00284\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_ad9f5c03e42698153f0ab3979c8b98523}{Sub1Vector}}(\textcolor{keyword}{const}\ int16\_t*\ vector,\ \textcolor{keywordtype}{int}\ v\_size,\ int16\_t*\ result)\ \{}
+\DoxyCodeLine{00285\ \ \ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_a3d3a101d2ea648e358421da0f1079127}{PortableSub1Vector}}(vector,\ v\_size,\ result);}
+\DoxyCodeLine{00286\ \}}
+\DoxyCodeLine{00287\ }
+\DoxyCodeLine{00288\ \textcolor{comment}{//\ Multiply\ all\ elements\ of\ vector\ with\ a\ scalar.}}
+\DoxyCodeLine{00289\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_acb32e1681446e161dc3f1836f3a757ae}{VectorScalarMultiply}}(\textcolor{keyword}{const}\ int8\_t*\ vector,\ \textcolor{keywordtype}{int}\ v\_size,\ \textcolor{keywordtype}{float}\ \mbox{\hyperlink{batch__matmul__test_8cc_a1d28dec57cce925ad92342891bd71e7c}{scale}},}
+\DoxyCodeLine{00290\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}*\ result)\ \{}
+\DoxyCodeLine{00291\ \ \ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_a7f79dd80917fc589619ffdadcfe63999}{PortableVectorScalarMultiply}}(vector,\ v\_size,\ \mbox{\hyperlink{batch__matmul__test_8cc_a1d28dec57cce925ad92342891bd71e7c}{scale}},\ result);}
+\DoxyCodeLine{00292\ \}}
+\DoxyCodeLine{00293\ }
+\DoxyCodeLine{00294\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_a695680608ead1c5de98a426e9aed0c96}{ReductionSumVector}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{float}*\ input\_vector,\ \textcolor{keywordtype}{float}*\ output\_vector,}
+\DoxyCodeLine{00295\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{mirror__pad_8cpp_ad8d3d4ec9395e78bb589ab744c5fbaaa}{output\_size}},\ \textcolor{keywordtype}{int}\ reduction\_size)\ \{}
+\DoxyCodeLine{00296\ \ \ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_ad7a3c7286e5eed0974a5981832195a20}{PortableReductionSumVector}}(input\_vector,\ output\_vector,\ \mbox{\hyperlink{mirror__pad_8cpp_ad8d3d4ec9395e78bb589ab744c5fbaaa}{output\_size}},}
+\DoxyCodeLine{00297\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ reduction\_size);}
+\DoxyCodeLine{00298\ \}}
+\DoxyCodeLine{00299\ }
+\DoxyCodeLine{00300\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_a695680608ead1c5de98a426e9aed0c96}{ReductionSumVector}}(\textcolor{keyword}{const}\ int32\_t*\ input\_vector,\ int32\_t*\ output\_vector,}
+\DoxyCodeLine{00301\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{mirror__pad_8cpp_ad8d3d4ec9395e78bb589ab744c5fbaaa}{output\_size}},\ \textcolor{keywordtype}{int}\ reduction\_size)\ \{}
+\DoxyCodeLine{00302\ \ \ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_ad7a3c7286e5eed0974a5981832195a20}{PortableReductionSumVector}}(input\_vector,\ output\_vector,\ \mbox{\hyperlink{mirror__pad_8cpp_ad8d3d4ec9395e78bb589ab744c5fbaaa}{output\_size}},}
+\DoxyCodeLine{00303\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ reduction\_size);}
+\DoxyCodeLine{00304\ \}}
+\DoxyCodeLine{00305\ }
+\DoxyCodeLine{00306\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_a695680608ead1c5de98a426e9aed0c96}{ReductionSumVector}}(\textcolor{keyword}{const}\ int8\_t*\ input\_vector,\ int32\_t*\ output\_vector,}
+\DoxyCodeLine{00307\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{mirror__pad_8cpp_ad8d3d4ec9395e78bb589ab744c5fbaaa}{output\_size}},\ \textcolor{keywordtype}{int}\ reduction\_size)\ \{}
+\DoxyCodeLine{00308\ \ \ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_ad7a3c7286e5eed0974a5981832195a20}{PortableReductionSumVector}}(input\_vector,\ output\_vector,\ \mbox{\hyperlink{mirror__pad_8cpp_ad8d3d4ec9395e78bb589ab744c5fbaaa}{output\_size}},}
+\DoxyCodeLine{00309\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ reduction\_size);}
+\DoxyCodeLine{00310\ \}}
+\DoxyCodeLine{00311\ }
+\DoxyCodeLine{00312\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_a3de391bb3d11be44e4349d36f33320db}{MeanStddevNormalization}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{float}*\ input\_vector,\ \textcolor{keywordtype}{float}*\ output\_vector,}
+\DoxyCodeLine{00313\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ v\_size,\ \textcolor{keywordtype}{int}\ n\_batch)\ \{}
+\DoxyCodeLine{00314\ \ \ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_aff582b9757e300858924f0d87e5f71ca}{PortableMeanStddevNormalization}}(input\_vector,\ output\_vector,\ v\_size,\ n\_batch);}
+\DoxyCodeLine{00315\ \}}
+\DoxyCodeLine{00316\ }
+\DoxyCodeLine{00317\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_a8bf1e3471ee86ce211a1f66afa9db512}{TwoGateSaturatingAdd}}(\textcolor{keyword}{const}\ int8\_t*\ \mbox{\hyperlink{squeeze_8cpp_a9cebfb3d6ddd692fbdd268cf4b9ad024}{input}},\ int8\_t\ input\_zp,}
+\DoxyCodeLine{00318\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ int8\_t*\ recurrent,\ int8\_t\ recurrent\_zp,}
+\DoxyCodeLine{00319\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ int32\_t\ input\_effective\_scale\_a,}
+\DoxyCodeLine{00320\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ int32\_t\ input\_effective\_scale\_b,}
+\DoxyCodeLine{00321\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ int32\_t\ recurrent\_effective\_scale\_a,}
+\DoxyCodeLine{00322\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ int32\_t\ recurrent\_effective\_scale\_b,\ int32\_t\ n\_batch,}
+\DoxyCodeLine{00323\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ int32\_t\ n\_cell,\ int16\_t*\ \mbox{\hyperlink{maximum__minimum_8cpp_a7a2a916a8059078c2d7a05f46c7126fd}{output}})\ \{}
+\DoxyCodeLine{00324\ \ \ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_a916efe4cd2ee89f625a5caac64dd8c88}{PortableTwoGateSaturatingAdd}}(}
+\DoxyCodeLine{00325\ \ \ \ \ \ \ \mbox{\hyperlink{squeeze_8cpp_a9cebfb3d6ddd692fbdd268cf4b9ad024}{input}},\ input\_zp,\ recurrent,\ recurrent\_zp,\ input\_effective\_scale\_a,}
+\DoxyCodeLine{00326\ \ \ \ \ \ \ input\_effective\_scale\_b,\ recurrent\_effective\_scale\_a,}
+\DoxyCodeLine{00327\ \ \ \ \ \ \ recurrent\_effective\_scale\_b,\ n\_batch,\ n\_cell,\ \mbox{\hyperlink{maximum__minimum_8cpp_a7a2a916a8059078c2d7a05f46c7126fd}{output}});}
+\DoxyCodeLine{00328\ \}}
+\DoxyCodeLine{00329\ }
+\DoxyCodeLine{00330\ \}\ \ \textcolor{comment}{//\ namespace\ tensor\_utils}}
+\DoxyCodeLine{00331\ \}\ \ \textcolor{comment}{//\ namespace\ tflite}}
+\DoxyCodeLine{00332\ }
+\DoxyCodeLine{00333\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ TENSORFLOW\_LITE\_KERNELS\_INTERNAL\_REFERENCE\_PORTABLE\_TENSOR\_UTILS\_H\_}}
+
+\end{DoxyCode}

@@ -1,0 +1,153 @@
+\doxysection{strided\+\_\+slice.\+h}
+\hypertarget{tflite-micro-main_2tensorflow_2lite_2kernels_2internal_2reference_2strided__slice_8h_source}{}\label{tflite-micro-main_2tensorflow_2lite_2kernels_2internal_2reference_2strided__slice_8h_source}\index{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/main/tensorflow/lite/kernels/internal/reference/strided\_slice.h@{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/main/tensorflow/lite/kernels/internal/reference/strided\_slice.h}}
+\mbox{\hyperlink{tflite-micro-main_2tensorflow_2lite_2kernels_2internal_2reference_2strided__slice_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{/*\ Copyright\ 2017\ The\ TensorFlow\ Authors.\ All\ Rights\ Reserved.}}
+\DoxyCodeLine{00002\ \textcolor{comment}{}}
+\DoxyCodeLine{00003\ \textcolor{comment}{Licensed\ under\ the\ Apache\ License,\ Version\ 2.0\ (the\ "{}License"{});}}
+\DoxyCodeLine{00004\ \textcolor{comment}{you\ may\ not\ use\ this\ file\ except\ in\ compliance\ with\ the\ License.}}
+\DoxyCodeLine{00005\ \textcolor{comment}{You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{00006\ \textcolor{comment}{}}
+\DoxyCodeLine{00007\ \textcolor{comment}{\ \ \ \ http://www.apache.org/licenses/LICENSE-\/2.0}}
+\DoxyCodeLine{00008\ \textcolor{comment}{}}
+\DoxyCodeLine{00009\ \textcolor{comment}{Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ software}}
+\DoxyCodeLine{00010\ \textcolor{comment}{distributed\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,}}
+\DoxyCodeLine{00011\ \textcolor{comment}{WITHOUT\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,\ either\ express\ or\ implied.}}
+\DoxyCodeLine{00012\ \textcolor{comment}{See\ the\ License\ for\ the\ specific\ language\ governing\ permissions\ and}}
+\DoxyCodeLine{00013\ \textcolor{comment}{limitations\ under\ the\ License.}}
+\DoxyCodeLine{00014\ \textcolor{comment}{==============================================================================*/}}
+\DoxyCodeLine{00015\ \textcolor{preprocessor}{\#ifndef\ TENSORFLOW\_LITE\_KERNELS\_INTERNAL\_REFERENCE\_STRIDED\_SLICE\_H\_}}
+\DoxyCodeLine{00016\ \textcolor{preprocessor}{\#define\ TENSORFLOW\_LITE\_KERNELS\_INTERNAL\_REFERENCE\_STRIDED\_SLICE\_H\_}}
+\DoxyCodeLine{00017\ }
+\DoxyCodeLine{00018\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{instrumentation_8h}{ruy/profiler/instrumentation.h}}"{}}\ \ \textcolor{comment}{//\ from\ @ruy}}
+\DoxyCodeLine{00019\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/kernels/internal/common.h"{}}}
+\DoxyCodeLine{00020\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/kernels/internal/compatibility.h"{}}}
+\DoxyCodeLine{00021\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/kernels/internal/portable\_tensor.h"{}}}
+\DoxyCodeLine{00022\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/kernels/internal/strided\_slice\_logic.h"{}}}
+\DoxyCodeLine{00023\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/kernels/internal/types.h"{}}}
+\DoxyCodeLine{00024\ }
+\DoxyCodeLine{00025\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacetflite}{tflite}}\ \{}
+\DoxyCodeLine{00026\ }
+\DoxyCodeLine{00027\ \textcolor{keyword}{namespace\ }reference\_ops\ \{}
+\DoxyCodeLine{00028\ }
+\DoxyCodeLine{00029\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{00030\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1reference__ops_afc86bddcfcd4a97d39ea0ed67a7da056}{StridedSlice}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structtflite_1_1_strided_slice_params}{tflite::StridedSliceParams}}\&\ op\_params,}
+\DoxyCodeLine{00031\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ RuntimeShape\&\ unextended\_input\_shape,}
+\DoxyCodeLine{00032\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ RuntimeShape\&\ unextended\_output\_shape,}
+\DoxyCodeLine{00033\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ SequentialTensorWriter<T>*\ writer)\ \{}
+\DoxyCodeLine{00034\ \ \ \mbox{\hyperlink{classruy_1_1profiler_1_1_scope_label}{ruy::profiler::ScopeLabel}}\ \mbox{\hyperlink{namespace_arduino_tinyml_workshop_aa3ba06fbb1cde2537e5c8d5173ef6c87}{label}}(\textcolor{stringliteral}{"{}StridedSlice"{}});}
+\DoxyCodeLine{00035\ }
+\DoxyCodeLine{00036\ \ \ \textcolor{comment}{//\ Note\ that\ the\ output\_shape\ is\ not\ used\ herein.}}
+\DoxyCodeLine{00037\ \ \ \mbox{\hyperlink{structtflite_1_1_strided_slice_params}{tflite::StridedSliceParams}}\ params\_copy\ =\ op\_params;}
+\DoxyCodeLine{00038\ }
+\DoxyCodeLine{00039\ \ \ \mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2kernels_2internal_2compatibility_8h_a153a4c7bc866139ad88ebf7cb7f4c400}{TFLITE\_DCHECK\_LE}}(unextended\_input\_shape.DimensionsCount(),\ 5);}
+\DoxyCodeLine{00040\ \ \ \mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2kernels_2internal_2compatibility_8h_a153a4c7bc866139ad88ebf7cb7f4c400}{TFLITE\_DCHECK\_LE}}(unextended\_output\_shape.DimensionsCount(),\ 5);}
+\DoxyCodeLine{00041\ \ \ \textcolor{keyword}{const}\ RuntimeShape\ \mbox{\hyperlink{namespace_m_n_i_s_t_afa2c1de24d40248bcf9a833cf7e9e0bc}{input\_shape}}\ =}
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \mbox{\hyperlink{classtflite_1_1_runtime_shape_a647264349b0f266c94102a8b3dda22cf}{RuntimeShape::ExtendedShape}}(5,\ unextended\_input\_shape);}
+\DoxyCodeLine{00043\ \ \ \textcolor{keyword}{const}\ RuntimeShape\ output\_shape\ =}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \mbox{\hyperlink{classtflite_1_1_runtime_shape_a647264349b0f266c94102a8b3dda22cf}{RuntimeShape::ExtendedShape}}(5,\ unextended\_output\_shape);}
+\DoxyCodeLine{00045\ }
+\DoxyCodeLine{00046\ \ \ \textcolor{comment}{//\ Reverse\ and\ pad\ to\ 5\ dimensions\ because\ that\ is\ what\ the\ runtime\ code}}
+\DoxyCodeLine{00047\ \ \ \textcolor{comment}{//\ requires\ (ie.\ all\ shapes\ must\ be\ 5D\ and\ are\ given\ backwards).}}
+\DoxyCodeLine{00048\ \ \ \mbox{\hyperlink{namespacetflite_1_1strided__slice_a744a0e56f01f2ee6ea645799c4dafe01}{strided\_slice::StridedSlicePadIndices}}(\&params\_copy,\ 5);}
+\DoxyCodeLine{00049\ }
+\DoxyCodeLine{00050\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ start\_0\ =}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_1_1strided__slice_a93a9643ace0f642b56b489ef285af956}{strided\_slice::StridedSliceStartForAxis}}(params\_copy,\ input\_shape,\ 0);}
+\DoxyCodeLine{00052\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ stop\_0\ =\ \mbox{\hyperlink{namespacetflite_1_1strided__slice_a47b234fb853114fda7b62d7a1bb8d31e}{strided\_slice::StridedSliceEndForAxis}}(}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ params\_copy,\ input\_shape,\ 0,\ start\_0);}
+\DoxyCodeLine{00054\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ start\_1\ =}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_1_1strided__slice_a93a9643ace0f642b56b489ef285af956}{strided\_slice::StridedSliceStartForAxis}}(params\_copy,\ input\_shape,\ 1);}
+\DoxyCodeLine{00056\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ stop\_1\ =\ \mbox{\hyperlink{namespacetflite_1_1strided__slice_a47b234fb853114fda7b62d7a1bb8d31e}{strided\_slice::StridedSliceEndForAxis}}(}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ params\_copy,\ input\_shape,\ 1,\ start\_1);}
+\DoxyCodeLine{00058\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ start\_2\ =}
+\DoxyCodeLine{00059\ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_1_1strided__slice_a93a9643ace0f642b56b489ef285af956}{strided\_slice::StridedSliceStartForAxis}}(params\_copy,\ input\_shape,\ 2);}
+\DoxyCodeLine{00060\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ stop\_2\ =\ \mbox{\hyperlink{namespacetflite_1_1strided__slice_a47b234fb853114fda7b62d7a1bb8d31e}{strided\_slice::StridedSliceEndForAxis}}(}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ params\_copy,\ input\_shape,\ 2,\ start\_2);}
+\DoxyCodeLine{00062\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ start\_3\ =}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_1_1strided__slice_a93a9643ace0f642b56b489ef285af956}{strided\_slice::StridedSliceStartForAxis}}(params\_copy,\ input\_shape,\ 3);}
+\DoxyCodeLine{00064\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ stop\_3\ =\ \mbox{\hyperlink{namespacetflite_1_1strided__slice_a47b234fb853114fda7b62d7a1bb8d31e}{strided\_slice::StridedSliceEndForAxis}}(}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ params\_copy,\ input\_shape,\ 3,\ start\_3);}
+\DoxyCodeLine{00066\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ start\_4\ =}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_1_1strided__slice_a93a9643ace0f642b56b489ef285af956}{strided\_slice::StridedSliceStartForAxis}}(params\_copy,\ input\_shape,\ 4);}
+\DoxyCodeLine{00068\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ stop\_4\ =\ \mbox{\hyperlink{namespacetflite_1_1strided__slice_a47b234fb853114fda7b62d7a1bb8d31e}{strided\_slice::StridedSliceEndForAxis}}(}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ params\_copy,\ input\_shape,\ 4,\ start\_4);}
+\DoxyCodeLine{00070\ }
+\DoxyCodeLine{00071\ \ \ \textcolor{keyword}{auto}\ lc\ =\ [\&](\textcolor{keywordtype}{int}\ \mbox{\hyperlink{strided__slice_8cpp_a4415abf9861e3883a31d588f3909eba9}{end}},\ \textcolor{keywordtype}{int}\ stride,\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{namespace_arduino_tinyml_workshop_a230c8eac09a3338f6adcc073d97bc4a1}{index}})\ \{}
+\DoxyCodeLine{00072\ \ \ \ \ \textcolor{keywordflow}{if}\ (stride\ <\ 0)\ \{}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespace_arduino_tinyml_workshop_a230c8eac09a3338f6adcc073d97bc4a1}{index}}\ >\ \mbox{\hyperlink{strided__slice_8cpp_a4415abf9861e3883a31d588f3909eba9}{end}};}
+\DoxyCodeLine{00074\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespace_arduino_tinyml_workshop_a230c8eac09a3338f6adcc073d97bc4a1}{index}}\ <\ \mbox{\hyperlink{strided__slice_8cpp_a4415abf9861e3883a31d588f3909eba9}{end}};}
+\DoxyCodeLine{00076\ \ \ \ \ \}}
+\DoxyCodeLine{00077\ \ \ \};}
+\DoxyCodeLine{00078\ \ \ \textcolor{comment}{//\ With\ a\ static\_cast\ it\ is\ not\ possible\ to\ initialize}}
+\DoxyCodeLine{00079\ \ \ \textcolor{comment}{//\ a\ variable\ of\ type\ 'const\ int\ *'}}
+\DoxyCodeLine{00080\ \ \ \textcolor{comment}{//\ with\ an\ rvalue\ of\ type\ 'const\ int32\_t\ *'\ (aka\ 'const\ long\ *').}}
+\DoxyCodeLine{00081\ \ \ \textcolor{comment}{//\ reinterpret\_cast\ is\ required\ to\ handle\ this\ casting.}}
+\DoxyCodeLine{00082\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}*\ shape\ =\ \textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\textcolor{keywordtype}{int}*\textcolor{keyword}{>}(\mbox{\hyperlink{namespace_m_n_i_s_t_afa2c1de24d40248bcf9a833cf7e9e0bc}{input\_shape}}.DimsData());}
+\DoxyCodeLine{00083\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}*\ stride\ =\ \textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\textcolor{keywordtype}{int}*\textcolor{keyword}{>}(params\_copy.\mbox{\hyperlink{structtflite_1_1_strided_slice_params_aa31f0113c11f9579f0b4bd1c8c6e4629}{strides}});}
+\DoxyCodeLine{00084\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{bool}\ inner\_stride\_is\_1\ =\ params\_copy.\mbox{\hyperlink{structtflite_1_1_strided_slice_params_aa31f0113c11f9579f0b4bd1c8c6e4629}{strides}}[4]\ ==\ 1;}
+\DoxyCodeLine{00085\ }
+\DoxyCodeLine{00086\ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ offset\_0\ =\ start\_0;\ lc(stop\_0,\ stride[0],\ offset\_0);}
+\DoxyCodeLine{00087\ \ \ \ \ \ \ \ offset\_0\ +=\ stride[0])\ \{}
+\DoxyCodeLine{00088\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ offset\_1\ =\ start\_1;\ lc(stop\_1,\ stride[1],\ offset\_1);}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \ \ \ offset\_1\ +=\ stride[1])\ \{}
+\DoxyCodeLine{00090\ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ offset\_2\ =\ start\_2;\ lc(stop\_2,\ stride[2],\ offset\_2);}
+\DoxyCodeLine{00091\ \ \ \ \ \ \ \ \ \ \ \ offset\_2\ +=\ stride[2])\ \{}
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ offset\_3\ =\ start\_3;\ lc(stop\_3,\ stride[3],\ offset\_3);}
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \ \ \ \ \ \ \ offset\_3\ +=\ stride[3])\ \{}
+\DoxyCodeLine{00094\ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ When\ the\ stride\ is\ 1,\ the\ inner\ loop\ is\ equivalent\ to\ the}}
+\DoxyCodeLine{00095\ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ optimized\ slice\ inner\ loop.\ Otherwise,\ it\ is\ identical\ to\ the}}
+\DoxyCodeLine{00096\ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ strided\_slice\ reference\ implementation\ inner\ loop.}}
+\DoxyCodeLine{00097\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (inner\_stride\_is\_1)\ \{}
+\DoxyCodeLine{00098\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ len\ =\ stop\_4\ -\/\ start\_4;}
+\DoxyCodeLine{00099\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{namespace_arduino_tinyml_workshop_a230c8eac09a3338f6adcc073d97bc4a1}{index}}\ =\ start\_4\ +\ offset\_3\ *\ shape[4]\ +}
+\DoxyCodeLine{00100\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ offset\_2\ *\ shape[3]\ *\ shape[4]\ +}
+\DoxyCodeLine{00101\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ offset\_1\ *\ shape[2]\ *\ shape[3]\ *\ shape[4]\ +}
+\DoxyCodeLine{00102\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ offset\_0\ *\ shape[1]\ *\ shape[2]\ *\ shape[3]\ *\ shape[4];}
+\DoxyCodeLine{00103\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (len\ >\ 0)\ \{}
+\DoxyCodeLine{00104\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ writer-\/>WriteN(index,\ len);}
+\DoxyCodeLine{00105\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00106\ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00107\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ offset\_4\ =\ start\_4;\ lc(stop\_4,\ stride[4],\ offset\_4);}
+\DoxyCodeLine{00108\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ offset\_4\ +=\ stride[4])\ \{}
+\DoxyCodeLine{00109\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{namespace_arduino_tinyml_workshop_a230c8eac09a3338f6adcc073d97bc4a1}{index}}\ =\ offset\_4\ +\ offset\_3\ *\ shape[4]\ +}
+\DoxyCodeLine{00110\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ offset\_2\ *\ shape[3]\ *\ shape[4]\ +}
+\DoxyCodeLine{00111\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ offset\_1\ *\ shape[2]\ *\ shape[3]\ *\ shape[4]\ +}
+\DoxyCodeLine{00112\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ offset\_0\ *\ shape[1]\ *\ shape[2]\ *\ shape[3]\ *\ shape[4];}
+\DoxyCodeLine{00113\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ writer-\/>Write(index);}
+\DoxyCodeLine{00114\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00115\ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00116\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00117\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00118\ \ \ \ \ \}}
+\DoxyCodeLine{00119\ \ \ \}}
+\DoxyCodeLine{00120\ \}}
+\DoxyCodeLine{00121\ }
+\DoxyCodeLine{00122\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{00123\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1reference__ops_afc86bddcfcd4a97d39ea0ed67a7da056}{StridedSlice}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structtflite_1_1_strided_slice_params}{tflite::StridedSliceParams}}\&\ op\_params,}
+\DoxyCodeLine{00124\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ RuntimeShape\&\ unextended\_input\_shape,}
+\DoxyCodeLine{00125\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ T*\ \mbox{\hyperlink{add__n__test_8cc_a5612ba79d1f0b544c7aeae4621166fea}{input\_data}},}
+\DoxyCodeLine{00126\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ RuntimeShape\&\ unextended\_output\_shape,}
+\DoxyCodeLine{00127\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ T*\ \mbox{\hyperlink{add__n__test_8cc_a3305b43869c4b837b0a33c12cff5069b}{output\_data}})\ \{}
+\DoxyCodeLine{00128\ \ \ SequentialTensorWriter<T>\ writer(\mbox{\hyperlink{add__n__test_8cc_a5612ba79d1f0b544c7aeae4621166fea}{input\_data}},\ \mbox{\hyperlink{add__n__test_8cc_a3305b43869c4b837b0a33c12cff5069b}{output\_data}});}
+\DoxyCodeLine{00129\ \ \ \mbox{\hyperlink{namespacetflite_1_1reference__ops_afc86bddcfcd4a97d39ea0ed67a7da056}{StridedSlice<T>}}(op\_params,\ unextended\_input\_shape,\ unextended\_output\_shape,}
+\DoxyCodeLine{00130\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&writer);}
+\DoxyCodeLine{00131\ \}}
+\DoxyCodeLine{00132\ }
+\DoxyCodeLine{00133\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{00134\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1reference__ops_afc86bddcfcd4a97d39ea0ed67a7da056}{StridedSlice}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structtflite_1_1_strided_slice_params}{tflite::StridedSliceParams}}\&\ op\_params,}
+\DoxyCodeLine{00135\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ RuntimeShape\&\ unextended\_input\_shape,}
+\DoxyCodeLine{00136\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_tf_lite_tensor}{TfLiteTensor}}*\ \mbox{\hyperlink{squeeze_8cpp_a9cebfb3d6ddd692fbdd268cf4b9ad024}{input}},}
+\DoxyCodeLine{00137\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ RuntimeShape\&\ unextended\_output\_shape,}
+\DoxyCodeLine{00138\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_tf_lite_tensor}{TfLiteTensor}}*\ \mbox{\hyperlink{maximum__minimum_8cpp_a7a2a916a8059078c2d7a05f46c7126fd}{output}})\ \{}
+\DoxyCodeLine{00139\ \ \ SequentialTensorWriter<T>\ writer(\mbox{\hyperlink{squeeze_8cpp_a9cebfb3d6ddd692fbdd268cf4b9ad024}{input}},\ \mbox{\hyperlink{maximum__minimum_8cpp_a7a2a916a8059078c2d7a05f46c7126fd}{output}});}
+\DoxyCodeLine{00140\ \ \ \mbox{\hyperlink{namespacetflite_1_1reference__ops_afc86bddcfcd4a97d39ea0ed67a7da056}{StridedSlice<T>}}(op\_params,\ unextended\_input\_shape,\ unextended\_output\_shape,}
+\DoxyCodeLine{00141\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&writer);}
+\DoxyCodeLine{00142\ \}}
+\DoxyCodeLine{00143\ }
+\DoxyCodeLine{00144\ \}\ \ \textcolor{comment}{//\ namespace\ reference\_ops}}
+\DoxyCodeLine{00145\ \}\ \ \textcolor{comment}{//\ namespace\ tflite}}
+\DoxyCodeLine{00146\ }
+\DoxyCodeLine{00147\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ TENSORFLOW\_LITE\_KERNELS\_INTERNAL\_REFERENCE\_STRIDED\_SLICE\_H\_}}
+
+\end{DoxyCode}

@@ -1,0 +1,118 @@
+\doxysection{fully\+\_\+connected.\+h}
+\hypertarget{_face___access__inferencing_2src_2edge-impulse-sdk_2tensorflow_2lite_2micro_2kernels_2fully__connected_8h_source}{}\label{_face___access__inferencing_2src_2edge-impulse-sdk_2tensorflow_2lite_2micro_2kernels_2fully__connected_8h_source}\index{Face\_Access\_inferencing/src/edge-\/impulse-\/sdk/tensorflow/lite/micro/kernels/fully\_connected.h@{Face\_Access\_inferencing/src/edge-\/impulse-\/sdk/tensorflow/lite/micro/kernels/fully\_connected.h}}
+\mbox{\hyperlink{_face___access__inferencing_2src_2edge-impulse-sdk_2tensorflow_2lite_2micro_2kernels_2fully__connected_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{/*\ Copyright\ 2022\ The\ TensorFlow\ Authors.\ All\ Rights\ Reserved.}}
+\DoxyCodeLine{00002\ \textcolor{comment}{}}
+\DoxyCodeLine{00003\ \textcolor{comment}{Licensed\ under\ the\ Apache\ License,\ Version\ 2.0\ (the\ "{}License"{});}}
+\DoxyCodeLine{00004\ \textcolor{comment}{you\ may\ not\ use\ this\ file\ except\ in\ compliance\ with\ the\ License.}}
+\DoxyCodeLine{00005\ \textcolor{comment}{You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{00006\ \textcolor{comment}{}}
+\DoxyCodeLine{00007\ \textcolor{comment}{\ \ \ \ http://www.apache.org/licenses/LICENSE-\/2.0}}
+\DoxyCodeLine{00008\ \textcolor{comment}{}}
+\DoxyCodeLine{00009\ \textcolor{comment}{Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ software}}
+\DoxyCodeLine{00010\ \textcolor{comment}{distributed\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,}}
+\DoxyCodeLine{00011\ \textcolor{comment}{WITHOUT\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,\ either\ express\ or\ implied.}}
+\DoxyCodeLine{00012\ \textcolor{comment}{See\ the\ License\ for\ the\ specific\ language\ governing\ permissions\ and}}
+\DoxyCodeLine{00013\ \textcolor{comment}{limitations\ under\ the\ License.}}
+\DoxyCodeLine{00014\ \textcolor{comment}{==============================================================================*/}}
+\DoxyCodeLine{00015\ \textcolor{preprocessor}{\#ifndef\ TENSORFLOW\_LITE\_MICRO\_KERNELS\_FULLY\_CONNECTED\_H\_}}
+\DoxyCodeLine{00016\ \textcolor{preprocessor}{\#define\ TENSORFLOW\_LITE\_MICRO\_KERNELS\_FULLY\_CONNECTED\_H\_}}
+\DoxyCodeLine{00017\ }
+\DoxyCodeLine{00018\ \textcolor{preprocessor}{\#include\ <cstdint>}}
+\DoxyCodeLine{00019\ }
+\DoxyCodeLine{00020\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{_face___access__inferencing_2src_2edge-impulse-sdk_2tensorflow_2lite_2c_2builtin__op__data_8h}{edge-\/impulse-\/sdk/tensorflow/lite/c/builtin\_op\_data.h}}"{}}}
+\DoxyCodeLine{00021\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{_face___access__inferencing_2src_2edge-impulse-sdk_2tensorflow_2lite_2c_2common_8h}{edge-\/impulse-\/sdk/tensorflow/lite/c/common.h}}"{}}}
+\DoxyCodeLine{00022\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{_face___access__inferencing_2src_2edge-impulse-sdk_2tensorflow_2lite_2kernels_2internal_2types_8h}{edge-\/impulse-\/sdk/tensorflow/lite/kernels/internal/types.h}}"{}}}
+\DoxyCodeLine{00023\ }
+\DoxyCodeLine{00024\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacetflite}{tflite}}\ \{}
+\DoxyCodeLine{00025\ }
+\DoxyCodeLine{00026\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structtflite_1_1_op_data_fully_connected}{OpDataFullyConnected}}\ \{}
+\DoxyCodeLine{00027\ \ \ \textcolor{comment}{//\ The\ scaling\ factor\ from\ input\ to\ output\ (aka\ the\ 'real\ multiplier')\ can}}
+\DoxyCodeLine{00028\ \ \ \textcolor{comment}{//\ be\ represented\ as\ a\ fixed\ point\ multiplier\ plus\ a\ left\ shift.}}
+\DoxyCodeLine{00029\ \ \ int32\_t\ \mbox{\hyperlink{structtflite_1_1_op_data_fully_connected_ab29398d5e578a2b905d762e95a8d8ef6}{output\_multiplier}};}
+\DoxyCodeLine{00030\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{structtflite_1_1_op_data_fully_connected_a813ebd28d3d29c108f310758a489fa8f}{output\_shift}};}
+\DoxyCodeLine{00031\ \ \ \textcolor{comment}{//\ The\ range\ of\ the\ fused\ activation\ layer.\ For\ example\ for\ kNone\ and}}
+\DoxyCodeLine{00032\ \ \ \textcolor{comment}{//\ uint8\_t\ these\ would\ be\ 0\ and\ 255.}}
+\DoxyCodeLine{00033\ \ \ int32\_t\ \mbox{\hyperlink{structtflite_1_1_op_data_fully_connected_a610242686b018c8b817ce773dd1a39df}{output\_activation\_min}};}
+\DoxyCodeLine{00034\ \ \ int32\_t\ \mbox{\hyperlink{structtflite_1_1_op_data_fully_connected_af8237ebe120b4ad00720bd121321d637}{output\_activation\_max}};}
+\DoxyCodeLine{00035\ \ \ \textcolor{comment}{//\ The\ index\ of\ the\ temporary\ tensor\ where\ the\ quantized\ inputs\ are\ cached.}}
+\DoxyCodeLine{00036\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{structtflite_1_1_op_data_fully_connected_ab028f8752da688f2dcd02d7268bcad6e}{input\_quantized\_index}};}
+\DoxyCodeLine{00037\ \ \ \textcolor{comment}{//\ Cached\ zero\ point\ values\ of\ tensors.}}
+\DoxyCodeLine{00038\ \ \ int32\_t\ \mbox{\hyperlink{structtflite_1_1_op_data_fully_connected_aea22a8fe054cef44547696ef775264a7}{input\_zero\_point}};}
+\DoxyCodeLine{00039\ \ \ int32\_t\ \mbox{\hyperlink{structtflite_1_1_op_data_fully_connected_afb2b24890cd54699c41bce5c9cee0a00}{filter\_zero\_point}};}
+\DoxyCodeLine{00040\ \ \ int32\_t\ \mbox{\hyperlink{structtflite_1_1_op_data_fully_connected_adc226066fede8f72bfd039f1107ae06f}{output\_zero\_point}};}
+\DoxyCodeLine{00041\ }
+\DoxyCodeLine{00042\ \textcolor{comment}{//\ TODO(b/258710417):\ enable\ by\ default\ once\ optimized\ fully-\/connected\ works\ for}}
+\DoxyCodeLine{00043\ \textcolor{comment}{//\ all\ targets.}}
+\DoxyCodeLine{00044\ \textcolor{preprocessor}{\#if\ !defined(HEXAGON)}}
+\DoxyCodeLine{00045\ \ \ \textcolor{comment}{//\ A\ buffer\ used\ to\ store\ unpacked\ filter\ values.\ This\ is\ used\ if\ the\ source}}
+\DoxyCodeLine{00046\ \ \ \textcolor{comment}{//\ tensor\ is\ of\ n-\/bit\ precision\ that\ cannot\ be\ easily\ processed\ by\ kernels.}}
+\DoxyCodeLine{00047\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{structtflite_1_1_op_data_fully_connected_a26e6aabdc1773dc09b4cee5d45677c00}{filter\_buffer\_index}};}
+\DoxyCodeLine{00048\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00049\ \};}
+\DoxyCodeLine{00050\ }
+\DoxyCodeLine{00051\ \textcolor{keyword}{extern}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{namespacetflite_a9af3b2e1e531e693dbba40ea6de9a180}{kFullyConnectedInputTensor}};}
+\DoxyCodeLine{00052\ \textcolor{keyword}{extern}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{namespacetflite_a38fc72c92e118c2a0de72d5d5905a9c1}{kFullyConnectedWeightsTensor}};}
+\DoxyCodeLine{00053\ \textcolor{keyword}{extern}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{namespacetflite_ae21b36274ab0250b4e4b84bcdd5c1c05}{kFullyConnectedBiasTensor}};}
+\DoxyCodeLine{00054\ \textcolor{keyword}{extern}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{namespacetflite_ad6481c486a2e3540539dc42bb79536e3}{kFullyConnectedOutputTensor}};}
+\DoxyCodeLine{00055\ }
+\DoxyCodeLine{00056\ \textcolor{comment}{//\ Returns\ a\ FullyConnectedParams\ struct\ with\ all\ the\ parameters\ needed\ for\ a}}
+\DoxyCodeLine{00057\ \textcolor{comment}{//\ float\ computation.}}
+\DoxyCodeLine{00058\ \mbox{\hyperlink{structtflite_1_1_fully_connected_params}{FullyConnectedParams}}\ \mbox{\hyperlink{namespacetflite_a24823b5cccf4bd37bfb6f8f0b1871d71}{FullyConnectedParamsFloat}}(}
+\DoxyCodeLine{00059\ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src7f67a4373e2a0d20daf1d1ff4e1f4339_acc9e377dbc009d68bbfa5480d2559565}{TfLiteFusedActivation}}\ \mbox{\hyperlink{l2__pool__2d__test_8cc_a77ea056afd837c816867a0a9887131b6}{activation}});}
+\DoxyCodeLine{00060\ }
+\DoxyCodeLine{00061\ \textcolor{comment}{//\ Returns\ a\ FullyConnectedParams\ struct\ with\ all\ the\ parameters\ needed\ for\ a}}
+\DoxyCodeLine{00062\ \textcolor{comment}{//\ quantized\ computation.}}
+\DoxyCodeLine{00063\ \mbox{\hyperlink{structtflite_1_1_fully_connected_params}{FullyConnectedParams}}\ \mbox{\hyperlink{namespacetflite_a3161f15556f0f33476c76b70f3377303}{FullyConnectedParamsQuantized}}(}
+\DoxyCodeLine{00064\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structtflite_1_1_op_data_fully_connected}{OpDataFullyConnected}}\&\ \mbox{\hyperlink{batch__matmul_8cc_a0f851164a16c8d772c43d8da3ec4be95}{op\_data}});}
+\DoxyCodeLine{00065\ }
+\DoxyCodeLine{00066\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_a1bdaa29cf039256b08e4fe9ab935b40f}{CalculateOpDataFullyConnected}}(}
+\DoxyCodeLine{00067\ \ \ \ \ \mbox{\hyperlink{struct_tf_lite_context}{TfLiteContext}}*\ context,\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src7f67a4373e2a0d20daf1d1ff4e1f4339_acc9e377dbc009d68bbfa5480d2559565}{TfLiteFusedActivation}}\ \mbox{\hyperlink{l2__pool__2d__test_8cc_a77ea056afd837c816867a0a9887131b6}{activation}},}
+\DoxyCodeLine{00068\ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_a8a47ba81bdef28b5c479ee7928a7d123}{TfLiteType}}\ data\_type,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_tf_lite_tensor}{TfLiteTensor}}*\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src5afb18c45f6346167aa977a363205143_a9cebfb3d6ddd692fbdd268cf4b9ad024}{input}},\ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_tf_lite_tensor}{TfLiteTensor}}*\ filter,}
+\DoxyCodeLine{00069\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_tf_lite_tensor}{TfLiteTensor}}*\ bias,\ \mbox{\hyperlink{struct_tf_lite_tensor}{TfLiteTensor}}*\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbcd3bbe90c4644d53fde1ce4e312f437_a7a2a916a8059078c2d7a05f46c7126fd}{output}},\ \mbox{\hyperlink{structtflite_1_1_op_data_fully_connected}{OpDataFullyConnected}}*\ \mbox{\hyperlink{hello__world__model_8cc_ab2a9259b73b53c0bb06a6b242aa7ae32}{data}});}
+\DoxyCodeLine{00070\ }
+\DoxyCodeLine{00071\ \textcolor{comment}{//\ This\ is\ the\ most\ generic\ TfLiteRegistration.\ The\ actual\ supported\ types\ may}}
+\DoxyCodeLine{00072\ \textcolor{comment}{//\ still\ be\ target\ dependent.\ The\ only\ requirement\ is\ that\ every\ implementation}}
+\DoxyCodeLine{00073\ \textcolor{comment}{//\ (reference\ or\ optimized)\ must\ define\ this\ function.}}
+\DoxyCodeLine{00074\ \mbox{\hyperlink{struct_tf_lite_registration}{TfLiteRegistration}}\ \mbox{\hyperlink{namespacetflite_a39158ab45a7dc88427df33dcd031232b}{Register\_FULLY\_CONNECTED}}();}
+\DoxyCodeLine{00075\ }
+\DoxyCodeLine{00076\ \textcolor{preprocessor}{\#if\ defined(CMSIS\_NN)\ ||\ defined(HEXAGON)\ ||\ defined(EI\_CLASSIFIER\_TFLITE\_ENABLE\_SILABS\_MVP)}}
+\DoxyCodeLine{00077\ \textcolor{comment}{//\ Returns\ a\ TfLiteRegistration\ struct\ for\ kernel\ variant\ that\ only\ supports}}
+\DoxyCodeLine{00078\ \textcolor{comment}{//\ int8.}}
+\DoxyCodeLine{00079\ \mbox{\hyperlink{struct_tf_lite_registration}{TfLiteRegistration}}\ \mbox{\hyperlink{namespacetflite_aad4964712f02a4d3458b72d83fcdc1fe}{Register\_FULLY\_CONNECTED\_INT8}}();}
+\DoxyCodeLine{00080\ }
+\DoxyCodeLine{00081\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00082\ \textcolor{comment}{//\ Note\ that\ while\ this\ block\ gets\ used\ for\ both\ reference\ and\ optimized\ kernels}}
+\DoxyCodeLine{00083\ \textcolor{comment}{//\ that\ do\ not\ have\ any\ specialized\ implementations,\ the\ only\ goal\ here\ is\ to}}
+\DoxyCodeLine{00084\ \textcolor{comment}{//\ define\ fallback\ implementation\ that\ allow\ reference\ kernels\ to\ still\ be\ used}}
+\DoxyCodeLine{00085\ \textcolor{comment}{//\ from\ applications\ that\ call\ a\ more\ specific\ kernel\ variant.}}
+\DoxyCodeLine{00086\ }
+\DoxyCodeLine{00087\ \textcolor{keyword}{inline}\ \mbox{\hyperlink{struct_tf_lite_registration}{TfLiteRegistration}}\ \mbox{\hyperlink{namespacetflite_aad4964712f02a4d3458b72d83fcdc1fe}{Register\_FULLY\_CONNECTED\_INT8}}()\ \{}
+\DoxyCodeLine{00088\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacetflite_a39158ab45a7dc88427df33dcd031232b}{Register\_FULLY\_CONNECTED}}();}
+\DoxyCodeLine{00089\ \}}
+\DoxyCodeLine{00090\ }
+\DoxyCodeLine{00091\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00092\ }
+\DoxyCodeLine{00093\ \textcolor{preprocessor}{\#if\ defined(CMSIS\_NN)}}
+\DoxyCodeLine{00094\ \textcolor{comment}{//\ Returns\ a\ TfLiteRegistration\ struct\ for\ kernel\ variant\ that\ only\ supports}}
+\DoxyCodeLine{00095\ \textcolor{comment}{//\ int16.}}
+\DoxyCodeLine{00096\ \mbox{\hyperlink{struct_tf_lite_registration}{TfLiteRegistration}}\ \mbox{\hyperlink{namespacetflite_a00aded28940d4de25f93bbdb5e9d52a3}{Register\_FULLY\_CONNECTED\_INT16}}();}
+\DoxyCodeLine{00097\ }
+\DoxyCodeLine{00098\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00099\ \textcolor{comment}{//\ Note\ that\ while\ this\ block\ gets\ used\ for\ both\ reference\ and\ optimized\ kernels}}
+\DoxyCodeLine{00100\ \textcolor{comment}{//\ that\ do\ not\ have\ any\ specialized\ implementations,\ the\ only\ goal\ here\ is\ to}}
+\DoxyCodeLine{00101\ \textcolor{comment}{//\ define\ fallback\ implementation\ that\ allow\ reference\ kernels\ to\ still\ be\ used}}
+\DoxyCodeLine{00102\ \textcolor{comment}{//\ from\ applications\ that\ call\ a\ more\ specific\ kernel\ variant.}}
+\DoxyCodeLine{00103\ }
+\DoxyCodeLine{00104\ \textcolor{keyword}{inline}\ \mbox{\hyperlink{struct_tf_lite_registration}{TfLiteRegistration}}\ \mbox{\hyperlink{namespacetflite_a00aded28940d4de25f93bbdb5e9d52a3}{Register\_FULLY\_CONNECTED\_INT16}}()\ \{}
+\DoxyCodeLine{00105\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacetflite_a39158ab45a7dc88427df33dcd031232b}{Register\_FULLY\_CONNECTED}}();}
+\DoxyCodeLine{00106\ \}}
+\DoxyCodeLine{00107\ }
+\DoxyCodeLine{00108\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00109\ }
+\DoxyCodeLine{00110\ \}\ \ \textcolor{comment}{//\ namespace\ tflite}}
+\DoxyCodeLine{00111\ }
+\DoxyCodeLine{00112\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ TENSORFLOW\_LITE\_MICRO\_KERNELS\_FULLY\_CONNECTED\_H\_}}
+
+\end{DoxyCode}

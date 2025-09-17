@@ -1,0 +1,95 @@
+\doxysection{quantize.\+h}
+\hypertarget{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2kernels_2internal_2reference_2quantize_8h_source}{}\label{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2kernels_2internal_2reference_2quantize_8h_source}\index{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/arduino-\/examples-\/main/src/tensorflow/lite/kernels/internal/reference/quantize.h@{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/arduino-\/examples-\/main/src/tensorflow/lite/kernels/internal/reference/quantize.h}}
+\mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2kernels_2internal_2reference_2quantize_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{/*\ Copyright\ 2019\ The\ TensorFlow\ Authors.\ All\ Rights\ Reserved.}}
+\DoxyCodeLine{00002\ \textcolor{comment}{}}
+\DoxyCodeLine{00003\ \textcolor{comment}{Licensed\ under\ the\ Apache\ License,\ Version\ 2.0\ (the\ "{}License"{});}}
+\DoxyCodeLine{00004\ \textcolor{comment}{you\ may\ not\ use\ this\ file\ except\ in\ compliance\ with\ the\ License.}}
+\DoxyCodeLine{00005\ \textcolor{comment}{You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{00006\ \textcolor{comment}{}}
+\DoxyCodeLine{00007\ \textcolor{comment}{\ \ \ \ http://www.apache.org/licenses/LICENSE-\/2.0}}
+\DoxyCodeLine{00008\ \textcolor{comment}{}}
+\DoxyCodeLine{00009\ \textcolor{comment}{Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ software}}
+\DoxyCodeLine{00010\ \textcolor{comment}{distributed\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,}}
+\DoxyCodeLine{00011\ \textcolor{comment}{WITHOUT\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,\ either\ express\ or\ implied.}}
+\DoxyCodeLine{00012\ \textcolor{comment}{See\ the\ License\ for\ the\ specific\ language\ governing\ permissions\ and}}
+\DoxyCodeLine{00013\ \textcolor{comment}{limitations\ under\ the\ License.}}
+\DoxyCodeLine{00014\ \textcolor{comment}{==============================================================================*/}}
+\DoxyCodeLine{00015\ \textcolor{preprocessor}{\#ifndef\ TENSORFLOW\_LITE\_KERNELS\_INTERNAL\_REFERENCE\_QUANTIZE\_H\_}}
+\DoxyCodeLine{00016\ \textcolor{preprocessor}{\#define\ TENSORFLOW\_LITE\_KERNELS\_INTERNAL\_REFERENCE\_QUANTIZE\_H\_}}
+\DoxyCodeLine{00017\ }
+\DoxyCodeLine{00018\ \textcolor{preprocessor}{\#include\ <algorithm>}}
+\DoxyCodeLine{00019\ \textcolor{preprocessor}{\#include\ <limits>}}
+\DoxyCodeLine{00020\ \textcolor{preprocessor}{\#include\ <vector>}}
+\DoxyCodeLine{00021\ }
+\DoxyCodeLine{00022\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/kernels/internal/common.h"{}}}
+\DoxyCodeLine{00023\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/kernels/internal/compatibility.h"{}}}
+\DoxyCodeLine{00024\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/kernels/internal/cppmath.h"{}}}
+\DoxyCodeLine{00025\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/kernels/internal/types.h"{}}}
+\DoxyCodeLine{00026\ }
+\DoxyCodeLine{00027\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacetflite}{tflite}}\ \{}
+\DoxyCodeLine{00028\ }
+\DoxyCodeLine{00029\ \textcolor{keyword}{namespace\ }reference\_ops\ \{}
+\DoxyCodeLine{00030\ }
+\DoxyCodeLine{00031\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ InputT,\ \textcolor{keyword}{typename}\ OutputT>}
+\DoxyCodeLine{00032\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1reference__ops_a79bd0e81e5f3984610a18ee2263dd1bd}{AffineQuantize}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structtflite_1_1_quantization_params}{tflite::QuantizationParams}}\&\ op\_params,}
+\DoxyCodeLine{00033\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classtflite_1_1_runtime_shape}{RuntimeShape}}\&\ input\_shape,}
+\DoxyCodeLine{00034\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ InputT*\ \mbox{\hyperlink{add__n__test_8cc_a5612ba79d1f0b544c7aeae4621166fea}{input\_data}},}
+\DoxyCodeLine{00035\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classtflite_1_1_runtime_shape}{RuntimeShape}}\&\ output\_shape,}
+\DoxyCodeLine{00036\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ OutputT*\ \mbox{\hyperlink{add__n__test_8cc_a3305b43869c4b837b0a33c12cff5069b}{output\_data}})\ \{}
+\DoxyCodeLine{00037\ \ \ \textcolor{keyword}{const}\ int32\_t\ \mbox{\hyperlink{batch__matmul__test_8cc_a2be4e05b1d1f5ff4043c3bd42b8f5f44}{zero\_point}}\ =\ op\_params.\mbox{\hyperlink{structtflite_1_1_quantization_params_a769087c34b7c8565459626fdf844010b}{zero\_point}};}
+\DoxyCodeLine{00038\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{double}\ \mbox{\hyperlink{batch__matmul__test_8cc_a1d28dec57cce925ad92342891bd71e7c}{scale}}\ =\ op\_params.\mbox{\hyperlink{structtflite_1_1_quantization_params_a1f9e07c658be5ad19128b55792b41dc6}{scale}};}
+\DoxyCodeLine{00039\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ flat\_size\ =\ \mbox{\hyperlink{namespacetflite_a8d6998b7eb7b2f0d21f8352da6f6271f}{MatchingFlatSize}}(input\_shape,\ output\_shape);}
+\DoxyCodeLine{00040\ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ int32\_t\ min\_val\ =\ std::numeric\_limits<OutputT>::min();}
+\DoxyCodeLine{00041\ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ int32\_t\ max\_val\ =\ std::numeric\_limits<OutputT>::max();}
+\DoxyCodeLine{00042\ }
+\DoxyCodeLine{00043\ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ flat\_size;\ i++)\ \{}
+\DoxyCodeLine{00044\ \ \ \ \ \textcolor{keyword}{const}\ InputT\ val\ =\ \mbox{\hyperlink{add__n__test_8cc_a5612ba79d1f0b544c7aeae4621166fea}{input\_data}}[i];}
+\DoxyCodeLine{00045\ \ \ \ \ int32\_t\ unclamped\ =}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static\_cast<}int32\_t\textcolor{keyword}{>}(TfLiteRound(val\ /\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{float}\textcolor{keyword}{>}(\mbox{\hyperlink{batch__matmul__test_8cc_a1d28dec57cce925ad92342891bd71e7c}{scale}})))\ +}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{batch__matmul__test_8cc_a2be4e05b1d1f5ff4043c3bd42b8f5f44}{zero\_point}};}
+\DoxyCodeLine{00048\ \ \ \ \ int32\_t\ clamped\ =\ std::min(std::max(unclamped,\ min\_val),\ max\_val);}
+\DoxyCodeLine{00049\ \ \ \ \ \mbox{\hyperlink{add__n__test_8cc_a3305b43869c4b837b0a33c12cff5069b}{output\_data}}[i]\ =\ clamped;}
+\DoxyCodeLine{00050\ \ \ \}}
+\DoxyCodeLine{00051\ \}}
+\DoxyCodeLine{00052\ }
+\DoxyCodeLine{00053\ \textcolor{comment}{//\ Quantizes\ per-\/channel.}}
+\DoxyCodeLine{00054\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ InputT,\ \textcolor{keyword}{typename}\ OutputT>}
+\DoxyCodeLine{00055\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1reference__ops_a8a7cf1a787d5ae737c4673c6e5aca109}{PerChannelQuantize}}(}
+\DoxyCodeLine{00056\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structtflite_1_1_per_channel_quantization_params}{tflite::PerChannelQuantizationParams}}\&\ op\_params,}
+\DoxyCodeLine{00057\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classtflite_1_1_runtime_shape}{RuntimeShape}}\&\ input\_shape,\ \textcolor{keyword}{const}\ InputT*\ \mbox{\hyperlink{add__n__test_8cc_a5612ba79d1f0b544c7aeae4621166fea}{input\_data}},}
+\DoxyCodeLine{00058\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classtflite_1_1_runtime_shape}{RuntimeShape}}\&\ output\_shape,\ OutputT*\ \mbox{\hyperlink{add__n__test_8cc_a3305b43869c4b837b0a33c12cff5069b}{output\_data}})\ \{}
+\DoxyCodeLine{00059\ \ \ \textcolor{comment}{//\ Ensure\ flat\ size\ is\ same.}}
+\DoxyCodeLine{00060\ \ \ \mbox{\hyperlink{namespacetflite_a8d6998b7eb7b2f0d21f8352da6f6271f}{MatchingFlatSize}}(input\_shape,\ output\_shape);}
+\DoxyCodeLine{00061\ }
+\DoxyCodeLine{00062\ \ \ \textcolor{keyword}{const}\ int32\_t*\ \mbox{\hyperlink{batch__matmul__test_8cc_a2be4e05b1d1f5ff4043c3bd42b8f5f44}{zero\_point}}\ =\ op\_params.\mbox{\hyperlink{structtflite_1_1_per_channel_quantization_params_aba7ef396f5b0e8b92eec8bf3b85f48a0}{zero\_point}};}
+\DoxyCodeLine{00063\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{float}*\ \mbox{\hyperlink{batch__matmul__test_8cc_a1d28dec57cce925ad92342891bd71e7c}{scale}}\ =\ op\_params.\mbox{\hyperlink{structtflite_1_1_per_channel_quantization_params_a3e2b94e89fa24982c086fe49f453e8a0}{scale}};}
+\DoxyCodeLine{00064\ \ \ \textcolor{keyword}{const}\ int32\_t\ quantized\_dimension\ =\ op\_params.\mbox{\hyperlink{structtflite_1_1_per_channel_quantization_params_a2c22240c4315ce1c69200ca6776606b6}{quantized\_dimension}};}
+\DoxyCodeLine{00065\ \ \ \textcolor{keyword}{const}\ int32\_t\ num\_dims\ =\ input\_shape.DimensionsCount();}
+\DoxyCodeLine{00066\ \ \ \textcolor{keyword}{const}\ int32\_t*\ dims\_data\ =\ input\_shape.DimsData();}
+\DoxyCodeLine{00067\ \ \ std::vector<int>\ current\_dim(num\_dims,\ 0);}
+\DoxyCodeLine{00068\ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ int32\_t\ min\_val\ =\ std::numeric\_limits<OutputT>::min();}
+\DoxyCodeLine{00069\ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ int32\_t\ max\_val\ =\ std::numeric\_limits<OutputT>::max();}
+\DoxyCodeLine{00070\ }
+\DoxyCodeLine{00071\ \ \ \textcolor{keywordflow}{do}\ \{}
+\DoxyCodeLine{00072\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{mirror__pad_8cpp_aed7ea92f45bd273dde380a45ddced592}{offset}}\ =}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_a0a91a18b90dfd4c4505f630ec80e00d5}{ReducedOutputOffset}}(num\_dims,\ \textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\textcolor{keywordtype}{int}*\textcolor{keyword}{>}(dims\_data),}
+\DoxyCodeLine{00074\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ current\_dim.data(),\ 0,\ \textcolor{keyword}{nullptr});}
+\DoxyCodeLine{00075\ \ \ \ \ \textcolor{keyword}{const}\ InputT\ val\ =\ \mbox{\hyperlink{add__n__test_8cc_a5612ba79d1f0b544c7aeae4621166fea}{input\_data}}[\mbox{\hyperlink{mirror__pad_8cpp_aed7ea92f45bd273dde380a45ddced592}{offset}}];}
+\DoxyCodeLine{00076\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ channel\ =\ current\_dim[quantized\_dimension];}
+\DoxyCodeLine{00077\ \ \ \ \ int32\_t\ unclamped\ =\ \textcolor{keyword}{static\_cast<}int32\_t\textcolor{keyword}{>}(TfLiteRound(}
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ val\ /\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{float}\textcolor{keyword}{>}(\mbox{\hyperlink{batch__matmul__test_8cc_a1d28dec57cce925ad92342891bd71e7c}{scale}}[channel])))\ +}
+\DoxyCodeLine{00079\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{batch__matmul__test_8cc_a2be4e05b1d1f5ff4043c3bd42b8f5f44}{zero\_point}}[channel];}
+\DoxyCodeLine{00080\ \ \ \ \ int32\_t\ clamped\ =\ std::min(std::max(unclamped,\ min\_val),\ max\_val);}
+\DoxyCodeLine{00081\ \ \ \ \ \mbox{\hyperlink{add__n__test_8cc_a3305b43869c4b837b0a33c12cff5069b}{output\_data}}[\mbox{\hyperlink{mirror__pad_8cpp_aed7ea92f45bd273dde380a45ddced592}{offset}}]\ =\ \textcolor{keyword}{static\_cast<}OutputT\textcolor{keyword}{>}(clamped);}
+\DoxyCodeLine{00082\ \ \ \}\ \textcolor{keywordflow}{while}\ (\mbox{\hyperlink{namespacetflite_a852937183ae246d19c3d429f41ad8d14}{NextIndex}}(num\_dims,\ \textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\textcolor{keywordtype}{int}*\textcolor{keyword}{>}(dims\_data),}
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ current\_dim.data()));}
+\DoxyCodeLine{00084\ \}}
+\DoxyCodeLine{00085\ }
+\DoxyCodeLine{00086\ \}\ \ \textcolor{comment}{//\ namespace\ reference\_ops}}
+\DoxyCodeLine{00087\ }
+\DoxyCodeLine{00088\ \}\ \ \textcolor{comment}{//\ namespace\ tflite}}
+\DoxyCodeLine{00089\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ TENSORFLOW\_LITE\_KERNELS\_INTERNAL\_REFERENCE\_QUANTIZE\_H\_}}
+
+\end{DoxyCode}

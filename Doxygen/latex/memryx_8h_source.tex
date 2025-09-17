@@ -1,0 +1,462 @@
+\doxysection{memryx.\+h}
+\hypertarget{memryx_8h_source}{}\label{memryx_8h_source}\index{Face\_Access\_inferencing/src/edge-\/impulse-\/sdk/classifier/inferencing\_engines/memryx.h@{Face\_Access\_inferencing/src/edge-\/impulse-\/sdk/classifier/inferencing\_engines/memryx.h}}
+\mbox{\hyperlink{memryx_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{/*\ Edge\ Impulse\ inferencing\ library}}
+\DoxyCodeLine{00002\ \textcolor{comment}{\ *\ Copyright\ (c)\ 2023\ EdgeImpulse\ Inc.}}
+\DoxyCodeLine{00003\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00004\ \textcolor{comment}{\ *\ Permission\ is\ hereby\ granted,\ free\ of\ charge,\ to\ any\ person\ obtaining\ a\ copy}}
+\DoxyCodeLine{00005\ \textcolor{comment}{\ *\ of\ this\ software\ and\ associated\ documentation\ files\ (the\ "{}Software"{}),\ to\ deal}}
+\DoxyCodeLine{00006\ \textcolor{comment}{\ *\ in\ the\ Software\ without\ restriction,\ including\ without\ limitation\ the\ rights}}
+\DoxyCodeLine{00007\ \textcolor{comment}{\ *\ to\ use,\ copy,\ modify,\ merge,\ publish,\ distribute,\ sublicense,\ and/or\ sell}}
+\DoxyCodeLine{00008\ \textcolor{comment}{\ *\ copies\ of\ the\ Software,\ and\ to\ permit\ persons\ to\ whom\ the\ Software\ is}}
+\DoxyCodeLine{00009\ \textcolor{comment}{\ *\ furnished\ to\ do\ so,\ subject\ to\ the\ following\ conditions:}}
+\DoxyCodeLine{00010\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00011\ \textcolor{comment}{\ *\ The\ above\ copyright\ notice\ and\ this\ permission\ notice\ shall\ be\ included\ in}}
+\DoxyCodeLine{00012\ \textcolor{comment}{\ *\ all\ copies\ or\ substantial\ portions\ of\ the\ Software.}}
+\DoxyCodeLine{00013\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00014\ \textcolor{comment}{\ *\ THE\ SOFTWARE\ IS\ PROVIDED\ "{}AS\ IS"{},\ WITHOUT\ WARRANTY\ OF\ ANY\ KIND,\ EXPRESS\ OR}}
+\DoxyCodeLine{00015\ \textcolor{comment}{\ *\ IMPLIED,\ INCLUDING\ BUT\ NOT\ LIMITED\ TO\ THE\ WARRANTIES\ OF\ MERCHANTABILITY,}}
+\DoxyCodeLine{00016\ \textcolor{comment}{\ *\ FITNESS\ FOR\ A\ PARTICULAR\ PURPOSE\ AND\ NONINFRINGEMENT.\ IN\ NO\ EVENT\ SHALL\ THE}}
+\DoxyCodeLine{00017\ \textcolor{comment}{\ *\ AUTHORS\ OR\ COPYRIGHT\ HOLDERS\ BE\ LIABLE\ FOR\ ANY\ CLAIM,\ DAMAGES\ OR\ OTHER}}
+\DoxyCodeLine{00018\ \textcolor{comment}{\ *\ LIABILITY,\ WHETHER\ IN\ AN\ ACTION\ OF\ CONTRACT,\ TORT\ OR\ OTHERWISE,\ ARISING\ FROM,}}
+\DoxyCodeLine{00019\ \textcolor{comment}{\ *\ OUT\ OF\ OR\ IN\ CONNECTION\ WITH\ THE\ SOFTWARE\ OR\ THE\ USE\ OR\ OTHER\ DEALINGS\ IN\ THE}}
+\DoxyCodeLine{00020\ \textcolor{comment}{\ *\ SOFTWARE.}}
+\DoxyCodeLine{00021\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{00022\ }
+\DoxyCodeLine{00023\ \textcolor{preprocessor}{\#ifndef\ EI\_CLASSIFIER\_INFERENCING\_ENGINE\_MEMRYX\_H}}
+\DoxyCodeLine{00024\ \textcolor{preprocessor}{\#define\ EI\_CLASSIFIER\_INFERENCING\_ENGINE\_MEMRYX\_H}}
+\DoxyCodeLine{00025\ }
+\DoxyCodeLine{00026\ \textcolor{preprocessor}{\#if\ (EI\_CLASSIFIER\_INFERENCING\_ENGINE\ ==\ EI\_CLASSIFIER\_MEMRYX)}}
+\DoxyCodeLine{00027\ }
+\DoxyCodeLine{00033\ \textcolor{preprocessor}{\#ifndef\ EI\_CLASSIFIER\_USE\_MEMRYX\_SOFTWARE}}
+\DoxyCodeLine{00034\ \textcolor{preprocessor}{\#define\ EI\_CLASSIFIER\_USE\_MEMRYX\_HARDWARE\ 1}}
+\DoxyCodeLine{00035\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00036\ }
+\DoxyCodeLine{00042\ \textcolor{preprocessor}{\#ifndef\ EI\_CLASSIFIER\_USE\_MEMRYX\_CHIPS\_COUNT}}
+\DoxyCodeLine{00043\ \textcolor{preprocessor}{\#define\ EI\_CLASSIFIER\_USE\_MEMRYX\_CHIPS\_COUNT\ 1}}
+\DoxyCodeLine{00044\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00045\ }
+\DoxyCodeLine{00046\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{model__metadata_8h}{model-\/parameters/model\_metadata.h}}"{}}}
+\DoxyCodeLine{00047\ \textcolor{preprocessor}{\#if\ EI\_CLASSIFIER\_HAS\_MODEL\_VARIABLES\ ==\ 1}}
+\DoxyCodeLine{00048\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{model__variables_8h}{model-\/parameters/model\_variables.h}}"{}}}
+\DoxyCodeLine{00049\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00050\ }
+\DoxyCodeLine{00051\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{ei__classifier__porting_8h}{edge-\/impulse-\/sdk/porting/ei\_classifier\_porting.h}}"{}}}
+\DoxyCodeLine{00052\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{ei__fill__result__struct_8h}{edge-\/impulse-\/sdk/classifier/ei\_fill\_result\_struct.h}}"{}}}
+\DoxyCodeLine{00053\ \textcolor{preprocessor}{\#include\ "{}tensorflow-\/lite/tensorflow/lite/kernels/internal/reference/softmax.h"{}}}
+\DoxyCodeLine{00054\ \textcolor{preprocessor}{\#include\ <vector>}}
+\DoxyCodeLine{00055\ \textcolor{preprocessor}{\#include\ <fstream>}}
+\DoxyCodeLine{00056\ \textcolor{preprocessor}{\#include\ <sstream>}}
+\DoxyCodeLine{00057\ \textcolor{preprocessor}{\#include\ <iomanip>}}
+\DoxyCodeLine{00058\ \textcolor{preprocessor}{\#include\ <limits>}}
+\DoxyCodeLine{00059\ \textcolor{preprocessor}{\#include\ <math.h>}}
+\DoxyCodeLine{00060\ \textcolor{preprocessor}{\#ifdef\ EI\_CLASSIFIER\_USE\_MEMRYX\_SOFTWARE}}
+\DoxyCodeLine{00061\ \textcolor{preprocessor}{\#include\ "{}pybind11/embed.h"{}}}
+\DoxyCodeLine{00062\ \textcolor{preprocessor}{\#include\ "{}pybind11/numpy.h"{}}}
+\DoxyCodeLine{00063\ \textcolor{preprocessor}{\#include\ "{}pybind11/stl.h"{}}}
+\DoxyCodeLine{00064\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00065\ \textcolor{preprocessor}{\#include\ "{}memx/memx.h"{}}}
+\DoxyCodeLine{00066\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00067\ \textcolor{comment}{/*\ Headers\ below\ help\ us\ bundle\ the\ DFP\ model\ with\ EIM\ in\ single\ binary\ */}}
+\DoxyCodeLine{00068\ \textcolor{preprocessor}{\#include\ "{}memryx-\/model/memryx-\/model.h"{}}}
+\DoxyCodeLine{00069\ \textcolor{preprocessor}{\#include\ "{}utils/model\_header\_utils.h"{}}}
+\DoxyCodeLine{00070\ }
+\DoxyCodeLine{00071\ \textcolor{comment}{/*\ Result\ delivered\ by\ memryx\ simulator\ contains\ 3\ fields,\ indexes\ for\ print\ */}}
+\DoxyCodeLine{00072\ \textcolor{preprocessor}{\#define\ MX\_SIM\_RES\_OUTPUTS\ 0}}
+\DoxyCodeLine{00073\ \textcolor{preprocessor}{\#define\ MX\_SIM\_RES\_LATENCY\ 1}}
+\DoxyCodeLine{00074\ \textcolor{preprocessor}{\#define\ MX\_SIM\_RES\_FPS\ \ \ \ \ 2}}
+\DoxyCodeLine{00075\ }
+\DoxyCodeLine{00076\ std::stringstream\ \mbox{\hyperlink{memryx_8h_a385b0bd18814f0f7ad3e2606c5f30f25}{engine\_info}};}
+\DoxyCodeLine{00077\ }
+\DoxyCodeLine{00078\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{memryx_8h_a15d883bed3f1e33b7cd9e616109c3bb5}{memryx\_initialized}}\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00079\ }
+\DoxyCodeLine{00080\ \textcolor{preprocessor}{\#ifdef\ EI\_CLASSIFIER\_USE\_MEMRYX\_SOFTWARE}}
+\DoxyCodeLine{00081\ \textcolor{comment}{/*\ brings\ in\ the\ \`{}\_a`\ literals\ to\ set\ args\ to\ python\ API\ */}}
+\DoxyCodeLine{00082\ \textcolor{keyword}{using\ namespace\ }pybind11::literals;}
+\DoxyCodeLine{00083\ \textcolor{keyword}{namespace\ }py\ =\ pybind11;}
+\DoxyCodeLine{00084\ \textcolor{comment}{/*\ PyBind\ variables\ for\ EIM\ with\ Simulator\ */}}
+\DoxyCodeLine{00085\ \textcolor{keyword}{static}\ py::module\_\ memryx;}
+\DoxyCodeLine{00086\ \textcolor{keyword}{static}\ py::module\_\ np;}
+\DoxyCodeLine{00087\ \textcolor{keyword}{static}\ py::object\ zeroes;}
+\DoxyCodeLine{00088\ \textcolor{keyword}{static}\ py::object\ Simulator;}
+\DoxyCodeLine{00089\ \textcolor{keyword}{static}\ py::object\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2model_8h_ae142afd8c2e2c711c1c62440deebe03c}{model}};}
+\DoxyCodeLine{00090\ \textcolor{keyword}{static}\ py::object\ \mbox{\hyperlink{akida_8h_ad56ed4d147ee2780df7f469658e8dd67}{device}};}
+\DoxyCodeLine{00091\ \textcolor{keyword}{static}\ std::vector<size\_t>\ vec;}
+\DoxyCodeLine{00092\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00093\ }
+\DoxyCodeLine{00094\ \textcolor{preprocessor}{\#ifdef\ EI\_CLASSIFIER\_USE\_MEMRYX\_HARDWARE}}
+\DoxyCodeLine{00095\ \textcolor{comment}{/*\ Variables\ for\ EIM\ with\ Hardware\ */}}
+\DoxyCodeLine{00096\ \textcolor{keyword}{const}\ uint8\_t\ \mbox{\hyperlink{memryx_8h_a1aaf75a7cb1e9c4ffbe7d65987c8a85b}{flow\_id}}\ =\ 0;\ \textcolor{comment}{//\ flow\ port\ 0}}
+\DoxyCodeLine{00097\ \textcolor{keyword}{const}\ uint8\_t\ \mbox{\hyperlink{memryx_8h_a782806bdc54c49a8d4799435919ef839}{model\_id}}\ =\ 0;\ \textcolor{comment}{//\ model\ 0}}
+\DoxyCodeLine{00098\ \textcolor{keyword}{const}\ uint8\_t\ \mbox{\hyperlink{memryx_8h_a71589072c5bdb712cd495762ef03d600}{group\_id}}\ =\ 0;\ \textcolor{comment}{//\ MPU\ device\ group\ 0}}
+\DoxyCodeLine{00099\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{memryx_8h_a654210ae605a61110cf5a8a0c9f2d72c}{timeout}}\ =\ 0;\ \textcolor{comment}{//\ was\ 200\ ms}}
+\DoxyCodeLine{00100\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{memryx_8h_ad4879bc41636502a72fde90f74fba7b4}{argmax}}\ =\ 0;\ \textcolor{comment}{//\ index\ with\ maximum\ score}}
+\DoxyCodeLine{00101\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00102\ }
+\DoxyCodeLine{00103\ \textcolor{comment}{/*\ We\ need\ a\ workaround\ for\ softmax\ because}}
+\DoxyCodeLine{00104\ \textcolor{comment}{\ *\ the\ MX3+\ is\ not\ coming\ out\ this\ year,\ and}}
+\DoxyCodeLine{00105\ \textcolor{comment}{\ *\ the\ MX3\ does\ not\ support\ the\ SoftMax\ layer}}
+\DoxyCodeLine{00106\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{00107\ \textcolor{keyword}{static}\ \mbox{\hyperlink{classtflite_1_1_runtime_shape}{tflite::RuntimeShape}}\ \mbox{\hyperlink{memryx_8h_a52cd3949eba004f3b8791be094e50549}{softmax\_shape}};}
+\DoxyCodeLine{00108\ \textcolor{keyword}{static}\ \mbox{\hyperlink{structtflite_1_1_softmax_params}{tflite::SoftmaxParams}}\ \mbox{\hyperlink{memryx_8h_aa32eba6b3164559e24b544f632e08fb6}{dummy\_params}};}
+\DoxyCodeLine{00109\ }
+\DoxyCodeLine{00110\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{memryx_8h_aa4949de33718984eb9eba135672c60b9}{verbose\_debug}}\ =\ 0;}
+\DoxyCodeLine{00111\ }
+\DoxyCodeLine{00112\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{memryx_8h_a55cbccd650cd3ad4829c996c54fb7f6a}{init\_memryx}}(\textcolor{keywordtype}{bool}\ \mbox{\hyperlink{ei__fill__result__struct_8h_a881f62341b5a41a3c5707268bd537be1}{debug}},\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structei__impulse}{ei\_impulse\_t}}\ *impulse)}
+\DoxyCodeLine{00113\ \{}
+\DoxyCodeLine{00114\ \ \ \ \ \textcolor{comment}{/*\ Unpack\ DFP\ model\ to\ file\ system\ */}}
+\DoxyCodeLine{00115\ \ \ \ \ std::string\ project\_file\_path\ =\ \textcolor{stringliteral}{"{}/tmp/"{}}\ +\ std::string(impulse-\/>\mbox{\hyperlink{structei__impulse_ace394cd723e23081bcb5829d3518e138}{project\_name}})\ +\ \textcolor{stringliteral}{"{}-\/"{}}\ +\ std::to\_string(impulse-\/>\mbox{\hyperlink{structei__impulse_ae4faff2e5e8dcd665cac0cddbe240a7f}{project\_id}})\ +\ \textcolor{stringliteral}{"{}-\/"{}}\ +\ std::to\_string(impulse-\/>\mbox{\hyperlink{structei__impulse_ad77fcf55624e04594d9f0e3cfc487726}{deploy\_version}});}
+\DoxyCodeLine{00116\ \ \ \ \ create\_project\_if\_not\_exists(project\_file\_path,\ model\_h\_files,\ model\_h\_files\_len);}
+\DoxyCodeLine{00117\ }
+\DoxyCodeLine{00118\ \ \ \ \ std::string\ proj\_model\_path\ =\ project\_file\_path\ +\ \textcolor{stringliteral}{"{}/memryx\_trained.dfp"{}};}
+\DoxyCodeLine{00119\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *\ model\_file\_path\ =\ proj\_model\_path.c\_str();}
+\DoxyCodeLine{00120\ \textcolor{preprocessor}{\#if\ (defined(EI\_CLASSIFIER\_USE\_MEMRYX\_HARDWARE)\ \&\&\ (EI\_CLASSIFIER\_USE\_MEMRYX\_HARDWARE\ ==\ 1))}}
+\DoxyCodeLine{00121\ \textcolor{preprocessor}{\#warning\ "{}Building\ EIM\ for\ use\ with\ MemryX\ Hardware"{}}}
+\DoxyCodeLine{00122\ \ \ \ \ memx\_status\ \mbox{\hyperlink{_simple_web_server_8ino_a6e27f49150e9a14580fb313cc2777e00}{status}}\ =\ MEMX\_STATUS\_OK;}
+\DoxyCodeLine{00123\ \ \ \ \ \textcolor{comment}{//\ 1.\ Bind\ MPU\ device\ group\ 0\ as\ MX3:Cascade\ to\ model\ 0.}}
+\DoxyCodeLine{00124\ \ \ \ \ \mbox{\hyperlink{_simple_web_server_8ino_a6e27f49150e9a14580fb313cc2777e00}{status}}\ =\ memx\_open(\mbox{\hyperlink{memryx_8h_a782806bdc54c49a8d4799435919ef839}{model\_id}},\ \mbox{\hyperlink{memryx_8h_a71589072c5bdb712cd495762ef03d600}{group\_id}},\ MEMX\_DEVICE\_CASCADE);}
+\DoxyCodeLine{00125\ \ \ \ \ \textcolor{keywordflow}{if}(memx\_status\_error(\mbox{\hyperlink{_simple_web_server_8ino_a6e27f49150e9a14580fb313cc2777e00}{status}}))\ \{}
+\DoxyCodeLine{00126\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00127\ \ \ \ \ \}}
+\DoxyCodeLine{00128\ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}Memryx\ device\ opened.\(\backslash\)n"{}});}
+\DoxyCodeLine{00129\ }
+\DoxyCodeLine{00130\ \ \ \ \ \textcolor{comment}{//\ 2.\ Download\ model\ from\ a\ DFP\ file\ to\ MPU\ device\ group,\ input\ and}}
+\DoxyCodeLine{00131\ \ \ \ \ \textcolor{comment}{//\ output\ feature\ map\ shape\ is\ auto,\ configured\ after\ download\ complete.}}
+\DoxyCodeLine{00132\ \ \ \ \ \mbox{\hyperlink{_simple_web_server_8ino_a6e27f49150e9a14580fb313cc2777e00}{status}}\ =\ memx\_download\_model(\mbox{\hyperlink{memryx_8h_a782806bdc54c49a8d4799435919ef839}{model\_id}},\ model\_file\_path,\ 0,\ \textcolor{comment}{//\ model\_idx\ =\ 0}}
+\DoxyCodeLine{00133\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ MEMX\_DOWNLOAD\_TYPE\_WTMEM\_AND\_MODEL);}
+\DoxyCodeLine{00134\ \ \ \ \ \textcolor{keywordflow}{if}(memx\_status\_error(\mbox{\hyperlink{_simple_web_server_8ino_a6e27f49150e9a14580fb313cc2777e00}{status}}))\ \{}
+\DoxyCodeLine{00135\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00136\ \ \ \ \ \}}
+\DoxyCodeLine{00137\ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}Memryx\ model\ downloaded.\(\backslash\)n"{}});}
+\DoxyCodeLine{00138\ }
+\DoxyCodeLine{00139\ \ \ \ \ \textcolor{comment}{//\ 3.\ Enable\ data\ transfer\ of\ this\ model\ to\ device.\ Set\ to\ no\ wait\ here}}
+\DoxyCodeLine{00140\ \ \ \ \ \textcolor{comment}{//\ since\ driver\ will\ go\ to\ data\ transfer\ state\ eventually.}}
+\DoxyCodeLine{00141\ \ \ \ \ \mbox{\hyperlink{_simple_web_server_8ino_a6e27f49150e9a14580fb313cc2777e00}{status}}\ =\ memx\_set\_stream\_enable(\mbox{\hyperlink{memryx_8h_a782806bdc54c49a8d4799435919ef839}{model\_id}},\ 0);}
+\DoxyCodeLine{00142\ \ \ \ \ \textcolor{keywordflow}{if}(memx\_status\_error(\mbox{\hyperlink{_simple_web_server_8ino_a6e27f49150e9a14580fb313cc2777e00}{status}}))\ \{}
+\DoxyCodeLine{00143\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00144\ \ \ \ \ \}}
+\DoxyCodeLine{00145\ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}Data\ streaming\ to\ and\ from\ the\ MX3\ board\ is\ enabled\(\backslash\)n"{}});}
+\DoxyCodeLine{00146\ \textcolor{preprocessor}{\#elif\ (defined(EI\_CLASSIFIER\_USE\_MEMRYX\_SOFTWARE)\ \&\&\ (EI\_CLASSIFIER\_USE\_MEMRYX\_SOFTWARE\ ==\ 1))}}
+\DoxyCodeLine{00147\ \textcolor{preprocessor}{\#warning\ "{}MEMRYX\ model\ will\ be\ run\ in\ SIMULATION\ mode\ (not\ on\ real\ hardware)!"{}}}
+\DoxyCodeLine{00148\ \ \ \ \ py::list\ path;}
+\DoxyCodeLine{00149\ \ \ \ \ \textcolor{comment}{//\ import\ Python's\ memryx\ module}}
+\DoxyCodeLine{00150\ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00151\ \ \ \ \ \ \ \ \ memryx\ =\ py::module\_::import(\textcolor{stringliteral}{"{}memryx"{}});}
+\DoxyCodeLine{00152\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\mbox{\hyperlink{ei__fill__result__struct_8h_a881f62341b5a41a3c5707268bd537be1}{debug}})\ printf(\textcolor{stringliteral}{"{}Memryx\ PyModule\ init\(\backslash\)n"{}});}
+\DoxyCodeLine{00153\ \ \ \ \ \}}
+\DoxyCodeLine{00154\ \ \ \ \ \textcolor{keywordflow}{catch}\ (py::error\_already\_set\ \&e)\ \{}
+\DoxyCodeLine{00155\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}ERR:\ Importing\ 'memryx'\ library\ failed:\(\backslash\)n\%s\(\backslash\)n"{}},\ e.what());}
+\DoxyCodeLine{00156\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00157\ \ \ \ \ \}}
+\DoxyCodeLine{00158\ }
+\DoxyCodeLine{00159\ \ \ \ \ Simulator\ =\ memryx.attr(\textcolor{stringliteral}{"{}Simulator"{}});}
+\DoxyCodeLine{00160\ \ \ \ \ \textcolor{keywordflow}{if}(\mbox{\hyperlink{ei__fill__result__struct_8h_a881f62341b5a41a3c5707268bd537be1}{debug}})\ printf(\textcolor{stringliteral}{"{}Simulator\ API\ init\(\backslash\)n"{}});}
+\DoxyCodeLine{00161\ }
+\DoxyCodeLine{00162\ \ \ \ \ \textcolor{comment}{//\ load\ model}}
+\DoxyCodeLine{00163\ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00164\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2model_8h_ae142afd8c2e2c711c1c62440deebe03c}{model}}\ =\ Simulator(\textcolor{stringliteral}{"{}dfp"{}}\_a\ =\ model\_file\_path);}
+\DoxyCodeLine{00165\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\mbox{\hyperlink{ei__fill__result__struct_8h_a881f62341b5a41a3c5707268bd537be1}{debug}})\ printf(\textcolor{stringliteral}{"{}Model\ API\ init\(\backslash\)n"{}});}
+\DoxyCodeLine{00166\ \ \ \ \ \}}
+\DoxyCodeLine{00167\ \ \ \ \ \textcolor{keywordflow}{catch}\ (py::error\_already\_set\ \&e)\ \{}
+\DoxyCodeLine{00168\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}ERR:\ Can't\ load\ model\ file\ from\ \%s\(\backslash\)n"{}},\ model\_file\_path);}
+\DoxyCodeLine{00169\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00170\ \ \ \ \ \}}
+\DoxyCodeLine{00171\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00172\ \textcolor{preprocessor}{\#error\ "{}Neither\ EI\_CLASSIFIER\_USE\_MEMRYX\_HARDWARE\ or\ EI\_CLASSIFIER\_USE\_MEMRYX\_SOFTWARE\ are\ defined\ or\ set\ to\ 1"{}}}
+\DoxyCodeLine{00173\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00174\ }
+\DoxyCodeLine{00175\ \ \ \ \ \textcolor{comment}{//\ clear\ info}}
+\DoxyCodeLine{00176\ \ \ \ \ \mbox{\hyperlink{memryx_8h_a385b0bd18814f0f7ad3e2606c5f30f25}{engine\_info}}.str(\textcolor{stringliteral}{"{}"{}});}
+\DoxyCodeLine{00177\ }
+\DoxyCodeLine{00178\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00179\ \}}
+\DoxyCodeLine{00180\ }
+\DoxyCodeLine{00181\ }
+\DoxyCodeLine{00192\ \textcolor{preprocessor}{\#if\ (defined(EI\_CLASSIFIER\_USE\_MEMRYX\_HARDWARE)\ \&\&\ (EI\_CLASSIFIER\_USE\_MEMRYX\_HARDWARE\ ==\ 1))}}
+\DoxyCodeLine{00193\ \mbox{\hyperlink{group__ei__returntypes_gad9580b47a6cd5e74cfc31a03bdfecebe}{EI\_IMPULSE\_ERROR}}\ \mbox{\hyperlink{memryx_8h_a945f35e39a49bfe4e1194edaf89571cd}{run\_nn\_inference}}(}
+\DoxyCodeLine{00194\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structei__impulse}{ei\_impulse\_t}}\ *impulse,}
+\DoxyCodeLine{00195\ \ \ \ \ \mbox{\hyperlink{structei__feature__t}{ei\_feature\_t}}\ *fmatrix,}
+\DoxyCodeLine{00196\ \ \ \ \ uint32\_t\ learn\_block\_index,}
+\DoxyCodeLine{00197\ \ \ \ \ uint32\_t*\ input\_block\_ids,}
+\DoxyCodeLine{00198\ \ \ \ \ uint32\_t\ input\_block\_ids\_size,}
+\DoxyCodeLine{00199\ \ \ \ \ \mbox{\hyperlink{structei__impulse__result__t}{ei\_impulse\_result\_t}}\ *\mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}},}
+\DoxyCodeLine{00200\ \ \ \ \ \textcolor{keywordtype}{void}\ *\mbox{\hyperlink{ei__run__dsp_8h_a0819d397f9fba7b345b75fef1c1f782a}{config\_ptr}},}
+\DoxyCodeLine{00201\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{ei__fill__result__struct_8h_a881f62341b5a41a3c5707268bd537be1}{debug}}\ =\ \textcolor{keyword}{false})}
+\DoxyCodeLine{00202\ \{}
+\DoxyCodeLine{00203\ \ \ \ \ \mbox{\hyperlink{structei__learning__block__config__tflite__graph__t}{ei\_learning\_block\_config\_tflite\_graph\_t}}\ *\mbox{\hyperlink{ei__fill__result__struct_8h_aafcd7d36638d6a564b6edbceef06ea8b}{block\_config}}\ =\ (\mbox{\hyperlink{structei__learning__block__config__tflite__graph__t}{ei\_learning\_block\_config\_tflite\_graph\_t}}*)\mbox{\hyperlink{ei__run__dsp_8h_a0819d397f9fba7b345b75fef1c1f782a}{config\_ptr}};}
+\DoxyCodeLine{00204\ }
+\DoxyCodeLine{00205\ \ \ \ \ memx\_status\ \mbox{\hyperlink{_simple_web_server_8ino_a6e27f49150e9a14580fb313cc2777e00}{status}}\ =\ MEMX\_STATUS\_OK;}
+\DoxyCodeLine{00206\ \ \ \ \ int32\_t\ ifmap\_height,\ ifmap\_width,\ ifmap\_channel\_number,\ ifmap\_format;}
+\DoxyCodeLine{00207\ \ \ \ \ int32\_t\ ofmap\_height,\ ofmap\_width,\ ofmap\_channel\_number,\ ofmap\_format;}
+\DoxyCodeLine{00208\ \ \ \ \ int32\_t\ z;}
+\DoxyCodeLine{00209\ \ \ \ \ uint64\_t\ ctx\_start\_us\ =\ 0;}
+\DoxyCodeLine{00210\ \ \ \ \ uint64\_t\ ctx\_end\_us\ =\ 0;}
+\DoxyCodeLine{00211\ }
+\DoxyCodeLine{00212\ \ \ \ \ \textcolor{comment}{//\ check\ if\ we've\ initialized\ the\ interpreter\ and\ device?}}
+\DoxyCodeLine{00213\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{memryx_8h_a15d883bed3f1e33b7cd9e616109c3bb5}{memryx\_initialized}}\ ==\ \textcolor{keyword}{false})\ \{}
+\DoxyCodeLine{00214\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\mbox{\hyperlink{memryx_8h_a55cbccd650cd3ad4829c996c54fb7f6a}{init\_memryx}}(\mbox{\hyperlink{ei__fill__result__struct_8h_a881f62341b5a41a3c5707268bd537be1}{debug}},\ impulse)\ ==\ \textcolor{keyword}{false})\ \{}
+\DoxyCodeLine{00215\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{group__ei__returntypes_ggad9580b47a6cd5e74cfc31a03bdfecebeaa41f4af945eadc2a54936d9e67248f92}{EI\_IMPULSE\_MEMRYX\_ERROR}};}
+\DoxyCodeLine{00216\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00217\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{memryx_8h_a15d883bed3f1e33b7cd9e616109c3bb5}{memryx\_initialized}}\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00218\ \ \ \ \ \}}
+\DoxyCodeLine{00219\ }
+\DoxyCodeLine{00220\ \ \ \ \ \textcolor{comment}{/*\ 4.\ get\ input\ shape\ -\/\ Not\ needed\ during\ runtime,\ available\ only\ for\ debugging\ */}}
+\DoxyCodeLine{00221\ \ \ \ \ \textcolor{keywordflow}{if}(\mbox{\hyperlink{memryx_8h_aa4949de33718984eb9eba135672c60b9}{verbose\_debug}})\ \{}
+\DoxyCodeLine{00222\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_simple_web_server_8ino_a6e27f49150e9a14580fb313cc2777e00}{status}}\ =\ memx\_get\_ifmap\_size(\mbox{\hyperlink{memryx_8h_a782806bdc54c49a8d4799435919ef839}{model\_id}},\ \mbox{\hyperlink{memryx_8h_a1aaf75a7cb1e9c4ffbe7d65987c8a85b}{flow\_id}},\ \&ifmap\_height,\ \&ifmap\_width,\ \&z,\ \&ifmap\_channel\_number,\ \&ifmap\_format);}
+\DoxyCodeLine{00223\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}status\ =\ \%d,\ ifmap\ shape\ =\ (\%d,\ \%d,\ \%d),\ format\ =\ \%d\(\backslash\)n"{}},}
+\DoxyCodeLine{00224\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_simple_web_server_8ino_a6e27f49150e9a14580fb313cc2777e00}{status}},\ ifmap\_height,\ ifmap\_width,\ ifmap\_channel\_number,\ ifmap\_format);}
+\DoxyCodeLine{00225\ \ \ \ \ \}}
+\DoxyCodeLine{00226\ }
+\DoxyCodeLine{00227\ \ \ \ \ \textcolor{comment}{//\ 5.\ get\ output\ shape}}
+\DoxyCodeLine{00228\ \ \ \ \ \mbox{\hyperlink{_simple_web_server_8ino_a6e27f49150e9a14580fb313cc2777e00}{status}}\ =\ memx\_get\_ofmap\_size(\mbox{\hyperlink{memryx_8h_a782806bdc54c49a8d4799435919ef839}{model\_id}},\ \mbox{\hyperlink{memryx_8h_a1aaf75a7cb1e9c4ffbe7d65987c8a85b}{flow\_id}},\ \&ofmap\_height,\ \&ofmap\_width,\ \&z,\ \&ofmap\_channel\_number,\ \&ofmap\_format);}
+\DoxyCodeLine{00229\ \ \ \ \ \textcolor{keywordflow}{if}(\mbox{\hyperlink{ei__fill__result__struct_8h_a881f62341b5a41a3c5707268bd537be1}{debug}})\ \{}
+\DoxyCodeLine{00230\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}status\ =\ \%d,\ ofmap\ shape\ =\ (\%d,\ \%d,\ \%d),\ format\ =\ \%d\(\backslash\)n"{}},}
+\DoxyCodeLine{00231\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_simple_web_server_8ino_a6e27f49150e9a14580fb313cc2777e00}{status}},\ ofmap\_height,\ ofmap\_width,\ ofmap\_channel\_number,\ ofmap\_format);}
+\DoxyCodeLine{00232\ \ \ \ \ \}}
+\DoxyCodeLine{00233\ \ \ \ \ \textcolor{keywordflow}{if}(memx\_status\_error(\mbox{\hyperlink{_simple_web_server_8ino_a6e27f49150e9a14580fb313cc2777e00}{status}}))\ \{}
+\DoxyCodeLine{00234\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{group__ei__returntypes_ggad9580b47a6cd5e74cfc31a03bdfecebeaa41f4af945eadc2a54936d9e67248f92}{EI\_IMPULSE\_MEMRYX\_ERROR}};}
+\DoxyCodeLine{00235\ \ \ \ \ \}}
+\DoxyCodeLine{00236\ }
+\DoxyCodeLine{00237\ \ \ \ \ \textcolor{comment}{//\ 6.\ Prepare\ input\ and\ output\ buffers}}
+\DoxyCodeLine{00238\ \ \ \ \ \textcolor{keywordtype}{float}*\ ofmap\ =\ \textcolor{keyword}{new}\ \textcolor{keywordtype}{float}\ [ofmap\_width\ *\ ofmap\_height\ *\ ofmap\_channel\_number];}
+\DoxyCodeLine{00239\ }
+\DoxyCodeLine{00240\ \textcolor{preprocessor}{\#if\ EI\_CLASSIFIER\_SINGLE\_FEATURE\_INPUT\ ==\ 0}}
+\DoxyCodeLine{00241\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ mtx\_size\ =\ impulse-\/>\mbox{\hyperlink{structei__impulse_aab279e170490f9b5c0c59eff0b6fa484}{dsp\_blocks\_size}}\ +\ impulse-\/>\mbox{\hyperlink{structei__impulse_a686152786fe6f16b174bfecfe01308a9}{learning\_blocks\_size}};}
+\DoxyCodeLine{00242\ \ \ \ \ ei::matrix\_t*\ matrix\ =\ NULL;}
+\DoxyCodeLine{00243\ }
+\DoxyCodeLine{00244\ \ \ \ \ ei::matrix\_t\ combined\_matrix(1,\ impulse-\/>\mbox{\hyperlink{structei__impulse_a3b948bf79bdff1640fcae9a63476726a}{nn\_input\_frame\_size}});}
+\DoxyCodeLine{00245\ \ \ \ \ uint32\_t\ buf\_pos\ =\ 0;}
+\DoxyCodeLine{00246\ }
+\DoxyCodeLine{00247\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ input\_block\_ids\_size;\ i++)\ \{}
+\DoxyCodeLine{00248\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ cur\_mtx\ =\ input\_block\_ids[i];}
+\DoxyCodeLine{00249\ }
+\DoxyCodeLine{00250\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!find\_mtx\_by\_idx(fmatrix,\ \&matrix,\ cur\_mtx,\ mtx\_size))\ \{}
+\DoxyCodeLine{00251\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}ERR:\ Cannot\ find\ matrix\ with\ id\ \%zu\(\backslash\)n"{}},\ cur\_mtx);}
+\DoxyCodeLine{00252\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{group__ei__returntypes_ggad9580b47a6cd5e74cfc31a03bdfecebeab011336593a9cc40639bac0c8a32a51e}{EI\_IMPULSE\_INVALID\_SIZE}};}
+\DoxyCodeLine{00253\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00254\ }
+\DoxyCodeLine{00255\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ ix\ =\ 0;\ ix\ <\ matrix-\/>rows\ *\ matrix-\/>cols;\ ix++)\ \{}
+\DoxyCodeLine{00256\ \ \ \ \ \ \ \ \ \ \ \ \ combined\_matrix.buffer[buf\_pos++]\ =\ matrix-\/>buffer[ix];}
+\DoxyCodeLine{00257\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00258\ \ \ \ \ \}}
+\DoxyCodeLine{00259\ \ \ \ \ matrix\ =\ \&combined\_matrix;}
+\DoxyCodeLine{00260\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00261\ \ \ \ \ ei::matrix\_t*\ matrix\ =\ fmatrix[0].\mbox{\hyperlink{structei__feature__t_a971fb9c93bddb4631925e579f5b88ebf}{matrix}};}
+\DoxyCodeLine{00262\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00263\ }
+\DoxyCodeLine{00264\ \ \ \ \ \textcolor{keywordtype}{float}*\ ifmap\ =\ (\textcolor{keywordtype}{float}*)matrix-\/>buffer;}
+\DoxyCodeLine{00265\ }
+\DoxyCodeLine{00266\ \ \ \ \ \textcolor{keywordflow}{if}(\mbox{\hyperlink{memryx_8h_aa4949de33718984eb9eba135672c60b9}{verbose\_debug}})\ \{}
+\DoxyCodeLine{00267\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int}\ fidx\ =\ 0;\ fidx\ <\ (ofmap\_width*ofmap\_height);\ fidx++)\ \{}
+\DoxyCodeLine{00268\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}\%f\(\backslash\)t"{}},\ matrix-\/>buffer[fidx]);}
+\DoxyCodeLine{00269\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(!(fidx\ \%\ ofmap\_width))\ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}\(\backslash\)n"{}});}
+\DoxyCodeLine{00270\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00271\ \ \ \ \ \}}
+\DoxyCodeLine{00272\ }
+\DoxyCodeLine{00273\ \ \ \ \ \textcolor{comment}{//\ TODO\ stream\_ifmap\ only\ copies\ buffer\ to\ MX3\ board,}}
+\DoxyCodeLine{00274\ \ \ \ \ \textcolor{comment}{//\ we\ need\ a\ different\ approach\ to\ measure\ latency}}
+\DoxyCodeLine{00275\ \ \ \ \ ctx\_start\_us\ =\ \mbox{\hyperlink{group__ei__user__functions_gac9aae7befaa896e21417df1f00518416}{ei\_read\_timer\_us}}();}
+\DoxyCodeLine{00276\ \ \ \ \ \textcolor{comment}{//\ 7.\ Stream\ inputs\ to\ device\ and\ start\ inference.}}
+\DoxyCodeLine{00277\ \ \ \ \ \mbox{\hyperlink{_simple_web_server_8ino_a6e27f49150e9a14580fb313cc2777e00}{status}}\ =\ memx\_stream\_ifmap(\mbox{\hyperlink{memryx_8h_a782806bdc54c49a8d4799435919ef839}{model\_id}},\ 0,\ ifmap,\ \mbox{\hyperlink{memryx_8h_a654210ae605a61110cf5a8a0c9f2d72c}{timeout}});}
+\DoxyCodeLine{00278\ \ \ \ \ ctx\_end\_us\ =\ \mbox{\hyperlink{group__ei__user__functions_gac9aae7befaa896e21417df1f00518416}{ei\_read\_timer\_us}}();}
+\DoxyCodeLine{00279\ \ \ \ \ \textcolor{keywordflow}{if}(memx\_status\_error(\mbox{\hyperlink{_simple_web_server_8ino_a6e27f49150e9a14580fb313cc2777e00}{status}}))\ \{}
+\DoxyCodeLine{00280\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{group__ei__returntypes_ggad9580b47a6cd5e74cfc31a03bdfecebeaa41f4af945eadc2a54936d9e67248f92}{EI\_IMPULSE\_MEMRYX\_ERROR}};}
+\DoxyCodeLine{00281\ \ \ \ \ \}}
+\DoxyCodeLine{00282\ }
+\DoxyCodeLine{00283\ \ \ \ \ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}}-\/>timing.classification\_us\ =\ ctx\_end\_us\ -\/\ ctx\_start\_us;}
+\DoxyCodeLine{00284\ \ \ \ \ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}}-\/>timing.classification\ =\ (int)(\mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}}-\/>timing.classification\_us\ /\ 1000);}
+\DoxyCodeLine{00285\ }
+\DoxyCodeLine{00286\ \ \ \ \ \mbox{\hyperlink{memryx_8h_a385b0bd18814f0f7ad3e2606c5f30f25}{engine\_info}}.str(\textcolor{stringliteral}{"{}"{}});}
+\DoxyCodeLine{00287\ \ \ \ \ \mbox{\hyperlink{memryx_8h_a385b0bd18814f0f7ad3e2606c5f30f25}{engine\_info}}\ <<\ \textcolor{stringliteral}{"{}Inferences\ per\ second:\ "{}}\ <<\ (1000000\ /\ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}}-\/>timing.classification\_us);}
+\DoxyCodeLine{00288\ }
+\DoxyCodeLine{00289\ \ \ \ \ \textcolor{comment}{//\ 6.\ Stream\ output\ results\ from\ device\ after\ inference}}
+\DoxyCodeLine{00290\ \ \ \ \ \mbox{\hyperlink{_simple_web_server_8ino_a6e27f49150e9a14580fb313cc2777e00}{status}}\ =\ memx\_stream\_ofmap(\mbox{\hyperlink{memryx_8h_a782806bdc54c49a8d4799435919ef839}{model\_id}},\ 0,\ ofmap,\ \mbox{\hyperlink{memryx_8h_a654210ae605a61110cf5a8a0c9f2d72c}{timeout}});}
+\DoxyCodeLine{00291\ \ \ \ \ \textcolor{keywordflow}{if}(\mbox{\hyperlink{ei__fill__result__struct_8h_a881f62341b5a41a3c5707268bd537be1}{debug}})\ \{}
+\DoxyCodeLine{00292\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}\ memx\_stream\_ofmap\ (status=\%d)\(\backslash\)n"{}},\ \mbox{\hyperlink{_simple_web_server_8ino_a6e27f49150e9a14580fb313cc2777e00}{status}});}
+\DoxyCodeLine{00293\ \ \ \ \ \}}
+\DoxyCodeLine{00294\ \ \ \ \ \textcolor{keywordflow}{if}(memx\_status\_error(\mbox{\hyperlink{_simple_web_server_8ino_a6e27f49150e9a14580fb313cc2777e00}{status}}))\ \{}
+\DoxyCodeLine{00295\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{group__ei__returntypes_ggad9580b47a6cd5e74cfc31a03bdfecebeaa41f4af945eadc2a54936d9e67248f92}{EI\_IMPULSE\_MEMRYX\_ERROR}};}
+\DoxyCodeLine{00296\ \ \ \ \ \}}
+\DoxyCodeLine{00297\ }
+\DoxyCodeLine{00298\ \ \ \ \ \textcolor{comment}{//\ init\ softmax\ shape}}
+\DoxyCodeLine{00299\ \ \ \ \ std::vector<size\_t>\ output\_shape\ =\ \{\textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{size\_t}\textcolor{keyword}{>}(ofmap\_height),\textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{size\_t}\textcolor{keyword}{>}(ofmap\_width),}
+\DoxyCodeLine{00300\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{size\_t}\textcolor{keyword}{>}(ofmap\_channel\_number)\};}
+\DoxyCodeLine{00301\ \ \ \ \ \mbox{\hyperlink{memryx_8h_a52cd3949eba004f3b8791be094e50549}{softmax\_shape}}.BuildFrom(output\_shape);}
+\DoxyCodeLine{00302\ \ \ \ \ \textcolor{comment}{//\ dumy\ beta\ parameter\ for\ softmax\ purposes}}
+\DoxyCodeLine{00303\ \ \ \ \ \mbox{\hyperlink{memryx_8h_aa32eba6b3164559e24b544f632e08fb6}{dummy\_params}}.\mbox{\hyperlink{structtflite_1_1_softmax_params_a8003007436aab20a1b265453c462067f}{beta}}\ =\ 1;}
+\DoxyCodeLine{00304\ }
+\DoxyCodeLine{00305\ \ \ \ \ \textcolor{comment}{//\ apply\ softmax,\ becuase\ MX3\ does\ not\ support\ this\ operation}}
+\DoxyCodeLine{00306\ \ \ \ \ \mbox{\hyperlink{namespacetflite_1_1reference__ops_ae06af6ac80f340cc1edfb85fc6f72633}{tflite::reference\_ops::Softmax}}(\mbox{\hyperlink{memryx_8h_aa32eba6b3164559e24b544f632e08fb6}{dummy\_params}},\ \mbox{\hyperlink{memryx_8h_a52cd3949eba004f3b8791be094e50549}{softmax\_shape}},\ ofmap,\ \mbox{\hyperlink{memryx_8h_a52cd3949eba004f3b8791be094e50549}{softmax\_shape}},\ ofmap);}
+\DoxyCodeLine{00307\ }
+\DoxyCodeLine{00308\ \ \ \ \ \textcolor{comment}{//\ handle\ inference\ outputs}}
+\DoxyCodeLine{00309\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{ei__fill__result__struct_8h_aafcd7d36638d6a564b6edbceef06ea8b}{block\_config}}-\/>\mbox{\hyperlink{structei__learning__block__config__tflite__graph__t_af1a9b7c47a826887609d831078ccbdbc}{object\_detection}})\ \{}
+\DoxyCodeLine{00310\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}\ (\mbox{\hyperlink{ei__fill__result__struct_8h_aafcd7d36638d6a564b6edbceef06ea8b}{block\_config}}-\/>\mbox{\hyperlink{structei__learning__block__config__tflite__graph__t_a9f1d65f69c49cecaddb6b6abb65644ef}{object\_detection\_last\_layer}})\ \{}
+\DoxyCodeLine{00311\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{ei__model__types_8h_ae9f473b0f3438b846c2c12ab84338858}{EI\_CLASSIFIER\_LAST\_LAYER\_FOMO}}:\ \{}
+\DoxyCodeLine{00312\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}FOMO\ executed\ on\ Memryx\(\backslash\)n"{}});}
+\DoxyCodeLine{00313\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ fill\_result\_struct\_f32\_fomo(}
+\DoxyCodeLine{00314\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ impulse,}
+\DoxyCodeLine{00315\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__fill__result__struct_8h_aafcd7d36638d6a564b6edbceef06ea8b}{block\_config}},}
+\DoxyCodeLine{00316\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}},}
+\DoxyCodeLine{00317\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ofmap,}
+\DoxyCodeLine{00318\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ impulse-\/>\mbox{\hyperlink{structei__impulse_a51d2390841b11688a861c16753380c15}{fomo\_output\_size}},}
+\DoxyCodeLine{00319\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ impulse-\/>\mbox{\hyperlink{structei__impulse_a51d2390841b11688a861c16753380c15}{fomo\_output\_size}});}
+\DoxyCodeLine{00320\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00321\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00322\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{ei__model__types_8h_a92c64af4832fb183ad9e80b1e9231d41}{EI\_CLASSIFIER\_LAST\_LAYER\_SSD}}:\ \{}
+\DoxyCodeLine{00323\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}Mobilenet\ SSD\ is\ not\ implemented\ for\ Edge\ Impulse\ MemryX\ engine,\ please\ contact\ Edge\ Impulse\ Support\(\backslash\)n"{}});}
+\DoxyCodeLine{00324\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00325\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00326\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}:\ \{}
+\DoxyCodeLine{00327\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}ERR:\ Unsupported\ object\ detection\ last\ layer\ (\%d)\(\backslash\)n"{}},}
+\DoxyCodeLine{00328\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__fill__result__struct_8h_aafcd7d36638d6a564b6edbceef06ea8b}{block\_config}}-\/>\mbox{\hyperlink{structei__learning__block__config__tflite__graph__t_a9f1d65f69c49cecaddb6b6abb65644ef}{object\_detection\_last\_layer}});}
+\DoxyCodeLine{00329\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{group__ei__returntypes_ggad9580b47a6cd5e74cfc31a03bdfecebea399c371041be7c468a3b05a4d8352d14}{EI\_IMPULSE\_UNSUPPORTED\_INFERENCING\_ENGINE}};}
+\DoxyCodeLine{00330\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00331\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00332\ \ \ \ \ \}}
+\DoxyCodeLine{00333\ \ \ \ \ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00334\ \ \ \ \ \ \ \ \ fill\_result\_struct\_f32(impulse,\ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}},\ ofmap,\ \mbox{\hyperlink{ei__fill__result__struct_8h_a881f62341b5a41a3c5707268bd537be1}{debug}});}
+\DoxyCodeLine{00335\ \ \ \ \ \}}
+\DoxyCodeLine{00336\ }
+\DoxyCodeLine{00337\ \ \ \ \ \textcolor{keyword}{delete}\ ofmap;}
+\DoxyCodeLine{00338\ \ \ \ \ \textcolor{comment}{//\ Device\ is\ closed\ only\ at\ EIM\ exit,\ therefore\ we\ do\ not\ use\ memx\_close()}}
+\DoxyCodeLine{00339\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{ei__fill__result__struct_8h_a2fb43be102b153d659b668ad295aff40}{EI\_IMPULSE\_OK}};}
+\DoxyCodeLine{00340\ \}}
+\DoxyCodeLine{00341\ }
+\DoxyCodeLine{00342\ \textcolor{preprocessor}{\#elif\ (defined(EI\_CLASSIFIER\_USE\_MEMRYX\_SOFTWARE)\ \&\&\ (EI\_CLASSIFIER\_USE\_MEMRYX\_SOFTWARE\ ==\ 1))}}
+\DoxyCodeLine{00343\ \mbox{\hyperlink{group__ei__returntypes_gad9580b47a6cd5e74cfc31a03bdfecebe}{EI\_IMPULSE\_ERROR}}\ \mbox{\hyperlink{memryx_8h_a945f35e39a49bfe4e1194edaf89571cd}{run\_nn\_inference}}(}
+\DoxyCodeLine{00344\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structei__impulse}{ei\_impulse\_t}}\ *impulse,}
+\DoxyCodeLine{00345\ \ \ \ \ \mbox{\hyperlink{structei__feature__t}{ei\_feature\_t}}\ *fmatrix,}
+\DoxyCodeLine{00346\ \ \ \ \ uint32\_t\ learn\_block\_index,}
+\DoxyCodeLine{00347\ \ \ \ \ uint32\_t*\ inputBlockIds,}
+\DoxyCodeLine{00348\ \ \ \ \ \mbox{\hyperlink{structei__impulse__result__t}{ei\_impulse\_result\_t}}\ *\mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}},}
+\DoxyCodeLine{00349\ \ \ \ \ \textcolor{keywordtype}{void}\ *\mbox{\hyperlink{ei__run__dsp_8h_a0819d397f9fba7b345b75fef1c1f782a}{config\_ptr}},}
+\DoxyCodeLine{00350\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{ei__fill__result__struct_8h_a881f62341b5a41a3c5707268bd537be1}{debug}}\ =\ \textcolor{keyword}{false})}
+\DoxyCodeLine{00351\ \{}
+\DoxyCodeLine{00352\ \ \ \ \ \mbox{\hyperlink{structei__learning__block__config__tflite__graph__t}{ei\_learning\_block\_config\_tflite\_graph\_t}}\ *\mbox{\hyperlink{ei__fill__result__struct_8h_aafcd7d36638d6a564b6edbceef06ea8b}{block\_config}}\ =\ (\mbox{\hyperlink{structei__learning__block__config__tflite__graph__t}{ei\_learning\_block\_config\_tflite\_graph\_t}}*)\mbox{\hyperlink{ei__run__dsp_8h_a0819d397f9fba7b345b75fef1c1f782a}{config\_ptr}};}
+\DoxyCodeLine{00353\ }
+\DoxyCodeLine{00354\ \ \ \ \ \textcolor{comment}{//\ init\ Python\ embedded\ interpreter\ (should\ be\ called\ once!)}}
+\DoxyCodeLine{00355\ \ \ \ \ \textcolor{keyword}{static}\ py::scoped\_interpreter\ guard\{\};}
+\DoxyCodeLine{00356\ }
+\DoxyCodeLine{00357\ \ \ \ \ \textcolor{comment}{//\ check\ if\ we've\ initialized\ the\ interpreter\ and\ device?}}
+\DoxyCodeLine{00358\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{memryx_8h_a15d883bed3f1e33b7cd9e616109c3bb5}{memryx\_initialized}}\ ==\ \textcolor{keyword}{false})\ \{}
+\DoxyCodeLine{00359\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\mbox{\hyperlink{memryx_8h_a55cbccd650cd3ad4829c996c54fb7f6a}{init\_memryx}}(\mbox{\hyperlink{ei__fill__result__struct_8h_a881f62341b5a41a3c5707268bd537be1}{debug}},\ impulse)\ ==\ \textcolor{keyword}{false})\ \{}
+\DoxyCodeLine{00360\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{group__ei__returntypes_ggad9580b47a6cd5e74cfc31a03bdfecebeaa41f4af945eadc2a54936d9e67248f92}{EI\_IMPULSE\_MEMRYX\_ERROR}};}
+\DoxyCodeLine{00361\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00362\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{memryx_8h_a15d883bed3f1e33b7cd9e616109c3bb5}{memryx\_initialized}}\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00363\ \ \ \ \ \}}
+\DoxyCodeLine{00364\ }
+\DoxyCodeLine{00365\ \ \ \ \ std::vector<size\_t>\ \mbox{\hyperlink{akida_8h_a0792621910eb31f95019ddc94eb3dece}{input\_shape}}\ =\ \{1,\ impulse-\/>\mbox{\hyperlink{structei__impulse_ae60988f0fadb5594fb6a7f00ef9f075a}{input\_width}},\ impulse-\/>\mbox{\hyperlink{structei__impulse_a5942f00730eec808be7862623464a3b6}{input\_height}},\ 3\};}
+\DoxyCodeLine{00366\ \ \ \ \ py::array\_t<float>\ \mbox{\hyperlink{add__n__test_8cc_a5612ba79d1f0b544c7aeae4621166fea}{input\_data}}(\mbox{\hyperlink{akida_8h_a0792621910eb31f95019ddc94eb3dece}{input\_shape}});\ \textcolor{comment}{//\ =\ zeroes(input\_shape,\ 0);}}
+\DoxyCodeLine{00367\ }
+\DoxyCodeLine{00368\ \ \ \ \ printf(\textcolor{stringliteral}{"{}impulse-\/>w=\%d\ h=\%d\(\backslash\)n"{}},\ impulse-\/>\mbox{\hyperlink{structei__impulse_ae60988f0fadb5594fb6a7f00ef9f075a}{input\_width}},\ impulse-\/>\mbox{\hyperlink{structei__impulse_a5942f00730eec808be7862623464a3b6}{input\_height}});}
+\DoxyCodeLine{00369\ }
+\DoxyCodeLine{00370\ \ \ \ \ \textcolor{comment}{/*}}
+\DoxyCodeLine{00371\ \textcolor{comment}{\ \ \ \ \ *\ convert\ features\ data\ to\ the\ expected\ shape\ (4dim)}}
+\DoxyCodeLine{00372\ \textcolor{comment}{\ \ \ \ \ *\ For\ images\ RGB\ shape\ is\ (width,\ height,\ colors)}}
+\DoxyCodeLine{00373\ \textcolor{comment}{\ \ \ \ \ *\ For\ images\ BW\ shape\ is\ (width,\ height,\ 1)}}
+\DoxyCodeLine{00374\ \textcolor{comment}{\ \ \ \ \ *\ For\ Audio\ shape\ is\ (width,\ height,\ 1)\ -\/\ spectrogram}}
+\DoxyCodeLine{00375\ \textcolor{comment}{\ \ \ \ \ */}}
+\DoxyCodeLine{00376\ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_acab531abaa74a7e664e3986f2522b33a}{r}}\ =\ \mbox{\hyperlink{add__n__test_8cc_a5612ba79d1f0b544c7aeae4621166fea}{input\_data}}.mutable\_unchecked<4>();}
+\DoxyCodeLine{00377\ }
+\DoxyCodeLine{00378\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ input\_block\_ids\_size;\ i++)\ \{}
+\DoxyCodeLine{00379\ \ \ \ \ \ \ \ \ uint16\_t\ cur\_mtx\ =\ input\_block\_ids[i];}
+\DoxyCodeLine{00380\ \textcolor{preprocessor}{\#if\ EI\_CLASSIFIER\_SINGLE\_FEATURE\_INPUT\ ==\ 0}}
+\DoxyCodeLine{00381\ \ \ \ \ \ \ \ \ ei::matrix\_t*\ matrix\ =\ NULL;}
+\DoxyCodeLine{00382\ }
+\DoxyCodeLine{00383\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!find\_mtx\_by\_idx(fmatrix,\ \&matrix,\ cur\_mtx,\ mtx\_size))\ \{}
+\DoxyCodeLine{00384\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}ERR:\ Cannot\ find\ matrix\ with\ id\ \%zu\(\backslash\)n"{}},\ cur\_mtx);}
+\DoxyCodeLine{00385\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{group__ei__returntypes_ggad9580b47a6cd5e74cfc31a03bdfecebeab011336593a9cc40639bac0c8a32a51e}{EI\_IMPULSE\_INVALID\_SIZE}};}
+\DoxyCodeLine{00386\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00387\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00388\ \ \ \ \ \ \ \ \ ei::matrix\_t*\ matrix\ =\ fmatrix[0].\mbox{\hyperlink{structei__feature__t_a971fb9c93bddb4631925e579f5b88ebf}{matrix}};}
+\DoxyCodeLine{00389\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00390\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (py::ssize\_t\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a6150e0515f7202e2fb518f7206ed97dc}{x}}\ =\ 0;\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a6150e0515f7202e2fb518f7206ed97dc}{x}}\ <\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_acab531abaa74a7e664e3986f2522b33a}{r}}.shape(1);\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a6150e0515f7202e2fb518f7206ed97dc}{x}}++)\ \{}
+\DoxyCodeLine{00391\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (py::ssize\_t\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_aa4f0d3eebc3c443f9be81bf48561a217}{y}}\ =\ 0;\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_aa4f0d3eebc3c443f9be81bf48561a217}{y}}\ <\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_acab531abaa74a7e664e3986f2522b33a}{r}}.shape(2);\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_aa4f0d3eebc3c443f9be81bf48561a217}{y}}++)\ \{}
+\DoxyCodeLine{00392\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(py::ssize\_t\ z\ =\ 0;\ z\ <\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_acab531abaa74a7e664e3986f2522b33a}{r}}.shape(3);\ z++)\ \{}
+\DoxyCodeLine{00393\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_acab531abaa74a7e664e3986f2522b33a}{r}}(0,\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a6150e0515f7202e2fb518f7206ed97dc}{x}},\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_aa4f0d3eebc3c443f9be81bf48561a217}{y}},\ z)\ =\ (float)(fmatrix.buffer[\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a6150e0515f7202e2fb518f7206ed97dc}{x}}\ *\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_acab531abaa74a7e664e3986f2522b33a}{r}}.shape(2)\ *\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_acab531abaa74a7e664e3986f2522b33a}{r}}.shape(3)\ +\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_aa4f0d3eebc3c443f9be81bf48561a217}{y}}\ *\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_acab531abaa74a7e664e3986f2522b33a}{r}}.shape(3)\ +\ z]);}
+\DoxyCodeLine{00394\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00395\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00396\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00397\ \ \ \ \ \}}
+\DoxyCodeLine{00398\ }
+\DoxyCodeLine{00399\ \ \ \ \ py::object\ runmodel\ =\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2model_8h_ae142afd8c2e2c711c1c62440deebe03c}{model}}.attr(\textcolor{stringliteral}{"{}run"{}});}
+\DoxyCodeLine{00400\ \ \ \ \ \textcolor{comment}{//\ result\ from\ mx\_sim\ is\ \{np\ array,\ float,\ float\}}}
+\DoxyCodeLine{00401\ \ \ \ \ py::tuple\ \mbox{\hyperlink{namespacecheck__tflite__files_ae0a3e9cb8fdc69292f78727c66e6b92e}{args}}\ =\ py::make\_tuple(py::none(),\ 0.00,\ 0.00);}
+\DoxyCodeLine{00402\ \ \ \ \ \textcolor{comment}{//\ run\ inference\ in\ sumualtor}}
+\DoxyCodeLine{00403\ \ \ \ \ printf(\textcolor{stringliteral}{"{}start\ inference\(\backslash\)n"{}});}
+\DoxyCodeLine{00404\ \ \ \ \ uint64\_t\ ctx\_start\_us\ =\ \mbox{\hyperlink{group__ei__user__functions_gac9aae7befaa896e21417df1f00518416}{ei\_read\_timer\_us}}();}
+\DoxyCodeLine{00405\ \ \ \ \ \mbox{\hyperlink{namespacecheck__tflite__files_ae0a3e9cb8fdc69292f78727c66e6b92e}{args}}\ =\ runmodel(\textcolor{stringliteral}{"{}inputs"{}}\_a=\mbox{\hyperlink{add__n__test_8cc_a5612ba79d1f0b544c7aeae4621166fea}{input\_data}},\textcolor{stringliteral}{"{}frames"{}}\_a=1);}
+\DoxyCodeLine{00406\ \ \ \ \ uint64\_t\ ctx\_end\_us\ =\ \mbox{\hyperlink{group__ei__user__functions_gac9aae7befaa896e21417df1f00518416}{ei\_read\_timer\_us}}();}
+\DoxyCodeLine{00407\ \ \ \ \ printf(\textcolor{stringliteral}{"{}end\ of\ inference\(\backslash\)n"{}});}
+\DoxyCodeLine{00408\ }
+\DoxyCodeLine{00409\ \ \ \ \ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}}-\/>timing.classification\_us\ =\ ctx\_end\_us\ -\/\ ctx\_start\_us;}
+\DoxyCodeLine{00410\ \ \ \ \ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}}-\/>timing.classification\ =\ (\mbox{\hyperlink{namespacefoto_a1005e20fd9ccefeed966f9fee79837cb}{int}})(\mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}}-\/>timing.classification\_us\ /\ 1000);}
+\DoxyCodeLine{00411\ }
+\DoxyCodeLine{00412\ \ \ \ \ \mbox{\hyperlink{memryx_8h_a385b0bd18814f0f7ad3e2606c5f30f25}{engine\_info}}.str(\textcolor{stringliteral}{"{}"{}});}
+\DoxyCodeLine{00413\ \ \ \ \ \mbox{\hyperlink{memryx_8h_a385b0bd18814f0f7ad3e2606c5f30f25}{engine\_info}}\ <<\ \textcolor{stringliteral}{"{}Inferences\ per\ second:\ "{}}\ <<\ (1000000\ /\ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}}-\/>timing.classification\_us);}
+\DoxyCodeLine{00414\ }
+\DoxyCodeLine{00415\ \ \ \ \ py::array\ \mbox{\hyperlink{hello__world__model_8cc_af907ab92e8169bbfa248dd4f8eb0005c}{outputs}}\ =\ py::list(args[0]);}
+\DoxyCodeLine{00416\ \ \ \ \ py::array\_t<float>\ potentials;}
+\DoxyCodeLine{00417\ \ \ \ \ std::vector<float>\ potentials\_v;}
+\DoxyCodeLine{00418\ }
+\DoxyCodeLine{00419\ \ \ \ \ potentials\ =\ \mbox{\hyperlink{hello__world__model_8cc_af907ab92e8169bbfa248dd4f8eb0005c}{outputs}}.squeeze().cast<py::array\_t<float>>();}
+\DoxyCodeLine{00420\ }
+\DoxyCodeLine{00421\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{ei__fill__result__struct_8h_aafcd7d36638d6a564b6edbceef06ea8b}{block\_config}}-\/>\mbox{\hyperlink{structei__learning__block__config__tflite__graph__t_af1a9b7c47a826887609d831078ccbdbc}{object\_detection}}\ ==\ \textcolor{keyword}{false})\ \{}
+\DoxyCodeLine{00422\ \ \ \ \ \ \ \ \ potentials\_v\ =\ \mbox{\hyperlink{hello__world__model_8cc_af907ab92e8169bbfa248dd4f8eb0005c}{outputs}}.squeeze().cast<std::vector<float>>();}
+\DoxyCodeLine{00423\ \ \ \ \ \}}
+\DoxyCodeLine{00424\ \ \ \ \ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00425\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ q\ =\ potentials.unchecked<>();}
+\DoxyCodeLine{00426\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (py::ssize\_t\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a6150e0515f7202e2fb518f7206ed97dc}{x}}\ =\ 0;\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a6150e0515f7202e2fb518f7206ed97dc}{x}}\ <\ q.shape(0);\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a6150e0515f7202e2fb518f7206ed97dc}{x}}++)\ \{}
+\DoxyCodeLine{00427\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (py::ssize\_t\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_aa4f0d3eebc3c443f9be81bf48561a217}{y}}\ =\ 0;\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_aa4f0d3eebc3c443f9be81bf48561a217}{y}}\ <\ q.shape(1);\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_aa4f0d3eebc3c443f9be81bf48561a217}{y}}++)\ \{}
+\DoxyCodeLine{00428\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(py::ssize\_t\ z\ =\ 0;\ z\ <\ q.shape(2);\ z++)\ \{}
+\DoxyCodeLine{00429\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ potentials\_v.push\_back(q(\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a6150e0515f7202e2fb518f7206ed97dc}{x}},\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_aa4f0d3eebc3c443f9be81bf48561a217}{y}},\ z));}
+\DoxyCodeLine{00430\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00431\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00432\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00433\ \ \ \ \ \}}
+\DoxyCodeLine{00434\ }
+\DoxyCodeLine{00435\ \ \ \ \ \textcolor{keywordflow}{if}(\mbox{\hyperlink{ei__fill__result__struct_8h_a881f62341b5a41a3c5707268bd537be1}{debug}})\ \{}
+\DoxyCodeLine{00436\ \ \ \ \ \ \ \ \ std::string\ ret\_str\ =\ py::str(potentials).cast<std::string>();}
+\DoxyCodeLine{00437\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}Memryx\ raw\ output:\(\backslash\)n\%s\(\backslash\)n"{}},\ ret\_str.c\_str());}
+\DoxyCodeLine{00438\ \ \ \ \ \}}
+\DoxyCodeLine{00439\ }
+\DoxyCodeLine{00440\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{ei__fill__result__struct_8h_aafcd7d36638d6a564b6edbceef06ea8b}{block\_config}}-\/>\mbox{\hyperlink{structei__learning__block__config__tflite__graph__t_af1a9b7c47a826887609d831078ccbdbc}{object\_detection}})\ \{}
+\DoxyCodeLine{00441\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}\ (\mbox{\hyperlink{ei__fill__result__struct_8h_aafcd7d36638d6a564b6edbceef06ea8b}{block\_config}}-\/>\mbox{\hyperlink{structei__learning__block__config__tflite__graph__t_a9f1d65f69c49cecaddb6b6abb65644ef}{object\_detection\_last\_layer}})\ \{}
+\DoxyCodeLine{00442\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{ei__model__types_8h_ae9f473b0f3438b846c2c12ab84338858}{EI\_CLASSIFIER\_LAST\_LAYER\_FOMO}}:\ \{}
+\DoxyCodeLine{00443\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}FOMO\ executed\ on\ Memryx\(\backslash\)n"{}});}
+\DoxyCodeLine{00444\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ fill\_result\_struct\_f32\_fomo(}
+\DoxyCodeLine{00445\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ impulse,}
+\DoxyCodeLine{00446\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__fill__result__struct_8h_aafcd7d36638d6a564b6edbceef06ea8b}{block\_config}},}
+\DoxyCodeLine{00447\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}},}
+\DoxyCodeLine{00448\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ potentials\_v.data(),}
+\DoxyCodeLine{00449\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ impulse-\/>\mbox{\hyperlink{structei__impulse_a51d2390841b11688a861c16753380c15}{fomo\_output\_size}},}
+\DoxyCodeLine{00450\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ impulse-\/>\mbox{\hyperlink{structei__impulse_a51d2390841b11688a861c16753380c15}{fomo\_output\_size}});}
+\DoxyCodeLine{00451\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00452\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00453\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{ei__model__types_8h_a92c64af4832fb183ad9e80b1e9231d41}{EI\_CLASSIFIER\_LAST\_LAYER\_SSD}}:\ \{}
+\DoxyCodeLine{00454\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}Mobilenet\ SSD\ executed\ on\ Memryx\(\backslash\)n"{}});}
+\DoxyCodeLine{00455\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00456\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00457\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}:\ \{}
+\DoxyCodeLine{00458\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}ERR:\ Unsupported\ object\ detection\ last\ layer\ (\%d)\(\backslash\)n"{}},}
+\DoxyCodeLine{00459\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ impulse-\/>object\_detection\_last\_layer);}
+\DoxyCodeLine{00460\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{group__ei__returntypes_ggad9580b47a6cd5e74cfc31a03bdfecebea399c371041be7c468a3b05a4d8352d14}{EI\_IMPULSE\_UNSUPPORTED\_INFERENCING\_ENGINE}};}
+\DoxyCodeLine{00461\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00462\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00463\ \ \ \ \ \}}
+\DoxyCodeLine{00464\ \ \ \ \ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00465\ \ \ \ \ \ \ \ \ fill\_result\_struct\_f32(impulse,\ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}},\ potentials\_v.data(),\ \mbox{\hyperlink{ei__fill__result__struct_8h_a881f62341b5a41a3c5707268bd537be1}{debug}});}
+\DoxyCodeLine{00466\ \ \ \ \ \}}
+\DoxyCodeLine{00467\ }
+\DoxyCodeLine{00468\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{ei__fill__result__struct_8h_a2fb43be102b153d659b668ad295aff40}{EI\_IMPULSE\_OK}};}
+\DoxyCodeLine{00469\ \}}
+\DoxyCodeLine{00470\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00471\ \textcolor{preprocessor}{\#error\ "{}Neither\ EI\_CLASSIFIER\_USE\_MEMRYX\_HARDWARE\ or\ EI\_CLASSIFIER\_USE\_MEMRYX\_SOFTWARE\ are\ defined\ or\ set\ to\ 1"{}}}
+\DoxyCodeLine{00472\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ USE\_HARDWARE}}
+\DoxyCodeLine{00473\ }
+\DoxyCodeLine{00474\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ EI\_CLASSIFIER\_INFERENCING\_ENGINE\ ==\ EI\_CLASSIFIER\_MEMRYX}}
+\DoxyCodeLine{00475\ }
+\DoxyCodeLine{00476\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{/*\ EI\_CLASSIFIER\_INFERENCING\_ENGINE\_MEMRYX\_H\ */}\textcolor{preprocessor}{}}
+
+\end{DoxyCode}

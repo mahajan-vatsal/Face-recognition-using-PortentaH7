@@ -1,0 +1,117 @@
+\chapter{renode}
+\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_2micro_2docs_2renode}{}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_2micro_2docs_2renode}\index{renode@{renode}}
+
+\begin{DoxyItemize}
+\item Software Emulation with Renode
+\item Installation
+\item Running Unit Tests
+\begin{DoxyItemize}
+\item Under the hood of the Testing Infrastructure
+\end{DoxyItemize}
+\item Running a non-\/test Binary with Renode
+\item Useful External Links for Renode and Robot Documentation
+\end{DoxyItemize}\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_2micro_2docs_2renode_autotoc_md225}{}\doxysection{\texorpdfstring{Software Emulation with Renode}{Software Emulation with Renode}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_2micro_2docs_2renode_autotoc_md225}
+Tensor\+Flow Lite Micro makes use of \href{https://github.com/renode/renode}{\texttt{ Renode}} to for software emulation.
+
+Here, we document how Renode is used as part of the TFLM project. For more general use of Renode, please refer to the \href{https://renode.readthedocs.io/en/latest/}{\texttt{ Renode documentation}}.
+
+You can also read more about Renode from a \href{https://docs.google.com/presentation/d/1j0gjI4pVkgF9CWvxaxr5XuCKakEB25YX2n-iFxlYKnE/edit}{\texttt{ publicly available slide deck}}.\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_2micro_2docs_2renode_autotoc_md226}{}\doxysection{\texorpdfstring{Installation}{Installation}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_2micro_2docs_2renode_autotoc_md226}
+Renode can be installed and used in a variety of ways, as documented in the \href{https://github.com/renode/renode/blob/master/README.rst\#installation/}{\texttt{ Renode README}}. For the purpose of Tensorflow Lite Micro, we make use of the portable version for Linux.
+
+Portable renode will be automatically installed when using the Tf\+Lite Micro Makefile to {\ttfamily tensorflow/lite/micro/tools/make/downloads/renode}.
+
+The Makefile internally calls the {\ttfamily renode\+\_\+download.\+sh} script\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{tensorflow/lite/micro/tools/make/renode\_download.sh\ tensorflow/lite/micro/tools/make/downloads}
+
+\end{DoxyCode}
+\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_2micro_2docs_2renode_autotoc_md227}{}\doxysection{\texorpdfstring{Running Unit Tests}{Running Unit Tests}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_2micro_2docs_2renode_autotoc_md227}
+All the tests for a specific platform (e.\+g. bluepill) can be run with\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{make\ -\/f\ tensorflow/lite/micro/tools/make/Makefile\ TARGET=bluepill\ test}
+
+\end{DoxyCode}
+
+
+
+\begin{DoxyItemize}
+\item This makes use of the robot framework from Renode.
+\item Note that the tests can currently not be run in parallel.
+\item It takes about 25 second to complete all tests, including around 3 seconds for suite startup/teardown and average 0.\+38 second per test.
+\end{DoxyItemize}\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_2micro_2docs_2renode_autotoc_md228}{}\doxysubsection{\texorpdfstring{Under the hood of the Testing Infrastructure}{Under the hood of the Testing Infrastructure}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_2micro_2docs_2renode_autotoc_md228}
+Describe how we wait for a particular string on the UART. Some pointers into the robot files as well as any relevant documentation from Renode.
+
+A test failure is the absence of a specific string on the UART so the test will wait for a specific timeout period (configured in the .robot) file before failing.
+
+
+\begin{DoxyItemize}
+\item What this means in practice is that a failing test will take longer to finish than a test that passes.
+\item If needed, an optimization on this would be to have a specific failure message as well so that both success and failure can be detected quickly.
+\end{DoxyItemize}\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_2micro_2docs_2renode_autotoc_md229}{}\doxysection{\texorpdfstring{Running a non-\/test Binary with Renode}{Running a non-\/test Binary with Renode}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_2micro_2docs_2renode_autotoc_md229}
+Renode can also be used to run and debug binaries interactively. For example, to debug {\ttfamily kernel\+\_\+addr\+\_\+test} on Bluepill platform, run Renode\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{tensorflow/lite/micro/tools/make/downloads/renode/renode}
+
+\end{DoxyCode}
+ and issue following commands\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\#\ Create\ platform}
+\DoxyCodeLine{include\ @tensorflow/lite/micro/testing/bluepill\_nontest.resc}
+\DoxyCodeLine{\#\ Load\ ELF\ file}
+\DoxyCodeLine{sysbus\ LoadELF\ @gen/bluepill\_x86\_64\_default/bin/kernel\_add\_test}
+\DoxyCodeLine{\#\ Start\ simulation}
+\DoxyCodeLine{start}
+\DoxyCodeLine{}
+\DoxyCodeLine{\#\ To\ run\ again:}
+\DoxyCodeLine{Clear}
+\DoxyCodeLine{include\ @tensorflow/lite/micro/testing/bluepill\_nontest.resc}
+\DoxyCodeLine{sysbus\ LoadELF\ @gen/bluepill\_cortex-\/m3\_default/bin/keyword\_benchmark}
+\DoxyCodeLine{start}
+
+\end{DoxyCode}
+
+
+To make repeat runs a bit easier, you can put all the commands into a single line (up arrow will show the last command in the Renode terminal)\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{Clear;\ include\ @tensorflow/lite/micro/testing/bluepill\_nontest.resc;\ sysbus\ LoadELF\ @gen/bluepill\_x86\_64\_default/bin/kernel\_add\_test;\ start}
+
+\end{DoxyCode}
+
+
+You can also connect GDB to the simulation. To do that, start the GDB server in Renode before issuing the {\ttfamily start} command\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{machine\ StartGdbServer\ 3333}
+
+\end{DoxyCode}
+ Than you can connect from GDB with\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{target\ remote\ localhost:3333}
+
+\end{DoxyCode}
+
+
+For further reference please see the \href{https://renode.readthedocs.io/en/latest/}{\texttt{ Renode documentation}}.\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_2micro_2docs_2renode_autotoc_md230}{}\doxysection{\texorpdfstring{Useful External Links for Renode and Robot Documentation}{Useful External Links for Renode and Robot Documentation}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_2micro_2docs_2renode_autotoc_md230}
+
+\begin{DoxyItemize}
+\item \href{https://renode.readthedocs.io/en/latest/introduction/testing.html?highlight=robot\#running-the-robot-test-script}{\texttt{ Testing with Renode}}
+\item \href{https://github.com/robotframework/robotframework}{\texttt{ Robot Testing Framework on Github}}. For someone new to the Robot Framework, the documentation can be a bit hard to navigate, so here are some links that are relevant to the use of the Robot Framework with Renode for TFLM\+:
+\begin{DoxyItemize}
+\item \href{http://robotframework.org/robotframework/latest/RobotFrameworkUserGuide.html\#creating-test-data}{\texttt{ Creating Test Data}} section of the user guide.
+\item Renode-\/specific additions to the Robot test description format are in the \href{https://github.com/renode/renode/tree/master/src/Renode/RobotFrameworkEngine}{\texttt{ Robot\+Framework\+Engine directory}}. For example,
+\begin{DoxyItemize}
+\item \href{https://github.com/renode/renode/blob/master/src/Renode/RobotFrameworkEngine/RenodeKeywords.cs\#L41-L42}{\texttt{ Start Emulation}}
+\item \href{https://github.com/renode/renode/blob/master/src/Renode/RobotFrameworkEngine/UartKeywords.cs\#L62-L63}{\texttt{ Wait For Line On Uart}} is where {\ttfamily Wait For Line On Uart} is defined.
+\end{DoxyItemize}
+\item Some documentation for all the \href{http://robotframework.org/robotframework/\#standard-libraries}{\texttt{ Standard Libraries}} that define commands such as\+:
+\begin{DoxyItemize}
+\item \href{http://robotframework.org/robotframework/latest/libraries/OperatingSystem.html\#Remove\%20File}{\texttt{ Remove File}}
+\item \href{https://robotframework.org/robotframework/latest/libraries/OperatingSystem.html\#List\%20Files\%20In\%20Directory}{\texttt{ List Files In Directory}} 
+\end{DoxyItemize}
+\end{DoxyItemize}
+\end{DoxyItemize}

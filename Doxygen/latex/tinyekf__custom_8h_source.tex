@@ -1,0 +1,95 @@
+\doxysection{tinyekf\+\_\+custom.\+h}
+\hypertarget{tinyekf__custom_8h_source}{}\label{tinyekf__custom_8h_source}\index{Face\_Access\_inferencing/src/edge-\/impulse-\/sdk/classifier/postprocessing/tinyEKF/tinyekf\_custom.h@{Face\_Access\_inferencing/src/edge-\/impulse-\/sdk/classifier/postprocessing/tinyEKF/tinyekf\_custom.h}}
+\mbox{\hyperlink{tinyekf__custom_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ }
+\DoxyCodeLine{00010\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{tinyekf__custom_8h_a20c450a62f5edf272452bf8abc579ae0}{outer}}(}
+\DoxyCodeLine{00011\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \_float\_t\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a6150e0515f7202e2fb518f7206ed97dc}{x}}[EKF\_N],}
+\DoxyCodeLine{00012\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \_float\_t\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_aa4f0d3eebc3c443f9be81bf48561a217}{y}}[EKF\_N],}
+\DoxyCodeLine{00013\ \ \ \ \ \ \ \ \ \_float\_t\ a[EKF\_N*EKF\_N])\ }
+\DoxyCodeLine{00014\ \{}
+\DoxyCodeLine{00015\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i=0;\ i<EKF\_N;\ i++)\ \{}
+\DoxyCodeLine{00016\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ j=0;\ j<EKF\_N;\ j++)\ \{}
+\DoxyCodeLine{00017\ \ \ \ \ \ \ \ \ \ \ \ \ a[i*EKF\_N+j]\ =\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a6150e0515f7202e2fb518f7206ed97dc}{x}}[i]\ *\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_aa4f0d3eebc3c443f9be81bf48561a217}{y}}[j];}
+\DoxyCodeLine{00018\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00019\ \ \ \ \ \}}
+\DoxyCodeLine{00020\ \}}
+\DoxyCodeLine{00021\ }
+\DoxyCodeLine{00023\ \textcolor{keyword}{static}\ \_float\_t\ \mbox{\hyperlink{tinyekf__custom_8h_ad3228a2f518a0a0c200b8e65ccfa8638}{dot}}(\textcolor{keyword}{const}\ \_float\_t\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a6150e0515f7202e2fb518f7206ed97dc}{x}}[EKF\_N],\ \textcolor{keyword}{const}\ \_float\_t\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_aa4f0d3eebc3c443f9be81bf48561a217}{y}}[EKF\_N])\ }
+\DoxyCodeLine{00024\ \{}
+\DoxyCodeLine{00025\ \ \ \ \ \_float\_t\ d\ =\ 0;}
+\DoxyCodeLine{00026\ }
+\DoxyCodeLine{00027\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ k=0;\ k<EKF\_N;\ k++)\ \{}
+\DoxyCodeLine{00028\ \ \ \ \ \ \ \ \ d\ +=\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a6150e0515f7202e2fb518f7206ed97dc}{x}}[k]\ *\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_aa4f0d3eebc3c443f9be81bf48561a217}{y}}[k];}
+\DoxyCodeLine{00029\ \ \ \ \ \}}
+\DoxyCodeLine{00030\ }
+\DoxyCodeLine{00031\ \ \ \ \ \textcolor{keywordflow}{return}\ d;}
+\DoxyCodeLine{00032\ \}}
+\DoxyCodeLine{00033\ }
+\DoxyCodeLine{00039\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{tinyekf__custom_8h_a3bd1dc34c2d4feaed353995907177db1}{ekf\_custom\_multiply\_covariance}}(}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \ \ ekf\_t\ *\ ekf,\ \textcolor{keyword}{const}\ \_float\_t\ A[EKF\_N*EKF\_N])\ }
+\DoxyCodeLine{00041\ \{}
+\DoxyCodeLine{00042\ \ \ \ \ \_float\_t\ AP[EKF\_N*EKF\_N]\ =\ \{\};}
+\DoxyCodeLine{00043\ \ \ \ \ \_mulmat(A,\ ekf-\/>P,\ \ AP,\ EKF\_N,\ EKF\_N,\ EKF\_N);}
+\DoxyCodeLine{00044\ }
+\DoxyCodeLine{00045\ \ \ \ \ \_float\_t\ At[EKF\_N*EKF\_N]\ =\ \{\};}
+\DoxyCodeLine{00046\ \ \ \ \ \_transpose(A,\ At,\ EKF\_N,\ EKF\_N);}
+\DoxyCodeLine{00047\ }
+\DoxyCodeLine{00048\ \ \ \ \ \_mulmat(AP,\ At,\ ekf-\/>P,\ EKF\_N,\ EKF\_N,\ EKF\_N);}
+\DoxyCodeLine{00049\ \}}
+\DoxyCodeLine{00050\ }
+\DoxyCodeLine{00058\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{tinyekf__custom_8h_ab9e86d8acfd13535b6ec21d9c67174fd}{ekf\_custom\_cleanup\_covariance}}(}
+\DoxyCodeLine{00059\ \ \ \ \ \ \ \ \ ekf\_t\ *\ ekf,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{float}\ minval,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{float}\ maxval)}
+\DoxyCodeLine{00060\ \{}
+\DoxyCodeLine{00061\ }
+\DoxyCodeLine{00062\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i=0;\ i<EKF\_N;\ i++)\ \{}
+\DoxyCodeLine{00063\ }
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ j=i;\ j<EKF\_N;\ j++)\ \{}
+\DoxyCodeLine{00065\ }
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \_float\_t\ pval\ =\ (ekf-\/>P[i*EKF\_N+j]\ +\ ekf-\/>P[EKF\_N*j+i])\ /\ 2;}
+\DoxyCodeLine{00067\ }
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ \ \ \ \ ekf-\/>P[i*EKF\_N+j]\ =\ ekf-\/>P[j*EKF\_N+i]\ =}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ pval\ >\ maxval\ ?\ \ maxval\ :}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (i==j\ \&\&\ pval\ <\ minval)\ ?\ \ minval\ :}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ pval;}
+\DoxyCodeLine{00072\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00073\ \ \ \ \ \}}
+\DoxyCodeLine{00074\ \}}
+\DoxyCodeLine{00075\ }
+\DoxyCodeLine{00085\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{tinyekf__custom_8h_accc925ed88a3261b73101c21fc72da35}{ekf\_custom\_scalar\_update}}(}
+\DoxyCodeLine{00086\ \ \ \ \ \ \ \ \ ekf\_t\ *\ ekf,}
+\DoxyCodeLine{00087\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \_float\_t\ z,}
+\DoxyCodeLine{00088\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \_float\_t\ hx,}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \_float\_t\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a85f2f1bd58b3b44ffdf3881823393959}{h}}[EKF\_N],\ }
+\DoxyCodeLine{00090\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \_float\_t\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_acab531abaa74a7e664e3986f2522b33a}{r}})}
+\DoxyCodeLine{00091\ \{}
+\DoxyCodeLine{00092\ \ \ \ \ (void)ekf\_update;}
+\DoxyCodeLine{00093\ }
+\DoxyCodeLine{00094\ \ \ \ \ \textcolor{comment}{//\ G\_k\ =\ P\_k\ H\string^T\_k\ (H\_k\ P\_k\ H\string^T\_k\ +\ R)\string^\{-\/1\}}}
+\DoxyCodeLine{00095\ \ \ \ \ \_float\_t\ ph[EKF\_N]\ =\ \{\};}
+\DoxyCodeLine{00096\ \ \ \ \ \_mulvec(ekf-\/>P,\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a85f2f1bd58b3b44ffdf3881823393959}{h}},\ ph,\ EKF\_N,\ EKF\_N);}
+\DoxyCodeLine{00097\ \ \ \ \ \textcolor{keyword}{const}\ \_float\_t\ hphtr\_inv\ =\ 1\ /\ (\mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_acab531abaa74a7e664e3986f2522b33a}{r}}\ +\ \mbox{\hyperlink{tinyekf__custom_8h_ad3228a2f518a0a0c200b8e65ccfa8638}{dot}}(\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a85f2f1bd58b3b44ffdf3881823393959}{h}},\ ph));\ }
+\DoxyCodeLine{00098\ \ \ \ \ \_float\_t\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a71867e609034d4dbd6d0ad8d84540e59}{g}}[EKF\_N]\ =\ \{\};}
+\DoxyCodeLine{00099\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i=0;\ i<EKF\_N;\ ++i)\ \{}
+\DoxyCodeLine{00100\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a71867e609034d4dbd6d0ad8d84540e59}{g}}[i]\ =\ ph[i]\ *\ hphtr\_inv;}
+\DoxyCodeLine{00101\ \ \ \ \ \}}
+\DoxyCodeLine{00102\ }
+\DoxyCodeLine{00103\ \ \ \ \ \textcolor{comment}{//\ \(\backslash\)hat\{x\}\_k\ =\ \(\backslash\)hat\{x\_k\}\ +\ G\_k(z\_k\ -\/\ h(\(\backslash\)hat\{x\}\_k))}}
+\DoxyCodeLine{00104\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i=0;\ i<EKF\_N;\ ++i)\ \{}
+\DoxyCodeLine{00105\ \ \ \ \ \ \ \ \ ekf-\/>x[i]\ +=\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a71867e609034d4dbd6d0ad8d84540e59}{g}}[i]\ *\ (z\ -\/\ hx);}
+\DoxyCodeLine{00106\ \ \ \ \ \}}
+\DoxyCodeLine{00107\ }
+\DoxyCodeLine{00108\ \ \ \ \ \textcolor{comment}{//\ P\_k\ =\ (I\ -\/\ G\_k\ H\_k)\ P\_k\$}}
+\DoxyCodeLine{00109\ \ \ \ \ \_float\_t\ GH[EKF\_N*EKF\_N];}
+\DoxyCodeLine{00110\ \ \ \ \ \mbox{\hyperlink{tinyekf__custom_8h_a20c450a62f5edf272452bf8abc579ae0}{outer}}(\mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a71867e609034d4dbd6d0ad8d84540e59}{g}},\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a85f2f1bd58b3b44ffdf3881823393959}{h}},\ GH);\ }
+\DoxyCodeLine{00111\ \ \ \ \ ekf\_update\_step3(ekf,\ GH);}
+\DoxyCodeLine{00112\ }
+\DoxyCodeLine{00113\ \ \ \ \ \textcolor{comment}{//\ Does\ this\ belong\ here,\ or\ in\ caller?}}
+\DoxyCodeLine{00114\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i=0;\ i<EKF\_N;\ i++)\ \{}
+\DoxyCodeLine{00115\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ j=i;\ j<EKF\_N;\ j++)\ \{}
+\DoxyCodeLine{00116\ \ \ \ \ \ \ \ \ \ \ \ \ ekf-\/>P[i*EKF\_N+j]\ +=\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_acab531abaa74a7e664e3986f2522b33a}{r}}\ *\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a71867e609034d4dbd6d0ad8d84540e59}{g}}[i]\ *\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a71867e609034d4dbd6d0ad8d84540e59}{g}}[j];}
+\DoxyCodeLine{00117\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00118\ \ \ \ \ \}}
+\DoxyCodeLine{00119\ \}}
+
+\end{DoxyCode}

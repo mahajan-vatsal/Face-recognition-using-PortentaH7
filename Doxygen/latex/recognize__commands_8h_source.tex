@@ -1,0 +1,157 @@
+\doxysection{recognize\+\_\+commands.\+h}
+\hypertarget{recognize__commands_8h_source}{}\label{recognize__commands_8h_source}\index{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/arduino-\/examples-\/main/examples/micro\_speech/recognize\_commands.h@{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/arduino-\/examples-\/main/examples/micro\_speech/recognize\_commands.h}}
+\mbox{\hyperlink{recognize__commands_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{/*\ Copyright\ 2022\ The\ TensorFlow\ Authors.\ All\ Rights\ Reserved.}}
+\DoxyCodeLine{00002\ \textcolor{comment}{}}
+\DoxyCodeLine{00003\ \textcolor{comment}{Licensed\ under\ the\ Apache\ License,\ Version\ 2.0\ (the\ "{}License"{});}}
+\DoxyCodeLine{00004\ \textcolor{comment}{you\ may\ not\ use\ this\ file\ except\ in\ compliance\ with\ the\ License.}}
+\DoxyCodeLine{00005\ \textcolor{comment}{You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{00006\ \textcolor{comment}{}}
+\DoxyCodeLine{00007\ \textcolor{comment}{\ \ \ \ http://www.apache.org/licenses/LICENSE-\/2.0}}
+\DoxyCodeLine{00008\ \textcolor{comment}{}}
+\DoxyCodeLine{00009\ \textcolor{comment}{Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ software}}
+\DoxyCodeLine{00010\ \textcolor{comment}{distributed\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,}}
+\DoxyCodeLine{00011\ \textcolor{comment}{WITHOUT\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,\ either\ express\ or\ implied.}}
+\DoxyCodeLine{00012\ \textcolor{comment}{See\ the\ License\ for\ the\ specific\ language\ governing\ permissions\ and}}
+\DoxyCodeLine{00013\ \textcolor{comment}{limitations\ under\ the\ License.}}
+\DoxyCodeLine{00014\ \textcolor{comment}{==============================================================================*/}}
+\DoxyCodeLine{00015\ }
+\DoxyCodeLine{00016\ \textcolor{preprocessor}{\#ifndef\ TENSORFLOW\_LITE\_MICRO\_EXAMPLES\_MICRO\_SPEECH\_RECOGNIZE\_COMMANDS\_H\_}}
+\DoxyCodeLine{00017\ \textcolor{preprocessor}{\#define\ TENSORFLOW\_LITE\_MICRO\_EXAMPLES\_MICRO\_SPEECH\_RECOGNIZE\_COMMANDS\_H\_}}
+\DoxyCodeLine{00018\ }
+\DoxyCodeLine{00019\ \textcolor{preprocessor}{\#include\ <cstdint>}}
+\DoxyCodeLine{00020\ }
+\DoxyCodeLine{00021\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{micro__features__micro__model__settings_8h}{micro\_features\_micro\_model\_settings.h}}"{}}}
+\DoxyCodeLine{00022\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/c/common.h"{}}}
+\DoxyCodeLine{00023\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/micro/micro\_log.h"{}}}
+\DoxyCodeLine{00024\ }
+\DoxyCodeLine{00025\ \textcolor{comment}{//\ Partial\ implementation\ of\ std::dequeue,\ just\ providing\ the\ functionality}}
+\DoxyCodeLine{00026\ \textcolor{comment}{//\ that's\ needed\ to\ keep\ a\ record\ of\ previous\ neural\ network\ results\ over\ a}}
+\DoxyCodeLine{00027\ \textcolor{comment}{//\ short\ time\ period,\ so\ they\ can\ be\ averaged\ together\ to\ produce\ a\ more}}
+\DoxyCodeLine{00028\ \textcolor{comment}{//\ accurate\ overall\ prediction.\ This\ doesn't\ use\ any\ dynamic\ memory\ allocation}}
+\DoxyCodeLine{00029\ \textcolor{comment}{//\ so\ it's\ a\ better\ fit\ for\ microcontroller\ applications,\ but\ this\ does\ mean}}
+\DoxyCodeLine{00030\ \textcolor{comment}{//\ there\ are\ hard\ limits\ on\ the\ number\ of\ results\ it\ can\ store.}}
+\DoxyCodeLine{00031\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_previous_results_queue}{PreviousResultsQueue}}\ \{}
+\DoxyCodeLine{00032\ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00033\ \ \ \mbox{\hyperlink{class_previous_results_queue_a627b7356c9f7db3aa86364f684142881}{PreviousResultsQueue}}()\ :\ \mbox{\hyperlink{class_previous_results_queue_abacb5e01ed9b21874ca4c7d9b4e65032}{front\_index\_}}(0),\ \mbox{\hyperlink{class_previous_results_queue_a8450f0b5c8907542670ba5399c3ed99b}{size\_}}(0)\ \{\}}
+\DoxyCodeLine{00034\ }
+\DoxyCodeLine{00035\ \ \ \textcolor{comment}{//\ Data\ structure\ that\ holds\ an\ inference\ result,\ and\ the\ time\ when\ it}}
+\DoxyCodeLine{00036\ \ \ \textcolor{comment}{//\ was\ recorded.}}
+\DoxyCodeLine{00037\ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_previous_results_queue_1_1_result}{Result}}\ \{}
+\DoxyCodeLine{00038\ \ \ \ \ \mbox{\hyperlink{struct_previous_results_queue_1_1_result_a087550e24006ca62faee791ac6f7a942}{Result}}()\ :\ \mbox{\hyperlink{struct_previous_results_queue_1_1_result_ac68798a65a1b42ed48365f27bdc0eb99}{time\_}}(0),\ \mbox{\hyperlink{struct_previous_results_queue_1_1_result_a11caaf0e2921fda5355d190d9168b5ca}{scores}}()\ \{\}}
+\DoxyCodeLine{00039\ \ \ \ \ \mbox{\hyperlink{struct_previous_results_queue_1_1_result_a8f53ba1045de2b17677815554a87737d}{Result}}(int32\_t\ time,\ int8\_t*\ input\_scores)\ :\ \mbox{\hyperlink{struct_previous_results_queue_1_1_result_ac68798a65a1b42ed48365f27bdc0eb99}{time\_}}(time)\ \{}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ \mbox{\hyperlink{micro__features__micro__model__settings_8h_ad02d553c1a70e5443b673e59b7d5fc25}{kCategoryCount}};\ ++i)\ \{}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_previous_results_queue_1_1_result_a11caaf0e2921fda5355d190d9168b5ca}{scores}}[i]\ =\ input\_scores[i];}
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00043\ \ \ \ \ \}}
+\DoxyCodeLine{00044\ \ \ \ \ int32\_t\ \mbox{\hyperlink{struct_previous_results_queue_1_1_result_ac68798a65a1b42ed48365f27bdc0eb99}{time\_}};}
+\DoxyCodeLine{00045\ \ \ \ \ int8\_t\ \mbox{\hyperlink{struct_previous_results_queue_1_1_result_a11caaf0e2921fda5355d190d9168b5ca}{scores}}[\mbox{\hyperlink{micro__features__micro__model__settings_8h_ad02d553c1a70e5443b673e59b7d5fc25}{kCategoryCount}}];}
+\DoxyCodeLine{00046\ \ \ \};}
+\DoxyCodeLine{00047\ }
+\DoxyCodeLine{00048\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{class_previous_results_queue_a2bd7e3922881405fc010081209655434}{size}}()\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_previous_results_queue_a8450f0b5c8907542670ba5399c3ed99b}{size\_}};\ \}}
+\DoxyCodeLine{00049\ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{class_previous_results_queue_ae34d117907dbc79598e55cbf30c314ff}{empty}}()\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_previous_results_queue_a8450f0b5c8907542670ba5399c3ed99b}{size\_}}\ ==\ 0;\ \}}
+\DoxyCodeLine{00050\ \ \ \mbox{\hyperlink{struct_previous_results_queue_1_1_result}{Result}}\&\ \mbox{\hyperlink{class_previous_results_queue_a9f6aaefb56cacc0ad5363525e5f63740}{front}}()\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_previous_results_queue_a72bf77cf4d6c148a5a137763f99bad38}{results\_}}[\mbox{\hyperlink{class_previous_results_queue_abacb5e01ed9b21874ca4c7d9b4e65032}{front\_index\_}}];\ \}}
+\DoxyCodeLine{00051\ \ \ \mbox{\hyperlink{struct_previous_results_queue_1_1_result}{Result}}\&\ \mbox{\hyperlink{class_previous_results_queue_a0933bcae042c7c0b8790b937a553a0f5}{back}}()\ \{}
+\DoxyCodeLine{00052\ \ \ \ \ \textcolor{keywordtype}{int}\ back\_index\ =\ \mbox{\hyperlink{class_previous_results_queue_abacb5e01ed9b21874ca4c7d9b4e65032}{front\_index\_}}\ +\ (\mbox{\hyperlink{class_previous_results_queue_a8450f0b5c8907542670ba5399c3ed99b}{size\_}}\ -\/\ 1);}
+\DoxyCodeLine{00053\ \ \ \ \ \textcolor{keywordflow}{if}\ (back\_index\ >=\ \mbox{\hyperlink{class_previous_results_queue_a59054f3fd8aa65205b7a52b68bfc53e8}{kMaxResults}})\ \{}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ back\_index\ -\/=\ \mbox{\hyperlink{class_previous_results_queue_a59054f3fd8aa65205b7a52b68bfc53e8}{kMaxResults}};}
+\DoxyCodeLine{00055\ \ \ \ \ \}}
+\DoxyCodeLine{00056\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_previous_results_queue_a72bf77cf4d6c148a5a137763f99bad38}{results\_}}[back\_index];}
+\DoxyCodeLine{00057\ \ \ \}}
+\DoxyCodeLine{00058\ }
+\DoxyCodeLine{00059\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_previous_results_queue_a6b20cd834e20d93d4fd8773de9e2e1e7}{push\_back}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{struct_previous_results_queue_1_1_result}{Result}}\&\ entry)\ \{}
+\DoxyCodeLine{00060\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{class_previous_results_queue_a2bd7e3922881405fc010081209655434}{size}}()\ >=\ \mbox{\hyperlink{class_previous_results_queue_a59054f3fd8aa65205b7a52b68bfc53e8}{kMaxResults}})\ \{}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \mbox{\hyperlink{_face___access__inferencing_2src_2edge-impulse-sdk_2tensorflow_2lite_2micro_2micro__log_8h_ab9bf491b4a37b06ba732fd7de6b04cb2}{MicroPrintf}}(\textcolor{stringliteral}{"{}Couldn't\ push\_back\ latest\ result,\ too\ many\ already!"{}});}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00063\ \ \ \ \ \}}
+\DoxyCodeLine{00064\ \ \ \ \ \mbox{\hyperlink{class_previous_results_queue_a8450f0b5c8907542670ba5399c3ed99b}{size\_}}\ +=\ 1;}
+\DoxyCodeLine{00065\ \ \ \ \ \mbox{\hyperlink{class_previous_results_queue_a0933bcae042c7c0b8790b937a553a0f5}{back}}()\ =\ entry;}
+\DoxyCodeLine{00066\ \ \ \}}
+\DoxyCodeLine{00067\ }
+\DoxyCodeLine{00068\ \ \ \mbox{\hyperlink{struct_previous_results_queue_1_1_result}{Result}}\ \mbox{\hyperlink{class_previous_results_queue_acf8062d9a7baee0122899e61b716f445}{pop\_front}}()\ \{}
+\DoxyCodeLine{00069\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{class_previous_results_queue_a2bd7e3922881405fc010081209655434}{size}}()\ <=\ 0)\ \{}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \mbox{\hyperlink{_face___access__inferencing_2src_2edge-impulse-sdk_2tensorflow_2lite_2micro_2micro__log_8h_ab9bf491b4a37b06ba732fd7de6b04cb2}{MicroPrintf}}(\textcolor{stringliteral}{"{}Couldn't\ pop\_front\ result,\ none\ present!"{}});}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{struct_previous_results_queue_1_1_result}{Result}}();}
+\DoxyCodeLine{00072\ \ \ \ \ \}}
+\DoxyCodeLine{00073\ \ \ \ \ \mbox{\hyperlink{struct_previous_results_queue_1_1_result}{Result}}\ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}}\ =\ \mbox{\hyperlink{class_previous_results_queue_a9f6aaefb56cacc0ad5363525e5f63740}{front}}();}
+\DoxyCodeLine{00074\ \ \ \ \ \mbox{\hyperlink{class_previous_results_queue_abacb5e01ed9b21874ca4c7d9b4e65032}{front\_index\_}}\ +=\ 1;}
+\DoxyCodeLine{00075\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{class_previous_results_queue_abacb5e01ed9b21874ca4c7d9b4e65032}{front\_index\_}}\ >=\ \mbox{\hyperlink{class_previous_results_queue_a59054f3fd8aa65205b7a52b68bfc53e8}{kMaxResults}})\ \{}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \mbox{\hyperlink{class_previous_results_queue_abacb5e01ed9b21874ca4c7d9b4e65032}{front\_index\_}}\ =\ 0;}
+\DoxyCodeLine{00077\ \ \ \ \ \}}
+\DoxyCodeLine{00078\ \ \ \ \ \mbox{\hyperlink{class_previous_results_queue_a8450f0b5c8907542670ba5399c3ed99b}{size\_}}\ -\/=\ 1;}
+\DoxyCodeLine{00079\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}};}
+\DoxyCodeLine{00080\ \ \ \}}
+\DoxyCodeLine{00081\ }
+\DoxyCodeLine{00082\ \ \ \textcolor{comment}{//\ Most\ of\ the\ functions\ are\ duplicates\ of\ dequeue\ containers,\ but\ this}}
+\DoxyCodeLine{00083\ \ \ \textcolor{comment}{//\ is\ a\ helper\ that\ makes\ it\ easy\ to\ iterate\ through\ the\ contents\ of\ the}}
+\DoxyCodeLine{00084\ \ \ \textcolor{comment}{//\ queue.}}
+\DoxyCodeLine{00085\ \ \ \mbox{\hyperlink{struct_previous_results_queue_1_1_result}{Result}}\&\ \mbox{\hyperlink{class_previous_results_queue_aca59282bca9d66771b2ab2a6370e0a9e}{from\_front}}(\textcolor{keywordtype}{int}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcaf138809236f667e9686fdd4aaf17705_aed7ea92f45bd273dde380a45ddced592}{offset}})\ \{}
+\DoxyCodeLine{00086\ \ \ \ \ \textcolor{keywordflow}{if}\ ((\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcaf138809236f667e9686fdd4aaf17705_aed7ea92f45bd273dde380a45ddced592}{offset}}\ <\ 0)\ ||\ (\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcaf138809236f667e9686fdd4aaf17705_aed7ea92f45bd273dde380a45ddced592}{offset}}\ >=\ \mbox{\hyperlink{class_previous_results_queue_a8450f0b5c8907542670ba5399c3ed99b}{size\_}}))\ \{}
+\DoxyCodeLine{00087\ \ \ \ \ \ \ \mbox{\hyperlink{_face___access__inferencing_2src_2edge-impulse-sdk_2tensorflow_2lite_2micro_2micro__log_8h_ab9bf491b4a37b06ba732fd7de6b04cb2}{MicroPrintf}}(\textcolor{stringliteral}{"{}Attempt\ to\ read\ beyond\ the\ end\ of\ the\ queue!"{}});}
+\DoxyCodeLine{00088\ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcaf138809236f667e9686fdd4aaf17705_aed7ea92f45bd273dde380a45ddced592}{offset}}\ =\ \mbox{\hyperlink{class_previous_results_queue_a8450f0b5c8907542670ba5399c3ed99b}{size\_}}\ -\/\ 1;}
+\DoxyCodeLine{00089\ \ \ \ \ \}}
+\DoxyCodeLine{00090\ \ \ \ \ \textcolor{keywordtype}{int}\ index\ =\ \mbox{\hyperlink{class_previous_results_queue_abacb5e01ed9b21874ca4c7d9b4e65032}{front\_index\_}}\ +\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcaf138809236f667e9686fdd4aaf17705_aed7ea92f45bd273dde380a45ddced592}{offset}};}
+\DoxyCodeLine{00091\ \ \ \ \ \textcolor{keywordflow}{if}\ (index\ >=\ \mbox{\hyperlink{class_previous_results_queue_a59054f3fd8aa65205b7a52b68bfc53e8}{kMaxResults}})\ \{}
+\DoxyCodeLine{00092\ \ \ \ \ \ \ index\ -\/=\ \mbox{\hyperlink{class_previous_results_queue_a59054f3fd8aa65205b7a52b68bfc53e8}{kMaxResults}};}
+\DoxyCodeLine{00093\ \ \ \ \ \}}
+\DoxyCodeLine{00094\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_previous_results_queue_a72bf77cf4d6c148a5a137763f99bad38}{results\_}}[index];}
+\DoxyCodeLine{00095\ \ \ \}}
+\DoxyCodeLine{00096\ }
+\DoxyCodeLine{00097\ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{00098\ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{class_previous_results_queue_a59054f3fd8aa65205b7a52b68bfc53e8}{kMaxResults}}\ =\ 50;}
+\DoxyCodeLine{00099\ \ \ \mbox{\hyperlink{struct_previous_results_queue_1_1_result}{Result}}\ \mbox{\hyperlink{class_previous_results_queue_a72bf77cf4d6c148a5a137763f99bad38}{results\_}}[\mbox{\hyperlink{class_previous_results_queue_a59054f3fd8aa65205b7a52b68bfc53e8}{kMaxResults}}];}
+\DoxyCodeLine{00100\ }
+\DoxyCodeLine{00101\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{class_previous_results_queue_abacb5e01ed9b21874ca4c7d9b4e65032}{front\_index\_}};}
+\DoxyCodeLine{00102\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{class_previous_results_queue_a8450f0b5c8907542670ba5399c3ed99b}{size\_}};}
+\DoxyCodeLine{00103\ \};}
+\DoxyCodeLine{00104\ }
+\DoxyCodeLine{00105\ \textcolor{comment}{//\ This\ class\ is\ designed\ to\ apply\ a\ very\ primitive\ decoding\ model\ on\ top\ of\ the}}
+\DoxyCodeLine{00106\ \textcolor{comment}{//\ instantaneous\ results\ from\ running\ an\ audio\ recognition\ model\ on\ a\ single}}
+\DoxyCodeLine{00107\ \textcolor{comment}{//\ window\ of\ samples.\ It\ applies\ smoothing\ over\ time\ so\ that\ noisy\ individual}}
+\DoxyCodeLine{00108\ \textcolor{comment}{//\ label\ scores\ are\ averaged,\ increasing\ the\ confidence\ that\ apparent\ matches}}
+\DoxyCodeLine{00109\ \textcolor{comment}{//\ are\ real.}}
+\DoxyCodeLine{00110\ \textcolor{comment}{//\ To\ use\ it,\ you\ should\ create\ a\ class\ object\ with\ the\ configuration\ you}}
+\DoxyCodeLine{00111\ \textcolor{comment}{//\ want,\ and\ then\ feed\ results\ from\ running\ a\ TensorFlow\ model\ into\ the}}
+\DoxyCodeLine{00112\ \textcolor{comment}{//\ processing\ method.\ The\ timestamp\ for\ each\ subsequent\ call\ should\ be}}
+\DoxyCodeLine{00113\ \textcolor{comment}{//\ increasing\ from\ the\ previous,\ since\ the\ class\ is\ designed\ to\ process\ a\ stream}}
+\DoxyCodeLine{00114\ \textcolor{comment}{//\ of\ data\ over\ time.}}
+\DoxyCodeLine{00115\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_recognize_commands}{RecognizeCommands}}\ \{}
+\DoxyCodeLine{00116\ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00117\ \ \ \textcolor{comment}{//\ labels\ should\ be\ a\ list\ of\ the\ strings\ associated\ with\ each\ one-\/hot\ score.}}
+\DoxyCodeLine{00118\ \ \ \textcolor{comment}{//\ The\ window\ duration\ controls\ the\ smoothing.\ Longer\ durations\ will\ give\ a}}
+\DoxyCodeLine{00119\ \ \ \textcolor{comment}{//\ higher\ confidence\ that\ the\ results\ are\ correct,\ but\ may\ miss\ some\ commands.}}
+\DoxyCodeLine{00120\ \ \ \textcolor{comment}{//\ The\ detection\ threshold\ has\ a\ similar\ effect,\ with\ high\ values\ increasing}}
+\DoxyCodeLine{00121\ \ \ \textcolor{comment}{//\ the\ precision\ at\ the\ cost\ of\ recall.\ The\ minimum\ count\ controls\ how\ many}}
+\DoxyCodeLine{00122\ \ \ \textcolor{comment}{//\ results\ need\ to\ be\ in\ the\ averaging\ window\ before\ it's\ seen\ as\ a\ reliable}}
+\DoxyCodeLine{00123\ \ \ \textcolor{comment}{//\ average.\ This\ prevents\ erroneous\ results\ when\ the\ averaging\ window\ is}}
+\DoxyCodeLine{00124\ \ \ \textcolor{comment}{//\ initially\ being\ populated\ for\ example.\ The\ suppression\ argument\ disables}}
+\DoxyCodeLine{00125\ \ \ \textcolor{comment}{//\ further\ recognitions\ for\ a\ set\ time\ after\ one\ has\ been\ triggered,\ which\ can}}
+\DoxyCodeLine{00126\ \ \ \textcolor{comment}{//\ help\ reduce\ spurious\ recognitions.}}
+\DoxyCodeLine{00127\ \ \ \textcolor{keyword}{explicit}\ \mbox{\hyperlink{class_recognize_commands_a87bdd50c43d03e996518ee35fa386b30}{RecognizeCommands}}(int32\_t\ average\_window\_duration\_ms\ =\ 1000,}
+\DoxyCodeLine{00128\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ uint8\_t\ detection\_threshold\ =\ 200,}
+\DoxyCodeLine{00129\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ int32\_t\ suppression\_ms\ =\ 1500,}
+\DoxyCodeLine{00130\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ int32\_t\ minimum\_count\ =\ 3);}
+\DoxyCodeLine{00131\ }
+\DoxyCodeLine{00132\ \ \ \textcolor{comment}{//\ Call\ this\ with\ the\ results\ of\ running\ a\ model\ on\ sample\ data.}}
+\DoxyCodeLine{00133\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{class_recognize_commands_a176a0991f61867a05f5fabb5b11c61fb}{ProcessLatestResults}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{struct_tf_lite_tensor}{TfLiteTensor}}*\ latest\_results,}
+\DoxyCodeLine{00134\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ int32\_t\ current\_time\_ms,}
+\DoxyCodeLine{00135\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}**\ found\_command,\ uint8\_t*\ score,}
+\DoxyCodeLine{00136\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}*\ is\_new\_command);}
+\DoxyCodeLine{00137\ }
+\DoxyCodeLine{00138\ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{00139\ \ \ \textcolor{comment}{//\ Configuration}}
+\DoxyCodeLine{00140\ \ \ int32\_t\ \mbox{\hyperlink{class_recognize_commands_a5b42a419d8399198bcbd3e6df032d5c4}{average\_window\_duration\_ms\_}};}
+\DoxyCodeLine{00141\ \ \ uint8\_t\ \mbox{\hyperlink{class_recognize_commands_a638e1b40cf92c24e4de2089d7a37fc2d}{detection\_threshold\_}};}
+\DoxyCodeLine{00142\ \ \ int32\_t\ \mbox{\hyperlink{class_recognize_commands_a2bea3a25bae1339649b6fbcbef094430}{suppression\_ms\_}};}
+\DoxyCodeLine{00143\ \ \ int32\_t\ \mbox{\hyperlink{class_recognize_commands_a3dba619bd131fb95754ddf4fbf3aabb4}{minimum\_count\_}};}
+\DoxyCodeLine{00144\ }
+\DoxyCodeLine{00145\ \ \ \textcolor{comment}{//\ Working\ variables}}
+\DoxyCodeLine{00146\ \ \ \mbox{\hyperlink{class_previous_results_queue}{PreviousResultsQueue}}\ \mbox{\hyperlink{class_recognize_commands_a0d6b0b726100f6dba09038b8310b940f}{previous\_results\_}};}
+\DoxyCodeLine{00147\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \mbox{\hyperlink{class_recognize_commands_a3bb7c61558fd5b69834558bea504b1d7}{previous\_top\_label\_}};}
+\DoxyCodeLine{00148\ \ \ int32\_t\ \mbox{\hyperlink{class_recognize_commands_aeaab4a312d6cabcab871d17cc80ac6b0}{previous\_top\_label\_time\_}};}
+\DoxyCodeLine{00149\ \};}
+\DoxyCodeLine{00150\ }
+\DoxyCodeLine{00151\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ TENSORFLOW\_LITE\_MICRO\_EXAMPLES\_MICRO\_SPEECH\_RECOGNIZE\_COMMANDS\_H\_}}
+
+\end{DoxyCode}

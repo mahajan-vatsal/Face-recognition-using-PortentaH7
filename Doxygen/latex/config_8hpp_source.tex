@@ -1,0 +1,112 @@
+\doxysection{config.\+hpp}
+\hypertarget{config_8hpp_source}{}\label{config_8hpp_source}\index{Face\_Access\_inferencing/src/edge-\/impulse-\/sdk/dsp/config.hpp@{Face\_Access\_inferencing/src/edge-\/impulse-\/sdk/dsp/config.hpp}}
+\mbox{\hyperlink{config_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{00002\ \textcolor{comment}{\ *\ Copyright\ (c)\ 2024\ EdgeImpulse\ Inc.}}
+\DoxyCodeLine{00003\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00004\ \textcolor{comment}{\ *\ Generated\ by\ Edge\ Impulse\ and\ licensed\ under\ the\ applicable\ Edge\ Impulse}}
+\DoxyCodeLine{00005\ \textcolor{comment}{\ *\ Terms\ of\ Service.\ Community\ and\ Professional\ Terms\ of\ Service}}
+\DoxyCodeLine{00006\ \textcolor{comment}{\ *\ (https://docs.edgeimpulse.com/page/terms-\/of-\/service)\ or\ Enterprise\ Terms\ of}}
+\DoxyCodeLine{00007\ \textcolor{comment}{\ *\ Service\ (https://docs.edgeimpulse.com/page/enterprise-\/terms-\/of-\/service),}}
+\DoxyCodeLine{00008\ \textcolor{comment}{\ *\ according\ to\ your\ product\ plan\ subscription\ (the\ “License”).}}
+\DoxyCodeLine{00009\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00010\ \textcolor{comment}{\ *\ This\ software,\ documentation\ and\ other\ associated\ files\ (collectively\ referred}}
+\DoxyCodeLine{00011\ \textcolor{comment}{\ *\ to\ as\ the\ “Software”)\ is\ a\ single\ SDK\ variation\ generated\ by\ the\ Edge\ Impulse}}
+\DoxyCodeLine{00012\ \textcolor{comment}{\ *\ platform\ and\ requires\ an\ active\ paid\ Edge\ Impulse\ subscription\ to\ use\ this}}
+\DoxyCodeLine{00013\ \textcolor{comment}{\ *\ Software\ for\ any\ purpose.}}
+\DoxyCodeLine{00014\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00015\ \textcolor{comment}{\ *\ You\ may\ NOT\ use\ this\ Software\ unless\ you\ have\ an\ active\ Edge\ Impulse\ subscription}}
+\DoxyCodeLine{00016\ \textcolor{comment}{\ *\ that\ meets\ the\ eligibility\ requirements\ for\ the\ applicable\ License,\ subject\ to}}
+\DoxyCodeLine{00017\ \textcolor{comment}{\ *\ your\ full\ and\ continued\ compliance\ with\ the\ terms\ and\ conditions\ of\ the\ License,}}
+\DoxyCodeLine{00018\ \textcolor{comment}{\ *\ including\ without\ limitation\ any\ usage\ restrictions\ under\ the\ applicable\ License.}}
+\DoxyCodeLine{00019\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00020\ \textcolor{comment}{\ *\ If\ you\ do\ not\ have\ an\ active\ Edge\ Impulse\ product\ plan\ subscription,\ or\ if\ use}}
+\DoxyCodeLine{00021\ \textcolor{comment}{\ *\ of\ this\ Software\ exceeds\ the\ usage\ limitations\ of\ your\ Edge\ Impulse\ product\ plan}}
+\DoxyCodeLine{00022\ \textcolor{comment}{\ *\ subscription,\ you\ are\ not\ permitted\ to\ use\ this\ Software\ and\ must\ immediately}}
+\DoxyCodeLine{00023\ \textcolor{comment}{\ *\ delete\ and\ erase\ all\ copies\ of\ this\ Software\ within\ your\ control\ or\ possession.}}
+\DoxyCodeLine{00024\ \textcolor{comment}{\ *\ Edge\ Impulse\ reserves\ all\ rights\ and\ remedies\ available\ to\ enforce\ its\ rights.}}
+\DoxyCodeLine{00025\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00026\ \textcolor{comment}{\ *\ Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ the\ Software\ is}}
+\DoxyCodeLine{00027\ \textcolor{comment}{\ *\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,\ WITHOUT\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,}}
+\DoxyCodeLine{00028\ \textcolor{comment}{\ *\ either\ express\ or\ implied.\ See\ the\ License\ for\ the\ specific\ language\ governing}}
+\DoxyCodeLine{00029\ \textcolor{comment}{\ *\ permissions,\ disclaimers\ and\ limitations\ under\ the\ License.}}
+\DoxyCodeLine{00030\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{00031\ \textcolor{preprocessor}{\#ifndef\ \_EIDSP\_CPP\_CONFIG\_H\_}}
+\DoxyCodeLine{00032\ \textcolor{preprocessor}{\#define\ \_EIDSP\_CPP\_CONFIG\_H\_}}
+\DoxyCodeLine{00033\ }
+\DoxyCodeLine{00034\ \textcolor{comment}{//\ clang-\/format\ off}}
+\DoxyCodeLine{00035\ \textcolor{preprocessor}{\#ifndef\ EIDSP\_USE\_CMSIS\_DSP\ }\textcolor{comment}{//\ \_\_ARM\_ARCH\_PROFILE\ is\ a\ predefine\ of\ arm-\/gcc.\ \ \_\_TARGET\_*\ is\ armcc}}
+\DoxyCodeLine{00036\ \textcolor{preprocessor}{\#if\ (defined(\_\_MBED\_\_)\ ||\ \_\_ARM\_ARCH\_PROFILE\ ==\ 'M'\ ||\ defined(\_\_TARGET\_CPU\_CORTEX\_M0)\ ||\ defined(\_\_TARGET\_CPU\_CORTEX\_M0PLUS)\ ||\ defined(\_\_TARGET\_CPU\_CORTEX\_M3)\ ||\ defined(\_\_TARGET\_CPU\_CORTEX\_M4)\ ||\ defined(\_\_TARGET\_CPU\_CORTEX\_M7)\ ||\ defined(USE\_HAL\_DRIVER)\ ||\ defined(ARDUINO\_NRF52\_ADAFRUIT))\ \&\&\ !defined(EI\_PORTING\_STM32\_CUBEAI)}}
+\DoxyCodeLine{00037\ \ \ \ \ \textcolor{comment}{//\ Mbed\ OS\ versions\ before\ 5.7\ are\ not\ based\ on\ CMSIS5,\ disable\ CMSIS-\/DSP\ and\ CMSIS-\/NN\ instructions}}
+\DoxyCodeLine{00038\ \textcolor{preprocessor}{\ \ \ \ \#if\ defined(\_\_MBED\_\_)}}
+\DoxyCodeLine{00039\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \#include\ "{}mbed\_version.h"{}}}
+\DoxyCodeLine{00040\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \#if\ (MBED\_VERSION\ <\ MBED\_ENCODE\_VERSION((5),\ (7),\ (0)))}}
+\DoxyCodeLine{00041\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \#define\ EIDSP\_USE\_CMSIS\_DSP\ \ \ \ \ \ 0}}
+\DoxyCodeLine{00042\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \#else}}
+\DoxyCodeLine{00043\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \#define\ EIDSP\_USE\_CMSIS\_DSP\ \ \ \ \ \ 1}}
+\DoxyCodeLine{00044\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \#endif\ }\textcolor{comment}{//\ Mbed\ OS\ 5.7\ version\ check}}
+\DoxyCodeLine{00045\ }
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Arduino\ on\ Mbed\ targets\ prior\ to\ Mbed\ OS\ 6.0.0\ ship\ their\ own\ CMSIS-\/DSP\ sources}}
+\DoxyCodeLine{00047\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \#if\ defined(ARDUINO)\ \&\&\ (MBED\_VERSION\ <\ MBED\_ENCODE\_VERSION((6),\ (0),\ (0)))}}
+\DoxyCodeLine{00048\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \#define\ EIDSP\_LOAD\_CMSIS\_DSP\_SOURCES\ \ \ \ \ \ 0}}
+\DoxyCodeLine{00049\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \#else}}
+\DoxyCodeLine{00050\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \#define\ EIDSP\_LOAD\_CMSIS\_DSP\_SOURCES\ \ \ \ \ \ 1}}
+\DoxyCodeLine{00051\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \#endif\ }\textcolor{comment}{//\ Mbed\ OS\ 6.0\ version\ check}}
+\DoxyCodeLine{00052\ \textcolor{preprocessor}{\ \ \ \ \#else}}
+\DoxyCodeLine{00053\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \#define\ EIDSP\_USE\_CMSIS\_DSP\ \ \ \ \ \ \ \ \ \ \ \ \ 1}}
+\DoxyCodeLine{00054\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \#define\ EIDSP\_LOAD\_CMSIS\_DSP\_SOURCES\ \ \ \ 1}}
+\DoxyCodeLine{00055\ \textcolor{preprocessor}{\ \ \ \ \#endif}}
+\DoxyCodeLine{00056\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00057\ \textcolor{preprocessor}{\ \ \ \ \#define\ EIDSP\_USE\_CMSIS\_DSP\ \ \ \ \ 0}}
+\DoxyCodeLine{00058\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ Mbed\ /\ ARM\ Core\ check}}
+\DoxyCodeLine{00059\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ ifndef\ EIDSP\_USE\_CMSIS\_DSP}}
+\DoxyCodeLine{00060\ }
+\DoxyCodeLine{00061\ \textcolor{preprocessor}{\#if\ EIDSP\_USE\_CMSIS\_DSP\ ==\ 1}}
+\DoxyCodeLine{00062\ \textcolor{preprocessor}{\#define\ EIDSP\_i32\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ int32\_t}}
+\DoxyCodeLine{00063\ \textcolor{preprocessor}{\#define\ EIDSP\_i16\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ int16\_t}}
+\DoxyCodeLine{00064\ \textcolor{preprocessor}{\#define\ EIDSP\_i8\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ q7\_t}}
+\DoxyCodeLine{00065\ \textcolor{preprocessor}{\#define\ ARM\_MATH\_ROUNDING\ \ \ \ \ \ \ \ 1}}
+\DoxyCodeLine{00066\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00067\ \textcolor{preprocessor}{\#define\ EIDSP\_i32\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ int32\_t}}
+\DoxyCodeLine{00068\ \textcolor{preprocessor}{\#define\ EIDSP\_i16\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ int16\_t}}
+\DoxyCodeLine{00069\ \textcolor{preprocessor}{\#define\ EIDSP\_i8\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ int8\_t}}
+\DoxyCodeLine{00070\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ EIDSP\_USE\_CMSIS\_DSP}}
+\DoxyCodeLine{00071\ }
+\DoxyCodeLine{00072\ \textcolor{preprocessor}{\#ifndef\ EIDSP\_USE\_ASSERTS}}
+\DoxyCodeLine{00073\ \textcolor{preprocessor}{\#define\ EIDSP\_USE\_ASSERTS\ \ \ \ \ \ \ \ 0}}
+\DoxyCodeLine{00074\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ EIDSP\_USE\_ASSERTS}}
+\DoxyCodeLine{00075\ }
+\DoxyCodeLine{00076\ \textcolor{preprocessor}{\#if\ EIDSP\_USE\_ASSERTS\ ==\ 1}}
+\DoxyCodeLine{00077\ \textcolor{preprocessor}{\#include\ <assert.h>}}
+\DoxyCodeLine{00078\ \textcolor{preprocessor}{\#define\ EIDSP\_ERR(err\_code)\ ei\_printf("{}ERR:\ \%d\ (\%s)\(\backslash\)n"{},\ err\_code,\ \#err\_code);\ assert(false)}}
+\DoxyCodeLine{00079\ \textcolor{preprocessor}{\#else\ }\textcolor{comment}{//\ EIDSP\_USE\_ASSERTS\ ==\ 0}}
+\DoxyCodeLine{00080\ \textcolor{preprocessor}{\#define\ EIDSP\_ERR(err\_code)\ return(err\_code)}}
+\DoxyCodeLine{00081\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00082\ }
+\DoxyCodeLine{00083\ \textcolor{comment}{//\ To\ save\ memory\ you\ can\ quantize\ the\ filterbanks,}}
+\DoxyCodeLine{00084\ \textcolor{comment}{//\ this\ has\ an\ effect\ on\ runtime\ speed\ as\ CMSIS-\/DSP\ does\ not\ have\ optimized\ instructions}}
+\DoxyCodeLine{00085\ \textcolor{comment}{//\ for\ q7\ matrix\ multiplication\ and\ matrix\ transformation...}}
+\DoxyCodeLine{00086\ \textcolor{preprocessor}{\#ifndef\ EIDSP\_QUANTIZE\_FILTERBANK}}
+\DoxyCodeLine{00087\ \textcolor{preprocessor}{\#define\ EIDSP\_QUANTIZE\_FILTERBANK\ \ \ \ 1}}
+\DoxyCodeLine{00088\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ EIDSP\_QUANTIZE\_FILTERBANK}}
+\DoxyCodeLine{00089\ }
+\DoxyCodeLine{00090\ \textcolor{comment}{//\ prints\ buffer\ allocations\ to\ stdout,\ useful\ when\ debugging}}
+\DoxyCodeLine{00091\ \textcolor{preprocessor}{\#ifndef\ EIDSP\_TRACK\_ALLOCATIONS}}
+\DoxyCodeLine{00092\ \textcolor{preprocessor}{\#define\ EIDSP\_TRACK\_ALLOCATIONS\ \ \ \ \ \ 0}}
+\DoxyCodeLine{00093\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ EIDSP\_TRACK\_ALLOCATIONS}}
+\DoxyCodeLine{00094\ }
+\DoxyCodeLine{00095\ \textcolor{comment}{//\ set\ EIDSP\_TRACK\_ALLOCATIONS=1\ and\ EIDSP\_PRINT\_ALLOCATIONS=0}}
+\DoxyCodeLine{00096\ \textcolor{comment}{//\ to\ track\ but\ not\ print\ allocations}}
+\DoxyCodeLine{00097\ \textcolor{preprocessor}{\#ifndef\ EIDSP\_PRINT\_ALLOCATIONS}}
+\DoxyCodeLine{00098\ \textcolor{preprocessor}{\#define\ EIDSP\_PRINT\_ALLOCATIONS\ \ \ \ \ \ 1}}
+\DoxyCodeLine{00099\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00100\ }
+\DoxyCodeLine{00101\ \textcolor{preprocessor}{\#ifndef\ EIDSP\_SIGNAL\_C\_FN\_POINTER}}
+\DoxyCodeLine{00102\ \textcolor{preprocessor}{\#define\ EIDSP\_SIGNAL\_C\_FN\_POINTER\ \ \ \ 0}}
+\DoxyCodeLine{00103\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ EIDSP\_SIGNAL\_C\_FN\_POINTER}}
+\DoxyCodeLine{00104\ }
+\DoxyCodeLine{00105\ \textcolor{comment}{//\ clang-\/format\ on}}
+\DoxyCodeLine{00106\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ \_EIDSP\_CPP\_CONFIG\_H\_}}
+
+\end{DoxyCode}

@@ -1,0 +1,662 @@
+\doxysection{onnx\+\_\+tidl.\+h}
+\hypertarget{onnx__tidl_8h_source}{}\label{onnx__tidl_8h_source}\index{Face\_Access\_inferencing/src/edge-\/impulse-\/sdk/classifier/inferencing\_engines/onnx\_tidl.h@{Face\_Access\_inferencing/src/edge-\/impulse-\/sdk/classifier/inferencing\_engines/onnx\_tidl.h}}
+\mbox{\hyperlink{onnx__tidl_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{00002\ \textcolor{comment}{\ *\ Copyright\ (c)\ 2022\ EdgeImpulse\ Inc.}}
+\DoxyCodeLine{00003\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00004\ \textcolor{comment}{\ *\ Licensed\ under\ the\ Apache\ License,\ Version\ 2.0\ (the\ "{}License"{});}}
+\DoxyCodeLine{00005\ \textcolor{comment}{\ *\ you\ may\ not\ use\ this\ file\ except\ in\ compliance\ with\ the\ License.}}
+\DoxyCodeLine{00006\ \textcolor{comment}{\ *\ You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{00007\ \textcolor{comment}{\ *\ http://www.apache.org/licenses/LICENSE-\/2.0}}
+\DoxyCodeLine{00008\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00009\ \textcolor{comment}{\ *\ Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,}}
+\DoxyCodeLine{00010\ \textcolor{comment}{\ *\ software\ distributed\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS}}
+\DoxyCodeLine{00011\ \textcolor{comment}{\ *\ IS"{}\ BASIS,\ WITHOUT\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,\ either}}
+\DoxyCodeLine{00012\ \textcolor{comment}{\ *\ express\ or\ implied.\ See\ the\ License\ for\ the\ specific\ language}}
+\DoxyCodeLine{00013\ \textcolor{comment}{\ *\ governing\ permissions\ and\ limitations\ under\ the\ License.}}
+\DoxyCodeLine{00014\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00015\ \textcolor{comment}{\ *\ SPDX-\/License-\/Identifier:\ Apache-\/2.0}}
+\DoxyCodeLine{00016\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{00017\ }
+\DoxyCodeLine{00018\ \textcolor{preprocessor}{\#ifndef\ \_EI\_CLASSIFIER\_INFERENCING\_ENGINE\_ONNX\_TIDL\_H\_}}
+\DoxyCodeLine{00019\ \textcolor{preprocessor}{\#define\ \_EI\_CLASSIFIER\_INFERENCING\_ENGINE\_ONNX\_TIDL\_H\_}}
+\DoxyCodeLine{00020\ }
+\DoxyCodeLine{00021\ \textcolor{preprocessor}{\#if\ (EI\_CLASSIFIER\_INFERENCING\_ENGINE\ ==\ EI\_CLASSIFIER\_ONNX\_TIDL)\ \&\&\ (EI\_CLASSIFIER\_COMPILED\ !=\ 1)}}
+\DoxyCodeLine{00022\ }
+\DoxyCodeLine{00023\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{model__metadata_8h}{model-\/parameters/model\_metadata.h}}"{}}}
+\DoxyCodeLine{00024\ \textcolor{preprocessor}{\#if\ EI\_CLASSIFIER\_HAS\_MODEL\_VARIABLES\ ==\ 1}}
+\DoxyCodeLine{00025\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{model__variables_8h}{model-\/parameters/model\_variables.h}}"{}}}
+\DoxyCodeLine{00026\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00027\ }
+\DoxyCodeLine{00028\ \textcolor{preprocessor}{\#include\ <getopt.h>}}
+\DoxyCodeLine{00029\ \textcolor{preprocessor}{\#include\ <iostream>}}
+\DoxyCodeLine{00030\ \textcolor{preprocessor}{\#include\ <cstdarg>}}
+\DoxyCodeLine{00031\ \textcolor{preprocessor}{\#include\ <cstdio>}}
+\DoxyCodeLine{00032\ \textcolor{preprocessor}{\#include\ <fstream>}}
+\DoxyCodeLine{00033\ \textcolor{preprocessor}{\#include\ <string>}}
+\DoxyCodeLine{00034\ \textcolor{preprocessor}{\#include\ <sys/time.h>}}
+\DoxyCodeLine{00035\ \textcolor{preprocessor}{\#include\ <list>}}
+\DoxyCodeLine{00036\ \textcolor{preprocessor}{\#include\ <sys/stat.h>}}
+\DoxyCodeLine{00037\ \textcolor{preprocessor}{\#include\ <vector>}}
+\DoxyCodeLine{00038\ \textcolor{preprocessor}{\#include\ <string>}}
+\DoxyCodeLine{00039\ }
+\DoxyCodeLine{00040\ \textcolor{preprocessor}{\#include\ "{}itidl\_rt.h"{}}}
+\DoxyCodeLine{00041\ \textcolor{preprocessor}{\#include\ <onnxruntime/core/session/onnxruntime\_cxx\_api.h>}}
+\DoxyCodeLine{00042\ \textcolor{preprocessor}{\#include\ <onnxruntime/core/providers/tidl/tidl\_provider\_factory.h>}}
+\DoxyCodeLine{00043\ \textcolor{preprocessor}{\#include\ <onnxruntime/core/providers/cpu/cpu\_provider\_factory.h>}}
+\DoxyCodeLine{00044\ }
+\DoxyCodeLine{00045\ \textcolor{preprocessor}{\#include\ <cmath>}}
+\DoxyCodeLine{00046\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{ei__aligned__malloc_8h}{edge-\/impulse-\/sdk/classifier/ei\_aligned\_malloc.h}}"{}}}
+\DoxyCodeLine{00047\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{ei__fill__result__struct_8h}{edge-\/impulse-\/sdk/classifier/ei\_fill\_result\_struct.h}}"{}}}
+\DoxyCodeLine{00048\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{ei__model__types_8h}{edge-\/impulse-\/sdk/classifier/ei\_model\_types.h}}"{}}}
+\DoxyCodeLine{00049\ }
+\DoxyCodeLine{00050\ \textcolor{preprocessor}{\#include\ "{}onnx-\/model/tidl-\/model.h"{}}}
+\DoxyCodeLine{00051\ \textcolor{preprocessor}{\#include\ "{}utils/model\_header\_utils.h"{}}}
+\DoxyCodeLine{00052\ }
+\DoxyCodeLine{00053\ \textcolor{preprocessor}{\#define\ TI\_PREPROC\_DEFAULT\_WIDTH\ 320}}
+\DoxyCodeLine{00054\ \textcolor{preprocessor}{\#define\ TI\_PREPROC\_DEFAULT\_HEIGHT\ 240}}
+\DoxyCodeLine{00055\ }
+\DoxyCodeLine{00056\ \textcolor{keyword}{using\ namespace\ }std;}
+\DoxyCodeLine{00057\ }
+\DoxyCodeLine{00062\ \textcolor{keywordtype}{double}\ \mbox{\hyperlink{onnx__tidl_8h_a6bceed6d0d125a16328def7d40c9a8f2}{getUs}}(\textcolor{keyword}{struct}\ timeval\ t)}
+\DoxyCodeLine{00063\ \{}
+\DoxyCodeLine{00064\ \ \ \ \ \textcolor{keywordflow}{return}(t.tv\_sec\ *\ 1000000\ +\ t.tv\_usec);}
+\DoxyCodeLine{00065\ \}}
+\DoxyCodeLine{00066\ }
+\DoxyCodeLine{00073\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{onnx__tidl_8h_a763b74426e540261d9ac52dd861a77bf}{printTensorInfo}}(Ort::Session\ *session,\ std::vector<const\ char\ *>\ *input\_node\_names,\ std::vector<const\ char\ *>\ *output\_node\_names)}
+\DoxyCodeLine{00074\ \{}
+\DoxyCodeLine{00075\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ num\_input\_nodes\ =\ (*session).GetInputCount();}
+\DoxyCodeLine{00076\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ num\_output\_nodes\ =\ (*session).GetOutputCount();}
+\DoxyCodeLine{00077\ \ \ \ \ Ort::TypeInfo\ type\_info\ =\ (*session).GetInputTypeInfo(0);}
+\DoxyCodeLine{00078\ \ \ \ \ \textcolor{keyword}{auto}\ tensor\_info\ =\ type\_info.GetTensorTypeAndShapeInfo();}
+\DoxyCodeLine{00079\ \ \ \ \ std::vector<int64\_t>\ input\_node\_dims\ =\ tensor\_info.GetShape();}
+\DoxyCodeLine{00080\ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}LOG\_INFO:\ number\ of\ inputs:\ \%d\(\backslash\)n"{}},\ (\textcolor{keywordtype}{int})num\_input\_nodes);}
+\DoxyCodeLine{00081\ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}LOG\_INFO:\ number\ of\ outputs:\ \%d\(\backslash\)n"{}},\ (\textcolor{keywordtype}{int})num\_output\_nodes);}
+\DoxyCodeLine{00082\ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}LOG\_INFO:\ input(0)\ name:\ \%s\(\backslash\)n"{}},\ (*input\_node\_names)[0]);}
+\DoxyCodeLine{00083\ }
+\DoxyCodeLine{00084\ \ \ \ \ Ort::TypeInfo\ type\_info\_out\ =\ (*session).GetOutputTypeInfo(0);}
+\DoxyCodeLine{00085\ \ \ \ \ \textcolor{keyword}{auto}\ tensor\_info\_out\ =\ type\_info\_out.GetTensorTypeAndShapeInfo();}
+\DoxyCodeLine{00086\ \ \ \ \ std::vector<int64\_t>\ output\_node\_dims\ =\ tensor\_info\_out.GetShape();}
+\DoxyCodeLine{00087\ \ \ \ \ \textcolor{comment}{/*\ iterate\ over\ all\ input\ nodes\ */}}
+\DoxyCodeLine{00088\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ (int)num\_input\_nodes;\ i++)}
+\DoxyCodeLine{00089\ \ \ \ \ \{}
+\DoxyCodeLine{00090\ \ \ \ \ \ \ \ \ \textcolor{comment}{/*\ print\ input\ node\ names\ */}}
+\DoxyCodeLine{00091\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}LOG\_INFO:\ Input\ \%d\ :\ name=\%s\(\backslash\)n"{}},\ i,\ (*input\_node\_names)[i]);}
+\DoxyCodeLine{00092\ }
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \ \ \textcolor{comment}{/*\ print\ input\ node\ types\ */}}
+\DoxyCodeLine{00094\ \ \ \ \ \ \ \ \ Ort::TypeInfo\ type\_info\ =\ (*session).GetInputTypeInfo(i);}
+\DoxyCodeLine{00095\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ tensor\_info\ =\ type\_info.GetTensorTypeAndShapeInfo();}
+\DoxyCodeLine{00096\ }
+\DoxyCodeLine{00097\ \ \ \ \ \ \ \ \ ONNXTensorElementDataType\ \mbox{\hyperlink{micro_2kernels_2overlap__add_8cc_a231b67310ea6e901bd0df1bded3963cf}{type}}\ =\ tensor\_info.GetElementType();}
+\DoxyCodeLine{00098\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}LOG\_INFO:\ Input\ \%d\ :\ type=\%d\(\backslash\)n"{}},\ i,\ \mbox{\hyperlink{micro_2kernels_2overlap__add_8cc_a231b67310ea6e901bd0df1bded3963cf}{type}});}
+\DoxyCodeLine{00099\ \ \ \ \ \ \ \ \ \textcolor{comment}{/*\ print\ input\ shapes/dims\ */}}
+\DoxyCodeLine{00100\ \ \ \ \ \ \ \ \ input\_node\_dims\ =\ tensor\_info.GetShape();}
+\DoxyCodeLine{00101\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}LOG\_INFO:\ Input\ \%d\ :\ num\_dims=\%zu\(\backslash\)n"{}},\ i,\ input\_node\_dims.size());}
+\DoxyCodeLine{00102\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ j\ =\ 0;\ j\ <\ input\_node\_dims.size();\ j++)}
+\DoxyCodeLine{00103\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00104\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}LOG\_INFO:\ Input\ \%d\ :\ dim\ \%d=\%jd\(\backslash\)n"{}},\ i,\ j,\ input\_node\_dims[j]);}
+\DoxyCodeLine{00105\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00106\ \ \ \ \ \}}
+\DoxyCodeLine{00107\ \ \ \ \ \textcolor{keywordflow}{if}\ (num\_input\_nodes\ !=\ 1)}
+\DoxyCodeLine{00108\ \ \ \ \ \{}
+\DoxyCodeLine{00109\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}LOG\_INFO:\ supports\ only\ single\ input\ model\ \(\backslash\)n"{}});}
+\DoxyCodeLine{00110\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{group__ei__returntypes_ggad9580b47a6cd5e74cfc31a03bdfecebea85445f0a590bd822af2879d968a19ffb}{EI\_IMPULSE\_ONNX\_ERROR}};}
+\DoxyCodeLine{00111\ \ \ \ \ \}}
+\DoxyCodeLine{00112\ }
+\DoxyCodeLine{00113\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ (int)num\_output\_nodes;\ i++)}
+\DoxyCodeLine{00114\ \ \ \ \ \{}
+\DoxyCodeLine{00115\ \ \ \ \ \ \ \ \ \textcolor{comment}{/*\ print\ output\ node\ names\ */}}
+\DoxyCodeLine{00116\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}LOG\_INFO:\ Output\ \%d\ :\ name=\%s\(\backslash\)n"{}},\ i,\ (*output\_node\_names)[i]);}
+\DoxyCodeLine{00117\ }
+\DoxyCodeLine{00118\ \ \ \ \ \ \ \ \ \textcolor{comment}{/*\ print\ output\ node\ types\ */}}
+\DoxyCodeLine{00119\ \ \ \ \ \ \ \ \ Ort::TypeInfo\ type\_info\ =\ (*session).GetOutputTypeInfo(i);}
+\DoxyCodeLine{00120\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ tensor\_info\ =\ type\_info.GetTensorTypeAndShapeInfo();}
+\DoxyCodeLine{00121\ }
+\DoxyCodeLine{00122\ \ \ \ \ \ \ \ \ ONNXTensorElementDataType\ \mbox{\hyperlink{micro_2kernels_2overlap__add_8cc_a231b67310ea6e901bd0df1bded3963cf}{type}}\ =\ tensor\_info.GetElementType();}
+\DoxyCodeLine{00123\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}LOG\_INFO:\ Output\ \%d\ :\ type=\%d\(\backslash\)n"{}},\ i,\ \mbox{\hyperlink{micro_2kernels_2overlap__add_8cc_a231b67310ea6e901bd0df1bded3963cf}{type}});}
+\DoxyCodeLine{00124\ \ \ \ \ \ \ \ \ \textcolor{comment}{/*\ print\ output\ shapes/dims\ */}}
+\DoxyCodeLine{00125\ \ \ \ \ \ \ \ \ output\_node\_dims\ =\ tensor\_info.GetShape();}
+\DoxyCodeLine{00126\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}LOG\_INFO:\ Output\ \%d\ :\ num\_dims=\%zu\(\backslash\)n"{}},\ i,\ output\_node\_dims.size());}
+\DoxyCodeLine{00127\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ j\ =\ 0;\ j\ <\ (int)output\_node\_dims.size();\ j++)}
+\DoxyCodeLine{00128\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00129\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}LOG\_INFO:\ Output\ \%d\ :\ dim\ \%d=\%jd\(\backslash\)n"{}},\ i,\ j,\ output\_node\_dims[j]);}
+\DoxyCodeLine{00130\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00131\ \ \ \ \ \}}
+\DoxyCodeLine{00132\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{ei__fill__result__struct_8h_a2fb43be102b153d659b668ad295aff40}{EI\_IMPULSE\_OK}};}
+\DoxyCodeLine{00133\ \}}
+\DoxyCodeLine{00134\ }
+\DoxyCodeLine{00135\ \textcolor{keywordtype}{void}\ *\ \mbox{\hyperlink{onnx__tidl_8h_a47ef4bb644fdd5a4924ef6ed3ca8cc09}{allocTensorMem}}(\textcolor{keywordtype}{int}\ \mbox{\hyperlink{namespaceei_a000f348b45d99db3a9dd6a9991ef667a}{size}},\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{nicla__sense__fusion_8ino_ab9319fdba407b0f6ef6285faef51f290}{accel}})}
+\DoxyCodeLine{00136\ \{}
+\DoxyCodeLine{00137\ \ \ \ \ \textcolor{keywordtype}{void}\ *\ \mbox{\hyperlink{namespaceei_a593af57fa44116ca69a3e62d0fd75adc}{ptr}}\ =\ NULL;}
+\DoxyCodeLine{00138\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{nicla__sense__fusion_8ino_ab9319fdba407b0f6ef6285faef51f290}{accel}})}
+\DoxyCodeLine{00139\ \ \ \ \ \{}
+\DoxyCodeLine{00140\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \#ifdef\ DEVICE\_AM62}}
+\DoxyCodeLine{00141\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}LOG\_INFO:\ TIDL\ Delgate\ mode\ is\ not\ allowed\ on\ AM62\ devices...\(\backslash\)n"{}});}
+\DoxyCodeLine{00142\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}LOG\_ERROR:\ Could\ not\ allocate\ memory\ for\ a\ Tensor\ of\ size\ \%d\ \(\backslash\)n\ "{}},\ \mbox{\hyperlink{namespaceei_a000f348b45d99db3a9dd6a9991ef667a}{size}});}
+\DoxyCodeLine{00143\ \ \ \ \ \ \ \ \ exit(0);}
+\DoxyCodeLine{00144\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \#else}}
+\DoxyCodeLine{00145\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespaceei_a593af57fa44116ca69a3e62d0fd75adc}{ptr}}\ =\ TIDLRT\_allocSharedMem(64,\ \mbox{\hyperlink{namespaceei_a000f348b45d99db3a9dd6a9991ef667a}{size}});}
+\DoxyCodeLine{00146\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \#endif}}
+\DoxyCodeLine{00147\ \ \ \ \ \}}
+\DoxyCodeLine{00148\ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00149\ \ \ \ \ \{}
+\DoxyCodeLine{00150\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespaceei_a593af57fa44116ca69a3e62d0fd75adc}{ptr}}\ =\ malloc(\mbox{\hyperlink{namespaceei_a000f348b45d99db3a9dd6a9991ef667a}{size}});}
+\DoxyCodeLine{00151\ \ \ \ \ \}}
+\DoxyCodeLine{00152\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{namespaceei_a593af57fa44116ca69a3e62d0fd75adc}{ptr}}\ ==\ NULL)}
+\DoxyCodeLine{00153\ \ \ \ \ \{}
+\DoxyCodeLine{00154\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}LOG\_ERROR:\ Could\ not\ allocate\ memory\ for\ a\ Tensor\ of\ size\ \%d\ \(\backslash\)n\ "{}},\ \mbox{\hyperlink{namespaceei_a000f348b45d99db3a9dd6a9991ef667a}{size}});}
+\DoxyCodeLine{00155\ \ \ \ \ \ \ \ \ exit(0);}
+\DoxyCodeLine{00156\ \ \ \ \ \}}
+\DoxyCodeLine{00157\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespaceei_a593af57fa44116ca69a3e62d0fd75adc}{ptr}};}
+\DoxyCodeLine{00158\ \}}
+\DoxyCodeLine{00159\ }
+\DoxyCodeLine{00160\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{onnx__tidl_8h_aad1acb9d97076199c3a4476df5b79119}{freeTensorMem}}(\textcolor{keywordtype}{void}\ *\ \mbox{\hyperlink{namespaceei_a593af57fa44116ca69a3e62d0fd75adc}{ptr}},\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{nicla__sense__fusion_8ino_ab9319fdba407b0f6ef6285faef51f290}{accel}})}
+\DoxyCodeLine{00161\ \{}
+\DoxyCodeLine{00162\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{nicla__sense__fusion_8ino_ab9319fdba407b0f6ef6285faef51f290}{accel}})}
+\DoxyCodeLine{00163\ \ \ \ \ \{}
+\DoxyCodeLine{00164\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \#ifndef\ DEVICE\_AM62}}
+\DoxyCodeLine{00165\ \ \ \ \ \ \ \ \ TIDLRT\_freeSharedMem(\mbox{\hyperlink{namespaceei_a593af57fa44116ca69a3e62d0fd75adc}{ptr}});}
+\DoxyCodeLine{00166\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \#endif}}
+\DoxyCodeLine{00167\ \ \ \ \ \}}
+\DoxyCodeLine{00168\ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00169\ \ \ \ \ \{}
+\DoxyCodeLine{00170\ \ \ \ \ \ \ \ \ free(\mbox{\hyperlink{namespaceei_a593af57fa44116ca69a3e62d0fd75adc}{ptr}});}
+\DoxyCodeLine{00171\ \ \ \ \ \}}
+\DoxyCodeLine{00172\ \}}
+\DoxyCodeLine{00173\ }
+\DoxyCodeLine{00185\ \textcolor{keyword}{static}\ \mbox{\hyperlink{group__ei__returntypes_gad9580b47a6cd5e74cfc31a03bdfecebe}{EI\_IMPULSE\_ERROR}}\ \mbox{\hyperlink{onnx__tidl_8h_a1f36bc1c96f3a91d32ede90f7afff0ba}{inference\_onnx\_setup}}(}
+\DoxyCodeLine{00186\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structei__impulse}{ei\_impulse\_t}}\ *impulse,}
+\DoxyCodeLine{00187\ \ \ \ \ uint64\_t\ *ctx\_start\_us,}
+\DoxyCodeLine{00188\ \ \ \ \ std::vector<Ort::Value>*\ input\_tensors,}
+\DoxyCodeLine{00189\ \ \ \ \ std::vector<Ort::Value>*\ output\_tensors,}
+\DoxyCodeLine{00190\ \ \ \ \ Ort::Session**\ session\_ptr,}
+\DoxyCodeLine{00191\ \ \ \ \ Ort::RunOptions**\ run\_options\_ptr,}
+\DoxyCodeLine{00192\ \ \ \ \ Ort::IoBinding**\ binding\_ptr)\ \{}
+\DoxyCodeLine{00193\ }
+\DoxyCodeLine{00194\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{bool}\ onnx\_first\_run\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00195\ \ \ \ \ \textcolor{comment}{//\ Nothing\ to\ do\ after\ first\ run}}
+\DoxyCodeLine{00196\ \ \ \ \ \textcolor{keywordflow}{if}\ (!onnx\_first\_run)\ \{}
+\DoxyCodeLine{00197\ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{ei__fill__result__struct_8h_a2fb43be102b153d659b668ad295aff40}{EI\_IMPULSE\_OK}};}
+\DoxyCodeLine{00198\ \ \ \ \ \}}
+\DoxyCodeLine{00199\ }
+\DoxyCodeLine{00200\ \ \ \ \ std::string\ proj\_artifacts\_path\ =\ \textcolor{stringliteral}{"{}/tmp/"{}}\ +\ std::string(impulse-\/>\mbox{\hyperlink{structei__impulse_ace394cd723e23081bcb5829d3518e138}{project\_name}})\ +\ \textcolor{stringliteral}{"{}-\/"{}}\ +\ std::to\_string(impulse-\/>\mbox{\hyperlink{structei__impulse_ae4faff2e5e8dcd665cac0cddbe240a7f}{project\_id}})\ +\ \textcolor{stringliteral}{"{}-\/"{}}\ +\ std::to\_string(impulse-\/>\mbox{\hyperlink{structei__impulse_ad77fcf55624e04594d9f0e3cfc487726}{deploy\_version}});}
+\DoxyCodeLine{00201\ }
+\DoxyCodeLine{00202\ \ \ \ \ create\_project\_if\_not\_exists(proj\_artifacts\_path,\ model\_h\_files,\ model\_h\_files\_len);}
+\DoxyCodeLine{00203\ }
+\DoxyCodeLine{00204\ \ \ \ \ std::string\ proj\_model\_path\ =\ proj\_artifacts\_path\ +\ \textcolor{stringliteral}{"{}/model.onnx"{}};}
+\DoxyCodeLine{00205\ }
+\DoxyCodeLine{00206\ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}test\ onnx\ tidl:\ \%s\(\backslash\)n"{}},\ \_\_FUNCTION\_\_);}
+\DoxyCodeLine{00207\ \textcolor{preprocessor}{\ \ \ \ \#pragma\ message\ (\ "{}test\ onnx\ tidl:\ run\_nn\_inference"{})}}
+\DoxyCodeLine{00208\ }
+\DoxyCodeLine{00209\ \ \ \ \ \textcolor{comment}{/*\ Initialize\ \ enviroment,\ maintains\ thread\ pools\ and\ state\ info\ */}}
+\DoxyCodeLine{00210\ \ \ \ \ Ort::Env\ env(ORT\_LOGGING\_LEVEL\_WARNING,\ \textcolor{stringliteral}{"{}test"{}});}
+\DoxyCodeLine{00211\ \ \ \ \ \textcolor{comment}{/*\ Initialize\ session\ options\ */}}
+\DoxyCodeLine{00212\ \ \ \ \ Ort::SessionOptions\ session\_options;}
+\DoxyCodeLine{00213\ \ \ \ \ \textcolor{comment}{//TODO:\ from\ where\ do\ we\ load\ number\ of\ threads?}}
+\DoxyCodeLine{00214\ \ \ \ \ session\_options.SetIntraOpNumThreads(1);}
+\DoxyCodeLine{00215\ }
+\DoxyCodeLine{00216\ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}LOG\_INFO:\ model\ accelerated\ \(\backslash\)n"{}});}
+\DoxyCodeLine{00217\ \ \ \ \ c\_api\_tidl\_options\ *options\ =\ (c\_api\_tidl\_options\ *)malloc(\textcolor{keyword}{sizeof}(c\_api\_tidl\_options));}
+\DoxyCodeLine{00218\ \ \ \ \ OrtStatus\ *def\_status\ =\ OrtSessionsOptionsSetDefault\_Tidl(options);}
+\DoxyCodeLine{00219\ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}LOG\_INFO:\ artifacts:\ \%s\ \(\backslash\)n"{}},\ proj\_artifacts\_path.c\_str());}
+\DoxyCodeLine{00220\ \ \ \ \ strcpy(options-\/>artifacts\_folder,\ proj\_artifacts\_path.c\_str());}
+\DoxyCodeLine{00221\ \ \ \ \ \textcolor{keywordflow}{if}(NULL\ ==\ options)\{}
+\DoxyCodeLine{00222\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}LOG\_ERROR:\ faild\ to\ allocate\ c\_api\_tidl\_options\ \(\backslash\)n"{}});}
+\DoxyCodeLine{00223\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{group__ei__returntypes_ggad9580b47a6cd5e74cfc31a03bdfecebea85445f0a590bd822af2879d968a19ffb}{EI\_IMPULSE\_ONNX\_ERROR}};}
+\DoxyCodeLine{00224\ \ \ \ \ \}}
+\DoxyCodeLine{00225\ \ \ \ \ OrtStatus\ *\mbox{\hyperlink{_simple_web_server_8ino_a6e27f49150e9a14580fb313cc2777e00}{status}}\ =\ OrtSessionOptionsAppendExecutionProvider\_Tidl(session\_options,\ options);}
+\DoxyCodeLine{00226\ }
+\DoxyCodeLine{00227\ \ \ \ \ session\_options.SetGraphOptimizationLevel(GraphOptimizationLevel::ORT\_ENABLE\_EXTENDED);}
+\DoxyCodeLine{00228\ \ \ \ \ Ort::AllocatorWithDefaultOptions\ allocator;}
+\DoxyCodeLine{00229\ }
+\DoxyCodeLine{00230\ \ \ \ \ \textcolor{comment}{/*\ ORT\ Session\ */}}
+\DoxyCodeLine{00231\ \ \ \ \ Ort::Session*\ session\ =\ \textcolor{keyword}{new}\ Ort::Session(env,\ proj\_model\_path.c\_str(),\ session\_options);}
+\DoxyCodeLine{00232\ \ \ \ \ *session\_ptr\ =\ session;}
+\DoxyCodeLine{00233\ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}LOG\_INFO:\ Loaded\ model\ \%s\(\backslash\)n"{}},\ proj\_model\_path.c\_str());}
+\DoxyCodeLine{00234\ }
+\DoxyCodeLine{00235\ \ \ \ \ \textcolor{comment}{/*\ Input\ information\ */}}
+\DoxyCodeLine{00236\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ num\_input\_nodes\ =\ session-\/>GetInputCount();}
+\DoxyCodeLine{00237\ \ \ \ \ std::vector<const\ char\ *>\ input\_node\_names(num\_input\_nodes);}
+\DoxyCodeLine{00238\ \ \ \ \ Ort::TypeInfo\ type\_info\ =\ session-\/>GetInputTypeInfo(0);}
+\DoxyCodeLine{00239\ \ \ \ \ \textcolor{keyword}{auto}\ tensor\_info\ =\ type\_info.GetTensorTypeAndShapeInfo();}
+\DoxyCodeLine{00240\ \ \ \ \ std::vector<int64\_t>\ input\_node\_dims\ =\ tensor\_info.GetShape();}
+\DoxyCodeLine{00241\ \ \ \ \ ONNXTensorElementDataType\ input\_tensor\_type\ =\ tensor\_info.GetElementType();}
+\DoxyCodeLine{00242\ }
+\DoxyCodeLine{00243\ \ \ \ \ \textcolor{comment}{/*\ output\ information\ */}}
+\DoxyCodeLine{00244\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ num\_output\_nodes\ =\ session-\/>GetOutputCount();}
+\DoxyCodeLine{00245\ \ \ \ \ std::vector<const\ char\ *>\ output\_node\_names(num\_output\_nodes);}
+\DoxyCodeLine{00246\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ (int)num\_output\_nodes;\ i++)}
+\DoxyCodeLine{00247\ \ \ \ \ \{}
+\DoxyCodeLine{00248\ \ \ \ \ \ \ \ \ output\_node\_names[i]\ =\ session-\/>GetOutputName(i,\ allocator);}
+\DoxyCodeLine{00249\ \ \ \ \ \}}
+\DoxyCodeLine{00250\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ (int)num\_input\_nodes;\ i++)}
+\DoxyCodeLine{00251\ \ \ \ \ \{}
+\DoxyCodeLine{00252\ \ \ \ \ \ \ \ \ input\_node\_names[i]\ =\ session-\/>GetInputName(i,\ allocator);}
+\DoxyCodeLine{00253\ \ \ \ \ \}}
+\DoxyCodeLine{00254\ }
+\DoxyCodeLine{00255\ \ \ \ \ type\_info\ =\ session-\/>GetOutputTypeInfo(0);}
+\DoxyCodeLine{00256\ \ \ \ \ \textcolor{keyword}{auto}\ output\_tensor\_info\ =\ type\_info.GetTensorTypeAndShapeInfo();}
+\DoxyCodeLine{00257\ \ \ \ \ std::vector<int64\_t>\ output\_node\_dims\ =\ output\_tensor\_info.GetShape();}
+\DoxyCodeLine{00258\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ output\_tensor\_size\ =\ output\_node\_dims[1];}
+\DoxyCodeLine{00259\ }
+\DoxyCodeLine{00260\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{group__ei__returntypes_ggad9580b47a6cd5e74cfc31a03bdfecebea85445f0a590bd822af2879d968a19ffb}{EI\_IMPULSE\_ONNX\_ERROR}}\ ==\ \mbox{\hyperlink{onnx__tidl_8h_a763b74426e540261d9ac52dd861a77bf}{printTensorInfo}}(session,\ \&input\_node\_names,\ \&output\_node\_names))\ \{}
+\DoxyCodeLine{00261\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}LOG\_ERROR:\ print\ tensor\ information\ failed!\(\backslash\)n"{}});}
+\DoxyCodeLine{00262\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{group__ei__returntypes_ggad9580b47a6cd5e74cfc31a03bdfecebea85445f0a590bd822af2879d968a19ffb}{EI\_IMPULSE\_ONNX\_ERROR}};}
+\DoxyCodeLine{00263\ \ \ \ \ \}}
+\DoxyCodeLine{00264\ }
+\DoxyCodeLine{00265\ \ \ \ \ ssize\_t\ input\_tensor\_size\_bytes;}
+\DoxyCodeLine{00266\ \ \ \ \ \textcolor{comment}{/*\ simplify\ ...\ using\ known\ dim\ values\ to\ calculate\ size\ */}}
+\DoxyCodeLine{00267\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ input\_tensor\_size\ =\ impulse-\/>\mbox{\hyperlink{structei__impulse_a3b948bf79bdff1640fcae9a63476726a}{nn\_input\_frame\_size}};}
+\DoxyCodeLine{00268\ \ \ \ \ \textcolor{keywordtype}{void}\ *inData;}
+\DoxyCodeLine{00269\ \ \ \ \ \textcolor{keywordflow}{if}\ (input\_tensor\_type\ ==\ ONNX\_TENSOR\_ELEMENT\_DATA\_TYPE\_FLOAT)}
+\DoxyCodeLine{00270\ \ \ \ \ \{}
+\DoxyCodeLine{00271\ \ \ \ \ \ \ \ \ input\_tensor\_size\_bytes\ =\ input\_tensor\_size\ *\ \textcolor{keyword}{sizeof}(float);}
+\DoxyCodeLine{00272\ \ \ \ \ \ \ \ \ inData\ =\ \mbox{\hyperlink{onnx__tidl_8h_a47ef4bb644fdd5a4924ef6ed3ca8cc09}{allocTensorMem}}(input\_tensor\_size\_bytes,\ \textcolor{keyword}{true});}
+\DoxyCodeLine{00273\ \ \ \ \ \}}
+\DoxyCodeLine{00274\ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (input\_tensor\_type\ ==\ ONNX\_TENSOR\_ELEMENT\_DATA\_TYPE\_UINT8)}
+\DoxyCodeLine{00275\ \ \ \ \ \{}
+\DoxyCodeLine{00276\ \ \ \ \ \ \ \ \ input\_tensor\_size\_bytes\ =\ input\_tensor\_size\ *\ \textcolor{keyword}{sizeof}(uint8\_t);}
+\DoxyCodeLine{00277\ \ \ \ \ \ \ \ \ inData\ =\ \mbox{\hyperlink{onnx__tidl_8h_a47ef4bb644fdd5a4924ef6ed3ca8cc09}{allocTensorMem}}(input\_tensor\_size\_bytes,\ \textcolor{keyword}{true});}
+\DoxyCodeLine{00278\ \ \ \ \ \}}
+\DoxyCodeLine{00279\ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00280\ \ \ \ \ \{}
+\DoxyCodeLine{00281\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}LOG\_ERROR:\ indata\ type\ not\ supported\ yet\ \(\backslash\)n\ "{}});}
+\DoxyCodeLine{00282\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{group__ei__returntypes_ggad9580b47a6cd5e74cfc31a03bdfecebea85445f0a590bd822af2879d968a19ffb}{EI\_IMPULSE\_ONNX\_ERROR}};}
+\DoxyCodeLine{00283\ \ \ \ \ \}}
+\DoxyCodeLine{00284\ \ \ \ \ \textcolor{keyword}{auto}\ memory\_info\ =\ Ort::MemoryInfo::CreateCpu(OrtArenaAllocator,\ OrtMemTypeDefault);}
+\DoxyCodeLine{00285\ }
+\DoxyCodeLine{00286\ \ \ \ \ Ort::Value\ input\_tensor\ =\ Ort::Value::CreateTensor(memory\_info,\ inData,\ input\_tensor\_size\_bytes,\ input\_node\_dims.data(),\ 4,\ input\_tensor\_type);}
+\DoxyCodeLine{00287\ \ \ \ \ input\_tensors-\/>push\_back(std::move(input\_tensor));}
+\DoxyCodeLine{00288\ }
+\DoxyCodeLine{00289\ \ \ \ \ Ort::RunOptions*\ run\_options\ =\ \textcolor{keyword}{new}\ Ort::RunOptions();}
+\DoxyCodeLine{00290\ \ \ \ \ *run\_options\_ptr\ =\ run\_options;}
+\DoxyCodeLine{00291\ \ \ \ \ run\_options-\/>SetRunLogVerbosityLevel(2);}
+\DoxyCodeLine{00292\ \ \ \ \ \textcolor{keyword}{auto}\ output\_tensors\_warm\_up\ =\ session-\/>Run(*run\_options,\ input\_node\_names.data(),\ input\_tensors-\/>data(),\ 1,\ output\_node\_names.data(),\ num\_output\_nodes);}
+\DoxyCodeLine{00293\ }
+\DoxyCodeLine{00294\ \ \ \ \ \textcolor{comment}{//void\ *outData\ =\ allocTensorMem(output\_tensor\_size\ *\ sizeof(float),\ true);}}
+\DoxyCodeLine{00295\ \ \ \ \ Ort::IoBinding*\ binding\ =\ \textcolor{keyword}{new}\ Ort::IoBinding(*session);}
+\DoxyCodeLine{00296\ \ \ \ \ *binding\_ptr\ =\ binding;}
+\DoxyCodeLine{00297\ \ \ \ \ binding-\/>BindInput(input\_node\_names[0],\ (*input\_tensors)[0]);}
+\DoxyCodeLine{00298\ }
+\DoxyCodeLine{00299\ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int}\ idx=0;\ idx\ <\ (int)num\_output\_nodes;\ idx++)}
+\DoxyCodeLine{00300\ \ \ \ \ \{}
+\DoxyCodeLine{00301\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ node\_dims\ =\ output\_tensors\_warm\_up[idx].GetTypeInfo().GetTensorTypeAndShapeInfo().GetShape();}
+\DoxyCodeLine{00302\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ tensor\_size\ =\ 1;}
+\DoxyCodeLine{00303\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int}\ j\ =\ node\_dims.size()-\/1;\ j\ >=\ 0;\ j-\/-\/)}
+\DoxyCodeLine{00304\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00305\ \ \ \ \ \ \ \ \ \ \ \ \ tensor\_size\ *=\ node\_dims[j];}
+\DoxyCodeLine{00306\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00307\ \ \ \ \ \ \ \ \ ONNXTensorElementDataType\ tensor\_type\ \ =\ output\_tensors\_warm\_up[idx].GetTypeInfo().GetTensorTypeAndShapeInfo().GetElementType();}
+\DoxyCodeLine{00308\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(tensor\_type\ ==\ ONNX\_TENSOR\_ELEMENT\_DATA\_TYPE\_FLOAT)}
+\DoxyCodeLine{00309\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00310\ \ \ \ \ \ \ \ \ \ \ \ \ tensor\_size\ *=\ \textcolor{keyword}{sizeof}(float);}
+\DoxyCodeLine{00311\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00312\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}(tensor\_type\ ==\ ONNX\_TENSOR\_ELEMENT\_DATA\_TYPE\_UINT8)}
+\DoxyCodeLine{00313\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00314\ \ \ \ \ \ \ \ \ \ \ \ \ tensor\_size\ *=\ \textcolor{keyword}{sizeof}(uint8\_t);}
+\DoxyCodeLine{00315\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00316\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}(tensor\_type\ ==\ ONNX\_TENSOR\_ELEMENT\_DATA\_TYPE\_INT64)}
+\DoxyCodeLine{00317\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00318\ \ \ \ \ \ \ \ \ \ \ \ \ tensor\_size\ *=\ \textcolor{keyword}{sizeof}(int64\_t);}
+\DoxyCodeLine{00319\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00320\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00321\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00322\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}LOG\_ERROR:\ Un\ Supported\ output\ tensor\_type\(\backslash\)n"{}});}
+\DoxyCodeLine{00323\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{group__ei__returntypes_ggad9580b47a6cd5e74cfc31a03bdfecebea85445f0a590bd822af2879d968a19ffb}{EI\_IMPULSE\_ONNX\_ERROR}};}
+\DoxyCodeLine{00324\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00325\ }
+\DoxyCodeLine{00326\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ *\ outData\ =\ \mbox{\hyperlink{onnx__tidl_8h_a47ef4bb644fdd5a4924ef6ed3ca8cc09}{allocTensorMem}}(tensor\_size,\ \textcolor{keyword}{true});}
+\DoxyCodeLine{00327\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ output\_tensor\ =\ Ort::Value::CreateTensor(memory\_info,\ (\textcolor{keywordtype}{void}\ *)outData,\ tensor\_size,\ node\_dims.data(),\ node\_dims.size(),tensor\_type);}
+\DoxyCodeLine{00328\ \ \ \ \ \ \ \ \ output\_tensors-\/>push\_back(std::move(output\_tensor));}
+\DoxyCodeLine{00329\ \ \ \ \ \ \ \ \ binding-\/>BindOutput(output\_node\_names[idx],\ (*output\_tensors)[idx]);}
+\DoxyCodeLine{00330\ \ \ \ \ \}}
+\DoxyCodeLine{00331\ }
+\DoxyCodeLine{00332\ \ \ \ \ onnx\_first\_run\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00333\ }
+\DoxyCodeLine{00334\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{ei__fill__result__struct_8h_a2fb43be102b153d659b668ad295aff40}{EI\_IMPULSE\_OK}};}
+\DoxyCodeLine{00335\ \}}
+\DoxyCodeLine{00336\ }
+\DoxyCodeLine{00349\ \textcolor{keyword}{static}\ \mbox{\hyperlink{group__ei__returntypes_gad9580b47a6cd5e74cfc31a03bdfecebe}{EI\_IMPULSE\_ERROR}}\ \mbox{\hyperlink{onnx__tidl_8h_a01c96c6da283198d0dc9ee34886e233a}{inference\_onnx\_run}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structei__impulse}{ei\_impulse\_t}}\ *impulse,}
+\DoxyCodeLine{00350\ \ \ \ \ \textcolor{keywordtype}{void}\ *\mbox{\hyperlink{ei__run__dsp_8h_a0819d397f9fba7b345b75fef1c1f782a}{config\_ptr}},}
+\DoxyCodeLine{00351\ \ \ \ \ uint64\_t\ ctx\_start\_us,}
+\DoxyCodeLine{00352\ \ \ \ \ std::vector<Ort::Value>*\ input\_tensors,}
+\DoxyCodeLine{00353\ \ \ \ \ std::vector<Ort::Value>*\ output\_tensors,}
+\DoxyCodeLine{00354\ \ \ \ \ Ort::Session*\ session,}
+\DoxyCodeLine{00355\ \ \ \ \ Ort::RunOptions*\ run\_options,}
+\DoxyCodeLine{00356\ \ \ \ \ Ort::IoBinding*\ binding,}
+\DoxyCodeLine{00357\ \ \ \ \ \mbox{\hyperlink{structei__impulse__result__t}{ei\_impulse\_result\_t}}\ *\mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}},}
+\DoxyCodeLine{00358\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{ei__fill__result__struct_8h_a881f62341b5a41a3c5707268bd537be1}{debug}})\ \{}
+\DoxyCodeLine{00359\ }
+\DoxyCodeLine{00360\ \ \ \ \ \mbox{\hyperlink{structei__learning__block__config__tflite__graph__t}{ei\_learning\_block\_config\_tflite\_graph\_t}}\ *\mbox{\hyperlink{ei__fill__result__struct_8h_aafcd7d36638d6a564b6edbceef06ea8b}{block\_config}}\ =\ (\mbox{\hyperlink{structei__learning__block__config__tflite__graph__t}{ei\_learning\_block\_config\_tflite\_graph\_t}}*)\mbox{\hyperlink{ei__run__dsp_8h_a0819d397f9fba7b345b75fef1c1f782a}{config\_ptr}};}
+\DoxyCodeLine{00361\ }
+\DoxyCodeLine{00362\ \ \ \ \ session-\/>Run(*run\_options,\ *binding);}
+\DoxyCodeLine{00363\ }
+\DoxyCodeLine{00364\ \ \ \ \ uint64\_t\ ctx\_end\_us\ =\ \mbox{\hyperlink{group__ei__user__functions_gac9aae7befaa896e21417df1f00518416}{ei\_read\_timer\_us}}();}
+\DoxyCodeLine{00365\ \ \ \ \ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}}-\/>timing.classification\_us\ =\ ctx\_end\_us\ -\/\ ctx\_start\_us;}
+\DoxyCodeLine{00366\ \ \ \ \ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}}-\/>timing.classification\ =\ (int)(\mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}}-\/>timing.classification\_us\ /\ 1000);}
+\DoxyCodeLine{00367\ }
+\DoxyCodeLine{00368\ \ \ \ \ ONNXTensorElementDataType\ output\_tensor\_type\ =\ (*output\_tensors).at(0).GetTypeInfo().GetTensorTypeAndShapeInfo().GetElementType();}
+\DoxyCodeLine{00369\ \ \ \ \ \textcolor{keywordtype}{void}\ *out\_data\ =\ output\_tensors-\/>front().GetTensorMutableData<\textcolor{keywordtype}{void}>();}
+\DoxyCodeLine{00370\ }
+\DoxyCodeLine{00371\ \ \ \ \ \textcolor{comment}{//\ get\ output\ features\ count\ from\ model}}
+\DoxyCodeLine{00372\ \ \ \ \ \textcolor{keyword}{auto}\ node\_dims\ =\ (*output\_tensors).at(0).GetTypeInfo().GetTensorTypeAndShapeInfo().GetShape();}
+\DoxyCodeLine{00373\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ output\_tensor\_features\_count\ =\ 1;}
+\DoxyCodeLine{00374\ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int}\ j\ =\ node\_dims.size()-\/1;\ j\ >=\ 0;\ j-\/-\/)}
+\DoxyCodeLine{00375\ \ \ \ \ \{}
+\DoxyCodeLine{00376\ \ \ \ \ \ \ \ \ output\_tensor\_features\_count\ *=\ node\_dims[j];}
+\DoxyCodeLine{00377\ \ \ \ \ \}}
+\DoxyCodeLine{00378\ }
+\DoxyCodeLine{00379\ \ \ \ \ \textcolor{comment}{//\ Read\ the\ predicted\ y\ value\ from\ the\ model's\ output\ tensor}}
+\DoxyCodeLine{00380\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{ei__fill__result__struct_8h_a881f62341b5a41a3c5707268bd537be1}{debug}})\ \{}
+\DoxyCodeLine{00381\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}Predictions\ (time:\ \%d\ ms.):\(\backslash\)n"{}},\ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}}-\/>timing.classification);}
+\DoxyCodeLine{00382\ \ \ \ \ \}}
+\DoxyCodeLine{00383\ }
+\DoxyCodeLine{00384\ \ \ \ \ \mbox{\hyperlink{group__ei__returntypes_gad9580b47a6cd5e74cfc31a03bdfecebe}{EI\_IMPULSE\_ERROR}}\ fill\_res\ =\ \mbox{\hyperlink{ei__fill__result__struct_8h_a2fb43be102b153d659b668ad295aff40}{EI\_IMPULSE\_OK}};}
+\DoxyCodeLine{00385\ }
+\DoxyCodeLine{00386\ \ \ \ \ \textcolor{comment}{//\ NOTE:\ for\ now\ only\ yolox\ object\ detection\ supported}}
+\DoxyCodeLine{00387\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{ei__fill__result__struct_8h_aafcd7d36638d6a564b6edbceef06ea8b}{block\_config}}-\/>\mbox{\hyperlink{structei__learning__block__config__tflite__graph__t_af1a9b7c47a826887609d831078ccbdbc}{object\_detection}})\ \{}
+\DoxyCodeLine{00388\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}\ (\mbox{\hyperlink{ei__fill__result__struct_8h_aafcd7d36638d6a564b6edbceef06ea8b}{block\_config}}-\/>\mbox{\hyperlink{structei__learning__block__config__tflite__graph__t_a9f1d65f69c49cecaddb6b6abb65644ef}{object\_detection\_last\_layer}})\ \{}
+\DoxyCodeLine{00389\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{ei__model__types_8h_ad05cd1d31a2e8f75e913d25141c2dba6}{EI\_CLASSIFIER\_LAST\_LAYER\_YOLOX}}:\ \{}
+\DoxyCodeLine{00390\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{ei__fill__result__struct_8h_aafcd7d36638d6a564b6edbceef06ea8b}{block\_config}}-\/>\mbox{\hyperlink{structei__learning__block__config__tflite__graph__t_a236c1ec337b36737f91b21516aa72182}{quantized}}\ ==\ 1)\ \{}
+\DoxyCodeLine{00391\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}ERR:\ YOLOX\ does\ not\ support\ quantized\ inference\(\backslash\)n"{}});}
+\DoxyCodeLine{00392\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{group__ei__returntypes_ggad9580b47a6cd5e74cfc31a03bdfecebea399c371041be7c468a3b05a4d8352d14}{EI\_IMPULSE\_UNSUPPORTED\_INFERENCING\_ENGINE}};}
+\DoxyCodeLine{00393\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00394\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00395\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{ei__fill__result__struct_8h_a881f62341b5a41a3c5707268bd537be1}{debug}})\ \{}
+\DoxyCodeLine{00396\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}YOLOX\ OUTPUT\ (\%d\ ms.):\ "{}},\ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}}-\/>timing.classification);}
+\DoxyCodeLine{00397\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ ix\ =\ 0;\ ix\ <\ output\_tensor\_features\_count;\ ix++)\ \{}
+\DoxyCodeLine{00398\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group__ei__user__functions_gadcb0babc6f41a7d0aa4c0801c96ae7e4}{ei\_printf\_float}}(((\textcolor{keywordtype}{float}*)out\_data)[ix]);}
+\DoxyCodeLine{00399\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}\ "{}});}
+\DoxyCodeLine{00400\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00401\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}\(\backslash\)n"{}});}
+\DoxyCodeLine{00402\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00403\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ fill\_res\ =\ fill\_result\_struct\_f32\_yolox\_detect(}
+\DoxyCodeLine{00404\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ impulse,}
+\DoxyCodeLine{00405\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__fill__result__struct_8h_aafcd7d36638d6a564b6edbceef06ea8b}{block\_config}},}
+\DoxyCodeLine{00406\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}},}
+\DoxyCodeLine{00407\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{keywordtype}{float}*)out\_data,}
+\DoxyCodeLine{00408\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ output\_tensor\_features\_count);}
+\DoxyCodeLine{00409\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00410\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00411\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00412\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}:\ \{}
+\DoxyCodeLine{00413\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}ERR:\ Unsupported\ object\ detection\ last\ layer\ (\%d)\(\backslash\)n"{}},}
+\DoxyCodeLine{00414\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__fill__result__struct_8h_aafcd7d36638d6a564b6edbceef06ea8b}{block\_config}}-\/>\mbox{\hyperlink{structei__learning__block__config__tflite__graph__t_a9f1d65f69c49cecaddb6b6abb65644ef}{object\_detection\_last\_layer}});}
+\DoxyCodeLine{00415\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00416\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00417\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00418\ \ \ \ \ \}}
+\DoxyCodeLine{00419\ \ \ \ \ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00420\ \textcolor{preprocessor}{\#if\ EI\_CLASSIFIER\_QUANTIZATION\_ENABLED\ ==\ 1}}
+\DoxyCodeLine{00421\ }
+\DoxyCodeLine{00422\ \ \ \ \ \textcolor{keywordflow}{switch}\ (output\_tensor\_type)\ \{}
+\DoxyCodeLine{00423\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ ONNX\_TENSOR\_ELEMENT\_DATA\_TYPE\_UINT8:\ \{}
+\DoxyCodeLine{00424\ \ \ \ \ \ \ \ \ \ \ \ \ fill\_res\ =\ fill\_result\_struct\_i8(impulse,\ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}},\ (int8\_t*)out\_data,\ impulse-\/>tflite\_output\_zeropoint,\ impulse-\/>tflite\_output\_scale,\ \mbox{\hyperlink{ei__fill__result__struct_8h_a881f62341b5a41a3c5707268bd537be1}{debug}});}
+\DoxyCodeLine{00425\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00426\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00427\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ ONNX\_TENSOR\_ELEMENT\_DATA\_TYPE\_INT8:\ \{}
+\DoxyCodeLine{00428\ \ \ \ \ \ \ \ \ \ \ \ \ fill\_res\ =\ fill\_result\_struct\_i8(impulse,\ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}},\ (int8\_t*)out\_data,\ impulse-\/>tflite\_output\_zeropoint,\ impulse-\/>tflite\_output\_scale,\ \mbox{\hyperlink{ei__fill__result__struct_8h_a881f62341b5a41a3c5707268bd537be1}{debug}});}
+\DoxyCodeLine{00429\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00430\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00431\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}:\ \{}
+\DoxyCodeLine{00432\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}ERR:\ Cannot\ handle\ output\ type\ (\%d)\(\backslash\)n"{}},\ output\_tensor\_type);}
+\DoxyCodeLine{00433\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{group__ei__returntypes_ggad9580b47a6cd5e74cfc31a03bdfecebea044ed37f0ac423223909460bad7850b4}{EI\_IMPULSE\_OUTPUT\_TENSOR\_WAS\_NULL}};}
+\DoxyCodeLine{00434\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00435\ \ \ \ \ \}}
+\DoxyCodeLine{00436\ }
+\DoxyCodeLine{00437\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00438\ \ \ \ \ \textcolor{keywordflow}{switch}\ (output\_tensor\_type)\ \{}
+\DoxyCodeLine{00439\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ ONNX\_TENSOR\_ELEMENT\_DATA\_TYPE\_FLOAT:\ \{}
+\DoxyCodeLine{00440\ \ \ \ \ \ \ \ \ \ \ \ \ fill\_res\ =\ fill\_result\_struct\_f32(impulse,\ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}},\ (\textcolor{keywordtype}{float}*)out\_data,\ \mbox{\hyperlink{ei__fill__result__struct_8h_a881f62341b5a41a3c5707268bd537be1}{debug}});}
+\DoxyCodeLine{00441\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00442\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00443\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}:\ \{}
+\DoxyCodeLine{00444\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}ERR:\ Cannot\ handle\ output\ type\ (\%d)\(\backslash\)n"{}},\ output\_tensor\_type);}
+\DoxyCodeLine{00445\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{group__ei__returntypes_ggad9580b47a6cd5e74cfc31a03bdfecebea044ed37f0ac423223909460bad7850b4}{EI\_IMPULSE\_OUTPUT\_TENSOR\_WAS\_NULL}};}
+\DoxyCodeLine{00446\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00447\ \ \ \ \ \}}
+\DoxyCodeLine{00448\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00449\ \ \ \ \ \}}
+\DoxyCodeLine{00450\ }
+\DoxyCodeLine{00452\ \ \ \ \ \textcolor{comment}{//for\ (size\_t\ i\ =\ 0;\ i\ <\ output\_tensors-\/>size();\ i++)}}
+\DoxyCodeLine{00453\ \ \ \ \ \textcolor{comment}{//\{}}
+\DoxyCodeLine{00454\ \ \ \ \ \textcolor{comment}{//\ \ \ \ void\ *ptr\ =\ (*output\_tensors)[i].GetTensorMutableData<void>();}}
+\DoxyCodeLine{00455\ \ \ \ \ \textcolor{comment}{//\ \ \ \ freeTensorMem(ptr,\ true);}}
+\DoxyCodeLine{00456\ \ \ \ \ \textcolor{comment}{//\}}}
+\DoxyCodeLine{00457\ \ \ \ \ \textcolor{comment}{//for\ (size\_t\ i\ =\ 0;\ i\ <\ input\_tensors-\/>size();\ i++)}}
+\DoxyCodeLine{00458\ \ \ \ \ \textcolor{comment}{//\{}}
+\DoxyCodeLine{00459\ \ \ \ \ \textcolor{comment}{//\ \ \ \ void\ *ptr\ =\ (*input\_tensors)[i].GetTensorMutableData<void>();}}
+\DoxyCodeLine{00460\ \ \ \ \ \textcolor{comment}{//\ \ \ \ freeTensorMem(ptr,\ true);}}
+\DoxyCodeLine{00461\ \ \ \ \ \textcolor{comment}{//\}}}
+\DoxyCodeLine{00462\ }
+\DoxyCodeLine{00463\ \ \ \ \ \textcolor{keywordflow}{if}\ (fill\_res\ !=\ \mbox{\hyperlink{ei__fill__result__struct_8h_a2fb43be102b153d659b668ad295aff40}{EI\_IMPULSE\_OK}})\ \{}
+\DoxyCodeLine{00464\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ fill\_res;}
+\DoxyCodeLine{00465\ \ \ \ \ \}}
+\DoxyCodeLine{00466\ }
+\DoxyCodeLine{00467\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{ei__fill__result__struct_8h_a2fb43be102b153d659b668ad295aff40}{EI\_IMPULSE\_OK}};}
+\DoxyCodeLine{00468\ \}}
+\DoxyCodeLine{00469\ }
+\DoxyCodeLine{00479\ \mbox{\hyperlink{group__ei__returntypes_gad9580b47a6cd5e74cfc31a03bdfecebe}{EI\_IMPULSE\_ERROR}}\ \mbox{\hyperlink{onnx__tidl_8h_ab7a2955e2cf72f882991f1c82cac9c74}{run\_nn\_inference}}(}
+\DoxyCodeLine{00480\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structei__impulse}{ei\_impulse\_t}}\ *impulse,}
+\DoxyCodeLine{00481\ \ \ \ \ \mbox{\hyperlink{structei__feature__t}{ei\_feature\_t}}\ *afmatrix,}
+\DoxyCodeLine{00482\ \ \ \ \ uint32\_t\ learn\_block\_index,}
+\DoxyCodeLine{00483\ \ \ \ \ uint32\_t*\ input\_block\_ids,}
+\DoxyCodeLine{00484\ \ \ \ \ uint32\_t\ input\_block\_ids\_size,}
+\DoxyCodeLine{00485\ \ \ \ \ \mbox{\hyperlink{structei__impulse__result__t}{ei\_impulse\_result\_t}}\ *\mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}},}
+\DoxyCodeLine{00486\ \ \ \ \ \textcolor{keywordtype}{void}\ *\mbox{\hyperlink{ei__run__dsp_8h_a0819d397f9fba7b345b75fef1c1f782a}{config\_ptr}},}
+\DoxyCodeLine{00487\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{ei__fill__result__struct_8h_a881f62341b5a41a3c5707268bd537be1}{debug}}\ =\ \textcolor{keyword}{false})}
+\DoxyCodeLine{00488\ \{}
+\DoxyCodeLine{00489\ \ \ \ \ \textcolor{keyword}{static}\ std::vector<Ort::Value>\ input\_tensors;}
+\DoxyCodeLine{00490\ \ \ \ \ \textcolor{keyword}{static}\ std::vector<Ort::Value>\ output\_tensors;}
+\DoxyCodeLine{00491\ \ \ \ \ \textcolor{keyword}{static}\ Ort::Session*\ session;}
+\DoxyCodeLine{00492\ \ \ \ \ \textcolor{keyword}{static}\ Ort::RunOptions*\ run\_options;}
+\DoxyCodeLine{00493\ \ \ \ \ \textcolor{keyword}{static}\ Ort::IoBinding*\ binding;}
+\DoxyCodeLine{00494\ \ \ \ \ uint64\_t\ ctx\_start\_us;}
+\DoxyCodeLine{00495\ }
+\DoxyCodeLine{00496\ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}test\ onnx\ tidl:\ \%s\(\backslash\)n"{}},\ \_\_FUNCTION\_\_);}
+\DoxyCodeLine{00497\ \textcolor{preprocessor}{\ \ \ \ \#pragma\ message\ (\ "{}test\ onnx\ tidl:\ run\_nn\_inference"{})}}
+\DoxyCodeLine{00498\ }
+\DoxyCodeLine{00499\ \ \ \ \ \mbox{\hyperlink{group__ei__returntypes_gad9580b47a6cd5e74cfc31a03bdfecebe}{EI\_IMPULSE\_ERROR}}\ init\_res\ =\ \mbox{\hyperlink{onnx__tidl_8h_a1f36bc1c96f3a91d32ede90f7afff0ba}{inference\_onnx\_setup}}(impulse,}
+\DoxyCodeLine{00500\ \ \ \ \ \ \ \ \ \&ctx\_start\_us,}
+\DoxyCodeLine{00501\ \ \ \ \ \ \ \ \ \&input\_tensors,}
+\DoxyCodeLine{00502\ \ \ \ \ \ \ \ \ \&output\_tensors,}
+\DoxyCodeLine{00503\ \ \ \ \ \ \ \ \ \&session,}
+\DoxyCodeLine{00504\ \ \ \ \ \ \ \ \ \&run\_options,}
+\DoxyCodeLine{00505\ \ \ \ \ \ \ \ \ \&binding);}
+\DoxyCodeLine{00506\ }
+\DoxyCodeLine{00507\ \ \ \ \ \textcolor{keywordflow}{if}\ (init\_res\ !=\ \mbox{\hyperlink{ei__fill__result__struct_8h_a2fb43be102b153d659b668ad295aff40}{EI\_IMPULSE\_OK}}\ ||\ session\ ==\ NULL\ ||\ run\_options\ ==\ NULL\ ||}
+\DoxyCodeLine{00508\ \ \ \ \ \ \ \ \ binding\ ==\ NULL)\ \{}
+\DoxyCodeLine{00509\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}LOG\_ERROR:\ ONNX\ inference\ setup\ failed!\(\backslash\)n"{}});}
+\DoxyCodeLine{00510\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{group__ei__returntypes_ggad9580b47a6cd5e74cfc31a03bdfecebea85445f0a590bd822af2879d968a19ffb}{EI\_IMPULSE\_ONNX\_ERROR}};}
+\DoxyCodeLine{00511\ \ \ \ \ \}}
+\DoxyCodeLine{00512\ }
+\DoxyCodeLine{00513\ \ \ \ \ uint64\_t\ dsp\_chw\_start\_us;}
+\DoxyCodeLine{00514\ \ \ \ \ dsp\_chw\_start\_us\ =\ \mbox{\hyperlink{group__ei__user__functions_gac9aae7befaa896e21417df1f00518416}{ei\_read\_timer\_us}}();}
+\DoxyCodeLine{00515\ }
+\DoxyCodeLine{00516\ \ \ \ \ \textcolor{comment}{/*}}
+\DoxyCodeLine{00517\ \textcolor{comment}{\ \ \ \ **\ Convert\ to\ CHW\ from\ HWC}}
+\DoxyCodeLine{00518\ \textcolor{comment}{\ \ \ \ \ */}}
+\DoxyCodeLine{00519\ \ \ \ \ \textcolor{comment}{//\ features\ matrix\ maps\ around\ the\ input\ tensor\ to\ not\ allocate\ any\ memory}}
+\DoxyCodeLine{00520\ \ \ \ \ \textcolor{keywordtype}{float}\ *input\_buffer\ =\ input\_tensors.front().GetTensorMutableData<\textcolor{keywordtype}{float}>();}
+\DoxyCodeLine{00521\ \ \ \ \ ei::matrix\_t\ fmatrix(1,\ impulse-\/>\mbox{\hyperlink{structei__impulse_a3b948bf79bdff1640fcae9a63476726a}{nn\_input\_frame\_size}},\ input\_buffer);}
+\DoxyCodeLine{00522\ }
+\DoxyCodeLine{00523\ \ \ \ \ \mbox{\hyperlink{structei__dsp__config__image__t}{ei\_dsp\_config\_image\_t}}\ *\mbox{\hyperlink{micro_2kernels_2filter__bank_8cc_ac0f32fd234a078ace764ae2fc15c41a0}{config}}\ =\ (\mbox{\hyperlink{structei__dsp__config__image__t}{ei\_dsp\_config\_image\_t}}\ *)impulse-\/>\mbox{\hyperlink{structei__impulse_a489e5b084b43bc5fba557f540a1d28cf}{dsp\_blocks}}[0].\mbox{\hyperlink{structei__model__dsp__t_a47f0ccb8e2258720b6e1e944dea17415}{config}};}
+\DoxyCodeLine{00524\ }
+\DoxyCodeLine{00525\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ channels\ =\ strcmp(\mbox{\hyperlink{micro_2kernels_2filter__bank_8cc_ac0f32fd234a078ace764ae2fc15c41a0}{config}}-\/>channels,\ \textcolor{stringliteral}{"{}Grayscale"{}})\ ==\ 0\ ?\ 1\ :\ 3;}
+\DoxyCodeLine{00526\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{ei__fill__result__struct_8h_aac5ab54ba2532a0b0cf671ad2baf9715}{height}}\ =\ impulse-\/>\mbox{\hyperlink{structei__impulse_a5942f00730eec808be7862623464a3b6}{input\_height}};}
+\DoxyCodeLine{00527\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{ei__fill__result__struct_8h_a62b225ba7c5226f6e6e923a28c1db968}{width}}\ =\ impulse-\/>\mbox{\hyperlink{structei__impulse_ae60988f0fadb5594fb6a7f00ef9f075a}{input\_width}};}
+\DoxyCodeLine{00528\ }
+\DoxyCodeLine{00529\ \ \ \ \ ei::matrix\_t*\ matrix\ =\ afmatrix[0].\mbox{\hyperlink{structei__feature__t_a971fb9c93bddb4631925e579f5b88ebf}{matrix}};}
+\DoxyCodeLine{00530\ }
+\DoxyCodeLine{00531\ \ \ \ \ \textcolor{keywordtype}{int}\ dest\_ix\ =\ 0;}
+\DoxyCodeLine{00532\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ c=0;\ c\ <\ channels;\ c++)\ \{}
+\DoxyCodeLine{00533\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a85f2f1bd58b3b44ffdf3881823393959}{h}}=0;\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a85f2f1bd58b3b44ffdf3881823393959}{h}}\ <\ \mbox{\hyperlink{ei__fill__result__struct_8h_aac5ab54ba2532a0b0cf671ad2baf9715}{height}};\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a85f2f1bd58b3b44ffdf3881823393959}{h}}++)\ \{}
+\DoxyCodeLine{00534\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a56eca241e2896b9f57a79589e76fd24b}{w}}=0;\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a56eca241e2896b9f57a79589e76fd24b}{w}}\ <\ \mbox{\hyperlink{ei__fill__result__struct_8h_a62b225ba7c5226f6e6e923a28c1db968}{width}};\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a56eca241e2896b9f57a79589e76fd24b}{w}}++)\ \{}
+\DoxyCodeLine{00535\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ uint32\_t\ src\_ix\ =\ channels\ *\ \mbox{\hyperlink{ei__fill__result__struct_8h_a62b225ba7c5226f6e6e923a28c1db968}{width}}\ *\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a85f2f1bd58b3b44ffdf3881823393959}{h}}\ +\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a56eca241e2896b9f57a79589e76fd24b}{w}}*channels\ +\ c;}
+\DoxyCodeLine{00536\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ fmatrix.buffer[dest\_ix++]\ =\ matrix-\/>buffer[src\_ix];}
+\DoxyCodeLine{00537\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00538\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00539\ \ \ \ \ \}}
+\DoxyCodeLine{00540\ }
+\DoxyCodeLine{00541\ \ \ \ \ uint64\_t\ dsp\_chw\_end\_us\ =\ \mbox{\hyperlink{group__ei__user__functions_gac9aae7befaa896e21417df1f00518416}{ei\_read\_timer\_us}}();}
+\DoxyCodeLine{00542\ \ \ \ \ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}}-\/>timing.dsp\_us\ +=\ dsp\_chw\_end\_us\ -\/\ dsp\_chw\_start\_us;}
+\DoxyCodeLine{00543\ \ \ \ \ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}}-\/>timing.dsp\ =\ (int)(\mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}}-\/>timing.dsp\_us\ /\ 1000);}
+\DoxyCodeLine{00544\ }
+\DoxyCodeLine{00545\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{ei__fill__result__struct_8h_a881f62341b5a41a3c5707268bd537be1}{debug}})\ \{}
+\DoxyCodeLine{00546\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}After\ Features\ (\%ld\ us.):\ "{}},\ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}}-\/>timing.dsp\_us);}
+\DoxyCodeLine{00547\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ ix\ =\ 0;\ ix\ <\ fmatrix.cols;\ ix++)\ \{}
+\DoxyCodeLine{00548\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group__ei__user__functions_gadcb0babc6f41a7d0aa4c0801c96ae7e4}{ei\_printf\_float}}(fmatrix.buffer[ix]);}
+\DoxyCodeLine{00549\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}\ "{}});}
+\DoxyCodeLine{00550\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00551\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}\(\backslash\)n"{}});}
+\DoxyCodeLine{00552\ \ \ \ \ \}}
+\DoxyCodeLine{00553\ }
+\DoxyCodeLine{00554\ \ \ \ \ ctx\_start\_us\ =\ \mbox{\hyperlink{group__ei__user__functions_gac9aae7befaa896e21417df1f00518416}{ei\_read\_timer\_us}}();}
+\DoxyCodeLine{00555\ \ \ \ \ \mbox{\hyperlink{group__ei__returntypes_gad9580b47a6cd5e74cfc31a03bdfecebe}{EI\_IMPULSE\_ERROR}}\ run\_res\ =\ \mbox{\hyperlink{onnx__tidl_8h_a01c96c6da283198d0dc9ee34886e233a}{inference\_onnx\_run}}(impulse,}
+\DoxyCodeLine{00556\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__dsp_8h_a0819d397f9fba7b345b75fef1c1f782a}{config\_ptr}},}
+\DoxyCodeLine{00557\ \ \ \ \ \ \ \ \ ctx\_start\_us,}
+\DoxyCodeLine{00558\ \ \ \ \ \ \ \ \ \&input\_tensors,}
+\DoxyCodeLine{00559\ \ \ \ \ \ \ \ \ \&output\_tensors,}
+\DoxyCodeLine{00560\ \ \ \ \ \ \ \ \ session,}
+\DoxyCodeLine{00561\ \ \ \ \ \ \ \ \ run\_options,}
+\DoxyCodeLine{00562\ \ \ \ \ \ \ \ \ binding,}
+\DoxyCodeLine{00563\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}},\ \mbox{\hyperlink{ei__fill__result__struct_8h_a881f62341b5a41a3c5707268bd537be1}{debug}});}
+\DoxyCodeLine{00564\ }
+\DoxyCodeLine{00565\ \ \ \ \ \textcolor{keywordflow}{if}\ (run\_res\ !=\ \mbox{\hyperlink{ei__fill__result__struct_8h_a2fb43be102b153d659b668ad295aff40}{EI\_IMPULSE\_OK}})\ \{}
+\DoxyCodeLine{00566\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ run\_res;}
+\DoxyCodeLine{00567\ \ \ \ \ \}}
+\DoxyCodeLine{00568\ }
+\DoxyCodeLine{00569\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{ei__fill__result__struct_8h_a2fb43be102b153d659b668ad295aff40}{EI\_IMPULSE\_OK}};}
+\DoxyCodeLine{00570\ \}}
+\DoxyCodeLine{00571\ }
+\DoxyCodeLine{00572\ \textcolor{preprocessor}{\#if\ EI\_CLASSIFIER\_QUANTIZATION\_ENABLED\ ==\ 1}}
+\DoxyCodeLine{00578\ \mbox{\hyperlink{group__ei__returntypes_gad9580b47a6cd5e74cfc31a03bdfecebe}{EI\_IMPULSE\_ERROR}}\ \mbox{\hyperlink{aton_8h_a5086db080c7196118d01d4a4c4a1bd3c}{run\_nn\_inference\_image\_quantized}}(}
+\DoxyCodeLine{00579\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structei__impulse}{ei\_impulse\_t}}\ *impulse,}
+\DoxyCodeLine{00580\ \ \ \ \ \mbox{\hyperlink{structei__signal__t}{signal\_t}}\ *\mbox{\hyperlink{classei_1_1signal}{signal}},}
+\DoxyCodeLine{00581\ \ \ \ \ \mbox{\hyperlink{structei__impulse__result__t}{ei\_impulse\_result\_t}}\ *\mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}},}
+\DoxyCodeLine{00582\ \ \ \ \ \textcolor{keywordtype}{void}\ *\mbox{\hyperlink{ei__run__dsp_8h_a0819d397f9fba7b345b75fef1c1f782a}{config\_ptr}},}
+\DoxyCodeLine{00583\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{ei__fill__result__struct_8h_a881f62341b5a41a3c5707268bd537be1}{debug}}\ =\ \textcolor{keyword}{false})}
+\DoxyCodeLine{00584\ \{}
+\DoxyCodeLine{00585\ \ \ \ \ \textcolor{keyword}{static}\ std::vector<Ort::Value>\ input\_tensors;}
+\DoxyCodeLine{00586\ \ \ \ \ \textcolor{keyword}{static}\ std::vector<Ort::Value>\ output\_tensors;}
+\DoxyCodeLine{00587\ \ \ \ \ \textcolor{keyword}{static}\ Ort::Session*\ session;}
+\DoxyCodeLine{00588\ \ \ \ \ \textcolor{keyword}{static}\ Ort::RunOptions*\ run\_options;}
+\DoxyCodeLine{00589\ \ \ \ \ \textcolor{keyword}{static}\ Ort::IoBinding*\ binding;}
+\DoxyCodeLine{00590\ \ \ \ \ uint64\_t\ ctx\_start\_us;}
+\DoxyCodeLine{00591\ }
+\DoxyCodeLine{00592\ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}test\ onnx\ tidl:\ \%s\(\backslash\)n"{}},\ \_\_FUNCTION\_\_);}
+\DoxyCodeLine{00593\ \textcolor{preprocessor}{\ \ \ \ \#pragma\ message\ (\ "{}test\ onnx\ tidl:\ run\_nn\_inference\_image\_quantized"{})}}
+\DoxyCodeLine{00594\ }
+\DoxyCodeLine{00595\ \ \ \ \ \mbox{\hyperlink{group__ei__returntypes_gad9580b47a6cd5e74cfc31a03bdfecebe}{EI\_IMPULSE\_ERROR}}\ init\_res\ =\ \mbox{\hyperlink{onnx__tidl_8h_a1f36bc1c96f3a91d32ede90f7afff0ba}{inference\_onnx\_setup}}(impulse,}
+\DoxyCodeLine{00596\ \ \ \ \ \ \ \ \ \&ctx\_start\_us,}
+\DoxyCodeLine{00597\ \ \ \ \ \ \ \ \ \&input\_tensors,\ \&output\_tensors,}
+\DoxyCodeLine{00598\ \ \ \ \ \ \ \ \ \&session,}
+\DoxyCodeLine{00599\ \ \ \ \ \ \ \ \ \&run\_options,}
+\DoxyCodeLine{00600\ \ \ \ \ \ \ \ \ \&binding);}
+\DoxyCodeLine{00601\ }
+\DoxyCodeLine{00602\ \ \ \ \ \textcolor{keywordflow}{if}\ (init\_res\ !=\ \mbox{\hyperlink{ei__fill__result__struct_8h_a2fb43be102b153d659b668ad295aff40}{EI\_IMPULSE\_OK}}\ ||\ session\ ==\ NULL\ ||\ run\_options\ ==\ NULL\ ||}
+\DoxyCodeLine{00603\ \ \ \ \ \ \ \ \ binding\ ==\ NULL)\ \{}
+\DoxyCodeLine{00604\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}LOG\_ERROR:\ ONNX\ inference\ setup\ failed!\(\backslash\)n"{}});}
+\DoxyCodeLine{00605\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{group__ei__returntypes_ggad9580b47a6cd5e74cfc31a03bdfecebea85445f0a590bd822af2879d968a19ffb}{EI\_IMPULSE\_ONNX\_ERROR}};}
+\DoxyCodeLine{00606\ \ \ \ \ \}}
+\DoxyCodeLine{00607\ }
+\DoxyCodeLine{00608\ \ \ \ \ ONNXTensorElementDataType\ input\_tensor\_type\ =\ input\_tensors.at(0).GetTypeInfo().GetTensorTypeAndShapeInfo().GetElementType();}
+\DoxyCodeLine{00609\ \ \ \ \ \textcolor{keywordflow}{if}\ (input\_tensor\_type\ !=\ ONNX\_TENSOR\_ELEMENT\_DATA\_TYPE\_UINT8\ \&\&}
+\DoxyCodeLine{00610\ \ \ \ \ \ \ \ \ input\_tensor\_type\ !=\ ONNX\_TENSOR\_ELEMENT\_DATA\_TYPE\_INT8)\ \{}
+\DoxyCodeLine{00611\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{group__ei__returntypes_ggad9580b47a6cd5e74cfc31a03bdfecebeac362bb096eacd28725c13ecccd943cea}{EI\_IMPULSE\_ONLY\_SUPPORTED\_FOR\_IMAGES}};}
+\DoxyCodeLine{00612\ \ \ \ \ \}}
+\DoxyCodeLine{00613\ }
+\DoxyCodeLine{00614\ \ \ \ \ uint64\_t\ dsp\_start\_us\ =\ \mbox{\hyperlink{group__ei__user__functions_gac9aae7befaa896e21417df1f00518416}{ei\_read\_timer\_us}}();}
+\DoxyCodeLine{00615\ }
+\DoxyCodeLine{00616\ \ \ \ \ ei::matrix\_i8\_t\ a\_features\_matrix(1,\ impulse-\/>\mbox{\hyperlink{structei__impulse_a3b948bf79bdff1640fcae9a63476726a}{nn\_input\_frame\_size}});}
+\DoxyCodeLine{00617\ }
+\DoxyCodeLine{00618\ \ \ \ \ \textcolor{comment}{//\ run\ DSP\ process\ and\ quantize\ automatically}}
+\DoxyCodeLine{00619\ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{ei__run__dsp_8h_a6baa346e44f4c2158d2be4f9b77b8203}{ret}}\ =\ extract\_image\_features\_quantized(impulse,\ \mbox{\hyperlink{classei_1_1signal}{signal}},\ \&a\_features\_matrix,\ impulse-\/>\mbox{\hyperlink{structei__impulse_a489e5b084b43bc5fba557f540a1d28cf}{dsp\_blocks}}[0].\mbox{\hyperlink{structei__model__dsp__t_a47f0ccb8e2258720b6e1e944dea17415}{config}},\ impulse-\/>\mbox{\hyperlink{structei__impulse_a093f0d48cbfbe485c9c6b0e49dfa2d37}{frequency}},}
+\DoxyCodeLine{00620\ \ \ \ \ \ \ \ \ impulse-\/>\mbox{\hyperlink{structei__impulse_af4361292e9ed35f5dbd46a97f2f9b562}{learning\_blocks}}[0].\mbox{\hyperlink{structei__learning__block__t_afb8d09c70e6d8376cb156b4f13fefc00}{image\_scaling}});}
+\DoxyCodeLine{00621\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{ei__run__dsp_8h_a6baa346e44f4c2158d2be4f9b77b8203}{ret}}\ !=\ \mbox{\hyperlink{namespaceei_a35329cd4e57031263ba0a94c8d3959baa58f9da92fe1aff29466bdd4aa2a7b361}{EIDSP\_OK}})\ \{}
+\DoxyCodeLine{00622\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}ERR:\ Failed\ to\ run\ DSP\ process\ (\%d)\(\backslash\)n"{}},\ \mbox{\hyperlink{ei__run__dsp_8h_a6baa346e44f4c2158d2be4f9b77b8203}{ret}});}
+\DoxyCodeLine{00623\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{group__ei__returntypes_ggad9580b47a6cd5e74cfc31a03bdfecebea8aa7b64c67d3575b5ccc5b8cf7c8ee4d}{EI\_IMPULSE\_DSP\_ERROR}};}
+\DoxyCodeLine{00624\ \ \ \ \ \}}
+\DoxyCodeLine{00625\ }
+\DoxyCodeLine{00626\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{ei__classifier__porting_8h_a650fcb83b9cce450c15d64133f69e324}{ei\_run\_impulse\_check\_canceled}}()\ ==\ \mbox{\hyperlink{group__ei__returntypes_ggad9580b47a6cd5e74cfc31a03bdfecebea89ce76cdbf5f921f740fea3ed38aecb0}{EI\_IMPULSE\_CANCELED}})\ \{}
+\DoxyCodeLine{00627\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{group__ei__returntypes_ggad9580b47a6cd5e74cfc31a03bdfecebea89ce76cdbf5f921f740fea3ed38aecb0}{EI\_IMPULSE\_CANCELED}};}
+\DoxyCodeLine{00628\ \ \ \ \ \}}
+\DoxyCodeLine{00629\ }
+\DoxyCodeLine{00630\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{ei__fill__result__struct_8h_a881f62341b5a41a3c5707268bd537be1}{debug}})\ \{}
+\DoxyCodeLine{00631\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}Before\ Features:\ "{}});}
+\DoxyCodeLine{00632\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ ix\ =\ 0;\ ix\ <\ a\_features\_matrix.cols;\ ix++)\ \{}
+\DoxyCodeLine{00633\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}\%d"{}},\ (uint8\_t)a\_features\_matrix.buffer[ix]);}
+\DoxyCodeLine{00634\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}\ "{}});}
+\DoxyCodeLine{00635\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00636\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}\(\backslash\)n"{}});}
+\DoxyCodeLine{00637\ \ \ \ \ \}}
+\DoxyCodeLine{00638\ }
+\DoxyCodeLine{00639\ \ \ \ \ \textcolor{comment}{/*}}
+\DoxyCodeLine{00640\ \textcolor{comment}{\ \ \ \ **\ Convert\ to\ CHW\ from\ HWC}}
+\DoxyCodeLine{00641\ \textcolor{comment}{\ \ \ \ \ */}}
+\DoxyCodeLine{00642\ \ \ \ \ \textcolor{comment}{//\ features\ matrix\ maps\ around\ the\ input\ tensor\ to\ not\ allocate\ any\ memory}}
+\DoxyCodeLine{00643\ \ \ \ \ uint8\_t\ *input\_buffer\ =\ input\_tensors.front().GetTensorMutableData<uint8\_t>();}
+\DoxyCodeLine{00644\ \ \ \ \ ei::matrix\_i8\_t\ features\_matrix(1,\ impulse-\/>\mbox{\hyperlink{structei__impulse_a3b948bf79bdff1640fcae9a63476726a}{nn\_input\_frame\_size}},\ (int8\_t*)\ input\_buffer);}
+\DoxyCodeLine{00645\ }
+\DoxyCodeLine{00646\ \ \ \ \ \mbox{\hyperlink{structei__dsp__config__image__t}{ei\_dsp\_config\_image\_t}}\ *\mbox{\hyperlink{micro_2kernels_2filter__bank_8cc_ac0f32fd234a078ace764ae2fc15c41a0}{config}}\ =\ (\mbox{\hyperlink{structei__dsp__config__image__t}{ei\_dsp\_config\_image\_t}}\ *)impulse-\/>\mbox{\hyperlink{structei__impulse_a489e5b084b43bc5fba557f540a1d28cf}{dsp\_blocks}}[0].\mbox{\hyperlink{structei__model__dsp__t_a47f0ccb8e2258720b6e1e944dea17415}{config}};}
+\DoxyCodeLine{00647\ }
+\DoxyCodeLine{00648\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ channels\ =\ strcmp(\mbox{\hyperlink{micro_2kernels_2filter__bank_8cc_ac0f32fd234a078ace764ae2fc15c41a0}{config}}-\/>channels,\ \textcolor{stringliteral}{"{}Grayscale"{}})\ ==\ 0\ ?\ 1\ :\ 3;}
+\DoxyCodeLine{00649\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{ei__fill__result__struct_8h_aac5ab54ba2532a0b0cf671ad2baf9715}{height}}\ =\ impulse-\/>\mbox{\hyperlink{structei__impulse_a5942f00730eec808be7862623464a3b6}{input\_height}};}
+\DoxyCodeLine{00650\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{ei__fill__result__struct_8h_a62b225ba7c5226f6e6e923a28c1db968}{width}}\ =\ impulse-\/>\mbox{\hyperlink{structei__impulse_ae60988f0fadb5594fb6a7f00ef9f075a}{input\_width}};}
+\DoxyCodeLine{00651\ }
+\DoxyCodeLine{00652\ \ \ \ \ \textcolor{keywordtype}{int}\ dest\_ix\ =\ 0;}
+\DoxyCodeLine{00653\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ c=0;\ \mbox{\hyperlink{namespace_face_tracking_ae1d05f5db945b43ec1f03e442d9ea864}{c}}\ <\ channels;\ \mbox{\hyperlink{namespace_face_tracking_ae1d05f5db945b43ec1f03e442d9ea864}{c}}++)\ \{}
+\DoxyCodeLine{00654\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a85f2f1bd58b3b44ffdf3881823393959}{h}}=0;\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a85f2f1bd58b3b44ffdf3881823393959}{h}}\ <\ \mbox{\hyperlink{ei__fill__result__struct_8h_aac5ab54ba2532a0b0cf671ad2baf9715}{height}};\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a85f2f1bd58b3b44ffdf3881823393959}{h}}++)\ \{}
+\DoxyCodeLine{00655\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a56eca241e2896b9f57a79589e76fd24b}{w}}=0;\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a56eca241e2896b9f57a79589e76fd24b}{w}}\ <\ \mbox{\hyperlink{ei__fill__result__struct_8h_a62b225ba7c5226f6e6e923a28c1db968}{width}};\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a56eca241e2896b9f57a79589e76fd24b}{w}}++)\ \{}
+\DoxyCodeLine{00656\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ uint32\_t\ src\_ix\ =\ channels\ *\ \mbox{\hyperlink{ei__fill__result__struct_8h_a62b225ba7c5226f6e6e923a28c1db968}{width}}\ *\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a85f2f1bd58b3b44ffdf3881823393959}{h}}\ +\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a56eca241e2896b9f57a79589e76fd24b}{w}}*channels\ +\ \mbox{\hyperlink{namespace_face_tracking_ae1d05f5db945b43ec1f03e442d9ea864}{c}};}
+\DoxyCodeLine{00657\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ features\_matrix.buffer[dest\_ix++]\ =\ a\_features\_matrix.buffer[src\_ix];}
+\DoxyCodeLine{00658\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00659\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00660\ \ \ \ \ \}}
+\DoxyCodeLine{00661\ }
+\DoxyCodeLine{00662\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{ei__fill__result__struct_8h_a881f62341b5a41a3c5707268bd537be1}{debug}})\ \{}
+\DoxyCodeLine{00663\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}After\ Features:\ "{}});}
+\DoxyCodeLine{00664\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ ix\ =\ 0;\ ix\ <\ features\_matrix.cols;\ ix++)\ \{}
+\DoxyCodeLine{00665\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}\%d"{}},\ (uint8\_t)features\_matrix.buffer[ix]);}
+\DoxyCodeLine{00666\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}\ "{}});}
+\DoxyCodeLine{00667\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00668\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}\(\backslash\)n"{}});}
+\DoxyCodeLine{00669\ \ \ \ \ \}}
+\DoxyCodeLine{00670\ }
+\DoxyCodeLine{00671\ \ \ \ \ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}}-\/>timing.dsp\_us\ =\ \mbox{\hyperlink{group__ei__user__functions_gac9aae7befaa896e21417df1f00518416}{ei\_read\_timer\_us}}()\ -\/\ dsp\_start\_us;}
+\DoxyCodeLine{00672\ \ \ \ \ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}}-\/>timing.dsp\ =\ (\mbox{\hyperlink{namespacefoto_a1005e20fd9ccefeed966f9fee79837cb}{int}})(\mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}}-\/>timing.dsp\_us\ /\ 1000);}
+\DoxyCodeLine{00673\ }
+\DoxyCodeLine{00674\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{ei__fill__result__struct_8h_a881f62341b5a41a3c5707268bd537be1}{debug}})\ \{}
+\DoxyCodeLine{00675\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}Features\ (\%d\ ms.):\ "{}},\ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}}-\/>timing.dsp);}
+\DoxyCodeLine{00676\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ ix\ =\ 0;\ ix\ <\ features\_matrix.cols;\ ix++)\ \{}
+\DoxyCodeLine{00677\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ expects\ scale\ of\ (1/255)\ and\ zeropoint\ of\ 0}}
+\DoxyCodeLine{00678\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group__ei__user__functions_gadcb0babc6f41a7d0aa4c0801c96ae7e4}{ei\_printf\_float}}(\textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{float}\textcolor{keyword}{>}(((uint8\_t)features\_matrix.buffer[ix]\ -\/\ impulse-\/>tflite\_input\_zeropoint)\ *\ impulse-\/>tflite\_input\_scale));}
+\DoxyCodeLine{00679\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}\ "{}});}
+\DoxyCodeLine{00680\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00681\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}\(\backslash\)n"{}});}
+\DoxyCodeLine{00682\ \ \ \ \ \}}
+\DoxyCodeLine{00683\ }
+\DoxyCodeLine{00684\ \ \ \ \ ctx\_start\_us\ =\ \mbox{\hyperlink{group__ei__user__functions_gac9aae7befaa896e21417df1f00518416}{ei\_read\_timer\_us}}();}
+\DoxyCodeLine{00685\ \ \ \ \ \mbox{\hyperlink{group__ei__returntypes_gad9580b47a6cd5e74cfc31a03bdfecebe}{EI\_IMPULSE\_ERROR}}\ run\_res\ =\ \mbox{\hyperlink{onnx__tidl_8h_a01c96c6da283198d0dc9ee34886e233a}{inference\_onnx\_run}}(impulse,}
+\DoxyCodeLine{00686\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__dsp_8h_a0819d397f9fba7b345b75fef1c1f782a}{config\_ptr}},}
+\DoxyCodeLine{00687\ \ \ \ \ \ \ \ \ ctx\_start\_us,}
+\DoxyCodeLine{00688\ \ \ \ \ \ \ \ \ \&input\_tensors,}
+\DoxyCodeLine{00689\ \ \ \ \ \ \ \ \ \&output\_tensors,}
+\DoxyCodeLine{00690\ \ \ \ \ \ \ \ \ session,}
+\DoxyCodeLine{00691\ \ \ \ \ \ \ \ \ run\_options,}
+\DoxyCodeLine{00692\ \ \ \ \ \ \ \ \ binding,}
+\DoxyCodeLine{00693\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}},\ \mbox{\hyperlink{ei__fill__result__struct_8h_a881f62341b5a41a3c5707268bd537be1}{debug}});}
+\DoxyCodeLine{00694\ }
+\DoxyCodeLine{00695\ \ \ \ \ \textcolor{keywordflow}{if}\ (run\_res\ !=\ \mbox{\hyperlink{ei__fill__result__struct_8h_a2fb43be102b153d659b668ad295aff40}{EI\_IMPULSE\_OK}})\ \{}
+\DoxyCodeLine{00696\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ run\_res;}
+\DoxyCodeLine{00697\ \ \ \ \ \}}
+\DoxyCodeLine{00698\ }
+\DoxyCodeLine{00699\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{ei__fill__result__struct_8h_a2fb43be102b153d659b668ad295aff40}{EI\_IMPULSE\_OK}};}
+\DoxyCodeLine{00700\ \}}
+\DoxyCodeLine{00701\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ EI\_CLASSIFIER\_QUANTIZATION\_ENABLED\ ==\ 1}}
+\DoxyCodeLine{00702\ }
+\DoxyCodeLine{00703\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ \#if\ (EI\_CLASSIFIER\_INFERENCING\_ENGINE\ ==\ EI\_CLASSIFIER\_ONNX\_TIDL)\ \&\&\ (EI\_CLASSIFIER\_COMPILED\ !=\ 1)}}
+\DoxyCodeLine{00704\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ \_EI\_CLASSIFIER\_INFERENCING\_ENGINE\_ONNX\_TIDL\_H\_}}
+
+\end{DoxyCode}

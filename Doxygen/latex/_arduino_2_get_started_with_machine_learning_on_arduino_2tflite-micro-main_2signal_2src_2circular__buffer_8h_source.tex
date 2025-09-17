@@ -1,0 +1,124 @@
+\doxysection{circular\+\_\+buffer.\+h}
+\hypertarget{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2signal_2src_2circular__buffer_8h_source}{}\label{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2signal_2src_2circular__buffer_8h_source}\index{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/main/signal/src/circular\_buffer.h@{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/main/signal/src/circular\_buffer.h}}
+\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2signal_2src_2circular__buffer_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{/*\ Copyright\ 2019\ The\ TensorFlow\ Authors.\ All\ Rights\ Reserved.}}
+\DoxyCodeLine{00002\ \textcolor{comment}{}}
+\DoxyCodeLine{00003\ \textcolor{comment}{Licensed\ under\ the\ Apache\ License,\ Version\ 2.0\ (the\ "{}License"{});}}
+\DoxyCodeLine{00004\ \textcolor{comment}{you\ may\ not\ use\ this\ file\ except\ in\ compliance\ with\ the\ License.}}
+\DoxyCodeLine{00005\ \textcolor{comment}{You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{00006\ \textcolor{comment}{}}
+\DoxyCodeLine{00007\ \textcolor{comment}{\ \ \ \ http://www.apache.org/licenses/LICENSE-\/2.0}}
+\DoxyCodeLine{00008\ \textcolor{comment}{}}
+\DoxyCodeLine{00009\ \textcolor{comment}{Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ software}}
+\DoxyCodeLine{00010\ \textcolor{comment}{distributed\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,}}
+\DoxyCodeLine{00011\ \textcolor{comment}{WITHOUT\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,\ either\ express\ or\ implied.}}
+\DoxyCodeLine{00012\ \textcolor{comment}{See\ the\ License\ for\ the\ specific\ language\ governing\ permissions\ and}}
+\DoxyCodeLine{00013\ \textcolor{comment}{limitations\ under\ the\ License.}}
+\DoxyCodeLine{00014\ \textcolor{comment}{==============================================================================*/}}
+\DoxyCodeLine{00015\ }
+\DoxyCodeLine{00016\ \textcolor{preprocessor}{\#ifndef\ SIGNAL\_SRC\_CIRCULAR\_BUFFER\_H\_}}
+\DoxyCodeLine{00017\ \textcolor{preprocessor}{\#define\ SIGNAL\_SRC\_CIRCULAR\_BUFFER\_H\_}}
+\DoxyCodeLine{00018\ }
+\DoxyCodeLine{00019\ \textcolor{preprocessor}{\#include\ <stddef.h>}}
+\DoxyCodeLine{00020\ \textcolor{preprocessor}{\#include\ <stdint.h>}}
+\DoxyCodeLine{00021\ }
+\DoxyCodeLine{00022\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacetflite}{tflite}}\ \{}
+\DoxyCodeLine{00023\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacetflm__signal}{tflm\_signal}}\ \{}
+\DoxyCodeLine{00024\ \textcolor{comment}{//\ TODO(b/286250473):\ remove\ namespace\ once\ de-\/duped\ libraries\ above}}
+\DoxyCodeLine{00025\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structtflite_1_1tflm__signal_1_1_circular_buffer}{CircularBuffer}}\ \{}
+\DoxyCodeLine{00026\ \ \ \textcolor{comment}{//\ Max\ number\ of\ elements,\ value\ passed-\/in\ to\ CircularBufferAlloc.}}
+\DoxyCodeLine{00027\ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{structtflite_1_1tflm__signal_1_1_circular_buffer_a3176975670a4a129e8f892f344884037}{capacity}};}
+\DoxyCodeLine{00028\ \ \ \textcolor{comment}{//\ Next\ position\ to\ read.}}
+\DoxyCodeLine{00029\ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{structtflite_1_1tflm__signal_1_1_circular_buffer_afd9ed98032af4f1a9a73dbcf59f7ce84}{read}};}
+\DoxyCodeLine{00030\ \ \ \textcolor{comment}{//\ Next\ position\ to\ write.}}
+\DoxyCodeLine{00031\ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{structtflite_1_1tflm__signal_1_1_circular_buffer_a9f83267f77fe986e192ee1835239a3cc}{write}};}
+\DoxyCodeLine{00032\ \ \ \textcolor{comment}{//\ Flag\ to\ indicate\ emptiness.}}
+\DoxyCodeLine{00033\ \ \ int32\_t\ \mbox{\hyperlink{structtflite_1_1tflm__signal_1_1_circular_buffer_a255ac4a57b4c3562db0795d882074717}{empty}};}
+\DoxyCodeLine{00034\ \ \ \textcolor{comment}{//\ Auto-\/generated\ size\ variable}}
+\DoxyCodeLine{00035\ \ \ int32\_t\ \mbox{\hyperlink{structtflite_1_1tflm__signal_1_1_circular_buffer_acedad9e491f466f67ca3e8dfda28b15b}{buffer\_size}};}
+\DoxyCodeLine{00036\ \ \ \textcolor{comment}{//\ Array\ of\ the\ circular\ buffer\ elements\ (integers).}}
+\DoxyCodeLine{00037\ \ \ int16\_t*\ \mbox{\hyperlink{structtflite_1_1tflm__signal_1_1_circular_buffer_acc83d37d6d37258e31ef79c600198b22}{buffer}};}
+\DoxyCodeLine{00038\ \};}
+\DoxyCodeLine{00039\ }
+\DoxyCodeLine{00040\ \textcolor{comment}{//\ Returns\ the\ size\ of\ the\ memory\ that\ the\ circular\ buffer\ needs}}
+\DoxyCodeLine{00041\ \textcolor{comment}{//\ in\ order\ to\ hold\ \`{}capacity`\ items.}}
+\DoxyCodeLine{00042\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{namespacetflite_1_1tflm__signal_a7202a3ea65efe91f73b06b4428eeb13e}{CircularBufferGetNeededMemory}}(\textcolor{keywordtype}{size\_t}\ capacity);}
+\DoxyCodeLine{00043\ }
+\DoxyCodeLine{00044\ \textcolor{comment}{//\ Initialize\ an\ instance\ of\ the\ circular\ buffer\ that\ holds\ \`{}capacity`\ items.}}
+\DoxyCodeLine{00045\ \textcolor{comment}{//\ \`{}state`\ points\ to\ a\ memory\ allocation\ of\ size\ \`{}state\_size`.\ The\ size}}
+\DoxyCodeLine{00046\ \textcolor{comment}{//\ \ should\ be\ greater\ or\ equal\ to\ the\ value\ returned\ by}}
+\DoxyCodeLine{00047\ \textcolor{comment}{//\ \ CircularBufferGetNeededMemory(capacity).\ Fails\ if\ it\ isn't.}}
+\DoxyCodeLine{00048\ \textcolor{comment}{//\ \ On\ success,\ returns\ a\ pointer\ to\ the\ circular\ buffer's\ object.}}
+\DoxyCodeLine{00049\ \mbox{\hyperlink{structtflite_1_1tflm__signal_1_1_circular_buffer}{CircularBuffer}}*\ \mbox{\hyperlink{namespacetflite_1_1tflm__signal_a3b9ca12a905c2fbdbdbd96b196a2e191}{CircularBufferInit}}(\textcolor{keywordtype}{size\_t}\ capacity,\ \textcolor{keywordtype}{void}*\ \mbox{\hyperlink{ethosu55__interface_8h_adc6e5733fc3c22f0a7b2914188c49c90}{state}},}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ state\_size);}
+\DoxyCodeLine{00051\ }
+\DoxyCodeLine{00052\ \textcolor{comment}{//\ Reset\ a\ circular\ buffer\ to\ its\ initial\ empty\ state}}
+\DoxyCodeLine{00053\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1tflm__signal_af5f872d76450ed818745a3dcf6eb5b92}{CircularBufferReset}}(\mbox{\hyperlink{structtflite_1_1tflm__signal_1_1_circular_buffer}{CircularBuffer}}*\ cb);}
+\DoxyCodeLine{00054\ }
+\DoxyCodeLine{00055\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{namespacetflite_1_1tflm__signal_ac142a9e353bf9e37e51e380a568d9db4}{CircularBufferCapacity}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structtflite_1_1tflm__signal_1_1_circular_buffer}{CircularBuffer}}*\ cb);}
+\DoxyCodeLine{00056\ }
+\DoxyCodeLine{00057\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespacetflite_1_1tflm__signal_aff34e78b75b94fadd58aa26f618f297f}{CircularBufferFull}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structtflite_1_1tflm__signal_1_1_circular_buffer}{CircularBuffer}}*\ cb);}
+\DoxyCodeLine{00058\ }
+\DoxyCodeLine{00059\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespacetflite_1_1tflm__signal_ac124c2c954995b74e2cd38c6de82b6bc}{CircularBufferEmpty}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structtflite_1_1tflm__signal_1_1_circular_buffer}{CircularBuffer}}*\ cb);}
+\DoxyCodeLine{00060\ }
+\DoxyCodeLine{00061\ \textcolor{comment}{//\ Returns\ the\ number\ of\ elements\ ready\ to\ read}}
+\DoxyCodeLine{00062\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{namespacetflite_1_1tflm__signal_a42bf6c0831c17ead92ec739a66ab4295}{CircularBufferAvailable}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structtflite_1_1tflm__signal_1_1_circular_buffer}{CircularBuffer}}*\ cb);}
+\DoxyCodeLine{00063\ }
+\DoxyCodeLine{00064\ \textcolor{comment}{//\ Returns\ the\ number\ of\ elements\ available\ to\ write.}}
+\DoxyCodeLine{00065\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{namespacetflite_1_1tflm__signal_a93732537c3b343d376c435ff2f6ddbc1}{CircularBufferCanWrite}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structtflite_1_1tflm__signal_1_1_circular_buffer}{CircularBuffer}}*\ cb);}
+\DoxyCodeLine{00066\ }
+\DoxyCodeLine{00067\ \textcolor{comment}{//\ Adds\ a\ single\ \`{}value`\ to\ the\ buffer\ and\ advances\ the\ write\ pointer.}}
+\DoxyCodeLine{00068\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1tflm__signal_a8a8f96575d1f4de8670dbad7d4b77bba}{CircularBufferAdd}}(\mbox{\hyperlink{structtflite_1_1tflm__signal_1_1_circular_buffer}{CircularBuffer}}*\ cb,\ int16\_t\ \mbox{\hyperlink{wm8960__regs_8h_a638e4503e0ae6ce655b7ad2e17e8f0ad}{value}});}
+\DoxyCodeLine{00069\ }
+\DoxyCodeLine{00070\ \textcolor{comment}{//\ Writes\ \`{}n`\ \`{}values`\ into\ the\ buffer\ and\ advances\ the\ write\ pointer.}}
+\DoxyCodeLine{00071\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1tflm__signal_aa060c12728dd717b58dea7a56044bd22}{CircularBufferWrite}}(\mbox{\hyperlink{structtflite_1_1tflm__signal_1_1_circular_buffer}{CircularBuffer}}*\ cb,\ \textcolor{keyword}{const}\ int16\_t*\ values,\ \textcolor{keywordtype}{size\_t}\ n);}
+\DoxyCodeLine{00072\ }
+\DoxyCodeLine{00073\ \textcolor{comment}{//\ Writes\ \`{}n`\ zeros\ into\ the\ buffer\ and\ advances\ the\ write\ pointer.}}
+\DoxyCodeLine{00074\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1tflm__signal_abff117f47b322f256abcefe25b24594f}{CircularBufferWriteZeros}}(\mbox{\hyperlink{structtflite_1_1tflm__signal_1_1_circular_buffer}{CircularBuffer}}*\ cb,\ \textcolor{keywordtype}{size\_t}\ n);}
+\DoxyCodeLine{00075\ }
+\DoxyCodeLine{00076\ \textcolor{comment}{//\ Returns\ a\ pointer\ to\ a\ buffer\ where\ elements\ can\ be\ written,\ and}}
+\DoxyCodeLine{00077\ \textcolor{comment}{//\ advances\ the\ write\ pointer\ as\ though\ they\ have\ already\ been\ written.}}
+\DoxyCodeLine{00078\ \textcolor{comment}{//\ Fails\ if\ \`{}n`\ elements\ are\ not\ available\ contiguously\ at\ the\ current}}
+\DoxyCodeLine{00079\ \textcolor{comment}{//\ write\ position.}}
+\DoxyCodeLine{00080\ int16\_t*\ \mbox{\hyperlink{namespacetflite_1_1tflm__signal_a21ca14b2e1b9135520f863054841cc17}{CircularBufferReserveForWrite}}(\mbox{\hyperlink{structtflite_1_1tflm__signal_1_1_circular_buffer}{CircularBuffer}}*\ cb,\ \textcolor{keywordtype}{size\_t}\ n);}
+\DoxyCodeLine{00081\ }
+\DoxyCodeLine{00082\ \textcolor{comment}{//\ Copies\ the\ final\ region\ (`count`\ elements)\ of\ the\ buffer\ \`{}n`\ times,\ to}}
+\DoxyCodeLine{00083\ \textcolor{comment}{//\ the\ end\ of\ the\ buffer.}}
+\DoxyCodeLine{00084\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1tflm__signal_af0635866e6a011c119a037c0e3f5e2a9}{CircularBufferExtend}}(\mbox{\hyperlink{structtflite_1_1tflm__signal_1_1_circular_buffer}{CircularBuffer}}*\ cb,\ \textcolor{keywordtype}{size\_t}\ count,\ int32\_t\ n);}
+\DoxyCodeLine{00085\ }
+\DoxyCodeLine{00086\ \textcolor{comment}{//\ Reads\ a\ single\ value\ from\ the\ buffer\ and\ advances\ the\ read\ pointer}}
+\DoxyCodeLine{00087\ int16\_t\ \mbox{\hyperlink{namespacetflite_1_1tflm__signal_ac501ad5294b7d03e19b03f201056d2da}{CircularBufferRemove}}(\mbox{\hyperlink{structtflite_1_1tflm__signal_1_1_circular_buffer}{CircularBuffer}}*\ cb);}
+\DoxyCodeLine{00088\ }
+\DoxyCodeLine{00089\ \textcolor{comment}{//\ Reads\ the\ value\ at\ the\ given\ \`{}index`,\ does\ not\ modify\ the\ read\ pointer.}}
+\DoxyCodeLine{00090\ int16\_t\ \mbox{\hyperlink{namespacetflite_1_1tflm__signal_a895dfe8ad51ad53c0bb17b36c74b6573}{CircularBufferPeek}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structtflite_1_1tflm__signal_1_1_circular_buffer}{CircularBuffer}}*\ cb,\ \textcolor{keywordtype}{size\_t}\ index);}
+\DoxyCodeLine{00091\ }
+\DoxyCodeLine{00092\ \textcolor{comment}{//\ Rewinds\ to\ restore\ the\ previous\ \`{}n`\ values\ read}}
+\DoxyCodeLine{00093\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1tflm__signal_a005da271824b8b6021a65ba11b391f1f}{CircularBufferRewind}}(\mbox{\hyperlink{structtflite_1_1tflm__signal_1_1_circular_buffer}{CircularBuffer}}*\ cb,\ \textcolor{keywordtype}{size\_t}\ n);}
+\DoxyCodeLine{00094\ }
+\DoxyCodeLine{00095\ \textcolor{comment}{//\ Returns\ a\ pointer\ directly\ into\ the\ circular\ buffer\ at\ the\ given\ \`{}index`.}}
+\DoxyCodeLine{00096\ \textcolor{comment}{//\ Caller\ is\ responsible\ for\ not\ reading\ past\ the\ end.}}
+\DoxyCodeLine{00097\ \textcolor{keyword}{const}\ int16\_t*\ \mbox{\hyperlink{namespacetflite_1_1tflm__signal_a0db79bcbd2b278f0c6da3725fb6c299f}{CircularBufferPeekDirect}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structtflite_1_1tflm__signal_1_1_circular_buffer}{CircularBuffer}}*\ cb,\ \textcolor{keywordtype}{size\_t}\ index);}
+\DoxyCodeLine{00098\ }
+\DoxyCodeLine{00099\ \textcolor{comment}{//\ Returns\ a\ pointer\ into\ the\ circular\ buffer\ at\ the\ current\ read\ pointer,}}
+\DoxyCodeLine{00100\ \textcolor{comment}{//\ setting\ \`{}n`\ to\ the\ number\ of\ values\ available\ to\ be\ read\ from\ here.}}
+\DoxyCodeLine{00101\ \textcolor{keyword}{const}\ int16\_t*\ \mbox{\hyperlink{namespacetflite_1_1tflm__signal_a654be0ab37f8287561d4a82a41d50297}{CircularBufferPeekMax}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structtflite_1_1tflm__signal_1_1_circular_buffer}{CircularBuffer}}*\ cb,\ \textcolor{keywordtype}{size\_t}*\ n);}
+\DoxyCodeLine{00102\ }
+\DoxyCodeLine{00103\ \textcolor{comment}{//\ Copies\ \`{}n`\ \`{}values`\ from\ the\ buffer\ and\ does\ not\ advance\ the\ read}}
+\DoxyCodeLine{00104\ \textcolor{comment}{//\ pointer\ and\ does\ not\ update\ the\ empty\ flag.}}
+\DoxyCodeLine{00105\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1tflm__signal_a5d737e73f71f5e6d00a65ded5dbbdb19}{CircularBufferGet}}(\mbox{\hyperlink{structtflite_1_1tflm__signal_1_1_circular_buffer}{CircularBuffer}}*\ cb,\ \textcolor{keywordtype}{size\_t}\ n,\ int16\_t*\ values);}
+\DoxyCodeLine{00106\ }
+\DoxyCodeLine{00107\ \textcolor{comment}{//\ Discards\ the\ next\ \`{}n`\ values\ by\ advancing\ the\ read\ index.}}
+\DoxyCodeLine{00108\ \textcolor{comment}{//\ Valid\ for\ n\ >\ 0.}}
+\DoxyCodeLine{00109\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1tflm__signal_adbdf6a3acb3813672f8671018e3df7b5}{CircularBufferDiscard}}(\mbox{\hyperlink{structtflite_1_1tflm__signal_1_1_circular_buffer}{CircularBuffer}}*\ cb,\ \textcolor{keywordtype}{size\_t}\ n);}
+\DoxyCodeLine{00110\ }
+\DoxyCodeLine{00111\ \textcolor{comment}{//\ Shifts\ the\ buffer\ with\ \`{}n`\ values\ (`n`\ can\ be\ negative)\ by\ moving}}
+\DoxyCodeLine{00112\ \textcolor{comment}{//\ the\ read\ index.}}
+\DoxyCodeLine{00113\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1tflm__signal_aba01b83f7325bdab2b4448b57048d8fd}{CircularBufferShift}}(\mbox{\hyperlink{structtflite_1_1tflm__signal_1_1_circular_buffer}{CircularBuffer}}*\ cb,\ \textcolor{keywordtype}{int}\ n);}
+\DoxyCodeLine{00114\ }
+\DoxyCodeLine{00115\ \}\ \ \textcolor{comment}{//\ namespace\ tflm\_signal}}
+\DoxyCodeLine{00116\ \}\ \ \textcolor{comment}{//\ namespace\ tflite}}
+\DoxyCodeLine{00117\ }
+\DoxyCodeLine{00118\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ SIGNAL\_SRC\_CIRCULAR\_BUFFER\_H\_}}
+
+\end{DoxyCode}

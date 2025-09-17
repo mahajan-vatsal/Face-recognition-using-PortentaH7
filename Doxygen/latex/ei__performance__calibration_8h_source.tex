@@ -1,0 +1,340 @@
+\doxysection{ei\+\_\+performance\+\_\+calibration.\+h}
+\hypertarget{ei__performance__calibration_8h_source}{}\label{ei__performance__calibration_8h_source}\index{Face\_Access\_inferencing/src/edge-\/impulse-\/sdk/classifier/postprocessing/ei\_performance\_calibration.h@{Face\_Access\_inferencing/src/edge-\/impulse-\/sdk/classifier/postprocessing/ei\_performance\_calibration.h}}
+\mbox{\hyperlink{ei__performance__calibration_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{00002\ \textcolor{comment}{\ *\ Copyright\ (c)\ 2022\ EdgeImpulse\ Inc.}}
+\DoxyCodeLine{00003\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00004\ \textcolor{comment}{\ *\ Licensed\ under\ the\ Apache\ License,\ Version\ 2.0\ (the\ "{}License"{});}}
+\DoxyCodeLine{00005\ \textcolor{comment}{\ *\ you\ may\ not\ use\ this\ file\ except\ in\ compliance\ with\ the\ License.}}
+\DoxyCodeLine{00006\ \textcolor{comment}{\ *\ You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{00007\ \textcolor{comment}{\ *\ http://www.apache.org/licenses/LICENSE-\/2.0}}
+\DoxyCodeLine{00008\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00009\ \textcolor{comment}{\ *\ Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,}}
+\DoxyCodeLine{00010\ \textcolor{comment}{\ *\ software\ distributed\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS}}
+\DoxyCodeLine{00011\ \textcolor{comment}{\ *\ IS"{}\ BASIS,\ WITHOUT\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,\ either}}
+\DoxyCodeLine{00012\ \textcolor{comment}{\ *\ express\ or\ implied.\ See\ the\ License\ for\ the\ specific\ language}}
+\DoxyCodeLine{00013\ \textcolor{comment}{\ *\ governing\ permissions\ and\ limitations\ under\ the\ License.}}
+\DoxyCodeLine{00014\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00015\ \textcolor{comment}{\ *\ SPDX-\/License-\/Identifier:\ Apache-\/2.0}}
+\DoxyCodeLine{00016\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{00017\ }
+\DoxyCodeLine{00018\ \textcolor{preprocessor}{\#ifndef\ EI\_PERFORMANCE\_CALIBRATION\_H}}
+\DoxyCodeLine{00019\ \textcolor{preprocessor}{\#define\ EI\_PERFORMANCE\_CALIBRATION\_H}}
+\DoxyCodeLine{00020\ }
+\DoxyCodeLine{00021\ \textcolor{preprocessor}{\#if\ EI\_CLASSIFIER\_CALIBRATION\_ENABLED}}
+\DoxyCodeLine{00022\ }
+\DoxyCodeLine{00023\ \textcolor{comment}{/*\ Includes\ -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/\ */}}
+\DoxyCodeLine{00024\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{numpy__types_8h}{edge-\/impulse-\/sdk/dsp/numpy\_types.h}}"{}}}
+\DoxyCodeLine{00025\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{returntypes_8hpp}{edge-\/impulse-\/sdk/dsp/returntypes.hpp}}"{}}}
+\DoxyCodeLine{00026\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{ei__model__types_8h}{edge-\/impulse-\/sdk/classifier/ei\_model\_types.h}}"{}}}
+\DoxyCodeLine{00027\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{model__metadata_8h}{model-\/parameters/model\_metadata.h}}"{}}}
+\DoxyCodeLine{00028\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{ei__postprocessing__common_8h}{edge-\/impulse-\/sdk/classifier/postprocessing/ei\_postprocessing\_common.h}}"{}}}
+\DoxyCodeLine{00029\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{ei__logging_8h}{edge-\/impulse-\/sdk/porting/ei\_logging.h}}"{}}}
+\DoxyCodeLine{00030\ }
+\DoxyCodeLine{00031\ \textcolor{comment}{/*\ Private\ const\ types\ -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/\ */}}
+\DoxyCodeLine{00032\ \textcolor{preprocessor}{\#define\ MEM\_ERROR\ \ \ "{}ERR:\ Failed\ to\ allocate\ memory\ for\ performance\ calibration\(\backslash\)r\(\backslash\)n"{}}}
+\DoxyCodeLine{00033\ }
+\DoxyCodeLine{00034\ \textcolor{preprocessor}{\#define\ EI\_PC\_RET\_NO\_EVENT\_DETECTED\ \ \ \ -\/1}}
+\DoxyCodeLine{00035\ \textcolor{preprocessor}{\#define\ EI\_PC\_RET\_MEMORY\_ERROR\ \ \ \ \ \ \ \ \ -\/2}}
+\DoxyCodeLine{00036\ }
+\DoxyCodeLine{00037\ \textcolor{keyword}{extern}\ \mbox{\hyperlink{classei__impulse__handle__t}{ei\_impulse\_handle\_t}}\ \&\ \mbox{\hyperlink{ei__object__counting_8h_ab3ae8708390cf5f755074573247bd806}{ei\_default\_impulse}};}
+\DoxyCodeLine{00038\ }
+\DoxyCodeLine{00039\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\{}
+\DoxyCodeLine{00040\ \ \ \ \ \textcolor{keywordtype}{float}\ detection\_threshold;}
+\DoxyCodeLine{00041\ \}\ ei\_perf\_cal\_params\_t;}
+\DoxyCodeLine{00042\ }
+\DoxyCodeLine{00043\ \textcolor{keyword}{class\ }PerfCal\ \{}
+\DoxyCodeLine{00044\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00045\ \ \ \ \ PerfCal(}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structei__performance__calibration__config__t}{ei\_performance\_calibration\_config\_t}}\ *\mbox{\hyperlink{micro_2kernels_2filter__bank_8cc_ac0f32fd234a078ace764ae2fc15c41a0}{config}},}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \ \ uint32\_t\ n\_labels,}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \ \ uint32\_t\ sample\_length,}
+\DoxyCodeLine{00049\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}\ sample\_interval\_ms)}
+\DoxyCodeLine{00050\ \ \ \ \ \{}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ this-\/>\_score\_array\ =\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \ \ this-\/>\_running\_sum\ =\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ this-\/>\_detection\_threshold\ =\ \mbox{\hyperlink{micro_2kernels_2filter__bank_8cc_ac0f32fd234a078ace764ae2fc15c41a0}{config}}-\/>detection\_threshold;}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \ \ this-\/>\_suppression\_flags\ =\ \mbox{\hyperlink{micro_2kernels_2filter__bank_8cc_ac0f32fd234a078ace764ae2fc15c41a0}{config}}-\/>suppression\_flags;}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \ \ this-\/>\_should\_boost\ =\ \mbox{\hyperlink{micro_2kernels_2filter__bank_8cc_ac0f32fd234a078ace764ae2fc15c41a0}{config}}-\/>is\_configured;}
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \ \ this-\/>\_n\_labels\ =\ n\_labels;}
+\DoxyCodeLine{00057\ }
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \ \ \textcolor{comment}{/*\ Determine\ sample\ length\ in\ ms\ */}}
+\DoxyCodeLine{00059\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}\ sample\_length\_ms\ =\ (\textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{float}\textcolor{keyword}{>}(sample\_length)\ *\ sample\_interval\_ms);}
+\DoxyCodeLine{00060\ }
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \ \ \textcolor{comment}{/*\ Calculate\ number\ of\ inference\ runs\ needed\ for\ the\ duration\ window\ */}}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ this-\/>\_average\_window\_duration\_samples\ =}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \ \ \ \ (\mbox{\hyperlink{micro_2kernels_2filter__bank_8cc_ac0f32fd234a078ace764ae2fc15c41a0}{config}}-\/>average\_window\_duration\_ms\ <\ \textcolor{keyword}{static\_cast<}uint32\_t\textcolor{keyword}{>}(sample\_length\_ms))}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \ \ \ \ \ \ ?\ 1}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \ \ \ \ \ \ :\ static\_cast<uint32\_t>(static\_cast<float>(\mbox{\hyperlink{micro_2kernels_2filter__bank_8cc_ac0f32fd234a078ace764ae2fc15c41a0}{config}}-\/>average\_window\_duration\_ms)\ /\ sample\_length\_ms);}
+\DoxyCodeLine{00066\ }
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ \textcolor{comment}{/*\ Calculate\ number\ of\ inference\ runs\ for\ suppression\ */}}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ this-\/>\_suppression\_samples\ =\ (\mbox{\hyperlink{micro_2kernels_2filter__bank_8cc_ac0f32fd234a078ace764ae2fc15c41a0}{config}}-\/>suppression\_ms\ <\ \textcolor{keyword}{static\_cast<}uint32\_t\textcolor{keyword}{>}(sample\_length\_ms))}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ \ \ \ \ ?\ 0}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \ \ \ \ \ \ :\ \textcolor{keyword}{static\_cast<}uint32\_t\textcolor{keyword}{>}(\textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{float}\textcolor{keyword}{>}(\mbox{\hyperlink{micro_2kernels_2filter__bank_8cc_ac0f32fd234a078ace764ae2fc15c41a0}{config}}-\/>suppression\_ms)\ /\ sample\_length\_ms);}
+\DoxyCodeLine{00071\ }
+\DoxyCodeLine{00072\ \ \ \ \ \ \ \ \ \textcolor{comment}{/*\ Detection\ threshold\ should\ be\ high\ enough\ to\ only\ classify\ 1\ possible\ output\ */}}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (this-\/>\_detection\_threshold\ <=\ (1.f\ /\ this-\/>\_n\_labels))\ \{}
+\DoxyCodeLine{00074\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__logging_8h_a754a1a854d8d67297d5e8e5113a15d35}{EI\_LOGE}}(\textcolor{stringliteral}{"{}Classifier\ detection\ threshold\ too\ low\(\backslash\)r\(\backslash\)n"{}});}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00077\ }
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \ \ \textcolor{comment}{/*\ Array\ to\ store\ scores\ for\ all\ labels\ */}}
+\DoxyCodeLine{00079\ \ \ \ \ \ \ \ \ this-\/>\_score\_array\ =\ (\textcolor{keywordtype}{float}\ *)\mbox{\hyperlink{group__ei__user__functions_ga71ecca5661ac4434a709c88e4c39b4aa}{ei\_malloc}}(}
+\DoxyCodeLine{00080\ \ \ \ \ \ \ \ \ \ \ \ \ this-\/>\_average\_window\_duration\_samples\ *\ this-\/>\_n\_labels\ *\ \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{float}));}
+\DoxyCodeLine{00081\ }
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (this-\/>\_score\_array\ ==\ NULL)\ \{}
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(MEM\_ERROR);}
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00085\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00086\ }
+\DoxyCodeLine{00087\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (uint32\_t\ i\ =\ 0;\ i\ <\ this-\/>\_average\_window\_duration\_samples\ *\ this-\/>\_n\_labels;\ i++)\ \{}
+\DoxyCodeLine{00088\ \ \ \ \ \ \ \ \ \ \ \ \ this-\/>\_score\_array[i]\ =\ 0.f;}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00090\ \ \ \ \ \ \ \ \ this-\/>\_score\_idx\ =\ 0;}
+\DoxyCodeLine{00091\ }
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \ \ \textcolor{comment}{/*\ Running\ sum\ for\ all\ labels\ */}}
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \ \ this-\/>\_running\_sum\ =\ (\textcolor{keywordtype}{float}\ *)\mbox{\hyperlink{group__ei__user__functions_ga71ecca5661ac4434a709c88e4c39b4aa}{ei\_malloc}}(this-\/>\_n\_labels\ *\ \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{float}));}
+\DoxyCodeLine{00094\ }
+\DoxyCodeLine{00095\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (this-\/>\_running\_sum\ !=\ NULL)\ \{}
+\DoxyCodeLine{00096\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (uint32\_t\ i\ =\ 0;\ i\ <\ this-\/>\_n\_labels;\ i++)\ \{}
+\DoxyCodeLine{00097\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ this-\/>\_running\_sum[i]\ =\ 0.f;}
+\DoxyCodeLine{00098\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00099\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00100\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00101\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(MEM\_ERROR);}
+\DoxyCodeLine{00102\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00103\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00104\ }
+\DoxyCodeLine{00105\ \ \ \ \ \ \ \ \ this-\/>\_suppression\_count\ =\ this-\/>\_suppression\_samples;}
+\DoxyCodeLine{00106\ \ \ \ \ \ \ \ \ this-\/>\_n\_scores\_in\_array\ =\ 0;}
+\DoxyCodeLine{00107\ \ \ \ \ \}}
+\DoxyCodeLine{00108\ }
+\DoxyCodeLine{00109\ \ \ \ \ \string~PerfCal()}
+\DoxyCodeLine{00110\ \ \ \ \ \{}
+\DoxyCodeLine{00111\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (this-\/>\_score\_array)\ \{}
+\DoxyCodeLine{00112\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group__ei__user__functions_ga7a6a70833407ff1870c12396ce2c4aa3}{ei\_free}}((\textcolor{keywordtype}{void}\ *)this-\/>\_score\_array);}
+\DoxyCodeLine{00113\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00114\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (this-\/>\_running\_sum)\ \{}
+\DoxyCodeLine{00115\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group__ei__user__functions_ga7a6a70833407ff1870c12396ce2c4aa3}{ei\_free}}((\textcolor{keywordtype}{void}\ *)this-\/>\_running\_sum);}
+\DoxyCodeLine{00116\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00117\ \ \ \ \ \}}
+\DoxyCodeLine{00118\ }
+\DoxyCodeLine{00119\ \ \ \ \ \textcolor{keywordtype}{bool}\ should\_boost()}
+\DoxyCodeLine{00120\ \ \ \ \ \{}
+\DoxyCodeLine{00121\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ this-\/>\_should\_boost;}
+\DoxyCodeLine{00122\ \ \ \ \ \}}
+\DoxyCodeLine{00123\ }
+\DoxyCodeLine{00124\ \ \ \ \ \textcolor{keywordtype}{void}\ set\_detection\_threshold(\textcolor{keywordtype}{float}\ detection\_threshold)}
+\DoxyCodeLine{00125\ \ \ \ \ \{}
+\DoxyCodeLine{00126\ \ \ \ \ \ \ \ \ this-\/>\_detection\_threshold\ =\ detection\_threshold;}
+\DoxyCodeLine{00127\ \ \ \ \ \}}
+\DoxyCodeLine{00128\ }
+\DoxyCodeLine{00129\ \ \ \ \ \textcolor{keywordtype}{float}\ get\_detection\_threshold()}
+\DoxyCodeLine{00130\ \ \ \ \ \{}
+\DoxyCodeLine{00131\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ this-\/>\_detection\_threshold;}
+\DoxyCodeLine{00132\ \ \ \ \ \}}
+\DoxyCodeLine{00133\ }
+\DoxyCodeLine{00134\ \ \ \ \ int32\_t\ trigger(\mbox{\hyperlink{structei__impulse__result__classification__t}{ei\_impulse\_result\_classification\_t}}\ *\mbox{\hyperlink{ei__fill__result__struct_8h_a834fa4160fcfdf8d438de54f4d897147}{scores}})}
+\DoxyCodeLine{00135\ \ \ \ \ \{}
+\DoxyCodeLine{00136\ \ \ \ \ \ \ \ \ int32\_t\ recognized\_event\ =\ EI\_PC\_RET\_NO\_EVENT\_DETECTED;}
+\DoxyCodeLine{00137\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}\ current\_top\_score\ =\ 0.f;}
+\DoxyCodeLine{00138\ \ \ \ \ \ \ \ \ uint32\_t\ current\_top\_index\ =\ 0;}
+\DoxyCodeLine{00139\ }
+\DoxyCodeLine{00140\ \ \ \ \ \ \ \ \ \textcolor{comment}{/*\ Check\ pointers\ */}}
+\DoxyCodeLine{00141\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (this-\/>\_score\_array\ ==\ NULL\ ||\ this-\/>\_running\_sum\ ==\ NULL)\ \{}
+\DoxyCodeLine{00142\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ EI\_PC\_RET\_MEMORY\_ERROR;}
+\DoxyCodeLine{00143\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00144\ }
+\DoxyCodeLine{00145\ \ \ \ \ \ \ \ \ \textcolor{comment}{/*\ Update\ the\ score\ array\ and\ running\ sum\ */}}
+\DoxyCodeLine{00146\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (uint32\_t\ i\ =\ 0;\ i\ <\ this-\/>\_n\_labels;\ i++)\ \{}
+\DoxyCodeLine{00147\ \ \ \ \ \ \ \ \ \ \ \ \ this-\/>\_running\_sum[i]\ -\/=\ this-\/>\_score\_array[(this-\/>\_score\_idx\ *\ this-\/>\_n\_labels)\ +\ i];}
+\DoxyCodeLine{00148\ \ \ \ \ \ \ \ \ \ \ \ \ this-\/>\_running\_sum[i]\ +=\ \mbox{\hyperlink{ei__fill__result__struct_8h_a834fa4160fcfdf8d438de54f4d897147}{scores}}[i].value;}
+\DoxyCodeLine{00149\ \ \ \ \ \ \ \ \ \ \ \ \ this-\/>\_score\_array[(this-\/>\_score\_idx\ *\ this-\/>\_n\_labels)\ +\ i]\ =\ \mbox{\hyperlink{ei__fill__result__struct_8h_a834fa4160fcfdf8d438de54f4d897147}{scores}}[i].\mbox{\hyperlink{wm8960__regs_8h_a638e4503e0ae6ce655b7ad2e17e8f0ad}{value}};}
+\DoxyCodeLine{00150\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00151\ }
+\DoxyCodeLine{00152\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (++this-\/>\_score\_idx\ >=\ this-\/>\_average\_window\_duration\_samples)\ \{}
+\DoxyCodeLine{00153\ \ \ \ \ \ \ \ \ \ \ \ \ this-\/>\_score\_idx\ =\ 0;}
+\DoxyCodeLine{00154\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00155\ }
+\DoxyCodeLine{00156\ \ \ \ \ \ \ \ \ \textcolor{comment}{/*\ Number\ of\ samples\ to\ average,\ increases\ until\ the\ buffer\ is\ full\ */}}
+\DoxyCodeLine{00157\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (this-\/>\_n\_scores\_in\_array\ <\ this-\/>\_average\_window\_duration\_samples)\ \{}
+\DoxyCodeLine{00158\ \ \ \ \ \ \ \ \ \ \ \ \ this-\/>\_n\_scores\_in\_array++;}
+\DoxyCodeLine{00159\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00160\ }
+\DoxyCodeLine{00161\ \ \ \ \ \ \ \ \ \textcolor{comment}{/*\ Average\ data\ and\ place\ in\ scores\ \&\ determine\ top\ score\ */}}
+\DoxyCodeLine{00162\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (uint32\_t\ i\ =\ 0;\ i\ <\ this-\/>\_n\_labels;\ i++)\ \{}
+\DoxyCodeLine{00163\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__fill__result__struct_8h_a834fa4160fcfdf8d438de54f4d897147}{scores}}[i].value\ =\ this-\/>\_running\_sum[i]\ /\ this-\/>\_n\_scores\_in\_array;}
+\DoxyCodeLine{00164\ }
+\DoxyCodeLine{00165\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{ei__fill__result__struct_8h_a834fa4160fcfdf8d438de54f4d897147}{scores}}[i].\mbox{\hyperlink{wm8960__regs_8h_a638e4503e0ae6ce655b7ad2e17e8f0ad}{value}}\ >\ current\_top\_score)\ \{}
+\DoxyCodeLine{00166\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(this-\/>\_suppression\_flags\ ==\ 0)\ \{}
+\DoxyCodeLine{00167\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ current\_top\_score\ =\ \mbox{\hyperlink{ei__fill__result__struct_8h_a834fa4160fcfdf8d438de54f4d897147}{scores}}[i].value;}
+\DoxyCodeLine{00168\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ current\_top\_index\ =\ i;}
+\DoxyCodeLine{00169\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00170\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}(this-\/>\_suppression\_flags\ \&\ (1\ <<\ i))\ \{}
+\DoxyCodeLine{00171\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ current\_top\_score\ =\ \mbox{\hyperlink{ei__fill__result__struct_8h_a834fa4160fcfdf8d438de54f4d897147}{scores}}[i].value;}
+\DoxyCodeLine{00172\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ current\_top\_index\ =\ i;}
+\DoxyCodeLine{00173\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00174\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00175\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00176\ }
+\DoxyCodeLine{00177\ \ \ \ \ \ \ \ \ \textcolor{comment}{/*\ Check\ threshold,\ suppression\ */}}
+\DoxyCodeLine{00178\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (this-\/>\_suppression\_samples\ \&\&\ this-\/>\_suppression\_count\ <\ this-\/>\_suppression\_samples)\ \{}
+\DoxyCodeLine{00179\ \ \ \ \ \ \ \ \ \ \ \ \ this-\/>\_suppression\_count++;}
+\DoxyCodeLine{00180\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00181\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00182\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (current\_top\_score\ >=\ this-\/>\_detection\_threshold)\ \{}
+\DoxyCodeLine{00183\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ recognized\_event\ =\ current\_top\_index;}
+\DoxyCodeLine{00184\ }
+\DoxyCodeLine{00185\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (this-\/>\_suppression\_flags\ \&\ (1\ <<\ current\_top\_index))\ \{}
+\DoxyCodeLine{00186\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ this-\/>\_suppression\_count\ =\ 0;}
+\DoxyCodeLine{00187\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00188\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00189\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00190\ }
+\DoxyCodeLine{00191\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ recognized\_event;}
+\DoxyCodeLine{00192\ \ \ \ \ \};}
+\DoxyCodeLine{00193\ }
+\DoxyCodeLine{00194\ \ \ \ \ \textcolor{keywordtype}{void}\ *\textcolor{keyword}{operator}\ \textcolor{keyword}{new}(\textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{hello__world__model_8cc_a439227feff9d7f55384e8780cfc2eb82}{size}})}
+\DoxyCodeLine{00195\ \ \ \ \ \{}
+\DoxyCodeLine{00196\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ *p\ =\ \mbox{\hyperlink{group__ei__user__functions_ga71ecca5661ac4434a709c88e4c39b4aa}{ei\_malloc}}(\mbox{\hyperlink{hello__world__model_8cc_a439227feff9d7f55384e8780cfc2eb82}{size}});}
+\DoxyCodeLine{00197\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ p;}
+\DoxyCodeLine{00198\ \ \ \ \ \}}
+\DoxyCodeLine{00199\ }
+\DoxyCodeLine{00200\ \ \ \ \ \textcolor{keywordtype}{void}\ \textcolor{keyword}{operator}\ \textcolor{keyword}{delete}(\textcolor{keywordtype}{void}\ *p)}
+\DoxyCodeLine{00201\ \ \ \ \ \{}
+\DoxyCodeLine{00202\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group__ei__user__functions_ga7a6a70833407ff1870c12396ce2c4aa3}{ei\_free}}(p);}
+\DoxyCodeLine{00203\ \ \ \ \ \}}
+\DoxyCodeLine{00204\ }
+\DoxyCodeLine{00205\ \textcolor{keyword}{private}:}
+\DoxyCodeLine{00206\ \ \ \ \ uint32\_t\ \_average\_window\_duration\_samples;}
+\DoxyCodeLine{00207\ \ \ \ \ \textcolor{keywordtype}{float}\ \_detection\_threshold;}
+\DoxyCodeLine{00208\ \ \ \ \ \textcolor{keywordtype}{bool}\ \_should\_boost;}
+\DoxyCodeLine{00209\ \ \ \ \ uint32\_t\ \_suppression\_samples;}
+\DoxyCodeLine{00210\ \ \ \ \ uint32\_t\ \_suppression\_count;}
+\DoxyCodeLine{00211\ \ \ \ \ uint32\_t\ \_suppression\_flags;}
+\DoxyCodeLine{00212\ \ \ \ \ uint32\_t\ \_n\_labels;}
+\DoxyCodeLine{00213\ \ \ \ \ \textcolor{keywordtype}{float}\ *\_score\_array;}
+\DoxyCodeLine{00214\ \ \ \ \ uint32\_t\ \_score\_idx;}
+\DoxyCodeLine{00215\ \ \ \ \ \textcolor{keywordtype}{float}\ *\_running\_sum;}
+\DoxyCodeLine{00216\ \ \ \ \ uint32\_t\ \_n\_scores\_in\_array;}
+\DoxyCodeLine{00217\ \};}
+\DoxyCodeLine{00218\ }
+\DoxyCodeLine{00219\ \mbox{\hyperlink{group__ei__returntypes_gad9580b47a6cd5e74cfc31a03bdfecebe}{EI\_IMPULSE\_ERROR}}\ init\_perfcal(\mbox{\hyperlink{classei__impulse__handle__t}{ei\_impulse\_handle\_t}}\ *\mbox{\hyperlink{ei__run__dsp_8h_a701ab73428c38eac35ba17226b628ffa}{handle}},\ \textcolor{keywordtype}{void}\ **\mbox{\hyperlink{ethosu55__interface_8h_adc6e5733fc3c22f0a7b2914188c49c90}{state}},\ \textcolor{keywordtype}{void}\ *\mbox{\hyperlink{micro_2kernels_2filter__bank_8cc_ac0f32fd234a078ace764ae2fc15c41a0}{config}})}
+\DoxyCodeLine{00220\ \{}
+\DoxyCodeLine{00221\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structei__impulse}{ei\_impulse\_t}}\ *impulse\ =\ \mbox{\hyperlink{ei__run__dsp_8h_a701ab73428c38eac35ba17226b628ffa}{handle}}-\/>impulse;}
+\DoxyCodeLine{00222\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structei__performance__calibration__config__t}{ei\_performance\_calibration\_config\_t}}\ *calibration\ =\ (\mbox{\hyperlink{structei__performance__calibration__config__t}{ei\_performance\_calibration\_config\_t}}*)\mbox{\hyperlink{micro_2kernels_2filter__bank_8cc_ac0f32fd234a078ace764ae2fc15c41a0}{config}};}
+\DoxyCodeLine{00223\ }
+\DoxyCodeLine{00224\ \ \ \ \ \textcolor{keywordflow}{if}(calibration\ !=\ NULL)\ \{}
+\DoxyCodeLine{00225\ \ \ \ \ \ \ \ \ PerfCal\ *perf\_cal\ =\ \textcolor{keyword}{new}\ PerfCal(calibration,\ impulse-\/>\mbox{\hyperlink{structei__impulse_a36de79e491fb2b96379e4dc3c384c436}{label\_count}},\ impulse-\/>\mbox{\hyperlink{structei__impulse_a537bb35287f479bad60c42e6e333cfae}{slice\_size}},}
+\DoxyCodeLine{00226\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ impulse-\/>\mbox{\hyperlink{structei__impulse_a384abb63097c0d2cf0723698a88fdfa6}{interval\_ms}});}
+\DoxyCodeLine{00227\ \ \ \ \ \ \ \ \ *\mbox{\hyperlink{ethosu55__interface_8h_adc6e5733fc3c22f0a7b2914188c49c90}{state}}\ =\ (\textcolor{keywordtype}{void}\ *)perf\_cal;}
+\DoxyCodeLine{00228\ }
+\DoxyCodeLine{00229\ \ \ \ \ \}}
+\DoxyCodeLine{00230\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{ei__fill__result__struct_8h_a2fb43be102b153d659b668ad295aff40}{EI\_IMPULSE\_OK}};}
+\DoxyCodeLine{00231\ \}}
+\DoxyCodeLine{00232\ }
+\DoxyCodeLine{00233\ \mbox{\hyperlink{group__ei__returntypes_gad9580b47a6cd5e74cfc31a03bdfecebe}{EI\_IMPULSE\_ERROR}}\ deinit\_perfcal(\textcolor{keywordtype}{void}\ *\mbox{\hyperlink{ethosu55__interface_8h_adc6e5733fc3c22f0a7b2914188c49c90}{state}},\ \textcolor{keywordtype}{void}\ *\mbox{\hyperlink{micro_2kernels_2filter__bank_8cc_ac0f32fd234a078ace764ae2fc15c41a0}{config}})}
+\DoxyCodeLine{00234\ \{}
+\DoxyCodeLine{00235\ \ \ \ \ PerfCal\ *perf\_cal\ =\ (PerfCal*)\mbox{\hyperlink{ethosu55__interface_8h_adc6e5733fc3c22f0a7b2914188c49c90}{state}};}
+\DoxyCodeLine{00236\ }
+\DoxyCodeLine{00237\ \ \ \ \ \textcolor{keywordflow}{if}((\textcolor{keywordtype}{void}\ *)perf\_cal\ !=\ NULL)\ \{}
+\DoxyCodeLine{00238\ \ \ \ \ \ \ \ \ \textcolor{keyword}{delete}\ perf\_cal;}
+\DoxyCodeLine{00239\ \ \ \ \ \}}
+\DoxyCodeLine{00240\ }
+\DoxyCodeLine{00241\ \ \ \ \ \mbox{\hyperlink{ethosu55__interface_8h_adc6e5733fc3c22f0a7b2914188c49c90}{state}}\ =\ NULL;}
+\DoxyCodeLine{00242\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{ei__fill__result__struct_8h_a2fb43be102b153d659b668ad295aff40}{EI\_IMPULSE\_OK}};}
+\DoxyCodeLine{00243\ \}}
+\DoxyCodeLine{00244\ }
+\DoxyCodeLine{00245\ \mbox{\hyperlink{group__ei__returntypes_gad9580b47a6cd5e74cfc31a03bdfecebe}{EI\_IMPULSE\_ERROR}}\ process\_perfcal(\mbox{\hyperlink{classei__impulse__handle__t}{ei\_impulse\_handle\_t}}\ *\mbox{\hyperlink{ei__run__dsp_8h_a701ab73428c38eac35ba17226b628ffa}{handle}},}
+\DoxyCodeLine{00246\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structei__impulse__result__t}{ei\_impulse\_result\_t}}\ *\mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}},}
+\DoxyCodeLine{00247\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ *\mbox{\hyperlink{micro_2kernels_2filter__bank_8cc_ac0f32fd234a078ace764ae2fc15c41a0}{config}},}
+\DoxyCodeLine{00248\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ *\mbox{\hyperlink{ethosu55__interface_8h_adc6e5733fc3c22f0a7b2914188c49c90}{state}})}
+\DoxyCodeLine{00249\ \{}
+\DoxyCodeLine{00250\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structei__impulse}{ei\_impulse\_t}}\ *impulse\ =\ \mbox{\hyperlink{ei__run__dsp_8h_a701ab73428c38eac35ba17226b628ffa}{handle}}-\/>impulse;}
+\DoxyCodeLine{00251\ \ \ \ \ PerfCal\ *perf\_cal\ =\ (PerfCal*)\mbox{\hyperlink{ethosu55__interface_8h_adc6e5733fc3c22f0a7b2914188c49c90}{state}};}
+\DoxyCodeLine{00252\ }
+\DoxyCodeLine{00253\ \ \ \ \ \textcolor{keywordflow}{if}\ (impulse-\/>\mbox{\hyperlink{structei__impulse_ab9380053268da6ced6c01e04dde37d6d}{sensor}}\ ==\ \mbox{\hyperlink{ei__model__types_8h_a6d269ed5990eb7b3a473ceb9db42badb}{EI\_CLASSIFIER\_SENSOR\_MICROPHONE}})\ \{}
+\DoxyCodeLine{00254\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}((\textcolor{keywordtype}{void}\ *)perf\_cal\ !=\ NULL)\ \{}
+\DoxyCodeLine{00255\ }
+\DoxyCodeLine{00256\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ perfcal\ is\ configured}}
+\DoxyCodeLine{00257\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{bool}\ has\_printed\_msg\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00258\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}}-\/>postprocessed\_output.perf\_cal\_output\ =\ *std::unique\_ptr<ei\_perf\_cal\_output\_t>(\textcolor{keyword}{new}\ ei\_perf\_cal\_output\_t).get();}
+\DoxyCodeLine{00259\ }
+\DoxyCodeLine{00260\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!has\_printed\_msg)\ \{}
+\DoxyCodeLine{00261\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}\(\backslash\)nPerformance\ calibration\ is\ configured\ for\ your\ project.\ If\ no\ event\ is\ detected,\ all\ values\ are\ 0.\(\backslash\)r\(\backslash\)n\(\backslash\)n"{}});}
+\DoxyCodeLine{00262\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ has\_printed\_msg\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00263\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00264\ }
+\DoxyCodeLine{00265\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ label\_detected\ =\ perf\_cal-\/>trigger(\mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}}-\/>classification);}
+\DoxyCodeLine{00266\ }
+\DoxyCodeLine{00267\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (perf\_cal-\/>should\_boost())\ \{}
+\DoxyCodeLine{00268\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ impulse-\/>\mbox{\hyperlink{structei__impulse_a36de79e491fb2b96379e4dc3c384c436}{label\_count}};\ i++)\ \{}
+\DoxyCodeLine{00269\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (i\ ==\ label\_detected)\ \{}
+\DoxyCodeLine{00270\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}}-\/>classification[i].value\ =\ 1.0f;}
+\DoxyCodeLine{00271\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}}-\/>postprocessed\_output.perf\_cal\_output.detected\_label\ =\ (\textcolor{keywordtype}{char}*)\mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}}-\/>classification[i].label;}
+\DoxyCodeLine{00272\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00273\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00274\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}}-\/>classification[i].value\ =\ 0.0f;}
+\DoxyCodeLine{00275\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00276\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00277\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00278\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00279\ \ \ \ \ \}}
+\DoxyCodeLine{00280\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{ei__fill__result__struct_8h_a2fb43be102b153d659b668ad295aff40}{EI\_IMPULSE\_OK}};}
+\DoxyCodeLine{00281\ \}}
+\DoxyCodeLine{00282\ }
+\DoxyCodeLine{00283\ \mbox{\hyperlink{group__ei__returntypes_gad9580b47a6cd5e74cfc31a03bdfecebe}{EI\_IMPULSE\_ERROR}}\ display\_perfcal(\mbox{\hyperlink{structei__impulse__result__t}{ei\_impulse\_result\_t}}\ *\mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}},}
+\DoxyCodeLine{00284\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ *\mbox{\hyperlink{micro_2kernels_2filter__bank_8cc_ac0f32fd234a078ace764ae2fc15c41a0}{config}})}
+\DoxyCodeLine{00285\ \{}
+\DoxyCodeLine{00286\ \ \ \ \ \textcolor{comment}{//\ print\ the\ detected\ label}}
+\DoxyCodeLine{00287\ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}Detected\ label:\ \%s\(\backslash\)r\(\backslash\)n"{}},\ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}}-\/>postprocessed\_output.perf\_cal\_output.detected\_label);}
+\DoxyCodeLine{00288\ }
+\DoxyCodeLine{00289\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{ei__fill__result__struct_8h_a2fb43be102b153d659b668ad295aff40}{EI\_IMPULSE\_OK}};}
+\DoxyCodeLine{00290\ \}}
+\DoxyCodeLine{00291\ }
+\DoxyCodeLine{00292\ \mbox{\hyperlink{group__ei__returntypes_gad9580b47a6cd5e74cfc31a03bdfecebe}{EI\_IMPULSE\_ERROR}}\ set\_post\_process\_params(\mbox{\hyperlink{classei__impulse__handle__t}{ei\_impulse\_handle\_t}}*\ \mbox{\hyperlink{ei__run__dsp_8h_a701ab73428c38eac35ba17226b628ffa}{handle}},\ ei\_perf\_cal\_params\_t*\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src4cbee0bfdfed30e8771023cedb1bab0d_a434686eb00eea897154eb5c3f9364ef7}{params}})\ \{}
+\DoxyCodeLine{00293\ \ \ \ \ int16\_t\ block\_number\ =\ \mbox{\hyperlink{ei__postprocessing__common_8h_ac5eb9ba176cb3e12e61e771e09c512b5}{get\_block\_number}}(\mbox{\hyperlink{ei__run__dsp_8h_a701ab73428c38eac35ba17226b628ffa}{handle}},\ (\textcolor{keywordtype}{void}*)init\_perfcal);}
+\DoxyCodeLine{00294\ \ \ \ \ \textcolor{keywordflow}{if}\ (block\_number\ ==\ -\/1)\ \{}
+\DoxyCodeLine{00295\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{group__ei__returntypes_ggad9580b47a6cd5e74cfc31a03bdfecebeafa0d3292585f9ccf29fe5f532df939ac}{EI\_IMPULSE\_POSTPROCESSING\_ERROR}};}
+\DoxyCodeLine{00296\ \ \ \ \ \}}
+\DoxyCodeLine{00297\ \ \ \ \ PerfCal\ *perf\_cal\ =\ (PerfCal*)\mbox{\hyperlink{ei__run__dsp_8h_a701ab73428c38eac35ba17226b628ffa}{handle}}-\/>post\_processing\_state[block\_number];}
+\DoxyCodeLine{00298\ }
+\DoxyCodeLine{00299\ \ \ \ \ perf\_cal-\/>set\_detection\_threshold(\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src4cbee0bfdfed30e8771023cedb1bab0d_a434686eb00eea897154eb5c3f9364ef7}{params}}-\/>detection\_threshold);}
+\DoxyCodeLine{00300\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{ei__fill__result__struct_8h_a2fb43be102b153d659b668ad295aff40}{EI\_IMPULSE\_OK}};}
+\DoxyCodeLine{00301\ \}}
+\DoxyCodeLine{00302\ }
+\DoxyCodeLine{00303\ \mbox{\hyperlink{group__ei__returntypes_gad9580b47a6cd5e74cfc31a03bdfecebe}{EI\_IMPULSE\_ERROR}}\ get\_post\_process\_params(\mbox{\hyperlink{classei__impulse__handle__t}{ei\_impulse\_handle\_t}}*\ \mbox{\hyperlink{ei__run__dsp_8h_a701ab73428c38eac35ba17226b628ffa}{handle}},\ ei\_perf\_cal\_params\_t*\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src4cbee0bfdfed30e8771023cedb1bab0d_a434686eb00eea897154eb5c3f9364ef7}{params}})\ \{}
+\DoxyCodeLine{00304\ \ \ \ \ int16\_t\ block\_number\ =\ \mbox{\hyperlink{ei__postprocessing__common_8h_ac5eb9ba176cb3e12e61e771e09c512b5}{get\_block\_number}}(\mbox{\hyperlink{ei__run__dsp_8h_a701ab73428c38eac35ba17226b628ffa}{handle}},\ (\textcolor{keywordtype}{void}*)init\_perfcal);}
+\DoxyCodeLine{00305\ \ \ \ \ \textcolor{keywordflow}{if}\ (block\_number\ ==\ -\/1)\ \{}
+\DoxyCodeLine{00306\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{group__ei__returntypes_ggad9580b47a6cd5e74cfc31a03bdfecebeafa0d3292585f9ccf29fe5f532df939ac}{EI\_IMPULSE\_POSTPROCESSING\_ERROR}};}
+\DoxyCodeLine{00307\ \ \ \ \ \}}
+\DoxyCodeLine{00308\ \ \ \ \ PerfCal\ *perf\_cal\ =\ (PerfCal*)\mbox{\hyperlink{ei__run__dsp_8h_a701ab73428c38eac35ba17226b628ffa}{handle}}-\/>post\_processing\_state[block\_number];}
+\DoxyCodeLine{00309\ }
+\DoxyCodeLine{00310\ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src4cbee0bfdfed30e8771023cedb1bab0d_a434686eb00eea897154eb5c3f9364ef7}{params}}-\/>detection\_threshold\ =\ perf\_cal-\/>get\_detection\_threshold();}
+\DoxyCodeLine{00311\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{ei__fill__result__struct_8h_a2fb43be102b153d659b668ad295aff40}{EI\_IMPULSE\_OK}};}
+\DoxyCodeLine{00312\ \}}
+\DoxyCodeLine{00313\ }
+\DoxyCodeLine{00314\ \textcolor{comment}{//\ versions\ that\ operate\ on\ the\ default\ impulse}}
+\DoxyCodeLine{00315\ \mbox{\hyperlink{group__ei__returntypes_gad9580b47a6cd5e74cfc31a03bdfecebe}{EI\_IMPULSE\_ERROR}}\ set\_post\_process\_params(ei\_perf\_cal\_params\_t\ *\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src4cbee0bfdfed30e8771023cedb1bab0d_a434686eb00eea897154eb5c3f9364ef7}{params}})\ \{}
+\DoxyCodeLine{00316\ \ \ \ \ \mbox{\hyperlink{classei__impulse__handle__t}{ei\_impulse\_handle\_t}}*\ \mbox{\hyperlink{ei__run__dsp_8h_a701ab73428c38eac35ba17226b628ffa}{handle}}\ =\ \&\mbox{\hyperlink{ei__object__counting_8h_ab3ae8708390cf5f755074573247bd806}{ei\_default\_impulse}};}
+\DoxyCodeLine{00317\ }
+\DoxyCodeLine{00318\ \ \ \ \ \textcolor{keywordflow}{if}(\mbox{\hyperlink{ei__run__dsp_8h_a701ab73428c38eac35ba17226b628ffa}{handle}}-\/>post\_processing\_state\ !=\ NULL)\ \{}
+\DoxyCodeLine{00319\ \ \ \ \ \ \ \ \ set\_post\_process\_params(\mbox{\hyperlink{ei__run__dsp_8h_a701ab73428c38eac35ba17226b628ffa}{handle}},\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src4cbee0bfdfed30e8771023cedb1bab0d_a434686eb00eea897154eb5c3f9364ef7}{params}});}
+\DoxyCodeLine{00320\ \ \ \ \ \}}
+\DoxyCodeLine{00321\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{ei__fill__result__struct_8h_a2fb43be102b153d659b668ad295aff40}{EI\_IMPULSE\_OK}};}
+\DoxyCodeLine{00322\ \}}
+\DoxyCodeLine{00323\ }
+\DoxyCodeLine{00324\ \mbox{\hyperlink{group__ei__returntypes_gad9580b47a6cd5e74cfc31a03bdfecebe}{EI\_IMPULSE\_ERROR}}\ get\_post\_process\_params(ei\_perf\_cal\_params\_t*\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src4cbee0bfdfed30e8771023cedb1bab0d_a434686eb00eea897154eb5c3f9364ef7}{params}})\ \{}
+\DoxyCodeLine{00325\ \ \ \ \ \mbox{\hyperlink{classei__impulse__handle__t}{ei\_impulse\_handle\_t}}*\ \mbox{\hyperlink{ei__run__dsp_8h_a701ab73428c38eac35ba17226b628ffa}{handle}}\ =\ \&\mbox{\hyperlink{ei__object__counting_8h_ab3ae8708390cf5f755074573247bd806}{ei\_default\_impulse}};}
+\DoxyCodeLine{00326\ }
+\DoxyCodeLine{00327\ \ \ \ \ \textcolor{keywordflow}{if}(\mbox{\hyperlink{ei__run__dsp_8h_a701ab73428c38eac35ba17226b628ffa}{handle}}-\/>post\_processing\_state\ !=\ NULL)\ \{}
+\DoxyCodeLine{00328\ \ \ \ \ \ \ \ \ get\_post\_process\_params(\mbox{\hyperlink{ei__run__dsp_8h_a701ab73428c38eac35ba17226b628ffa}{handle}},\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src4cbee0bfdfed30e8771023cedb1bab0d_a434686eb00eea897154eb5c3f9364ef7}{params}});}
+\DoxyCodeLine{00329\ \ \ \ \ \}}
+\DoxyCodeLine{00330\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{ei__fill__result__struct_8h_a2fb43be102b153d659b668ad295aff40}{EI\_IMPULSE\_OK}};}
+\DoxyCodeLine{00331\ \}}
+\DoxyCodeLine{00332\ }
+\DoxyCodeLine{00333\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//EI\_CLASSIFIER\_CALIBRATION\_ENABLED}}
+\DoxyCodeLine{00334\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//EI\_PERFORMANCE\_CALIBRATION}}
+
+\end{DoxyCode}

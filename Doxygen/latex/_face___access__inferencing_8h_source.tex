@@ -1,0 +1,62 @@
+\doxysection{Face\+\_\+\+Access\+\_\+inferencing.\+h}
+\hypertarget{_face___access__inferencing_8h_source}{}\label{_face___access__inferencing_8h_source}\index{Face\_Access\_inferencing/src/Face\_Access\_inferencing.h@{Face\_Access\_inferencing/src/Face\_Access\_inferencing.h}}
+\mbox{\hyperlink{_face___access__inferencing_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{/*\ Edge\ Impulse\ ingestion\ SDK}}
+\DoxyCodeLine{00002\ \textcolor{comment}{\ *\ Copyright\ (c)\ 2022\ EdgeImpulse\ Inc.}}
+\DoxyCodeLine{00003\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00004\ \textcolor{comment}{\ *\ Licensed\ under\ the\ Apache\ License,\ Version\ 2.0\ (the\ "{}License"{});}}
+\DoxyCodeLine{00005\ \textcolor{comment}{\ *\ you\ may\ not\ use\ this\ file\ except\ in\ compliance\ with\ the\ License.}}
+\DoxyCodeLine{00006\ \textcolor{comment}{\ *\ You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{00007\ \textcolor{comment}{\ *\ http://www.apache.org/licenses/LICENSE-\/2.0}}
+\DoxyCodeLine{00008\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00009\ \textcolor{comment}{\ *\ Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ software}}
+\DoxyCodeLine{00010\ \textcolor{comment}{\ *\ distributed\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,}}
+\DoxyCodeLine{00011\ \textcolor{comment}{\ *\ WITHOUT\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,\ either\ express\ or\ implied.}}
+\DoxyCodeLine{00012\ \textcolor{comment}{\ *\ See\ the\ License\ for\ the\ specific\ language\ governing\ permissions\ and}}
+\DoxyCodeLine{00013\ \textcolor{comment}{\ *\ limitations\ under\ the\ License.}}
+\DoxyCodeLine{00014\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00015\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{00016\ }
+\DoxyCodeLine{00017\ \textcolor{preprocessor}{\#ifndef\ \_INFERENCE\_H}}
+\DoxyCodeLine{00018\ \textcolor{preprocessor}{\#define\ \_INFERENCE\_H}}
+\DoxyCodeLine{00019\ }
+\DoxyCodeLine{00020\ \textcolor{comment}{//\ Undefine\ min/max\ macros\ as\ these\ conflict\ with\ C++\ std\ min/max\ functions}}
+\DoxyCodeLine{00021\ \textcolor{comment}{//\ these\ are\ often\ included\ by\ Arduino\ cores}}
+\DoxyCodeLine{00022\ \textcolor{preprocessor}{\#include\ <Arduino.h>}}
+\DoxyCodeLine{00023\ \textcolor{preprocessor}{\#include\ <stdarg.h>}}
+\DoxyCodeLine{00024\ \textcolor{preprocessor}{\#ifdef\ min}}
+\DoxyCodeLine{00025\ \textcolor{preprocessor}{\#undef\ min}}
+\DoxyCodeLine{00026\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ min}}
+\DoxyCodeLine{00027\ \textcolor{preprocessor}{\#ifdef\ max}}
+\DoxyCodeLine{00028\ \textcolor{preprocessor}{\#undef\ max}}
+\DoxyCodeLine{00029\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ max}}
+\DoxyCodeLine{00030\ \textcolor{preprocessor}{\#ifdef\ round}}
+\DoxyCodeLine{00031\ \textcolor{preprocessor}{\#undef\ round}}
+\DoxyCodeLine{00032\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ round}}
+\DoxyCodeLine{00033\ \textcolor{comment}{//\ Similar\ the\ ESP32\ seems\ to\ define\ this,\ which\ is\ also\ used\ as\ an\ enum\ value\ in\ TFLite}}
+\DoxyCodeLine{00034\ \textcolor{preprocessor}{\#ifdef\ DEFAULT}}
+\DoxyCodeLine{00035\ \textcolor{preprocessor}{\#undef\ DEFAULT}}
+\DoxyCodeLine{00036\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ DEFAULT}}
+\DoxyCodeLine{00037\ \textcolor{comment}{//\ Infineon\ core\ defines\ this,\ conflicts\ with\ CMSIS/DSP/Include/dsp/controller\_functions.h}}
+\DoxyCodeLine{00038\ \textcolor{preprocessor}{\#ifdef\ A0}}
+\DoxyCodeLine{00039\ \textcolor{preprocessor}{\#undef\ A0}}
+\DoxyCodeLine{00040\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ A0}}
+\DoxyCodeLine{00041\ \textcolor{preprocessor}{\#ifdef\ A1}}
+\DoxyCodeLine{00042\ \textcolor{preprocessor}{\#undef\ A1}}
+\DoxyCodeLine{00043\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ A1}}
+\DoxyCodeLine{00044\ \textcolor{preprocessor}{\#ifdef\ A2}}
+\DoxyCodeLine{00045\ \textcolor{preprocessor}{\#undef\ A2}}
+\DoxyCodeLine{00046\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ A2}}
+\DoxyCodeLine{00047\ }
+\DoxyCodeLine{00048\ \textcolor{comment}{/*\ Includes\ -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/\ */}}
+\DoxyCodeLine{00049\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{ei__run__classifier_8h}{edge-\/impulse-\/sdk/classifier/ei\_run\_classifier.h}}"{}}}
+\DoxyCodeLine{00050\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{numpy_8hpp}{edge-\/impulse-\/sdk/dsp/numpy.hpp}}"{}}}
+\DoxyCodeLine{00051\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{model__metadata_8h}{model-\/parameters/model\_metadata.h}}"{}}}
+\DoxyCodeLine{00052\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{ei__classifier__smooth_8h}{edge-\/impulse-\/sdk/classifier/ei\_classifier\_smooth.h}}"{}}}
+\DoxyCodeLine{00053\ }
+\DoxyCodeLine{00054\ \textcolor{keyword}{extern}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{_face___access__inferencing_8h_aa172a441ef3801477fc607c4a77ffede}{ei\_printf}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *format,\ ...);}
+\DoxyCodeLine{00055\ }
+\DoxyCodeLine{00056\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ \_INFERENCE\_H}}
+
+\end{DoxyCode}

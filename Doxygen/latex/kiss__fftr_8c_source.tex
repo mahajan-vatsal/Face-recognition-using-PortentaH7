@@ -1,0 +1,165 @@
+\doxysection{kiss\+\_\+fftr.\+c}
+\hypertarget{kiss__fftr_8c_source}{}\label{kiss__fftr_8c_source}\index{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/arduino-\/examples-\/main/src/third\_party/kissfft/tools/kiss\_fftr.c@{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/arduino-\/examples-\/main/src/third\_party/kissfft/tools/kiss\_fftr.c}}
+\mbox{\hyperlink{kiss__fftr_8c}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{00002\ \textcolor{comment}{Copyright\ (c)\ 2003-\/2004,\ Mark\ Borgerding}}
+\DoxyCodeLine{00003\ \textcolor{comment}{}}
+\DoxyCodeLine{00004\ \textcolor{comment}{All\ rights\ reserved.}}
+\DoxyCodeLine{00005\ \textcolor{comment}{}}
+\DoxyCodeLine{00006\ \textcolor{comment}{Redistribution\ and\ use\ in\ source\ and\ binary\ forms,\ with\ or\ without\ modification,\ are\ permitted\ provided\ that\ the\ following\ conditions\ are\ met:}}
+\DoxyCodeLine{00007\ \textcolor{comment}{}}
+\DoxyCodeLine{00008\ \textcolor{comment}{\ \ \ \ *\ Redistributions\ of\ source\ code\ must\ retain\ the\ above\ copyright\ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer.}}
+\DoxyCodeLine{00009\ \textcolor{comment}{\ \ \ \ *\ Redistributions\ in\ binary\ form\ must\ reproduce\ the\ above\ copyright\ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer\ in\ the\ documentation\ and/or\ other\ materials\ provided\ with\ the\ distribution.}}
+\DoxyCodeLine{00010\ \textcolor{comment}{\ \ \ \ *\ Neither\ the\ author\ nor\ the\ names\ of\ any\ contributors\ may\ be\ used\ to\ endorse\ or\ promote\ products\ derived\ from\ this\ software\ without\ specific\ prior\ written\ permission.}}
+\DoxyCodeLine{00011\ \textcolor{comment}{}}
+\DoxyCodeLine{00012\ \textcolor{comment}{THIS\ SOFTWARE\ IS\ PROVIDED\ BY\ THE\ COPYRIGHT\ HOLDERS\ AND\ CONTRIBUTORS\ "{}AS\ IS"{}\ AND\ ANY\ EXPRESS\ OR\ IMPLIED\ WARRANTIES,\ INCLUDING,\ BUT\ NOT\ LIMITED\ TO,\ THE\ IMPLIED\ WARRANTIES\ OF\ MERCHANTABILITY\ AND\ FITNESS\ FOR\ A\ PARTICULAR\ PURPOSE\ ARE\ DISCLAIMED.\ IN\ NO\ EVENT\ SHALL\ THE\ COPYRIGHT\ OWNER\ OR\ CONTRIBUTORS\ BE\ LIABLE\ FOR\ ANY\ DIRECT,\ INDIRECT,\ INCIDENTAL,\ SPECIAL,\ EXEMPLARY,\ OR\ CONSEQUENTIAL\ DAMAGES\ (INCLUDING,\ BUT\ NOT\ LIMITED\ TO,\ PROCUREMENT\ OF\ SUBSTITUTE\ GOODS\ OR\ SERVICES;\ LOSS\ OF\ USE,\ DATA,\ OR\ PROFITS;\ OR\ BUSINESS\ INTERRUPTION)\ HOWEVER\ CAUSED\ AND\ ON\ ANY\ THEORY\ OF\ LIABILITY,\ WHETHER\ IN\ CONTRACT,\ STRICT\ LIABILITY,\ OR\ TORT\ (INCLUDING\ NEGLIGENCE\ OR\ OTHERWISE)\ ARISING\ IN\ ANY\ WAY\ OUT\ OF\ THE\ USE\ OF\ THIS\ SOFTWARE,\ EVEN\ IF\ ADVISED\ OF\ THE\ POSSIBILITY\ OF\ SUCH\ DAMAGE.}}
+\DoxyCodeLine{00013\ \textcolor{comment}{*/}}
+\DoxyCodeLine{00014\ }
+\DoxyCodeLine{00015\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src18be51f66e984310a95bab7aac63d060}{third\_party/kissfft/tools/kiss\_fftr.h}}"{}}}
+\DoxyCodeLine{00016\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src881099158a8a67d34a3d3f8a6b7b88f0}{third\_party/kissfft/\_kiss\_fft\_guts.h}}"{}}}
+\DoxyCodeLine{00017\ }
+\DoxyCodeLine{00018\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structkiss__fftr__state}{kiss\_fftr\_state}}\{}
+\DoxyCodeLine{00019\ \ \ \ \ \mbox{\hyperlink{structkiss__fft__state}{kiss\_fft\_cfg}}\ \mbox{\hyperlink{structkiss__fftr__state_acdccafcf502fec1c13450c2eae901738}{substate}};}
+\DoxyCodeLine{00020\ \ \ \ \ \mbox{\hyperlink{structkiss__fft__cpx}{kiss\_fft\_cpx}}\ *\ \mbox{\hyperlink{structkiss__fftr__state_acdb7015328260989cb85dcd839e9ab1f}{tmpbuf}};}
+\DoxyCodeLine{00021\ \ \ \ \ \mbox{\hyperlink{structkiss__fft__cpx}{kiss\_fft\_cpx}}\ *\ \mbox{\hyperlink{structkiss__fftr__state_ab875131fa6af83bfe40b4e1e7d429d0f}{super\_twiddles}};}
+\DoxyCodeLine{00022\ \textcolor{preprocessor}{\#ifdef\ USE\_SIMD}}
+\DoxyCodeLine{00023\ \ \ \ \ \textcolor{keywordtype}{void}\ *\ pad;}
+\DoxyCodeLine{00024\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00025\ \};}
+\DoxyCodeLine{00026\ }
+\DoxyCodeLine{00027\ \mbox{\hyperlink{structkiss__fftr__state}{kiss\_fftr\_cfg}}\ \mbox{\hyperlink{kiss__fftr_8c_aead7aaed139f58158b446ea623a8b8cb}{kiss\_fftr\_alloc}}(\textcolor{keywordtype}{int}\ nfft,\textcolor{keywordtype}{int}\ inverse\_fft,\textcolor{keywordtype}{void}\ *\ mem,\textcolor{keywordtype}{size\_t}\ *\ lenmem)}
+\DoxyCodeLine{00028\ \{}
+\DoxyCodeLine{00029\ \ \ \ \ \textcolor{keywordtype}{int}\ i;}
+\DoxyCodeLine{00030\ \ \ \ \ \mbox{\hyperlink{structkiss__fftr__state}{kiss\_fftr\_cfg}}\ st\ =\ NULL;}
+\DoxyCodeLine{00031\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ subsize,\ memneeded;}
+\DoxyCodeLine{00032\ }
+\DoxyCodeLine{00033\ \ \ \ \ \textcolor{keywordflow}{if}\ (nfft\ \&\ 1)\ \{}
+\DoxyCodeLine{00034\ \ \ \ \ \ \ \ \ \textcolor{comment}{/*\ fprintf(stderr,"{}Real\ FFT\ optimization\ must\ be\ even.\(\backslash\)n"{});\ */}}
+\DoxyCodeLine{00035\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ NULL;}
+\DoxyCodeLine{00036\ \ \ \ \ \}}
+\DoxyCodeLine{00037\ \ \ \ \ nfft\ >>=\ 1;}
+\DoxyCodeLine{00038\ }
+\DoxyCodeLine{00039\ \ \ \ \ \mbox{\hyperlink{kiss__fft_8c_ab5ad1560b58375ec071da45401911358}{kiss\_fft\_alloc}}\ (nfft,\ inverse\_fft,\ NULL,\ \&subsize);}
+\DoxyCodeLine{00040\ \ \ \ \ memneeded\ =\ \textcolor{keyword}{sizeof}(\textcolor{keyword}{struct\ }\mbox{\hyperlink{structkiss__fftr__state}{kiss\_fftr\_state}})\ +\ subsize\ +\ sizeof(\mbox{\hyperlink{structkiss__fft__cpx}{kiss\_fft\_cpx}})\ *\ (\ nfft\ *\ 3\ /\ 2);}
+\DoxyCodeLine{00041\ }
+\DoxyCodeLine{00042\ \ \ \ \ \textcolor{keywordflow}{if}\ (lenmem\ ==\ NULL)\ \{}
+\DoxyCodeLine{00043\ \ \ \ \ \ \ \ \ st\ =\ (\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src18be51f66e984310a95bab7aac63d060_a9770a73a2aed969522b253322d069fb8}{kiss\_fftr\_cfg}})\ \mbox{\hyperlink{kiss__fft__int16_8cpp_a7cb6c1bac93660a8bd06c29db2f4181d}{KISS\_FFT\_MALLOC}}\ (memneeded);}
+\DoxyCodeLine{00044\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (*lenmem\ >=\ memneeded)}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \ \ \ \ \ \ st\ =\ (\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src18be51f66e984310a95bab7aac63d060_a9770a73a2aed969522b253322d069fb8}{kiss\_fftr\_cfg}})\ mem;}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \ \ *lenmem\ =\ memneeded;}
+\DoxyCodeLine{00048\ \ \ \ \ \}}
+\DoxyCodeLine{00049\ \ \ \ \ \textcolor{keywordflow}{if}\ (!st)}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ NULL;}
+\DoxyCodeLine{00051\ }
+\DoxyCodeLine{00052\ \ \ \ \ st-\/>\mbox{\hyperlink{structkiss__fftr__state_acdccafcf502fec1c13450c2eae901738}{substate}}\ =\ (\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcd60fd2c96e0a236dfb5f77629fb99d4f_ab8c364e12d4cbde47dca54eb4bc3ce79}{kiss\_fft\_cfg}})\ (st\ +\ 1);\ \textcolor{comment}{/*just\ beyond\ kiss\_fftr\_state\ struct\ */}}
+\DoxyCodeLine{00053\ \ \ \ \ st-\/>\mbox{\hyperlink{structkiss__fftr__state_acdb7015328260989cb85dcd839e9ab1f}{tmpbuf}}\ =\ (\mbox{\hyperlink{structkiss__fft__cpx}{kiss\_fft\_cpx}}\ *)\ (((\textcolor{keywordtype}{char}\ *)\ st-\/>\mbox{\hyperlink{structkiss__fftr__state_acdccafcf502fec1c13450c2eae901738}{substate}})\ +\ subsize);}
+\DoxyCodeLine{00054\ \ \ \ \ st-\/>\mbox{\hyperlink{structkiss__fftr__state_ab875131fa6af83bfe40b4e1e7d429d0f}{super\_twiddles}}\ =\ st-\/>\mbox{\hyperlink{structkiss__fftr__state_acdb7015328260989cb85dcd839e9ab1f}{tmpbuf}}\ +\ nfft;}
+\DoxyCodeLine{00055\ \ \ \ \ \mbox{\hyperlink{kiss__fft_8c_ab5ad1560b58375ec071da45401911358}{kiss\_fft\_alloc}}(nfft,\ inverse\_fft,\ st-\/>\mbox{\hyperlink{structkiss__fftr__state_acdccafcf502fec1c13450c2eae901738}{substate}},\ \&subsize);}
+\DoxyCodeLine{00056\ }
+\DoxyCodeLine{00057\ \ \ \ \ \mbox{\hyperlink{ei__fill__result__struct_8h_a6c85f942e35ee62a17be5eeda3d36ad8}{for}}\ (i\ =\ 0;\ i\ <\ nfft/2;\ ++i)\ \{}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{double}\ phase\ =}
+\DoxyCodeLine{00059\ \ \ \ \ \ \ \ \ \ \ \ \ -\/3.14159265358979323846264338327\ *\ ((double)\ (i+1)\ /\ nfft\ +\ .5);}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (inverse\_fft)}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \ \ \ \ \ \ phase\ *=\ -\/1;}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{kiss__fft__int16_8cpp_ac7852abdf2dc5ed4538551be6d1dd20b}{kf\_cexp}}\ (st-\/>\mbox{\hyperlink{structkiss__fftr__state_ab875131fa6af83bfe40b4e1e7d429d0f}{super\_twiddles}}+i,phase);}
+\DoxyCodeLine{00063\ \ \ \ \ \}}
+\DoxyCodeLine{00064\ \ \ \ \ \textcolor{keywordflow}{return}\ st;}
+\DoxyCodeLine{00065\ \}}
+\DoxyCodeLine{00066\ }
+\DoxyCodeLine{00067\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{kiss__fftr_8c_a47dc7a9e54b7f0802dd225c27e6ec73b}{kiss\_fftr}}(\mbox{\hyperlink{structkiss__fftr__state}{kiss\_fftr\_cfg}}\ st,\textcolor{keyword}{const}\ \mbox{\hyperlink{kiss__fft__int16_8cpp_a4d9bf2d6a2ce1b061545a16faf77d337}{kiss\_fft\_scalar}}\ *timedata,\mbox{\hyperlink{structkiss__fft__cpx}{kiss\_fft\_cpx}}\ *freqdata)}
+\DoxyCodeLine{00068\ \{}
+\DoxyCodeLine{00069\ \ \ \ \ \textcolor{comment}{/*\ input\ buffer\ timedata\ is\ stored\ row-\/wise\ */}}
+\DoxyCodeLine{00070\ \ \ \ \ \textcolor{keywordtype}{int}\ k,ncfft;}
+\DoxyCodeLine{00071\ \ \ \ \ \mbox{\hyperlink{structkiss__fft__cpx}{kiss\_fft\_cpx}}\ fpnk,fpk,f1k,f2k,tw,tdc;}
+\DoxyCodeLine{00072\ }
+\DoxyCodeLine{00073\ \ \ \ \ \textcolor{keywordflow}{if}\ (\ st-\/>\mbox{\hyperlink{structkiss__fftr__state_acdccafcf502fec1c13450c2eae901738}{substate}}-\/>\mbox{\hyperlink{structkiss__fft__state_a8faed935610ffb08bf7ad9ea8d6c81d2}{inverse}})\ \{}
+\DoxyCodeLine{00074\ \ \ \ \ \ \ \ \ \textcolor{comment}{/*\ fprintf(stderr,"{}kiss\ fft\ usage\ error:\ improper\ alloc\(\backslash\)n"{});\ */}}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};\ \textcolor{comment}{/*\ exit(1);\ */}}
+\DoxyCodeLine{00076\ \ \ \ \ \}}
+\DoxyCodeLine{00077\ }
+\DoxyCodeLine{00078\ \ \ \ \ ncfft\ =\ st-\/>\mbox{\hyperlink{structkiss__fftr__state_acdccafcf502fec1c13450c2eae901738}{substate}}-\/>\mbox{\hyperlink{structkiss__fft__state_aa7446bded329a40e13aef0826e349791}{nfft}};}
+\DoxyCodeLine{00079\ }
+\DoxyCodeLine{00080\ \ \ \ \ \textcolor{comment}{/*perform\ the\ parallel\ fft\ of\ two\ real\ signals\ packed\ in\ real,imag*/}}
+\DoxyCodeLine{00081\ \ \ \ \ \mbox{\hyperlink{kiss__fft_8c_ab36e2bb33b74c1a7eabe3271d0916030}{kiss\_fft}}(\ st-\/>\mbox{\hyperlink{structkiss__fftr__state_acdccafcf502fec1c13450c2eae901738}{substate}}\ ,\ (\textcolor{keyword}{const}\ \mbox{\hyperlink{structkiss__fft__cpx}{kiss\_fft\_cpx}}*)timedata,\ st-\/>\mbox{\hyperlink{structkiss__fftr__state_acdb7015328260989cb85dcd839e9ab1f}{tmpbuf}}\ );}
+\DoxyCodeLine{00082\ \ \ \ \ \textcolor{comment}{/*\ The\ real\ part\ of\ the\ DC\ element\ of\ the\ frequency\ spectrum\ in\ st-\/>tmpbuf}}
+\DoxyCodeLine{00083\ \textcolor{comment}{\ \ \ \ \ *\ contains\ the\ sum\ of\ the\ even-\/numbered\ elements\ of\ the\ input\ time\ sequence}}
+\DoxyCodeLine{00084\ \textcolor{comment}{\ \ \ \ \ *\ The\ imag\ part\ is\ the\ sum\ of\ the\ odd-\/numbered\ elements}}
+\DoxyCodeLine{00085\ \textcolor{comment}{\ \ \ \ \ *}}
+\DoxyCodeLine{00086\ \textcolor{comment}{\ \ \ \ \ *\ The\ sum\ of\ tdc.r\ and\ tdc.i\ is\ the\ sum\ of\ the\ input\ time\ sequence.\ }}
+\DoxyCodeLine{00087\ \textcolor{comment}{\ \ \ \ \ *\ \ \ \ \ \ yielding\ DC\ of\ input\ time\ sequence}}
+\DoxyCodeLine{00088\ \textcolor{comment}{\ \ \ \ \ *\ The\ difference\ of\ tdc.r\ -\/\ tdc.i\ is\ the\ sum\ of\ the\ input\ (dot\ product)\ [1,-\/1,1,-\/1...\ }}
+\DoxyCodeLine{00089\ \textcolor{comment}{\ \ \ \ \ *\ \ \ \ \ \ yielding\ Nyquist\ bin\ of\ input\ time\ sequence}}
+\DoxyCodeLine{00090\ \textcolor{comment}{\ \ \ \ \ */}}
+\DoxyCodeLine{00091\ \ }
+\DoxyCodeLine{00092\ \ \ \ \ tdc.\mbox{\hyperlink{structkiss__fft__cpx_a686b6187e3e885de316908319c71ea8f}{r}}\ =\ st-\/>\mbox{\hyperlink{structkiss__fftr__state_acdb7015328260989cb85dcd839e9ab1f}{tmpbuf}}[0].\mbox{\hyperlink{structkiss__fft__cpx_a686b6187e3e885de316908319c71ea8f}{r}};}
+\DoxyCodeLine{00093\ \ \ \ \ tdc.\mbox{\hyperlink{structkiss__fft__cpx_ac1e17add2ae6b815da29d7d67b03fa70}{i}}\ =\ st-\/>\mbox{\hyperlink{structkiss__fftr__state_acdb7015328260989cb85dcd839e9ab1f}{tmpbuf}}[0].\mbox{\hyperlink{structkiss__fft__cpx_ac1e17add2ae6b815da29d7d67b03fa70}{i}};}
+\DoxyCodeLine{00094\ \ \ \ \ \mbox{\hyperlink{kiss__fft__int16_8cpp_a05e11bb1e8e815dd7bdd199060b7555a}{C\_FIXDIV}}(tdc,2);}
+\DoxyCodeLine{00095\ \ \ \ \ \mbox{\hyperlink{kiss__fft__int16_8cpp_a664c056b2a7093f88391d7db3558aa24}{CHECK\_OVERFLOW\_OP}}(tdc.\mbox{\hyperlink{structkiss__fft__cpx_a686b6187e3e885de316908319c71ea8f}{r}}\ ,+,\ tdc.\mbox{\hyperlink{structkiss__fft__cpx_ac1e17add2ae6b815da29d7d67b03fa70}{i}});}
+\DoxyCodeLine{00096\ \ \ \ \ \mbox{\hyperlink{kiss__fft__int16_8cpp_a664c056b2a7093f88391d7db3558aa24}{CHECK\_OVERFLOW\_OP}}(tdc.\mbox{\hyperlink{structkiss__fft__cpx_a686b6187e3e885de316908319c71ea8f}{r}}\ ,-\/,\ tdc.\mbox{\hyperlink{structkiss__fft__cpx_ac1e17add2ae6b815da29d7d67b03fa70}{i}});}
+\DoxyCodeLine{00097\ \ \ \ \ freqdata[0].\mbox{\hyperlink{structkiss__fft__cpx_a686b6187e3e885de316908319c71ea8f}{r}}\ =\ tdc.\mbox{\hyperlink{structkiss__fft__cpx_a686b6187e3e885de316908319c71ea8f}{r}}\ +\ tdc.\mbox{\hyperlink{structkiss__fft__cpx_ac1e17add2ae6b815da29d7d67b03fa70}{i}};}
+\DoxyCodeLine{00098\ \ \ \ \ freqdata[ncfft].\mbox{\hyperlink{structkiss__fft__cpx_a686b6187e3e885de316908319c71ea8f}{r}}\ =\ tdc.\mbox{\hyperlink{structkiss__fft__cpx_a686b6187e3e885de316908319c71ea8f}{r}}\ -\/\ tdc.\mbox{\hyperlink{structkiss__fft__cpx_ac1e17add2ae6b815da29d7d67b03fa70}{i}};}
+\DoxyCodeLine{00099\ \textcolor{preprocessor}{\#ifdef\ USE\_SIMD\ \ \ \ }}
+\DoxyCodeLine{00100\ \ \ \ \ freqdata[ncfft].\mbox{\hyperlink{structkiss__fft__cpx_ac1e17add2ae6b815da29d7d67b03fa70}{i}}\ =\ freqdata[0].\mbox{\hyperlink{structkiss__fft__cpx_ac1e17add2ae6b815da29d7d67b03fa70}{i}}\ =\ \_mm\_set1\_ps(0);}
+\DoxyCodeLine{00101\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00102\ \ \ \ \ freqdata[ncfft].\mbox{\hyperlink{structkiss__fft__cpx_ac1e17add2ae6b815da29d7d67b03fa70}{i}}\ =\ freqdata[0].\mbox{\hyperlink{structkiss__fft__cpx_ac1e17add2ae6b815da29d7d67b03fa70}{i}}\ =\ 0;}
+\DoxyCodeLine{00103\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00104\ }
+\DoxyCodeLine{00105\ \ \ \ \ \textcolor{keywordflow}{for}\ (\ k=1;k\ <=\ ncfft/2\ ;\ ++k\ )\ \{}
+\DoxyCodeLine{00106\ \ \ \ \ \ \ \ \ fpk\ \ \ \ =\ st-\/>\mbox{\hyperlink{structkiss__fftr__state_acdb7015328260989cb85dcd839e9ab1f}{tmpbuf}}[k];\ }
+\DoxyCodeLine{00107\ \ \ \ \ \ \ \ \ fpnk.\mbox{\hyperlink{structkiss__fft__cpx_a686b6187e3e885de316908319c71ea8f}{r}}\ =\ \ \ st-\/>\mbox{\hyperlink{structkiss__fftr__state_acdb7015328260989cb85dcd839e9ab1f}{tmpbuf}}[ncfft-\/k].\mbox{\hyperlink{structkiss__fft__cpx_a686b6187e3e885de316908319c71ea8f}{r}};}
+\DoxyCodeLine{00108\ \ \ \ \ \ \ \ \ fpnk.\mbox{\hyperlink{structkiss__fft__cpx_ac1e17add2ae6b815da29d7d67b03fa70}{i}}\ =\ -\/\ st-\/>\mbox{\hyperlink{structkiss__fftr__state_acdb7015328260989cb85dcd839e9ab1f}{tmpbuf}}[ncfft-\/k].\mbox{\hyperlink{structkiss__fft__cpx_ac1e17add2ae6b815da29d7d67b03fa70}{i}};}
+\DoxyCodeLine{00109\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{kiss__fft__int16_8cpp_a05e11bb1e8e815dd7bdd199060b7555a}{C\_FIXDIV}}(fpk,2);}
+\DoxyCodeLine{00110\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{kiss__fft__int16_8cpp_a05e11bb1e8e815dd7bdd199060b7555a}{C\_FIXDIV}}(fpnk,2);}
+\DoxyCodeLine{00111\ }
+\DoxyCodeLine{00112\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{kiss__fft__int16_8cpp_a1f70747639c855259a0965de768e030a}{C\_ADD}}(\ f1k,\ fpk\ ,\ fpnk\ );}
+\DoxyCodeLine{00113\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{kiss__fft__int16_8cpp_a8c00bd9702f25a8514402a3779b3bdda}{C\_SUB}}(\ f2k,\ fpk\ ,\ fpnk\ );}
+\DoxyCodeLine{00114\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{kiss__fft__int16_8cpp_ab5092aa032092f1057feca5fbea40758}{C\_MUL}}(\ tw\ ,\ f2k\ ,\ st-\/>\mbox{\hyperlink{structkiss__fftr__state_ab875131fa6af83bfe40b4e1e7d429d0f}{super\_twiddles}}[k-\/1]);}
+\DoxyCodeLine{00115\ }
+\DoxyCodeLine{00116\ \ \ \ \ \ \ \ \ freqdata[k].\mbox{\hyperlink{structkiss__fft__cpx_a686b6187e3e885de316908319c71ea8f}{r}}\ =\ \mbox{\hyperlink{kiss__fft__int16_8cpp_a0b812a30fdb0c530a90a18d1692fab6c}{HALF\_OF}}(f1k.\mbox{\hyperlink{structkiss__fft__cpx_a686b6187e3e885de316908319c71ea8f}{r}}\ +\ tw.\mbox{\hyperlink{structkiss__fft__cpx_a686b6187e3e885de316908319c71ea8f}{r}});}
+\DoxyCodeLine{00117\ \ \ \ \ \ \ \ \ freqdata[k].\mbox{\hyperlink{structkiss__fft__cpx_ac1e17add2ae6b815da29d7d67b03fa70}{i}}\ =\ \mbox{\hyperlink{kiss__fft__int16_8cpp_a0b812a30fdb0c530a90a18d1692fab6c}{HALF\_OF}}(f1k.\mbox{\hyperlink{structkiss__fft__cpx_ac1e17add2ae6b815da29d7d67b03fa70}{i}}\ +\ tw.\mbox{\hyperlink{structkiss__fft__cpx_ac1e17add2ae6b815da29d7d67b03fa70}{i}});}
+\DoxyCodeLine{00118\ \ \ \ \ \ \ \ \ freqdata[ncfft-\/k].\mbox{\hyperlink{structkiss__fft__cpx_a686b6187e3e885de316908319c71ea8f}{r}}\ =\ \mbox{\hyperlink{kiss__fft__int16_8cpp_a0b812a30fdb0c530a90a18d1692fab6c}{HALF\_OF}}(f1k.\mbox{\hyperlink{structkiss__fft__cpx_a686b6187e3e885de316908319c71ea8f}{r}}\ -\/\ tw.\mbox{\hyperlink{structkiss__fft__cpx_a686b6187e3e885de316908319c71ea8f}{r}});}
+\DoxyCodeLine{00119\ \ \ \ \ \ \ \ \ freqdata[ncfft-\/k].\mbox{\hyperlink{structkiss__fft__cpx_ac1e17add2ae6b815da29d7d67b03fa70}{i}}\ =\ \mbox{\hyperlink{kiss__fft__int16_8cpp_a0b812a30fdb0c530a90a18d1692fab6c}{HALF\_OF}}(tw.\mbox{\hyperlink{structkiss__fft__cpx_ac1e17add2ae6b815da29d7d67b03fa70}{i}}\ -\/\ f1k.\mbox{\hyperlink{structkiss__fft__cpx_ac1e17add2ae6b815da29d7d67b03fa70}{i}});}
+\DoxyCodeLine{00120\ \ \ \ \ \}}
+\DoxyCodeLine{00121\ \}}
+\DoxyCodeLine{00122\ }
+\DoxyCodeLine{00123\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{kiss__fftr_8c_ac196009fea8f02380a2a0bedeb1936d9}{kiss\_fftri}}(\mbox{\hyperlink{structkiss__fftr__state}{kiss\_fftr\_cfg}}\ st,\textcolor{keyword}{const}\ \mbox{\hyperlink{structkiss__fft__cpx}{kiss\_fft\_cpx}}\ *freqdata,\mbox{\hyperlink{kiss__fft__int16_8cpp_a4d9bf2d6a2ce1b061545a16faf77d337}{kiss\_fft\_scalar}}\ *timedata)}
+\DoxyCodeLine{00124\ \{}
+\DoxyCodeLine{00125\ \ \ \ \ \textcolor{comment}{/*\ input\ buffer\ timedata\ is\ stored\ row-\/wise\ */}}
+\DoxyCodeLine{00126\ \ \ \ \ \textcolor{keywordtype}{int}\ k,\ ncfft;}
+\DoxyCodeLine{00127\ }
+\DoxyCodeLine{00128\ \ \ \ \ \textcolor{keywordflow}{if}\ (st-\/>\mbox{\hyperlink{structkiss__fftr__state_acdccafcf502fec1c13450c2eae901738}{substate}}-\/>\mbox{\hyperlink{structkiss__fft__state_a8faed935610ffb08bf7ad9ea8d6c81d2}{inverse}}\ ==\ 0)\ \{}
+\DoxyCodeLine{00129\ \ \ \ \ \ \ \ \ \textcolor{comment}{/*\ fprintf\ (stderr,\ "{}kiss\ fft\ usage\ error:\ improper\ alloc\(\backslash\)n"{});\ */}}
+\DoxyCodeLine{00130\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};\ \textcolor{comment}{/*\ exit\ (1);\ */}}
+\DoxyCodeLine{00131\ \ \ \ \ \}}
+\DoxyCodeLine{00132\ }
+\DoxyCodeLine{00133\ \ \ \ \ ncfft\ =\ st-\/>\mbox{\hyperlink{structkiss__fftr__state_acdccafcf502fec1c13450c2eae901738}{substate}}-\/>\mbox{\hyperlink{structkiss__fft__state_aa7446bded329a40e13aef0826e349791}{nfft}};}
+\DoxyCodeLine{00134\ }
+\DoxyCodeLine{00135\ \ \ \ \ st-\/>\mbox{\hyperlink{structkiss__fftr__state_acdb7015328260989cb85dcd839e9ab1f}{tmpbuf}}[0].\mbox{\hyperlink{structkiss__fft__cpx_a686b6187e3e885de316908319c71ea8f}{r}}\ =\ freqdata[0].\mbox{\hyperlink{structkiss__fft__cpx_a686b6187e3e885de316908319c71ea8f}{r}}\ +\ freqdata[ncfft].\mbox{\hyperlink{structkiss__fft__cpx_a686b6187e3e885de316908319c71ea8f}{r}};}
+\DoxyCodeLine{00136\ \ \ \ \ st-\/>\mbox{\hyperlink{structkiss__fftr__state_acdb7015328260989cb85dcd839e9ab1f}{tmpbuf}}[0].\mbox{\hyperlink{structkiss__fft__cpx_ac1e17add2ae6b815da29d7d67b03fa70}{i}}\ =\ freqdata[0].\mbox{\hyperlink{structkiss__fft__cpx_a686b6187e3e885de316908319c71ea8f}{r}}\ -\/\ freqdata[ncfft].\mbox{\hyperlink{structkiss__fft__cpx_a686b6187e3e885de316908319c71ea8f}{r}};}
+\DoxyCodeLine{00137\ \ \ \ \ \mbox{\hyperlink{kiss__fft__int16_8cpp_a05e11bb1e8e815dd7bdd199060b7555a}{C\_FIXDIV}}(st-\/>\mbox{\hyperlink{structkiss__fftr__state_acdb7015328260989cb85dcd839e9ab1f}{tmpbuf}}[0],2);}
+\DoxyCodeLine{00138\ }
+\DoxyCodeLine{00139\ \ \ \ \ \textcolor{keywordflow}{for}\ (k\ =\ 1;\ k\ <=\ ncfft\ /\ 2;\ ++k)\ \{}
+\DoxyCodeLine{00140\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structkiss__fft__cpx}{kiss\_fft\_cpx}}\ fk,\ fnkc,\ fek,\ fok,\ tmp;}
+\DoxyCodeLine{00141\ \ \ \ \ \ \ \ \ fk\ =\ freqdata[k];}
+\DoxyCodeLine{00142\ \ \ \ \ \ \ \ \ fnkc.\mbox{\hyperlink{structkiss__fft__cpx_a686b6187e3e885de316908319c71ea8f}{r}}\ =\ freqdata[ncfft\ -\/\ k].\mbox{\hyperlink{structkiss__fft__cpx_a686b6187e3e885de316908319c71ea8f}{r}};}
+\DoxyCodeLine{00143\ \ \ \ \ \ \ \ \ fnkc.\mbox{\hyperlink{structkiss__fft__cpx_ac1e17add2ae6b815da29d7d67b03fa70}{i}}\ =\ -\/freqdata[ncfft\ -\/\ k].\mbox{\hyperlink{structkiss__fft__cpx_ac1e17add2ae6b815da29d7d67b03fa70}{i}};}
+\DoxyCodeLine{00144\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{kiss__fft__int16_8cpp_a05e11bb1e8e815dd7bdd199060b7555a}{C\_FIXDIV}}(\ fk\ ,\ 2\ );}
+\DoxyCodeLine{00145\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{kiss__fft__int16_8cpp_a05e11bb1e8e815dd7bdd199060b7555a}{C\_FIXDIV}}(\ fnkc\ ,\ 2\ );}
+\DoxyCodeLine{00146\ }
+\DoxyCodeLine{00147\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{kiss__fft__int16_8cpp_a1f70747639c855259a0965de768e030a}{C\_ADD}}\ (fek,\ fk,\ fnkc);}
+\DoxyCodeLine{00148\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{kiss__fft__int16_8cpp_a8c00bd9702f25a8514402a3779b3bdda}{C\_SUB}}\ (tmp,\ fk,\ fnkc);}
+\DoxyCodeLine{00149\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{kiss__fft__int16_8cpp_ab5092aa032092f1057feca5fbea40758}{C\_MUL}}\ (fok,\ tmp,\ st-\/>\mbox{\hyperlink{structkiss__fftr__state_ab875131fa6af83bfe40b4e1e7d429d0f}{super\_twiddles}}[k-\/1]);}
+\DoxyCodeLine{00150\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{kiss__fft__int16_8cpp_a1f70747639c855259a0965de768e030a}{C\_ADD}}\ (st-\/>\mbox{\hyperlink{structkiss__fftr__state_acdb7015328260989cb85dcd839e9ab1f}{tmpbuf}}[k],\ \ \ \ \ fek,\ fok);}
+\DoxyCodeLine{00151\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{kiss__fft__int16_8cpp_a8c00bd9702f25a8514402a3779b3bdda}{C\_SUB}}\ (st-\/>\mbox{\hyperlink{structkiss__fftr__state_acdb7015328260989cb85dcd839e9ab1f}{tmpbuf}}[ncfft\ -\/\ k],\ fek,\ fok);}
+\DoxyCodeLine{00152\ \textcolor{preprocessor}{\#ifdef\ USE\_SIMD\ \ \ \ \ \ \ \ }}
+\DoxyCodeLine{00153\ \ \ \ \ \ \ \ \ st-\/>\mbox{\hyperlink{structkiss__fftr__state_acdb7015328260989cb85dcd839e9ab1f}{tmpbuf}}[ncfft\ -\/\ k].\mbox{\hyperlink{structkiss__fft__cpx_ac1e17add2ae6b815da29d7d67b03fa70}{i}}\ *=\ \_mm\_set1\_ps(-\/1.0);}
+\DoxyCodeLine{00154\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00155\ \ \ \ \ \ \ \ \ st-\/>\mbox{\hyperlink{structkiss__fftr__state_acdb7015328260989cb85dcd839e9ab1f}{tmpbuf}}[ncfft\ -\/\ k].\mbox{\hyperlink{structkiss__fft__cpx_ac1e17add2ae6b815da29d7d67b03fa70}{i}}\ *=\ -\/1;}
+\DoxyCodeLine{00156\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00157\ \ \ \ \ \}}
+\DoxyCodeLine{00158\ \ \ \ \ \mbox{\hyperlink{kiss__fft_8c_ab36e2bb33b74c1a7eabe3271d0916030}{kiss\_fft}}\ (st-\/>\mbox{\hyperlink{structkiss__fftr__state_acdccafcf502fec1c13450c2eae901738}{substate}},\ st-\/>\mbox{\hyperlink{structkiss__fftr__state_acdb7015328260989cb85dcd839e9ab1f}{tmpbuf}},\ (\mbox{\hyperlink{structkiss__fft__cpx}{kiss\_fft\_cpx}}\ *)\ timedata);}
+\DoxyCodeLine{00159\ \}}
+
+\end{DoxyCode}

@@ -1,0 +1,68 @@
+\doxysection{micro\+\_\+op\+\_\+resolver.\+h}
+\hypertarget{tflite-micro-main_2tensorflow_2lite_2micro_2micro__op__resolver_8h_source}{}\label{tflite-micro-main_2tensorflow_2lite_2micro_2micro__op__resolver_8h_source}\index{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/main/tensorflow/lite/micro/micro\_op\_resolver.h@{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/main/tensorflow/lite/micro/micro\_op\_resolver.h}}
+\mbox{\hyperlink{tflite-micro-main_2tensorflow_2lite_2micro_2micro__op__resolver_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{/*\ Copyright\ 2020\ The\ TensorFlow\ Authors.\ All\ Rights\ Reserved.}}
+\DoxyCodeLine{00002\ \textcolor{comment}{}}
+\DoxyCodeLine{00003\ \textcolor{comment}{Licensed\ under\ the\ Apache\ License,\ Version\ 2.0\ (the\ "{}License"{});}}
+\DoxyCodeLine{00004\ \textcolor{comment}{you\ may\ not\ use\ this\ file\ except\ in\ compliance\ with\ the\ License.}}
+\DoxyCodeLine{00005\ \textcolor{comment}{You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{00006\ \textcolor{comment}{}}
+\DoxyCodeLine{00007\ \textcolor{comment}{\ \ \ \ http://www.apache.org/licenses/LICENSE-\/2.0}}
+\DoxyCodeLine{00008\ \textcolor{comment}{}}
+\DoxyCodeLine{00009\ \textcolor{comment}{Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ software}}
+\DoxyCodeLine{00010\ \textcolor{comment}{distributed\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,}}
+\DoxyCodeLine{00011\ \textcolor{comment}{WITHOUT\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,\ either\ express\ or\ implied.}}
+\DoxyCodeLine{00012\ \textcolor{comment}{See\ the\ License\ for\ the\ specific\ language\ governing\ permissions\ and}}
+\DoxyCodeLine{00013\ \textcolor{comment}{limitations\ under\ the\ License.}}
+\DoxyCodeLine{00014\ \textcolor{comment}{==============================================================================*/}}
+\DoxyCodeLine{00015\ \textcolor{preprocessor}{\#ifndef\ TENSORFLOW\_LITE\_MICRO\_MICRO\_OP\_RESOLVER\_H\_}}
+\DoxyCodeLine{00016\ \textcolor{preprocessor}{\#define\ TENSORFLOW\_LITE\_MICRO\_MICRO\_OP\_RESOLVER\_H\_}}
+\DoxyCodeLine{00017\ }
+\DoxyCodeLine{00018\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/c/common.h"{}}}
+\DoxyCodeLine{00019\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{micro__common_8h}{tensorflow/lite/micro/micro\_common.h}}"{}}}
+\DoxyCodeLine{00020\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/micro/tflite\_bridge/flatbuffer\_conversions\_bridge.h"{}}}
+\DoxyCodeLine{00021\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/schema/schema\_generated.h"{}}}
+\DoxyCodeLine{00022\ }
+\DoxyCodeLine{00023\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacetflite}{tflite}}\ \{}
+\DoxyCodeLine{00024\ }
+\DoxyCodeLine{00025\ \textcolor{comment}{//\ This\ is\ an\ interface\ for\ the\ OpResolver\ for\ TFLiteMicro.\ The\ differences\ from}}
+\DoxyCodeLine{00026\ \textcolor{comment}{//\ the\ TFLite\ OpResolver\ base\ class\ are\ to:}}
+\DoxyCodeLine{00027\ \textcolor{comment}{//\ \ *\ explicitly\ remove\ support\ for\ Op\ versions}}
+\DoxyCodeLine{00028\ \textcolor{comment}{//\ \ *\ allow\ for\ finer\ grained\ registration\ of\ the\ Builtin\ Ops\ to\ reduce\ code}}
+\DoxyCodeLine{00029\ \textcolor{comment}{//\ \ \ \ size\ for\ TFLiteMicro.}}
+\DoxyCodeLine{00030\ \textcolor{comment}{//}}
+\DoxyCodeLine{00031\ \textcolor{comment}{//\ We\ need\ an\ interface\ class\ instead\ of\ directly\ using\ MicroMutableOpResolver}}
+\DoxyCodeLine{00032\ \textcolor{comment}{//\ because\ MicroMutableOpResolver\ is\ a\ class\ template\ with\ the\ number\ of}}
+\DoxyCodeLine{00033\ \textcolor{comment}{//\ registered\ Ops\ as\ the\ template\ parameter.}}
+\DoxyCodeLine{00034\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classtflite_1_1_micro_op_resolver}{MicroOpResolver}}\ \{}
+\DoxyCodeLine{00035\ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00036\ \ \ \textcolor{comment}{//\ Returns\ the\ Op\ registration\ struct\ corresponding\ to\ the\ enum\ code\ from\ the}}
+\DoxyCodeLine{00037\ \ \ \textcolor{comment}{//\ flatbuffer\ schema.\ Returns\ nullptr\ if\ the\ op\ is\ not\ found\ or\ if\ op\ ==}}
+\DoxyCodeLine{00038\ \ \ \textcolor{comment}{//\ BuiltinOperator\_CUSTOM.}}
+\DoxyCodeLine{00039\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_t_f_l_m_registration}{TFLMRegistration}}*\ \mbox{\hyperlink{classtflite_1_1_micro_op_resolver_a19e0f781b22bdd3b665010040fd4b758}{FindOp}}(\mbox{\hyperlink{namespacetflite_ab29efbedf49bccb2d2259fd931ba06ac}{BuiltinOperator}}\ op)\ \textcolor{keyword}{const}\ =\ 0;}
+\DoxyCodeLine{00040\ }
+\DoxyCodeLine{00041\ \ \ \textcolor{comment}{//\ Returns\ the\ Op\ registration\ struct\ corresponding\ to\ the\ custom\ operator\ by}}
+\DoxyCodeLine{00042\ \ \ \textcolor{comment}{//\ name.}}
+\DoxyCodeLine{00043\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_t_f_l_m_registration}{TFLMRegistration}}*\ \mbox{\hyperlink{classtflite_1_1_micro_op_resolver_a0fb7f59a7c9ba4d4f295adc1a64f60e8}{FindOp}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ op)\ \textcolor{keyword}{const}\ =\ 0;}
+\DoxyCodeLine{00044\ }
+\DoxyCodeLine{00045\ \ \ \textcolor{comment}{//\ Returns\ the\ operator\ specific\ parsing\ function\ for\ the\ OpData\ for\ a}}
+\DoxyCodeLine{00046\ \ \ \textcolor{comment}{//\ BuiltinOperator\ (if\ registered),\ else\ nullptr.}}
+\DoxyCodeLine{00047\ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{namespacetflite_a6d04c6368d560b2eac8b896bccc64975}{TfLiteBridgeBuiltinParseFunction}}\ \mbox{\hyperlink{classtflite_1_1_micro_op_resolver_a6cc94872ef809e15ec57949bb8b7b10d}{GetOpDataParser}}(}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_ab29efbedf49bccb2d2259fd931ba06ac}{BuiltinOperator}}\ op)\ \textcolor{keyword}{const}\ =\ 0;}
+\DoxyCodeLine{00049\ }
+\DoxyCodeLine{00050\ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{classtflite_1_1_micro_op_resolver_a32bf0e206bb18c6af444a4befd005132}{\string~MicroOpResolver}}()\ \{\}}
+\DoxyCodeLine{00051\ \};}
+\DoxyCodeLine{00052\ }
+\DoxyCodeLine{00053\ \textcolor{comment}{//\ Handles\ the\ logic\ for\ converting\ between\ an\ OperatorCode\ structure\ extracted}}
+\DoxyCodeLine{00054\ \textcolor{comment}{//\ from\ a\ flatbuffer\ and\ information\ about\ a\ registered\ operator}}
+\DoxyCodeLine{00055\ \textcolor{comment}{//\ implementation.}}
+\DoxyCodeLine{00056\ \mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2core_2c_2c__api__types_8h_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_af8154a8f9b2b80e90f3a4fc76e0256f7}{GetRegistrationFromOpCode}}(\textcolor{keyword}{const}\ OperatorCode*\ opcode,}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ MicroOpResolver\&\ op\_resolver,}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_t_f_l_m_registration}{TFLMRegistration}}**\ registration);}
+\DoxyCodeLine{00059\ }
+\DoxyCodeLine{00060\ \}\ \ \textcolor{comment}{//\ namespace\ tflite}}
+\DoxyCodeLine{00061\ }
+\DoxyCodeLine{00062\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ TENSORFLOW\_LITE\_MICRO\_MICRO\_OP\_RESOLVER\_H\_}}
+
+\end{DoxyCode}

@@ -1,0 +1,107 @@
+\doxysection{ei\+\_\+ceva\+\_\+dsp.\+h}
+\hypertarget{ei__ceva__dsp_8h_source}{}\label{ei__ceva__dsp_8h_source}\index{Face\_Access\_inferencing/src/edge-\/impulse-\/sdk/dsp/dsp\_engines/ei\_ceva\_dsp.h@{Face\_Access\_inferencing/src/edge-\/impulse-\/sdk/dsp/dsp\_engines/ei\_ceva\_dsp.h}}
+\mbox{\hyperlink{ei__ceva__dsp_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{preprocessor}{\#ifndef\ EI\_CEVA\_DSP\_H}}
+\DoxyCodeLine{00002\ \textcolor{preprocessor}{\#define\ EI\_CEVA\_DSP\_H}}
+\DoxyCodeLine{00003\ }
+\DoxyCodeLine{00004\ \textcolor{preprocessor}{\#include\ <cstddef>}}
+\DoxyCodeLine{00005\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{returntypes_8hpp}{edge-\/impulse-\/sdk/dsp/returntypes.hpp}}"{}}}
+\DoxyCodeLine{00006\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{numpy__types_8h}{edge-\/impulse-\/sdk/dsp/numpy\_types.h}}"{}}}
+\DoxyCodeLine{00007\ \textcolor{preprocessor}{\#define\ CEVA\_DSP\_LIB\_MAX\_FFT\ 1024\ }\textcolor{comment}{//\ doesn't\ actually\ change\ link\ stage.\ \ But\ gives\ us\ all\ protos}}
+\DoxyCodeLine{00008\ }
+\DoxyCodeLine{00009\ \textcolor{keyword}{extern}\ \textcolor{stringliteral}{"{}C"{}}\ \{}
+\DoxyCodeLine{00010\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{ceva__dsp__lib__fft_8h}{ceva/ceva\_dsp\_lib\_fft.h}}"{}}}
+\DoxyCodeLine{00011\ \}}
+\DoxyCodeLine{00012\ }
+\DoxyCodeLine{00013\ \textcolor{keyword}{extern}\ \textcolor{stringliteral}{"{}C"{}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{ei__ceva__dsp_8h_ac0605e7c20b989493ec4552e78162452}{CEVA\_DSP\_LIB\_FLOAT\_FFT\_REAL}}(\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src82599f02174ce2f1c2fd003f3eee8b73_a224a688884bc63558dc173a05e2220d4}{int32}}\ log2\_buf\_len,}
+\DoxyCodeLine{00014\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_2micro_2kernels_2ceva_2types_8h_a2b24a5df8873f8e4fff3f18be417f63b}{float\_32}}\ *in\_buf,}
+\DoxyCodeLine{00015\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_2micro_2kernels_2ceva_2types_8h_a2b24a5df8873f8e4fff3f18be417f63b}{float\_32}}\ *out\_buf,}
+\DoxyCodeLine{00016\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_2micro_2kernels_2ceva_2types_8h_a2b24a5df8873f8e4fff3f18be417f63b}{float\_32}}\ \textcolor{keyword}{const}\ *twi\_table,}
+\DoxyCodeLine{00017\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_2micro_2kernels_2ceva_2types_8h_a2b24a5df8873f8e4fff3f18be417f63b}{float\_32}}\ \textcolor{keyword}{const}\ *last\_stage\_twi\_table,}
+\DoxyCodeLine{00018\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src82599f02174ce2f1c2fd003f3eee8b73_a5e39b6c06b357490824fbf07452086e9}{int16}}\ \textcolor{keyword}{const}\ *bitrev\_tbl,}
+\DoxyCodeLine{00019\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_2micro_2kernels_2ceva_2types_8h_a2b24a5df8873f8e4fff3f18be417f63b}{float\_32}}\ *temp\_buf,}
+\DoxyCodeLine{00020\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src82599f02174ce2f1c2fd003f3eee8b73_a224a688884bc63558dc173a05e2220d4}{int32}}\ br);}
+\DoxyCodeLine{00021\ }
+\DoxyCodeLine{00022\ }
+\DoxyCodeLine{00023\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespaceei}{ei}}\ \{}
+\DoxyCodeLine{00024\ \textcolor{keyword}{namespace\ }fft\ \{}
+\DoxyCodeLine{00025\ }
+\DoxyCodeLine{00026\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{namespaceei_1_1fft_ac3e1e48cf044b497351aa07e5218e798}{MIN\_FFT\_SIZE}}\ =\ 32;}
+\DoxyCodeLine{00027\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{namespaceei_1_1fft_afaf2f63ba88162a2e5228c4ac574aaed}{MAX\_FFT\_SIZE}}\ =\ 1024;}
+\DoxyCodeLine{00028\ }
+\DoxyCodeLine{00029\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespaceei_1_1fft_a875b58c1e08a7f047593c00320569fd3}{can\_do\_fft}}(\textcolor{keywordtype}{size\_t}\ n\_fft)}
+\DoxyCodeLine{00030\ \{}
+\DoxyCodeLine{00031\ \ \ \ \ \textcolor{keywordflow}{return}\ n\_fft\ ==\ 32\ ||\ n\_fft\ ==\ 64\ ||\ n\_fft\ ==\ 128\ ||\ n\_fft\ ==\ 256\ ||\ n\_fft\ ==\ 512\ ||}
+\DoxyCodeLine{00032\ \ \ \ \ \ \ \ \ n\_fft\ ==\ 1024;}
+\DoxyCodeLine{00033\ \}}
+\DoxyCodeLine{00034\ }
+\DoxyCodeLine{00035\ \textcolor{keyword}{static}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_2micro_2kernels_2ceva_2types_8h_a2b24a5df8873f8e4fff3f18be417f63b}{float\_32}}\ \textcolor{keyword}{const}\ *\mbox{\hyperlink{namespaceei_1_1fft_a8c2343fb8f59c6b6322039826201c146}{twiddle\_table\_for\_n\_fft}}(\textcolor{keywordtype}{size\_t}\ log2\_n\_fft)}
+\DoxyCodeLine{00036\ \{}
+\DoxyCodeLine{00037\ \textcolor{comment}{//\ First,\ the\ cases\ where\ we\ need\ all\ tables}}
+\DoxyCodeLine{00038\ \textcolor{preprocessor}{\#if\ EI\_CLASSIFIER\_HAS\_FFT\_INFO\ ==\ 1\ \ \&\&\ !defined(EI\_CLASSIFIER\_LOAD\_ALL\_FFTS)}}
+\DoxyCodeLine{00039\ \textcolor{comment}{//\ Intentionally\ empty}}
+\DoxyCodeLine{00040\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00041\ \textcolor{preprocessor}{\#define\ EI\_LOAD\_ALL\_FFT\_TABLES\ 1}}
+\DoxyCodeLine{00042\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00043\ }
+\DoxyCodeLine{00044\ \ \ \ \ \textcolor{keywordflow}{switch}\ (log2\_n\_fft)\ \{}
+\DoxyCodeLine{00045\ \textcolor{preprocessor}{\#if\ EI\_LOAD\_ALL\_FFT\_TABLES\ ||\ EI\_CLASSIFIER\_LOAD\_FFT\_32}}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ 5:\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{ceva__dsp__lib__fft_8h_a561ea85cdc1d4b70ab5b88dd8014d56f}{twi\_table\_float\_rfft\_32}};}
+\DoxyCodeLine{00047\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00048\ \textcolor{preprocessor}{\#if\ EI\_LOAD\_ALL\_FFT\_TABLES\ ||\ EI\_CLASSIFIER\_LOAD\_FFT\_64}}
+\DoxyCodeLine{00049\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ 6:\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{ceva__dsp__lib__fft_8h_a13ce8611dc65217ceb077d9345fcfcae}{twi\_table\_float\_rfft\_64}};}
+\DoxyCodeLine{00050\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00051\ \textcolor{preprocessor}{\#if\ EI\_LOAD\_ALL\_FFT\_TABLES\ ||\ EI\_CLASSIFIER\_LOAD\_FFT\_128}}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ 7:\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{ceva__dsp__lib__fft_8h_a20eaf3e26fe84b9796f800f1726974da}{twi\_table\_float\_rfft\_128}};}
+\DoxyCodeLine{00053\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00054\ \textcolor{preprocessor}{\#if\ EI\_LOAD\_ALL\_FFT\_TABLES\ ||\ EI\_CLASSIFIER\_LOAD\_FFT\_256}}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ 8:\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{ceva__dsp__lib__fft_8h_a99637c2d29f168574343b9b81080eb0f}{twi\_table\_float\_rfft\_256}};}
+\DoxyCodeLine{00056\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00057\ \textcolor{preprocessor}{\#if\ EI\_LOAD\_ALL\_FFT\_TABLES\ ||\ EI\_CLASSIFIER\_LOAD\_FFT\_512}}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ 9:\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{ceva__dsp__lib__fft_8h_a9353298801ccf217caa5b850e1585124}{twi\_table\_float\_rfft\_512}};}
+\DoxyCodeLine{00059\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00060\ \textcolor{preprocessor}{\#if\ EI\_LOAD\_ALL\_FFT\_TABLES\ ||\ EI\_CLASSIFIER\_LOAD\_FFT\_1024}}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ 10:\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{ceva__dsp__lib__fft_8h_ae3dc5b8b913e73bd2f24804f5919e28a}{twi\_table\_float\_rfft\_1024}};}
+\DoxyCodeLine{00062\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}:\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{00064\ \ \ \ \ \}}
+\DoxyCodeLine{00065\ \}}
+\DoxyCodeLine{00066\ }
+\DoxyCodeLine{00067\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{namespaceei_1_1fft_a579aaa6a4bf143e629c4f9714eae301f}{hw\_r2c\_fft}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{float}\ *\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src5afb18c45f6346167aa977a363205143_a9cebfb3d6ddd692fbdd268cf4b9ad024}{input}},\ ei::fft\_complex\_t\ *\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbcd3bbe90c4644d53fde1ce4e312f437_a7a2a916a8059078c2d7a05f46c7126fd}{output}},\ \textcolor{keywordtype}{size\_t}\ n\_fft)}
+\DoxyCodeLine{00068\ \{}
+\DoxyCodeLine{00069\ \ \ \ \ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespaceei}{ei}};}
+\DoxyCodeLine{00070\ \ \ \ \ \textcolor{keywordflow}{if}(!\mbox{\hyperlink{namespaceei_1_1fft_a875b58c1e08a7f047593c00320569fd3}{can\_do\_fft}}(n\_fft))\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespaceei_a35329cd4e57031263ba0a94c8d3959baaddc7216602b0d5ae1d90c6e2a310c5f0}{EIDSP\_FFT\_SIZE\_NOT\_SUPPORTED}};\ \}}
+\DoxyCodeLine{00071\ }
+\DoxyCodeLine{00072\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ log2\_n\_fft\ =\ 0;}
+\DoxyCodeLine{00073\ \ \ \ \ \textcolor{keywordflow}{while}\ ((1\ <<\ log2\_n\_fft)\ <\ n\_fft)\ \{}
+\DoxyCodeLine{00074\ \ \ \ \ \ \ \ \ log2\_n\_fft++;}
+\DoxyCodeLine{00075\ \ \ \ \ \}}
+\DoxyCodeLine{00076\ }
+\DoxyCodeLine{00077\ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_2micro_2kernels_2ceva_2types_8h_a2b24a5df8873f8e4fff3f18be417f63b}{float\_32}}\ \textcolor{keyword}{const}\ *twiddle\_table\ =\ \mbox{\hyperlink{namespaceei_1_1fft_a8c2343fb8f59c6b6322039826201c146}{twiddle\_table\_for\_n\_fft}}(log2\_n\_fft);}
+\DoxyCodeLine{00078\ \ \ \ \ \textcolor{keywordflow}{if}\ (!twiddle\_table)\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespaceei_a35329cd4e57031263ba0a94c8d3959baa191621b87734df002cf7b1736b71bc7b}{EIDSP\_FFT\_TABLE\_NOT\_LOADED}};\ \}}
+\DoxyCodeLine{00079\ }
+\DoxyCodeLine{00080\ \ \ \ \ \textcolor{keywordtype}{float}*\ \mbox{\hyperlink{nicla__sense__fusion_8ino_ae6219c1117781a1dbbb7839946bca32c}{temp}}\ =\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{00081\ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespaceei_a593af57fa44116ca69a3e62d0fd75adc}{ptr}}\ =\ \mbox{\hyperlink{memory_8hpp_a10a64d12824bb0d2081f5853045f7e87}{EI\_MAKE\_TRACKED\_POINTER}}(\mbox{\hyperlink{nicla__sense__fusion_8ino_ae6219c1117781a1dbbb7839946bca32c}{temp}},\ n\_fft);}
+\DoxyCodeLine{00082\ \ \ \ \ \mbox{\hyperlink{memory_8hpp_a2dc8370f84968c0d5865b3cbab3a9ca5}{EI\_ERR\_AND\_RETURN\_ON\_NULL}}(\mbox{\hyperlink{nicla__sense__fusion_8ino_ae6219c1117781a1dbbb7839946bca32c}{temp}},\ \mbox{\hyperlink{namespaceei_a35329cd4e57031263ba0a94c8d3959baa8340d6c1221f3cd7e0055ef8df56df32}{EIDSP\_OUT\_OF\_MEM}});}
+\DoxyCodeLine{00083\ }
+\DoxyCodeLine{00084\ \ \ \ \ \mbox{\hyperlink{ei__ceva__dsp_8h_ac0605e7c20b989493ec4552e78162452}{CEVA\_DSP\_LIB\_FLOAT\_FFT\_REAL}}(}
+\DoxyCodeLine{00085\ \ \ \ \ \ \ \ \ log2\_n\_fft,}
+\DoxyCodeLine{00086\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const\_cast<}\textcolor{keywordtype}{float}*\textcolor{keyword}{>}(\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src5afb18c45f6346167aa977a363205143_a9cebfb3d6ddd692fbdd268cf4b9ad024}{input}}),}
+\DoxyCodeLine{00087\ \ \ \ \ \ \ \ \ (\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_2micro_2kernels_2ceva_2types_8h_a2b24a5df8873f8e4fff3f18be417f63b}{float\_32}}\ *)\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbcd3bbe90c4644d53fde1ce4e312f437_a7a2a916a8059078c2d7a05f46c7126fd}{output}},}
+\DoxyCodeLine{00088\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ceva__dsp__lib__fft_8h_ab1fd66fee6dddbab38f3788a86803f7c}{CEVA\_DSP\_LIB\_FLOAT\_cos\_sin}},}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \ \ twiddle\_table,}
+\DoxyCodeLine{00090\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ceva__dsp__lib__fft_8h_ab5d07099c9135e93e6867ecc6f5c1a26}{bitrev\_32\_1024}},}
+\DoxyCodeLine{00091\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{nicla__sense__fusion_8ino_ae6219c1117781a1dbbb7839946bca32c}{temp}},}
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \ \ 1\ \textcolor{comment}{//\ bit\ reverse}}
+\DoxyCodeLine{00093\ \ \ \ \ );}
+\DoxyCodeLine{00094\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespaceei_a35329cd4e57031263ba0a94c8d3959baa58f9da92fe1aff29466bdd4aa2a7b361}{EIDSP\_OK}};}
+\DoxyCodeLine{00095\ \}}
+\DoxyCodeLine{00096\ }
+\DoxyCodeLine{00097\ \}\ \textcolor{comment}{//\ namespace\ fft}}
+\DoxyCodeLine{00098\ }
+\DoxyCodeLine{00099\ \}\ \textcolor{comment}{//\ namespace\ ei}}
+\DoxyCodeLine{00100\ }
+\DoxyCodeLine{00101\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ EI\_CEVA\_DSP\_H}}
+
+\end{DoxyCode}

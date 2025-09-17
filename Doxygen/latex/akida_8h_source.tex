@@ -1,0 +1,560 @@
+\doxysection{akida.\+h}
+\hypertarget{akida_8h_source}{}\label{akida_8h_source}\index{Face\_Access\_inferencing/src/edge-\/impulse-\/sdk/classifier/inferencing\_engines/akida.h@{Face\_Access\_inferencing/src/edge-\/impulse-\/sdk/classifier/inferencing\_engines/akida.h}}
+\mbox{\hyperlink{akida_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{/*\ Edge\ Impulse\ inferencing\ library}}
+\DoxyCodeLine{00002\ \textcolor{comment}{\ *\ Copyright\ (c)\ 2022\ EdgeImpulse\ Inc.}}
+\DoxyCodeLine{00003\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00004\ \textcolor{comment}{\ *\ Permission\ is\ hereby\ granted,\ free\ of\ charge,\ to\ any\ person\ obtaining\ a\ copy}}
+\DoxyCodeLine{00005\ \textcolor{comment}{\ *\ of\ this\ software\ and\ associated\ documentation\ files\ (the\ "{}Software"{}),\ to\ deal}}
+\DoxyCodeLine{00006\ \textcolor{comment}{\ *\ in\ the\ Software\ without\ restriction,\ including\ without\ limitation\ the\ rights}}
+\DoxyCodeLine{00007\ \textcolor{comment}{\ *\ to\ use,\ copy,\ modify,\ merge,\ publish,\ distribute,\ sublicense,\ and/or\ sell}}
+\DoxyCodeLine{00008\ \textcolor{comment}{\ *\ copies\ of\ the\ Software,\ and\ to\ permit\ persons\ to\ whom\ the\ Software\ is}}
+\DoxyCodeLine{00009\ \textcolor{comment}{\ *\ furnished\ to\ do\ so,\ subject\ to\ the\ following\ conditions:}}
+\DoxyCodeLine{00010\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00011\ \textcolor{comment}{\ *\ The\ above\ copyright\ notice\ and\ this\ permission\ notice\ shall\ be\ included\ in}}
+\DoxyCodeLine{00012\ \textcolor{comment}{\ *\ all\ copies\ or\ substantial\ portions\ of\ the\ Software.}}
+\DoxyCodeLine{00013\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00014\ \textcolor{comment}{\ *\ THE\ SOFTWARE\ IS\ PROVIDED\ "{}AS\ IS"{},\ WITHOUT\ WARRANTY\ OF\ ANY\ KIND,\ EXPRESS\ OR}}
+\DoxyCodeLine{00015\ \textcolor{comment}{\ *\ IMPLIED,\ INCLUDING\ BUT\ NOT\ LIMITED\ TO\ THE\ WARRANTIES\ OF\ MERCHANTABILITY,}}
+\DoxyCodeLine{00016\ \textcolor{comment}{\ *\ FITNESS\ FOR\ A\ PARTICULAR\ PURPOSE\ AND\ NONINFRINGEMENT.\ IN\ NO\ EVENT\ SHALL\ THE}}
+\DoxyCodeLine{00017\ \textcolor{comment}{\ *\ AUTHORS\ OR\ COPYRIGHT\ HOLDERS\ BE\ LIABLE\ FOR\ ANY\ CLAIM,\ DAMAGES\ OR\ OTHER}}
+\DoxyCodeLine{00018\ \textcolor{comment}{\ *\ LIABILITY,\ WHETHER\ IN\ AN\ ACTION\ OF\ CONTRACT,\ TORT\ OR\ OTHERWISE,\ ARISING\ FROM,}}
+\DoxyCodeLine{00019\ \textcolor{comment}{\ *\ OUT\ OF\ OR\ IN\ CONNECTION\ WITH\ THE\ SOFTWARE\ OR\ THE\ USE\ OR\ OTHER\ DEALINGS\ IN\ THE}}
+\DoxyCodeLine{00020\ \textcolor{comment}{\ *\ SOFTWARE.}}
+\DoxyCodeLine{00021\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{00022\ }
+\DoxyCodeLine{00023\ \textcolor{preprocessor}{\#ifndef\ EI\_CLASSIFIER\_INFERENCING\_ENGINE\_AKIDA\_H}}
+\DoxyCodeLine{00024\ \textcolor{preprocessor}{\#define\ EI\_CLASSIFIER\_INFERENCING\_ENGINE\_AKIDA\_H}}
+\DoxyCodeLine{00025\ }
+\DoxyCodeLine{00026\ \textcolor{preprocessor}{\#if\ (EI\_CLASSIFIER\_INFERENCING\_ENGINE\ ==\ EI\_CLASSIFIER\_AKIDA)}}
+\DoxyCodeLine{00027\ }
+\DoxyCodeLine{00033\ \textcolor{preprocessor}{\#ifndef\ EI\_CLASSIFIER\_USE\_AKIDA\_SOFTWARE}}
+\DoxyCodeLine{00034\ \textcolor{preprocessor}{\#define\ EI\_CLASSIFIER\_USE\_AKIDA\_HARDWARE\ 1}}
+\DoxyCodeLine{00035\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00036\ }
+\DoxyCodeLine{00043\ \textcolor{preprocessor}{\#ifndef\ EI\_CLASSIFIER\_USE\_AKIDA\_HARDWARE\_NO}}
+\DoxyCodeLine{00044\ \textcolor{preprocessor}{\#define\ EI\_CLASSIFIER\_USE\_AKIDA\_HARDWARE\_NO\ 0}}
+\DoxyCodeLine{00045\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00046\ }
+\DoxyCodeLine{00047\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{model__metadata_8h}{model-\/parameters/model\_metadata.h}}"{}}}
+\DoxyCodeLine{00048\ \textcolor{preprocessor}{\#include\ <thread>}}
+\DoxyCodeLine{00049\ \textcolor{preprocessor}{\#include\ "{}tensorflow-\/lite/tensorflow/lite/c/common.h"{}}}
+\DoxyCodeLine{00050\ \textcolor{preprocessor}{\#include\ "{}tensorflow-\/lite/tensorflow/lite/interpreter.h"{}}}
+\DoxyCodeLine{00051\ \textcolor{preprocessor}{\#include\ "{}tensorflow-\/lite/tensorflow/lite/kernels/register.h"{}}}
+\DoxyCodeLine{00052\ \textcolor{preprocessor}{\#include\ "{}tensorflow-\/lite/tensorflow/lite/model.h"{}}}
+\DoxyCodeLine{00053\ \textcolor{preprocessor}{\#include\ "{}tensorflow-\/lite/tensorflow/lite/optional\_debug\_tools.h"{}}}
+\DoxyCodeLine{00054\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{kernels_2custom_2tree__ensemble__classifier_8h}{edge-\/impulse-\/sdk/tensorflow/lite/kernels/custom/tree\_ensemble\_classifier.h}}"{}}}
+\DoxyCodeLine{00055\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{ei__model__types_8h}{edge-\/impulse-\/sdk/classifier/ei\_model\_types.h}}"{}}}
+\DoxyCodeLine{00056\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{ei__classifier__porting_8h}{edge-\/impulse-\/sdk/porting/ei\_classifier\_porting.h}}"{}}}
+\DoxyCodeLine{00057\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{ei__fill__result__struct_8h}{edge-\/impulse-\/sdk/classifier/ei\_fill\_result\_struct.h}}"{}}}
+\DoxyCodeLine{00058\ \textcolor{preprocessor}{\#include\ "{}tensorflow-\/lite/tensorflow/lite/kernels/internal/reference/softmax.h"{}}}
+\DoxyCodeLine{00059\ \textcolor{preprocessor}{\#undef\ EI\_CLASSIFIER\_INFERENCING\_ENGINE}}
+\DoxyCodeLine{00060\ \textcolor{preprocessor}{\#define\ EI\_CLASSIFIER\_INFERENCING\_ENGINE\ EI\_CLASSIFIER\_TFLITE\_FULL}}
+\DoxyCodeLine{00061\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{tflite__helper_8h}{tflite\_helper.h}}"{}}}
+\DoxyCodeLine{00062\ \textcolor{preprocessor}{\#undef\ EI\_CLASSIFIER\_INFERENCING\_ENGINE}}
+\DoxyCodeLine{00063\ \textcolor{preprocessor}{\#define\ EI\_CLASSIFIER\_INFERENCING\_ENGINE\ EI\_CLASSIFIER\_AKIDA}}
+\DoxyCodeLine{00064\ \textcolor{preprocessor}{\#include\ <vector>}}
+\DoxyCodeLine{00065\ \textcolor{preprocessor}{\#include\ <fstream>}}
+\DoxyCodeLine{00066\ \textcolor{preprocessor}{\#include\ <sstream>}}
+\DoxyCodeLine{00067\ \textcolor{preprocessor}{\#include\ <iomanip>}}
+\DoxyCodeLine{00068\ \textcolor{preprocessor}{\#include\ <limits>}}
+\DoxyCodeLine{00069\ \textcolor{preprocessor}{\#include\ <math.h>}}
+\DoxyCodeLine{00070\ \textcolor{preprocessor}{\#include\ <algorithm>}}
+\DoxyCodeLine{00071\ \textcolor{preprocessor}{\#include\ "{}pybind11/embed.h"{}}}
+\DoxyCodeLine{00072\ \textcolor{preprocessor}{\#include\ "{}pybind11/numpy.h"{}}}
+\DoxyCodeLine{00073\ \textcolor{preprocessor}{\#include\ "{}pybind11/stl.h"{}}}
+\DoxyCodeLine{00074\ }
+\DoxyCodeLine{00075\ \textcolor{keyword}{namespace\ }py\ =\ pybind11;}
+\DoxyCodeLine{00076\ }
+\DoxyCodeLine{00077\ std::stringstream\ \mbox{\hyperlink{akida_8h_a385b0bd18814f0f7ad3e2606c5f30f25}{engine\_info}};}
+\DoxyCodeLine{00078\ }
+\DoxyCodeLine{00079\ \textcolor{keyword}{static}\ py::module\_\ \mbox{\hyperlink{akida_8h_ad3aeb8015fd4de80acbfcccbd480d4f9}{akida}};}
+\DoxyCodeLine{00080\ \textcolor{keyword}{static}\ py::object\ \mbox{\hyperlink{akida_8h_aae63da0a007121c8192c17ac8be89a16}{model}};}
+\DoxyCodeLine{00081\ \textcolor{keyword}{static}\ py::object\ \mbox{\hyperlink{akida_8h_a0d0653d977a05dc75b9983c143d63cda}{model\_predict}};}
+\DoxyCodeLine{00082\ \textcolor{keyword}{static}\ py::object\ \mbox{\hyperlink{akida_8h_a68b6b78623e05bae409754c3103e52be}{model\_forward}};}
+\DoxyCodeLine{00083\ \textcolor{keyword}{static}\ py::object\ \mbox{\hyperlink{akida_8h_ad56ed4d147ee2780df7f469658e8dd67}{device}};}
+\DoxyCodeLine{00084\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{akida_8h_af35d4fe88ce6a2e276c3ff3c542460ad}{akida\_initialized}}\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00085\ \textcolor{keyword}{static}\ std::vector<size\_t>\ \mbox{\hyperlink{akida_8h_a0792621910eb31f95019ddc94eb3dece}{input\_shape}};}
+\DoxyCodeLine{00086\ \textcolor{keyword}{static}\ \mbox{\hyperlink{classtflite_1_1_runtime_shape}{tflite::RuntimeShape}}\ \mbox{\hyperlink{akida_8h_a52cd3949eba004f3b8791be094e50549}{softmax\_shape}};}
+\DoxyCodeLine{00087\ \textcolor{keyword}{static}\ \mbox{\hyperlink{structtflite_1_1_softmax_params}{tflite::SoftmaxParams}}\ \mbox{\hyperlink{akida_8h_aa32eba6b3164559e24b544f632e08fb6}{dummy\_params}};}
+\DoxyCodeLine{00088\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{akida_8h_a7b950177d9cb45e5c1ca09f7ff945deb}{model\_input\_bits}}\ =\ 0;}
+\DoxyCodeLine{00089\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{float}\ \mbox{\hyperlink{akida_8h_a1d28dec57cce925ad92342891bd71e7c}{scale}};}
+\DoxyCodeLine{00090\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{akida_8h_abe40c211ae00ce28964899acf497071b}{down\_scale}};}
+\DoxyCodeLine{00091\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\{}
+\DoxyCodeLine{00092\ \ \ \ \ std::unique\_ptr<tflite::FlatBufferModel>\ \mbox{\hyperlink{structei__tflite__state__t_a2a718661b2d6a6d38d0fe7d29cef2bb7}{model}};}
+\DoxyCodeLine{00093\ \ \ \ \ std::unique\_ptr<tflite::Interpreter>\ \mbox{\hyperlink{structei__tflite__state__t_af2d64469ee7ca0b7755ecf866d9880fc}{interpreter}};}
+\DoxyCodeLine{00094\ \}\ \mbox{\hyperlink{structei__tflite__state__t}{ei\_tflite\_state\_t}};}
+\DoxyCodeLine{00095\ }
+\DoxyCodeLine{00096\ std::map<uint32\_t,\ ei\_tflite\_state\_t*>\ \mbox{\hyperlink{akida_8h_a8d592742eb6381339c788d23b68712fc}{ei\_tflite\_instances}};}
+\DoxyCodeLine{00097\ }
+\DoxyCodeLine{00098\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{akida_8h_a0b1bcf29bf5a39167d540cd3ee1ce0f8}{init\_akida}}(\textcolor{keyword}{const}\ uint8\_t\ *model\_arr,\ \textcolor{keywordtype}{size\_t}\ model\_arr\_size,\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{ei__fill__result__struct_8h_a881f62341b5a41a3c5707268bd537be1}{debug}})}
+\DoxyCodeLine{00099\ \{}
+\DoxyCodeLine{00100\ \ \ \ \ py::module\_\ sys;}
+\DoxyCodeLine{00101\ \ \ \ \ py::list\ path;}
+\DoxyCodeLine{00102\ \ \ \ \ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{char}\ model\_file\_path[]\ =\ \textcolor{stringliteral}{"{}/tmp/akida\_model.fbz"{}};}
+\DoxyCodeLine{00103\ }
+\DoxyCodeLine{00104\ \ \ \ \ \textcolor{keywordflow}{if}(\mbox{\hyperlink{ei__fill__result__struct_8h_a881f62341b5a41a3c5707268bd537be1}{debug}})\ \{}
+\DoxyCodeLine{00105\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00106\ \ \ \ \ \ \ \ \ \ \ \ \ sys\ =\ py::module\_::import(\textcolor{stringliteral}{"{}sys"{}});}
+\DoxyCodeLine{00107\ \ \ \ \ \ \ \ \ \ \ \ \ path\ =\ sys.attr(\textcolor{stringliteral}{"{}path"{}});}
+\DoxyCodeLine{00108\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}DEBUG:\ sys.path:"{}});}
+\DoxyCodeLine{00109\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (py::handle\ p:\ path)\ \{}
+\DoxyCodeLine{00110\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}\(\backslash\)t\%s\(\backslash\)n"{}},\ p.cast<std::string>().c\_str());}
+\DoxyCodeLine{00111\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00112\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00113\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{catch}\ (py::error\_already\_set\ \&e)\ \{}
+\DoxyCodeLine{00114\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}ERR:\ Importing\ 'sys'\ library\ failed:\(\backslash\)n\%s\(\backslash\)n"{}},\ e.what());}
+\DoxyCodeLine{00115\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ as\ it\ is\ only\ for\ debug\ purposes,\ continue}}
+\DoxyCodeLine{00116\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00117\ \ \ \ \ \}}
+\DoxyCodeLine{00118\ }
+\DoxyCodeLine{00119\ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00120\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ import\ Python's\ akida\ module}}
+\DoxyCodeLine{00121\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{akida_8h_ad3aeb8015fd4de80acbfcccbd480d4f9}{akida}}\ =\ py::module\_::import(\textcolor{stringliteral}{"{}akida"{}});}
+\DoxyCodeLine{00122\ \ \ \ \ \}}
+\DoxyCodeLine{00123\ \ \ \ \ \textcolor{keywordflow}{catch}\ (py::error\_already\_set\ \&e)\ \{}
+\DoxyCodeLine{00124\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}ERR:\ Importing\ 'akida'\ library\ failed:\(\backslash\)n\%s\(\backslash\)n"{}},\ e.what());}
+\DoxyCodeLine{00125\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00126\ \ \ \ \ \}}
+\DoxyCodeLine{00127\ }
+\DoxyCodeLine{00128\ \ \ \ \ \textcolor{keywordflow}{if}(\mbox{\hyperlink{ei__fill__result__struct_8h_a881f62341b5a41a3c5707268bd537be1}{debug}})\ \{}
+\DoxyCodeLine{00129\ \ \ \ \ \ \ \ \ std::string\ ver\ =\ \mbox{\hyperlink{akida_8h_ad3aeb8015fd4de80acbfcccbd480d4f9}{akida}}.attr(\textcolor{stringliteral}{"{}\_\_version\_\_"{}}).cast<std::string>();}
+\DoxyCodeLine{00130\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}DEBUG:\ Akida\ version:\ \%s\(\backslash\)n"{}},\ ver.c\_str());}
+\DoxyCodeLine{00131\ \ \ \ \ \}}
+\DoxyCodeLine{00132\ }
+\DoxyCodeLine{00133\ \ \ \ \ py::object\ Model\ =\ \mbox{\hyperlink{akida_8h_ad3aeb8015fd4de80acbfcccbd480d4f9}{akida}}.attr(\textcolor{stringliteral}{"{}Model"{}});}
+\DoxyCodeLine{00134\ }
+\DoxyCodeLine{00135\ \ \ \ \ \textcolor{comment}{//\ deploy\ akida\ model\ file\ into\ temporary\ file}}
+\DoxyCodeLine{00136\ \ \ \ \ std::ofstream\ model\_file(model\_file\_path,\ std::ios::out\ |\ std::ios::binary);}
+\DoxyCodeLine{00137\ \ \ \ \ model\_file.write(\textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\textcolor{keywordtype}{char}*\textcolor{keyword}{>}(model\_arr),\ model\_arr\_size);}
+\DoxyCodeLine{00138\ \ \ \ \ \textcolor{keywordflow}{if}(model\_file.bad())\ \{}
+\DoxyCodeLine{00139\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}ERR:\ failed\ to\ unpack\ model\ ile\ into\ \%s\(\backslash\)n"{}},\ model\_file\_path);}
+\DoxyCodeLine{00140\ \ \ \ \ \ \ \ \ model\_file.close();}
+\DoxyCodeLine{00141\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00142\ \ \ \ \ \}}
+\DoxyCodeLine{00143\ \ \ \ \ model\_file.close();}
+\DoxyCodeLine{00144\ }
+\DoxyCodeLine{00145\ \ \ \ \ \textcolor{comment}{//\ load\ model}}
+\DoxyCodeLine{00146\ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00147\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{akida_8h_aae63da0a007121c8192c17ac8be89a16}{model}}\ =\ Model(model\_file\_path);}
+\DoxyCodeLine{00148\ \ \ \ \ \}}
+\DoxyCodeLine{00149\ \ \ \ \ \textcolor{keywordflow}{catch}\ (py::error\_already\_set\ \&e)\ \{}
+\DoxyCodeLine{00150\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}ERR:\ Can't\ load\ model\ file\ from\ \%s\(\backslash\)n"{}},\ model\_file\_path);}
+\DoxyCodeLine{00151\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}ERR:\ \%s\(\backslash\)n"{}},\ e.what());}
+\DoxyCodeLine{00152\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00153\ \ \ \ \ \}}
+\DoxyCodeLine{00154\ }
+\DoxyCodeLine{00155\ \ \ \ \ \textcolor{comment}{//\ get\ input\ shape\ from\ model}}
+\DoxyCodeLine{00156\ \ \ \ \ \mbox{\hyperlink{akida_8h_a0792621910eb31f95019ddc94eb3dece}{input\_shape}}\ =\ \mbox{\hyperlink{akida_8h_aae63da0a007121c8192c17ac8be89a16}{model}}.attr(\textcolor{stringliteral}{"{}input\_shape"{}}).cast<std::vector<size\_t>>();}
+\DoxyCodeLine{00157\ \ \ \ \ \textcolor{comment}{//TODO:\ temporarily\ only\ 3D\ input\ data\ is\ supported\ (see\ note\ in\ run\_nn\_inference)}}
+\DoxyCodeLine{00158\ \ \ \ \ \textcolor{keywordflow}{if}(\mbox{\hyperlink{akida_8h_a0792621910eb31f95019ddc94eb3dece}{input\_shape}}.size()\ !=\ 3)\ \{}
+\DoxyCodeLine{00159\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}ERR:\ Unsupported\ input\ data\ shape.\ Expected\ 3\ dimensions\ got\ \%d\(\backslash\)n"{}},\ (\textcolor{keywordtype}{int})\mbox{\hyperlink{akida_8h_a0792621910eb31f95019ddc94eb3dece}{input\_shape}}.size());}
+\DoxyCodeLine{00160\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00161\ \ \ \ \ \}}
+\DoxyCodeLine{00162\ \ \ \ \ \textcolor{comment}{//\ extend\ input\ by\ (N,\ ...)\ -\/\ hardcoded\ to\ (1,\ ...)}}
+\DoxyCodeLine{00163\ \ \ \ \ \mbox{\hyperlink{akida_8h_a0792621910eb31f95019ddc94eb3dece}{input\_shape}}.insert(\mbox{\hyperlink{akida_8h_a0792621910eb31f95019ddc94eb3dece}{input\_shape}}.begin(),\ (\textcolor{keywordtype}{size\_t})1);}
+\DoxyCodeLine{00164\ }
+\DoxyCodeLine{00165\ \ \ \ \ \textcolor{comment}{//\ get\ model\ input\_bits}}
+\DoxyCodeLine{00166\ \ \ \ \ std::vector<py::object>\ layers\ =\ \mbox{\hyperlink{akida_8h_aae63da0a007121c8192c17ac8be89a16}{model}}.attr(\textcolor{stringliteral}{"{}layers"{}}).cast<std::vector<py::object>>();}
+\DoxyCodeLine{00167\ \ \ \ \ \textcolor{keyword}{auto}\ input\_layer\ =\ layers[0];}
+\DoxyCodeLine{00168\ \ \ \ \ \mbox{\hyperlink{akida_8h_a7b950177d9cb45e5c1ca09f7ff945deb}{model\_input\_bits}}\ =\ input\_layer.attr(\textcolor{stringliteral}{"{}input\_bits"{}}).cast<\textcolor{keywordtype}{int}>();}
+\DoxyCodeLine{00169\ \ \ \ \ \textcolor{keywordflow}{if}((\mbox{\hyperlink{akida_8h_a7b950177d9cb45e5c1ca09f7ff945deb}{model\_input\_bits}}\ !=\ 8)\ \&\&\ (\mbox{\hyperlink{akida_8h_a7b950177d9cb45e5c1ca09f7ff945deb}{model\_input\_bits}}\ !=\ 4))\ \{}
+\DoxyCodeLine{00170\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}ERR:\ Unsupported\ input\_bits.\ Expected\ 4\ or\ 8\ got\ \%d\(\backslash\)n"{}},\ \mbox{\hyperlink{akida_8h_a7b950177d9cb45e5c1ca09f7ff945deb}{model\_input\_bits}});}
+\DoxyCodeLine{00171\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00172\ \ \ \ \ \}}
+\DoxyCodeLine{00173\ }
+\DoxyCodeLine{00174\ \ \ \ \ \textcolor{comment}{//\ initialize\ scale\ coefficients}}
+\DoxyCodeLine{00175\ \ \ \ \ \textcolor{keywordflow}{if}(\mbox{\hyperlink{akida_8h_a7b950177d9cb45e5c1ca09f7ff945deb}{model\_input\_bits}}\ ==\ 8)\ \{}
+\DoxyCodeLine{00176\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{akida_8h_a1d28dec57cce925ad92342891bd71e7c}{scale}}\ =\ 255;}
+\DoxyCodeLine{00177\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{akida_8h_abe40c211ae00ce28964899acf497071b}{down\_scale}}\ =\ 1;}
+\DoxyCodeLine{00178\ \ \ \ \ \}}
+\DoxyCodeLine{00179\ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}(\mbox{\hyperlink{akida_8h_a7b950177d9cb45e5c1ca09f7ff945deb}{model\_input\_bits}}\ ==\ 4)\ \{}
+\DoxyCodeLine{00180\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ these\ values\ are\ recommended\ by\ BrainChip}}
+\DoxyCodeLine{00181\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{akida_8h_a1d28dec57cce925ad92342891bd71e7c}{scale}}\ =\ 15;}
+\DoxyCodeLine{00182\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{akida_8h_abe40c211ae00ce28964899acf497071b}{down\_scale}}\ =\ 16;}
+\DoxyCodeLine{00183\ \ \ \ \ \}}
+\DoxyCodeLine{00184\ }
+\DoxyCodeLine{00185\ \ \ \ \ \textcolor{keywordflow}{if}(\mbox{\hyperlink{ei__fill__result__struct_8h_a881f62341b5a41a3c5707268bd537be1}{debug}})\ \{}
+\DoxyCodeLine{00186\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}INFO:\ Model\ input\_bits:\ \%d\(\backslash\)n"{}},\ \mbox{\hyperlink{akida_8h_a7b950177d9cb45e5c1ca09f7ff945deb}{model\_input\_bits}});}
+\DoxyCodeLine{00187\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}INFO:\ Scale:\ \%f\(\backslash\)n"{}},\ \mbox{\hyperlink{akida_8h_a1d28dec57cce925ad92342891bd71e7c}{scale}});}
+\DoxyCodeLine{00188\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}INFO:\ Down\ scale:\ \%d\(\backslash\)n"{}},\ \mbox{\hyperlink{akida_8h_abe40c211ae00ce28964899acf497071b}{down\_scale}});}
+\DoxyCodeLine{00189\ \ \ \ \ \}}
+\DoxyCodeLine{00190\ }
+\DoxyCodeLine{00191\ \textcolor{preprocessor}{\#if\ (defined(EI\_CLASSIFIER\_USE\_AKIDA\_HARDWARE)\ \&\&\ (EI\_CLASSIFIER\_USE\_AKIDA\_HARDWARE\ ==\ 1))}}
+\DoxyCodeLine{00192\ \ \ \ \ \textcolor{comment}{//\ get\ list\ of\ available\ devices}}
+\DoxyCodeLine{00193\ \ \ \ \ py::list\ devices\ =\ \mbox{\hyperlink{akida_8h_ad3aeb8015fd4de80acbfcccbd480d4f9}{akida}}.attr(\textcolor{stringliteral}{"{}devices"{}})();}
+\DoxyCodeLine{00194\ \ \ \ \ \textcolor{keywordflow}{if}(devices.empty()\ ==\ \textcolor{keyword}{true})\ \{}
+\DoxyCodeLine{00195\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}ERR:\ AKD1000\ device\ not\ found!\(\backslash\)n"{}});}
+\DoxyCodeLine{00196\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00197\ \ \ \ \ \}}
+\DoxyCodeLine{00198\ }
+\DoxyCodeLine{00199\ \ \ \ \ \textcolor{keywordflow}{if}(devices.size()\ >\ 1)\ \{}
+\DoxyCodeLine{00200\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}More\ than\ one\ device\ found!\ Using\ /dev/akida\%d\(\backslash\)n"{}},\ \mbox{\hyperlink{akida_8h_a78c6e19b13ec911a14929813c0e873a4}{EI\_CLASSIFIER\_USE\_AKIDA\_HARDWARE\_NO}});}
+\DoxyCodeLine{00201\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{akida_8h_ad56ed4d147ee2780df7f469658e8dd67}{device}}\ =\ devices[\mbox{\hyperlink{akida_8h_a78c6e19b13ec911a14929813c0e873a4}{EI\_CLASSIFIER\_USE\_AKIDA\_HARDWARE\_NO}}];}
+\DoxyCodeLine{00202\ \ \ \ \ \}}
+\DoxyCodeLine{00203\ \ \ \ \ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00204\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{akida_8h_ad56ed4d147ee2780df7f469658e8dd67}{device}}\ =\ devices[0];}
+\DoxyCodeLine{00205\ \ \ \ \ \}}
+\DoxyCodeLine{00206\ \ \ \ \ \textcolor{comment}{//TODO:\ check\ if\ selected\ device\ is\ correct\ (compare\ versions)}}
+\DoxyCodeLine{00207\ \ \ \ \ \textcolor{comment}{//\ enable\ power\ measurement}}
+\DoxyCodeLine{00208\ \ \ \ \ \mbox{\hyperlink{akida_8h_ad56ed4d147ee2780df7f469658e8dd67}{device}}.attr(\textcolor{stringliteral}{"{}soc"{}}).attr(\textcolor{stringliteral}{"{}power\_measurement\_enabled"{}})\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00209\ }
+\DoxyCodeLine{00210\ \ \ \ \ \textcolor{comment}{//\ map\ model\ to\ the\ device}}
+\DoxyCodeLine{00211\ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00212\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{akida_8h_aae63da0a007121c8192c17ac8be89a16}{model}}.attr(\textcolor{stringliteral}{"{}map"{}})(\mbox{\hyperlink{akida_8h_ad56ed4d147ee2780df7f469658e8dd67}{device}});}
+\DoxyCodeLine{00213\ \ \ \ \ \}}
+\DoxyCodeLine{00214\ \ \ \ \ \textcolor{keywordflow}{catch}\ (py::error\_already\_set\ \&e)\ \{}
+\DoxyCodeLine{00215\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}ERR:\ Can't\ load\ the\ ML\ model\ onto\ the\ AKD1000\ SoC\(\backslash\)n"{}});}
+\DoxyCodeLine{00216\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}ERR:\ \%s\(\backslash\)n"{}},\ e.what());}
+\DoxyCodeLine{00217\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00218\ \ \ \ \ \}}
+\DoxyCodeLine{00219\ \textcolor{preprocessor}{\#elif\ (defined(EI\_CLASSIFIER\_USE\_AKIDA\_SOFTWARE)\ \&\&\ (EI\_CLASSIFIER\_USE\_AKIDA\_SOFTWARE\ ==\ 1))}}
+\DoxyCodeLine{00220\ \textcolor{preprocessor}{\#warning\ "{}Akida\ model\ will\ be\ run\ in\ SIMULATION\ mode\ (not\ on\ real\ hardware)!"{}}}
+\DoxyCodeLine{00221\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00222\ \textcolor{preprocessor}{\#error\ "{}Neither\ EI\_CLASSIFIER\_USE\_AKIDA\_HARDWARE\ or\ EI\_CLASSIFIER\_USE\_AKIDA\_SOFTWARE\ are\ defined\ or\ set\ to\ 1"{}}}
+\DoxyCodeLine{00223\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00224\ }
+\DoxyCodeLine{00225\ \ \ \ \ \textcolor{comment}{//\ init\ softmax\ shape}}
+\DoxyCodeLine{00226\ \ \ \ \ std::vector<size\_t>\ tmp\ =\ \mbox{\hyperlink{akida_8h_aae63da0a007121c8192c17ac8be89a16}{model}}.attr(\textcolor{stringliteral}{"{}output\_shape"{}}).cast<std::vector<size\_t>>();}
+\DoxyCodeLine{00227\ \ \ \ \ \mbox{\hyperlink{akida_8h_a52cd3949eba004f3b8791be094e50549}{softmax\_shape}}.BuildFrom(tmp);}
+\DoxyCodeLine{00228\ \ \ \ \ \textcolor{comment}{//\ dumy\ beta\ parameter\ for\ softmax\ purposes}}
+\DoxyCodeLine{00229\ \ \ \ \ \mbox{\hyperlink{akida_8h_aa32eba6b3164559e24b544f632e08fb6}{dummy\_params}}.\mbox{\hyperlink{structtflite_1_1_softmax_params_a8003007436aab20a1b265453c462067f}{beta}}\ =\ 1;}
+\DoxyCodeLine{00230\ }
+\DoxyCodeLine{00231\ \ \ \ \ \textcolor{comment}{//\ get\ reference\ to\ predict\ function}}
+\DoxyCodeLine{00232\ \ \ \ \ \mbox{\hyperlink{akida_8h_a0d0653d977a05dc75b9983c143d63cda}{model\_predict}}\ =\ \mbox{\hyperlink{akida_8h_aae63da0a007121c8192c17ac8be89a16}{model}}.attr(\textcolor{stringliteral}{"{}predict"{}});}
+\DoxyCodeLine{00233\ \ \ \ \ \mbox{\hyperlink{akida_8h_a68b6b78623e05bae409754c3103e52be}{model\_forward}}\ =\ \mbox{\hyperlink{akida_8h_aae63da0a007121c8192c17ac8be89a16}{model}}.attr(\textcolor{stringliteral}{"{}forward"{}});}
+\DoxyCodeLine{00234\ }
+\DoxyCodeLine{00235\ \ \ \ \ \textcolor{comment}{//\ clear\ info\ stream}}
+\DoxyCodeLine{00236\ \ \ \ \ \mbox{\hyperlink{akida_8h_a385b0bd18814f0f7ad3e2606c5f30f25}{engine\_info}}.str(\textcolor{stringliteral}{"{}"{}});}
+\DoxyCodeLine{00237\ }
+\DoxyCodeLine{00238\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00239\ \}}
+\DoxyCodeLine{00240\ }
+\DoxyCodeLine{00241\ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{00242\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{akida_8h_aac1b1c836ebe120022de348aaa277d27}{debug\_print}}(\textcolor{keyword}{const}\ std::vector<T>\ vec,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ val\_per\_row\ =\ 3)}
+\DoxyCodeLine{00243\ \{}
+\DoxyCodeLine{00244\ \ \ \ \ \textcolor{keywordtype}{int}\ n\ =\ 0;}
+\DoxyCodeLine{00245\ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{auto}\ it\ =\ vec.begin();\ it\ !=\ vec.end();\ it++)\ \{}
+\DoxyCodeLine{00246\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}\%f\ "{}},\ *it);}
+\DoxyCodeLine{00247\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(++n\ >\ val\_per\_row\ -\/\ 1)\ \{}
+\DoxyCodeLine{00248\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}\(\backslash\)n"{}});}
+\DoxyCodeLine{00249\ \ \ \ \ \ \ \ \ \ \ \ \ n\ =\ 0;}
+\DoxyCodeLine{00250\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00251\ \ \ \ \ \}}
+\DoxyCodeLine{00252\ \}}
+\DoxyCodeLine{00253\ }
+\DoxyCodeLine{00264\ \mbox{\hyperlink{group__ei__returntypes_gad9580b47a6cd5e74cfc31a03bdfecebe}{EI\_IMPULSE\_ERROR}}\ \mbox{\hyperlink{akida_8h_ae95031a834aea77650106530f566fdb5}{run\_nn\_inference}}(}
+\DoxyCodeLine{00265\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structei__impulse}{ei\_impulse\_t}}\ *impulse,}
+\DoxyCodeLine{00266\ \ \ \ \ \mbox{\hyperlink{structei__feature__t}{ei\_feature\_t}}\ *fmatrix,}
+\DoxyCodeLine{00267\ \ \ \ \ uint32\_t\ learn\_block\_index,}
+\DoxyCodeLine{00268\ \ \ \ \ uint32\_t*\ input\_block\_ids,}
+\DoxyCodeLine{00269\ \ \ \ \ uint32\_t\ input\_block\_ids\_size,}
+\DoxyCodeLine{00270\ \ \ \ \ \mbox{\hyperlink{structei__impulse__result__t}{ei\_impulse\_result\_t}}\ *\mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}},}
+\DoxyCodeLine{00271\ \ \ \ \ \textcolor{keywordtype}{void}\ *\mbox{\hyperlink{akida_8h_a3658b236936f6ec57ce82f0fd8cbdabb}{config\_ptr}},}
+\DoxyCodeLine{00272\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{ei__fill__result__struct_8h_a881f62341b5a41a3c5707268bd537be1}{debug}})}
+\DoxyCodeLine{00273\ \{}
+\DoxyCodeLine{00274\ \ \ \ \ \mbox{\hyperlink{structei__learning__block__config__tflite__graph__t}{ei\_learning\_block\_config\_tflite\_graph\_t}}\ *\mbox{\hyperlink{ei__fill__result__struct_8h_aafcd7d36638d6a564b6edbceef06ea8b}{block\_config}}\ =\ ((\mbox{\hyperlink{structei__learning__block__config__tflite__graph__t}{ei\_learning\_block\_config\_tflite\_graph\_t}}*)\mbox{\hyperlink{akida_8h_a3658b236936f6ec57ce82f0fd8cbdabb}{config\_ptr}});}
+\DoxyCodeLine{00275\ \ \ \ \ \mbox{\hyperlink{structei__config__tflite__graph__t}{ei\_config\_tflite\_graph\_t}}\ *graph\_config\ =\ ((\mbox{\hyperlink{structei__config__tflite__graph__t}{ei\_config\_tflite\_graph\_t}}*)\mbox{\hyperlink{ei__fill__result__struct_8h_aafcd7d36638d6a564b6edbceef06ea8b}{block\_config}}-\/>\mbox{\hyperlink{structei__learning__block__config__tflite__graph__t_a42210921fb4db239d6b53c0409f6e5d9}{graph\_config}});}
+\DoxyCodeLine{00276\ }
+\DoxyCodeLine{00277\ \ \ \ \ \mbox{\hyperlink{group__ei__returntypes_gad9580b47a6cd5e74cfc31a03bdfecebe}{EI\_IMPULSE\_ERROR}}\ fill\_res\ =\ \mbox{\hyperlink{ei__fill__result__struct_8h_a2fb43be102b153d659b668ad295aff40}{EI\_IMPULSE\_OK}};}
+\DoxyCodeLine{00278\ }
+\DoxyCodeLine{00279\ \ \ \ \ \textcolor{comment}{//\ init\ Python\ embedded\ interpreter\ (should\ be\ called\ once!)}}
+\DoxyCodeLine{00280\ \ \ \ \ \textcolor{keyword}{static}\ py::scoped\_interpreter\ guard\{\};}
+\DoxyCodeLine{00281\ }
+\DoxyCodeLine{00282\ \ \ \ \ \textcolor{comment}{//\ check\ if\ we've\ initialized\ the\ interpreter\ and\ device?}}
+\DoxyCodeLine{00283\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{akida_8h_af35d4fe88ce6a2e276c3ff3c542460ad}{akida\_initialized}}\ ==\ \textcolor{keyword}{false})\ \{}
+\DoxyCodeLine{00284\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\mbox{\hyperlink{akida_8h_a0b1bcf29bf5a39167d540cd3ee1ce0f8}{init\_akida}}(graph\_config-\/>\mbox{\hyperlink{structei__config__tflite__graph__t_adb1b1d255db9be3eb16c0d680ae9de50}{model}},\ graph\_config-\/>\mbox{\hyperlink{structei__config__tflite__graph__t_ac0f014d6d63f118b2dfe9f43c84ebd71}{model\_size}},\ \mbox{\hyperlink{ei__fill__result__struct_8h_a881f62341b5a41a3c5707268bd537be1}{debug}})\ ==\ \textcolor{keyword}{false})\ \{}
+\DoxyCodeLine{00285\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{group__ei__returntypes_ggad9580b47a6cd5e74cfc31a03bdfecebea1137b5ef30c8f5241a42877876e3fcd9}{EI\_IMPULSE\_AKIDA\_ERROR}};}
+\DoxyCodeLine{00286\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00287\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{akida_8h_af35d4fe88ce6a2e276c3ff3c542460ad}{akida\_initialized}}\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00288\ \ \ \ \ \}}
+\DoxyCodeLine{00289\ }
+\DoxyCodeLine{00290\ \ \ \ \ \textcolor{comment}{//\ according\ to:}}
+\DoxyCodeLine{00291\ \ \ \ \ \textcolor{comment}{//\ https://doc.brainchipinc.com/api\_reference/akida\_apis.html\#akida.Model.predict}}
+\DoxyCodeLine{00292\ \ \ \ \ \textcolor{comment}{//\ input\ type\ is\ always\ uint8}}
+\DoxyCodeLine{00293\ \ \ \ \ py::array\_t<uint8\_t>\ \mbox{\hyperlink{add__n__test_8cc_a5612ba79d1f0b544c7aeae4621166fea}{input\_data}}(\mbox{\hyperlink{akida_8h_a0792621910eb31f95019ddc94eb3dece}{input\_shape}});}
+\DoxyCodeLine{00294\ }
+\DoxyCodeLine{00295\ \ \ \ \ \textcolor{comment}{/*}}
+\DoxyCodeLine{00296\ \textcolor{comment}{\ \ \ \ \ *\ convert\ data\ to\ uint8\ and\ copy\ features\ into\ input\ tensor}}
+\DoxyCodeLine{00297\ \textcolor{comment}{\ \ \ \ \ *\ For\ images\ RGB\ shape\ is\ (width,\ height,\ colors)}}
+\DoxyCodeLine{00298\ \textcolor{comment}{\ \ \ \ \ *\ For\ images\ BW\ shape\ is\ (width,\ height,\ 1)}}
+\DoxyCodeLine{00299\ \textcolor{comment}{\ \ \ \ \ *\ For\ Audio\ shape\ is\ (width,\ height,\ 1)\ -\/\ spectrogram}}
+\DoxyCodeLine{00300\ \textcolor{comment}{\ \ \ \ \ *\ TODO:\ test\ with\ other\ ML\ models/data\ types}}
+\DoxyCodeLine{00301\ \textcolor{comment}{\ \ \ \ \ *\ For\ details\ see:}}
+\DoxyCodeLine{00302\ \textcolor{comment}{\ \ \ \ \ *\ https://pybind11.readthedocs.io/en/stable/advanced/pycpp/numpy.html\#direct-\/access}}
+\DoxyCodeLine{00303\ \textcolor{comment}{\ \ \ \ \ */}}
+\DoxyCodeLine{00304\ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_acab531abaa74a7e664e3986f2522b33a}{r}}\ =\ \mbox{\hyperlink{add__n__test_8cc_a5612ba79d1f0b544c7aeae4621166fea}{input\_data}}.mutable\_unchecked<4>();}
+\DoxyCodeLine{00305\ \ \ \ \ \textcolor{keywordtype}{float}\ \mbox{\hyperlink{nicla__sense__fusion_8ino_ae6219c1117781a1dbbb7839946bca32c}{temp}};}
+\DoxyCodeLine{00306\ }
+\DoxyCodeLine{00307\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ mtx\_size\ =\ impulse-\/>\mbox{\hyperlink{structei__impulse_aab279e170490f9b5c0c59eff0b6fa484}{dsp\_blocks\_size}}\ +\ impulse-\/>\mbox{\hyperlink{structei__impulse_a686152786fe6f16b174bfecfe01308a9}{learning\_blocks\_size}};}
+\DoxyCodeLine{00308\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ input\_block\_ids\_size;\ i++)\ \{}
+\DoxyCodeLine{00309\ \ \ \ \ \ \ \ \ uint16\_t\ cur\_mtx\ =\ input\_block\_ids[i];}
+\DoxyCodeLine{00310\ \textcolor{preprocessor}{\#if\ EI\_CLASSIFIER\_SINGLE\_FEATURE\_INPUT\ ==\ 0}}
+\DoxyCodeLine{00311\ \ \ \ \ \ \ \ \ ei::matrix\_t*\ matrix\ =\ NULL;}
+\DoxyCodeLine{00312\ }
+\DoxyCodeLine{00313\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!find\_mtx\_by\_idx(fmatrix,\ \&matrix,\ cur\_mtx,\ mtx\_size))\ \{}
+\DoxyCodeLine{00314\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}ERR:\ Cannot\ find\ matrix\ with\ id\ \%zu\(\backslash\)n"{}},\ cur\_mtx);}
+\DoxyCodeLine{00315\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{group__ei__returntypes_ggad9580b47a6cd5e74cfc31a03bdfecebeab011336593a9cc40639bac0c8a32a51e}{EI\_IMPULSE\_INVALID\_SIZE}};}
+\DoxyCodeLine{00316\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00317\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00318\ \ \ \ \ \ \ \ \ ei::matrix\_t*\ matrix\ =\ fmatrix[0].\mbox{\hyperlink{structei__feature__t_a971fb9c93bddb4631925e579f5b88ebf}{matrix}};}
+\DoxyCodeLine{00319\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00320\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (py::ssize\_t\ \mbox{\hyperlink{akida_8h_ab73668665ed1903aab8905ff035a33c5}{x}}\ =\ 0;\ \mbox{\hyperlink{akida_8h_ab73668665ed1903aab8905ff035a33c5}{x}}\ <\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_acab531abaa74a7e664e3986f2522b33a}{r}}.shape(1);\ \mbox{\hyperlink{akida_8h_ab73668665ed1903aab8905ff035a33c5}{x}}++)\ \{}
+\DoxyCodeLine{00321\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (py::ssize\_t\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_aa4f0d3eebc3c443f9be81bf48561a217}{y}}\ =\ 0;\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_aa4f0d3eebc3c443f9be81bf48561a217}{y}}\ <\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_acab531abaa74a7e664e3986f2522b33a}{r}}.shape(2);\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_aa4f0d3eebc3c443f9be81bf48561a217}{y}}++)\ \{}
+\DoxyCodeLine{00322\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(py::ssize\_t\ z\ =\ 0;\ z\ <\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_acab531abaa74a7e664e3986f2522b33a}{r}}.shape(3);\ z++)\ \{}
+\DoxyCodeLine{00323\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{nicla__sense__fusion_8ino_ae6219c1117781a1dbbb7839946bca32c}{temp}}\ =\ (matrix-\/>buffer[\mbox{\hyperlink{akida_8h_ab73668665ed1903aab8905ff035a33c5}{x}}\ *\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_acab531abaa74a7e664e3986f2522b33a}{r}}.shape(2)\ *\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_acab531abaa74a7e664e3986f2522b33a}{r}}.shape(3)\ +\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_aa4f0d3eebc3c443f9be81bf48561a217}{y}}\ *\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_acab531abaa74a7e664e3986f2522b33a}{r}}.shape(3)\ +\ z]\ *\ \mbox{\hyperlink{akida_8h_a1d28dec57cce925ad92342891bd71e7c}{scale}});}
+\DoxyCodeLine{00324\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{nicla__sense__fusion_8ino_ae6219c1117781a1dbbb7839946bca32c}{temp}}\ =\ std::max(0.0f,\ std::min(\mbox{\hyperlink{nicla__sense__fusion_8ino_ae6219c1117781a1dbbb7839946bca32c}{temp}},\ 255.0f));}
+\DoxyCodeLine{00325\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_acab531abaa74a7e664e3986f2522b33a}{r}}(0,\ \mbox{\hyperlink{akida_8h_ab73668665ed1903aab8905ff035a33c5}{x}},\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_aa4f0d3eebc3c443f9be81bf48561a217}{y}},\ z)\ =\ (uint8\_t)(\mbox{\hyperlink{nicla__sense__fusion_8ino_ae6219c1117781a1dbbb7839946bca32c}{temp}}\ /\ \mbox{\hyperlink{akida_8h_abe40c211ae00ce28964899acf497071b}{down\_scale}});}
+\DoxyCodeLine{00326\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00327\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00328\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00329\ \ \ \ \ \}}
+\DoxyCodeLine{00330\ }
+\DoxyCodeLine{00331\ \ \ \ \ \textcolor{comment}{//\ Run\ inference\ on\ AKD1000}}
+\DoxyCodeLine{00332\ \ \ \ \ uint64\_t\ ctx\_start\_us\ =\ \mbox{\hyperlink{group__ei__user__functions_gac9aae7befaa896e21417df1f00518416}{ei\_read\_timer\_us}}();}
+\DoxyCodeLine{00333\ \ \ \ \ py::array\_t<float>\ potentials;}
+\DoxyCodeLine{00334\ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00335\ \ \ \ \ \ \ \ \ potentials\ =\ \mbox{\hyperlink{akida_8h_a0d0653d977a05dc75b9983c143d63cda}{model\_predict}}(\mbox{\hyperlink{add__n__test_8cc_a5612ba79d1f0b544c7aeae4621166fea}{input\_data}});}
+\DoxyCodeLine{00336\ \ \ \ \ \}}
+\DoxyCodeLine{00337\ \ \ \ \ \textcolor{keywordflow}{catch}\ (py::error\_already\_set\ \&e)\ \{}
+\DoxyCodeLine{00338\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}ERR:\ Inference\ error:\(\backslash\)n\%s\(\backslash\)n"{}},\ e.what());}
+\DoxyCodeLine{00339\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{group__ei__returntypes_ggad9580b47a6cd5e74cfc31a03bdfecebea1137b5ef30c8f5241a42877876e3fcd9}{EI\_IMPULSE\_AKIDA\_ERROR}};}
+\DoxyCodeLine{00340\ \ \ \ \ \}}
+\DoxyCodeLine{00341\ \ \ \ \ \textcolor{comment}{//\ TODO:\ 'forward'\ is\ returning\ int8\ or\ int32,\ but\ EI\ SDK\ supports\ int8\ or\ float32\ only}}
+\DoxyCodeLine{00342\ \ \ \ \ \textcolor{comment}{//\ py::array\_t<float>\ potentials\ =\ model\_forward(input\_data);}}
+\DoxyCodeLine{00343\ \ \ \ \ uint64\_t\ ctx\_end\_us\ =\ \mbox{\hyperlink{group__ei__user__functions_gac9aae7befaa896e21417df1f00518416}{ei\_read\_timer\_us}}();}
+\DoxyCodeLine{00344\ }
+\DoxyCodeLine{00345\ \ \ \ \ potentials\ =\ potentials.squeeze();}
+\DoxyCodeLine{00346\ }
+\DoxyCodeLine{00347\ \ \ \ \ \textcolor{keywordflow}{if}(\mbox{\hyperlink{ei__fill__result__struct_8h_a881f62341b5a41a3c5707268bd537be1}{debug}})\ \{}
+\DoxyCodeLine{00348\ \ \ \ \ \ \ \ \ std::string\ ret\_str\ =\ py::str(potentials).cast<std::string>();}
+\DoxyCodeLine{00349\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}AKD1000\ raw\ output:\(\backslash\)n\%s\(\backslash\)n"{}},\ ret\_str.c\_str());}
+\DoxyCodeLine{00350\ \ \ \ \ \}}
+\DoxyCodeLine{00351\ }
+\DoxyCodeLine{00352\ \ \ \ \ \textcolor{comment}{//\ convert\ to\ vector\ of\ floats\ to\ make\ further\ processing\ much\ easier}}
+\DoxyCodeLine{00353\ \ \ \ \ std::vector<float>\ potentials\_v;\textcolor{comment}{//\ =\ potentials.cast<std::vector<float>>();}}
+\DoxyCodeLine{00354\ }
+\DoxyCodeLine{00355\ \ \ \ \ \textcolor{comment}{//\ TODO:\ output\ conversion\ depending\ on\ output\ shape?}}
+\DoxyCodeLine{00356\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{ei__fill__result__struct_8h_aafcd7d36638d6a564b6edbceef06ea8b}{block\_config}}-\/>\mbox{\hyperlink{structei__learning__block__config__tflite__graph__t_af1a9b7c47a826887609d831078ccbdbc}{object\_detection}}\ ==\ \textcolor{keyword}{false})\ \{}
+\DoxyCodeLine{00357\ \ \ \ \ \ \ \ \ potentials\_v\ =\ potentials.squeeze().cast<std::vector<float>>();}
+\DoxyCodeLine{00358\ \ \ \ \ \}}
+\DoxyCodeLine{00359\ \ \ \ \ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00360\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ TODO:\ output\ from\ AkidaNet/MobileNet\ is\ always\ N\ x\ M\ x\ P\ (3\ dimensions)?}}
+\DoxyCodeLine{00361\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ q\ =\ potentials.unchecked<>();}
+\DoxyCodeLine{00362\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (py::ssize\_t\ \mbox{\hyperlink{akida_8h_ab73668665ed1903aab8905ff035a33c5}{x}}\ =\ 0;\ \mbox{\hyperlink{akida_8h_ab73668665ed1903aab8905ff035a33c5}{x}}\ <\ q.shape(0);\ \mbox{\hyperlink{akida_8h_ab73668665ed1903aab8905ff035a33c5}{x}}++)\ \{}
+\DoxyCodeLine{00363\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (py::ssize\_t\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_aa4f0d3eebc3c443f9be81bf48561a217}{y}}\ =\ 0;\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_aa4f0d3eebc3c443f9be81bf48561a217}{y}}\ <\ q.shape(1);\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_aa4f0d3eebc3c443f9be81bf48561a217}{y}}++)\ \{}
+\DoxyCodeLine{00364\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(py::ssize\_t\ z\ =\ 0;\ z\ <\ q.shape(2);\ z++)\ \{}
+\DoxyCodeLine{00365\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ potentials\_v.push\_back(q(\mbox{\hyperlink{akida_8h_ab73668665ed1903aab8905ff035a33c5}{x}},\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_aa4f0d3eebc3c443f9be81bf48561a217}{y}},\ z));}
+\DoxyCodeLine{00366\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00367\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00368\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00369\ \ \ \ \ \}}
+\DoxyCodeLine{00370\ }
+\DoxyCodeLine{00371\ \ \ \ \ \textcolor{keywordflow}{if}(\mbox{\hyperlink{ei__fill__result__struct_8h_aafcd7d36638d6a564b6edbceef06ea8b}{block\_config}}-\/>\mbox{\hyperlink{structei__learning__block__config__tflite__graph__t_a9f1d65f69c49cecaddb6b6abb65644ef}{object\_detection\_last\_layer}}\ !=\ \mbox{\hyperlink{ei__model__types_8h_ac1b68c7b64d1c0040288b01023b1efc4}{EI\_CLASSIFIER\_LAST\_LAYER\_YOLOV2}})\ \{}
+\DoxyCodeLine{00372\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ apply\ softmax,\ becuase\ Akida\ is\ not\ supporting\ this\ operation}}
+\DoxyCodeLine{00373\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_1_1reference__ops_ae06af6ac80f340cc1edfb85fc6f72633}{tflite::reference\_ops::Softmax}}(\mbox{\hyperlink{akida_8h_aa32eba6b3164559e24b544f632e08fb6}{dummy\_params}},\ \mbox{\hyperlink{akida_8h_a52cd3949eba004f3b8791be094e50549}{softmax\_shape}},\ potentials\_v.data(),\ \mbox{\hyperlink{akida_8h_a52cd3949eba004f3b8791be094e50549}{softmax\_shape}},\ potentials\_v.data());}
+\DoxyCodeLine{00374\ \ \ \ \ \}}
+\DoxyCodeLine{00375\ }
+\DoxyCodeLine{00376\ \ \ \ \ \textcolor{keywordflow}{if}(\mbox{\hyperlink{ei__fill__result__struct_8h_a881f62341b5a41a3c5707268bd537be1}{debug}}\ ==\ \textcolor{keyword}{true})\ \{}
+\DoxyCodeLine{00377\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}After\ softmax:\(\backslash\)n"{}});}
+\DoxyCodeLine{00378\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{akida_8h_aac1b1c836ebe120022de348aaa277d27}{debug\_print}}(potentials\_v);}
+\DoxyCodeLine{00379\ \ \ \ \ \}}
+\DoxyCodeLine{00380\ }
+\DoxyCodeLine{00381\ \ \ \ \ \textcolor{keywordtype}{float}\ active\_power\ =\ 0;}
+\DoxyCodeLine{00382\ \textcolor{preprocessor}{\#if\ (defined(EI\_CLASSIFIER\_USE\_AKIDA\_HARDWARE))}}
+\DoxyCodeLine{00383\ \ \ \ \ \textcolor{comment}{//\ power\ measurement\ post-\/processing}}
+\DoxyCodeLine{00384\ \ \ \ \ \textcolor{keywordtype}{float}\ floor\_power\ =\ \mbox{\hyperlink{akida_8h_ad56ed4d147ee2780df7f469658e8dd67}{device}}.attr(\textcolor{stringliteral}{"{}soc"{}}).attr(\textcolor{stringliteral}{"{}power\_meter"{}}).attr(\textcolor{stringliteral}{"{}floor"{}}).cast<\textcolor{keywordtype}{float}>();}
+\DoxyCodeLine{00385\ \ \ \ \ py::array\ pwr\_events\ =\ \mbox{\hyperlink{akida_8h_ad56ed4d147ee2780df7f469658e8dd67}{device}}.attr(\textcolor{stringliteral}{"{}soc"{}}).attr(\textcolor{stringliteral}{"{}power\_meter"{}}).attr(\textcolor{stringliteral}{"{}events"{}})();}
+\DoxyCodeLine{00386\ \ \ \ \ \textcolor{keyword}{auto}\ events\ =\ pwr\_events.mutable\_unchecked<py::object>();}
+\DoxyCodeLine{00387\ \ \ \ \ \textcolor{keywordflow}{for}\ (py::ssize\_t\ i\ =\ 0;\ i\ <\ events.shape(0);\ i++)\ \{}
+\DoxyCodeLine{00388\ \ \ \ \ \ \ \ \ active\_power\ +=\ events(i).attr(\textcolor{stringliteral}{"{}power"{}}).cast<\textcolor{keywordtype}{float}>();}
+\DoxyCodeLine{00389\ \ \ \ \ \}}
+\DoxyCodeLine{00390\ \ \ \ \ active\_power\ =\ (active\_power/pwr\_events.size())\ -\/\ floor\_power;}
+\DoxyCodeLine{00391\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00392\ }
+\DoxyCodeLine{00393\ \ \ \ \ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}}-\/>timing.classification\_us\ =\ ctx\_end\_us\ -\/\ ctx\_start\_us;}
+\DoxyCodeLine{00394\ \ \ \ \ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}}-\/>timing.classification\ =\ (int)(\mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}}-\/>timing.classification\_us\ /\ 1000);}
+\DoxyCodeLine{00395\ }
+\DoxyCodeLine{00396\ \ \ \ \ \textcolor{comment}{//\ clear\ info}}
+\DoxyCodeLine{00397\ \ \ \ \ \mbox{\hyperlink{akida_8h_a385b0bd18814f0f7ad3e2606c5f30f25}{engine\_info}}.str(\textcolor{stringliteral}{"{}"{}});}
+\DoxyCodeLine{00398\ \ \ \ \ \mbox{\hyperlink{akida_8h_a385b0bd18814f0f7ad3e2606c5f30f25}{engine\_info}}\ <<\ \textcolor{stringliteral}{"{}Power\ consumption:\ "{}}\ <<\ std::fixed\ <<\ std::setprecision(2)\ <<\ active\_power\ <<\ \textcolor{stringliteral}{"{}\ mW\(\backslash\)n"{}};}
+\DoxyCodeLine{00399\ \ \ \ \ \mbox{\hyperlink{akida_8h_a385b0bd18814f0f7ad3e2606c5f30f25}{engine\_info}}\ <<\ \textcolor{stringliteral}{"{}Inferences\ per\ second:\ "{}}\ <<\ (1000000\ /\ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}}-\/>timing.classification\_us);}
+\DoxyCodeLine{00400\ }
+\DoxyCodeLine{00401\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{ei__fill__result__struct_8h_aafcd7d36638d6a564b6edbceef06ea8b}{block\_config}}-\/>\mbox{\hyperlink{structei__learning__block__config__tflite__graph__t_af1a9b7c47a826887609d831078ccbdbc}{object\_detection}})\ \{}
+\DoxyCodeLine{00402\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}\ (\mbox{\hyperlink{ei__fill__result__struct_8h_aafcd7d36638d6a564b6edbceef06ea8b}{block\_config}}-\/>\mbox{\hyperlink{structei__learning__block__config__tflite__graph__t_a9f1d65f69c49cecaddb6b6abb65644ef}{object\_detection\_last\_layer}})\ \{}
+\DoxyCodeLine{00403\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{ei__model__types_8h_ae9f473b0f3438b846c2c12ab84338858}{EI\_CLASSIFIER\_LAST\_LAYER\_FOMO}}:\ \{}
+\DoxyCodeLine{00404\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ fill\_res\ =\ fill\_result\_struct\_f32\_fomo(}
+\DoxyCodeLine{00405\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ impulse,}
+\DoxyCodeLine{00406\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__fill__result__struct_8h_aafcd7d36638d6a564b6edbceef06ea8b}{block\_config}},}
+\DoxyCodeLine{00407\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}},}
+\DoxyCodeLine{00408\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ potentials\_v.data(),}
+\DoxyCodeLine{00409\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ impulse-\/>\mbox{\hyperlink{structei__impulse_a51d2390841b11688a861c16753380c15}{fomo\_output\_size}},}
+\DoxyCodeLine{00410\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ impulse-\/>\mbox{\hyperlink{structei__impulse_a51d2390841b11688a861c16753380c15}{fomo\_output\_size}});}
+\DoxyCodeLine{00411\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00412\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00413\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{ei__model__types_8h_ac1b68c7b64d1c0040288b01023b1efc4}{EI\_CLASSIFIER\_LAST\_LAYER\_YOLOV2}}:\ \{}
+\DoxyCodeLine{00414\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ fill\_res\ =\ fill\_result\_struct\_f32\_yolov2(}
+\DoxyCodeLine{00415\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ impulse,}
+\DoxyCodeLine{00416\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__fill__result__struct_8h_aafcd7d36638d6a564b6edbceef06ea8b}{block\_config}},}
+\DoxyCodeLine{00417\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}},}
+\DoxyCodeLine{00418\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ potentials\_v.data(),}
+\DoxyCodeLine{00419\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ impulse-\/>\mbox{\hyperlink{structei__impulse_a4dd1368c2ed2a4e899274669e81417e4}{tflite\_output\_features\_count}});}
+\DoxyCodeLine{00420\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00421\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00422\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{ei__model__types_8h_a92c64af4832fb183ad9e80b1e9231d41}{EI\_CLASSIFIER\_LAST\_LAYER\_SSD}}:\ \{}
+\DoxyCodeLine{00423\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}ERR:\ MobileNet\ SSD\ models\ are\ not\ implemented\ for\ Akida\ (\%d)\(\backslash\)n"{}},}
+\DoxyCodeLine{00424\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__fill__result__struct_8h_aafcd7d36638d6a564b6edbceef06ea8b}{block\_config}}-\/>\mbox{\hyperlink{structei__learning__block__config__tflite__graph__t_a9f1d65f69c49cecaddb6b6abb65644ef}{object\_detection\_last\_layer}});}
+\DoxyCodeLine{00425\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{group__ei__returntypes_ggad9580b47a6cd5e74cfc31a03bdfecebea399c371041be7c468a3b05a4d8352d14}{EI\_IMPULSE\_UNSUPPORTED\_INFERENCING\_ENGINE}};}
+\DoxyCodeLine{00426\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00427\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{ei__model__types_8h_ab706b8178a13309b0906763696334f45}{EI\_CLASSIFIER\_LAST\_LAYER\_YOLOV5}}:\ \{}
+\DoxyCodeLine{00428\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}ERR:\ YOLO\ v5\ models\ are\ not\ implemented\ for\ Akida\ (\%d)\(\backslash\)n"{}},}
+\DoxyCodeLine{00429\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__fill__result__struct_8h_aafcd7d36638d6a564b6edbceef06ea8b}{block\_config}}-\/>\mbox{\hyperlink{structei__learning__block__config__tflite__graph__t_a9f1d65f69c49cecaddb6b6abb65644ef}{object\_detection\_last\_layer}});}
+\DoxyCodeLine{00430\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{group__ei__returntypes_ggad9580b47a6cd5e74cfc31a03bdfecebea399c371041be7c468a3b05a4d8352d14}{EI\_IMPULSE\_UNSUPPORTED\_INFERENCING\_ENGINE}};}
+\DoxyCodeLine{00431\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00432\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}:\ \{}
+\DoxyCodeLine{00433\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}ERR:\ Unsupported\ object\ detection\ last\ layer\ (\%d)\(\backslash\)n"{}},}
+\DoxyCodeLine{00434\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__fill__result__struct_8h_aafcd7d36638d6a564b6edbceef06ea8b}{block\_config}}-\/>\mbox{\hyperlink{structei__learning__block__config__tflite__graph__t_a9f1d65f69c49cecaddb6b6abb65644ef}{object\_detection\_last\_layer}});}
+\DoxyCodeLine{00435\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{group__ei__returntypes_ggad9580b47a6cd5e74cfc31a03bdfecebea399c371041be7c468a3b05a4d8352d14}{EI\_IMPULSE\_UNSUPPORTED\_INFERENCING\_ENGINE}};}
+\DoxyCodeLine{00436\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00437\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00438\ \ \ \ \ \}}
+\DoxyCodeLine{00439\ \ \ \ \ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00440\ \ \ \ \ \ \ \ \ fill\_res\ =\ fill\_result\_struct\_f32(impulse,\ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}},\ potentials\_v.data(),\ \mbox{\hyperlink{ei__fill__result__struct_8h_a881f62341b5a41a3c5707268bd537be1}{debug}});}
+\DoxyCodeLine{00441\ \ \ \ \ \}}
+\DoxyCodeLine{00442\ }
+\DoxyCodeLine{00443\ \ \ \ \ \textcolor{keywordflow}{return}\ fill\_res;}
+\DoxyCodeLine{00444\ \}}
+\DoxyCodeLine{00445\ }
+\DoxyCodeLine{00449\ \textcolor{keyword}{static}\ \mbox{\hyperlink{group__ei__returntypes_gad9580b47a6cd5e74cfc31a03bdfecebe}{EI\_IMPULSE\_ERROR}}\ \mbox{\hyperlink{akida_8h_ade70c8b8e08562c755284449a4aaae57}{get\_interpreter}}(\mbox{\hyperlink{structei__learning__block__config__tflite__graph__t}{ei\_learning\_block\_config\_tflite\_graph\_t}}\ *\mbox{\hyperlink{ei__fill__result__struct_8h_aafcd7d36638d6a564b6edbceef06ea8b}{block\_config}},\ tflite::Interpreter\ **\mbox{\hyperlink{_inference_allocate_tensor_8cpp_a0d8f3bb5211083760f7c593d57adb17d}{interpreter}})\ \{}
+\DoxyCodeLine{00450\ \ \ \ \ \textcolor{comment}{//\ not\ in\ the\ map\ yet...}}
+\DoxyCodeLine{00451\ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{akida_8h_a8d592742eb6381339c788d23b68712fc}{ei\_tflite\_instances}}.count(\mbox{\hyperlink{ei__fill__result__struct_8h_aafcd7d36638d6a564b6edbceef06ea8b}{block\_config}}-\/>\mbox{\hyperlink{structei__learning__block__config__tflite__graph__t_a7c304bc1ccb9ff5e2b8155b5f77c91df}{block\_id}}))\ \{}
+\DoxyCodeLine{00452\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structei__config__tflite__graph__t}{ei\_config\_tflite\_graph\_t}}\ *graph\_config\ =\ (\mbox{\hyperlink{structei__config__tflite__graph__t}{ei\_config\_tflite\_graph\_t}}*)\mbox{\hyperlink{ei__fill__result__struct_8h_aafcd7d36638d6a564b6edbceef06ea8b}{block\_config}}-\/>\mbox{\hyperlink{structei__learning__block__config__tflite__graph__t_a42210921fb4db239d6b53c0409f6e5d9}{graph\_config}};}
+\DoxyCodeLine{00453\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structei__tflite__state__t}{ei\_tflite\_state\_t}}\ *new\_state\ =\ \textcolor{keyword}{new}\ \mbox{\hyperlink{structei__tflite__state__t}{ei\_tflite\_state\_t}}();}
+\DoxyCodeLine{00454\ }
+\DoxyCodeLine{00455\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ new\_model\ =\ tflite::FlatBufferModel::BuildFromBuffer((\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*)graph\_config-\/>\mbox{\hyperlink{structei__config__tflite__graph__t_adb1b1d255db9be3eb16c0d680ae9de50}{model}},\ graph\_config-\/>\mbox{\hyperlink{structei__config__tflite__graph__t_ac0f014d6d63f118b2dfe9f43c84ebd71}{model\_size}});}
+\DoxyCodeLine{00456\ \ \ \ \ \ \ \ \ new\_state-\/>\mbox{\hyperlink{structei__tflite__state__t_a2a718661b2d6a6d38d0fe7d29cef2bb7}{model}}\ =\ std::move(new\_model);}
+\DoxyCodeLine{00457\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!new\_state-\/>\mbox{\hyperlink{structei__tflite__state__t_a2a718661b2d6a6d38d0fe7d29cef2bb7}{model}})\ \{}
+\DoxyCodeLine{00458\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}Failed\ to\ build\ TFLite\ model\ from\ buffer\(\backslash\)n"{}});}
+\DoxyCodeLine{00459\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{group__ei__returntypes_ggad9580b47a6cd5e74cfc31a03bdfecebeadcc41afc4542dc94f9dcf36d88c1ea31}{EI\_IMPULSE\_TFLITE\_ERROR}};}
+\DoxyCodeLine{00460\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00461\ }
+\DoxyCodeLine{00462\ \ \ \ \ \ \ \ \ tflite::ops::builtin::BuiltinOpResolver\ resolver;}
+\DoxyCodeLine{00463\ \textcolor{preprocessor}{\#if\ EI\_CLASSIFIER\_HAS\_TREE\_ENSEMBLE\_CLASSIFIER}}
+\DoxyCodeLine{00464\ \ \ \ \ \ \ \ \ resolver.AddCustom(\textcolor{stringliteral}{"{}TreeEnsembleClassifier"{}},}
+\DoxyCodeLine{00465\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_1_1ops_1_1custom_a07a3b1e549c28600dbaf71e6fe38f3f7}{tflite::ops::custom::Register\_TREE\_ENSEMBLE\_CLASSIFIER}}());}
+\DoxyCodeLine{00466\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00467\ \ \ \ \ \ \ \ \ tflite::InterpreterBuilder\ builder(*new\_state-\/>\mbox{\hyperlink{structei__tflite__state__t_a2a718661b2d6a6d38d0fe7d29cef2bb7}{model}},\ resolver);}
+\DoxyCodeLine{00468\ \ \ \ \ \ \ \ \ builder(\&new\_state-\/>\mbox{\hyperlink{structei__tflite__state__t_af2d64469ee7ca0b7755ecf866d9880fc}{interpreter}});}
+\DoxyCodeLine{00469\ }
+\DoxyCodeLine{00470\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!new\_state-\/>\mbox{\hyperlink{structei__tflite__state__t_af2d64469ee7ca0b7755ecf866d9880fc}{interpreter}})\ \{}
+\DoxyCodeLine{00471\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}Failed\ to\ construct\ interpreter\(\backslash\)n"{}});}
+\DoxyCodeLine{00472\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{group__ei__returntypes_ggad9580b47a6cd5e74cfc31a03bdfecebeadcc41afc4542dc94f9dcf36d88c1ea31}{EI\_IMPULSE\_TFLITE\_ERROR}};}
+\DoxyCodeLine{00473\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00474\ }
+\DoxyCodeLine{00475\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (new\_state-\/>\mbox{\hyperlink{structei__tflite__state__t_af2d64469ee7ca0b7755ecf866d9880fc}{interpreter}}-\/>AllocateTensors()\ !=\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361ab25fe210808197f1b6601df8ccdcd699}{kTfLiteOk}})\ \{}
+\DoxyCodeLine{00476\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}AllocateTensors\ failed\(\backslash\)n"{}});}
+\DoxyCodeLine{00477\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{group__ei__returntypes_ggad9580b47a6cd5e74cfc31a03bdfecebeadcc41afc4542dc94f9dcf36d88c1ea31}{EI\_IMPULSE\_TFLITE\_ERROR}};}
+\DoxyCodeLine{00478\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00479\ }
+\DoxyCodeLine{00480\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ hw\_thread\_count\ =\ (int)std::thread::hardware\_concurrency();}
+\DoxyCodeLine{00481\ \ \ \ \ \ \ \ \ hw\_thread\_count\ -\/=\ 1;\ \textcolor{comment}{//\ leave\ one\ thread\ free\ for\ the\ other\ application}}
+\DoxyCodeLine{00482\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (hw\_thread\_count\ <\ 1)\ \{}
+\DoxyCodeLine{00483\ \ \ \ \ \ \ \ \ \ \ \ \ hw\_thread\_count\ =\ 1;}
+\DoxyCodeLine{00484\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00485\ }
+\DoxyCodeLine{00486\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (new\_state-\/>\mbox{\hyperlink{structei__tflite__state__t_af2d64469ee7ca0b7755ecf866d9880fc}{interpreter}}-\/>SetNumThreads(hw\_thread\_count)\ !=\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361ab25fe210808197f1b6601df8ccdcd699}{kTfLiteOk}})\ \{}
+\DoxyCodeLine{00487\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}SetNumThreads\ failed\(\backslash\)n"{}});}
+\DoxyCodeLine{00488\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{group__ei__returntypes_ggad9580b47a6cd5e74cfc31a03bdfecebeadcc41afc4542dc94f9dcf36d88c1ea31}{EI\_IMPULSE\_TFLITE\_ERROR}};}
+\DoxyCodeLine{00489\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00490\ }
+\DoxyCodeLine{00491\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{akida_8h_a8d592742eb6381339c788d23b68712fc}{ei\_tflite\_instances}}.insert(std::make\_pair(\mbox{\hyperlink{ei__fill__result__struct_8h_aafcd7d36638d6a564b6edbceef06ea8b}{block\_config}}-\/>\mbox{\hyperlink{structei__learning__block__config__tflite__graph__t_a7c304bc1ccb9ff5e2b8155b5f77c91df}{block\_id}},\ new\_state));}
+\DoxyCodeLine{00492\ \ \ \ \ \}}
+\DoxyCodeLine{00493\ }
+\DoxyCodeLine{00494\ \ \ \ \ \textcolor{keyword}{auto}\ tflite\_state\ =\ \mbox{\hyperlink{akida_8h_a8d592742eb6381339c788d23b68712fc}{ei\_tflite\_instances}}[\mbox{\hyperlink{ei__fill__result__struct_8h_aafcd7d36638d6a564b6edbceef06ea8b}{block\_config}}-\/>\mbox{\hyperlink{structei__learning__block__config__tflite__graph__t_a7c304bc1ccb9ff5e2b8155b5f77c91df}{block\_id}}];}
+\DoxyCodeLine{00495\ \ \ \ \ *\mbox{\hyperlink{_inference_allocate_tensor_8cpp_a0d8f3bb5211083760f7c593d57adb17d}{interpreter}}\ =\ tflite\_state-\/>interpreter.get();}
+\DoxyCodeLine{00496\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{ei__fill__result__struct_8h_a2fb43be102b153d659b668ad295aff40}{EI\_IMPULSE\_OK}};}
+\DoxyCodeLine{00497\ \}}
+\DoxyCodeLine{00498\ }
+\DoxyCodeLine{00499\ }
+\DoxyCodeLine{00500\ \textcolor{keyword}{extern}\ \textcolor{stringliteral}{"{}C"{}}\ \mbox{\hyperlink{group__ei__returntypes_gad9580b47a6cd5e74cfc31a03bdfecebe}{EI\_IMPULSE\_ERROR}}\ \mbox{\hyperlink{akida_8h_a85d5688f1dbc536dde02c237f84b5aa0}{run\_nn\_inference\_from\_dsp}}(}
+\DoxyCodeLine{00501\ \ \ \ \ \mbox{\hyperlink{structei__learning__block__config__tflite__graph__t}{ei\_learning\_block\_config\_tflite\_graph\_t}}\ *\mbox{\hyperlink{ei__fill__result__struct_8h_aafcd7d36638d6a564b6edbceef06ea8b}{block\_config}},}
+\DoxyCodeLine{00502\ \ \ \ \ \mbox{\hyperlink{structei__signal__t}{signal\_t}}\ *\mbox{\hyperlink{classei_1_1signal}{signal}},}
+\DoxyCodeLine{00503\ \ \ \ \ \mbox{\hyperlink{structei__matrix}{matrix\_t}}\ *\mbox{\hyperlink{akida_8h_aac4d93b158d42bda5829a01a9c507312}{output\_matrix}})}
+\DoxyCodeLine{00504\ \{}
+\DoxyCodeLine{00505\ \ \ \ \ tflite::Interpreter\ *\mbox{\hyperlink{_inference_allocate_tensor_8cpp_a0d8f3bb5211083760f7c593d57adb17d}{interpreter}};}
+\DoxyCodeLine{00506\ \ \ \ \ \textcolor{keyword}{auto}\ interpreter\_ret\ =\ \mbox{\hyperlink{akida_8h_ade70c8b8e08562c755284449a4aaae57}{get\_interpreter}}(\mbox{\hyperlink{ei__fill__result__struct_8h_aafcd7d36638d6a564b6edbceef06ea8b}{block\_config}},\ \&\mbox{\hyperlink{_inference_allocate_tensor_8cpp_a0d8f3bb5211083760f7c593d57adb17d}{interpreter}});}
+\DoxyCodeLine{00507\ \ \ \ \ \textcolor{keywordflow}{if}\ (interpreter\_ret\ !=\ \mbox{\hyperlink{ei__fill__result__struct_8h_a2fb43be102b153d659b668ad295aff40}{EI\_IMPULSE\_OK}})\ \{}
+\DoxyCodeLine{00508\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ interpreter\_ret;}
+\DoxyCodeLine{00509\ \ \ \ \ \}}
+\DoxyCodeLine{00510\ }
+\DoxyCodeLine{00511\ \ \ \ \ \mbox{\hyperlink{struct_tf_lite_tensor}{TfLiteTensor}}\ *\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src5afb18c45f6346167aa977a363205143_a9cebfb3d6ddd692fbdd268cf4b9ad024}{input}}\ =\ \mbox{\hyperlink{_inference_allocate_tensor_8cpp_a0d8f3bb5211083760f7c593d57adb17d}{interpreter}}-\/>\mbox{\hyperlink{classtflite_1_1_micro_interpreter_ac9046fdf3b601b6cbbcdcd4e28ad165d}{input\_tensor}}(0);}
+\DoxyCodeLine{00512\ \ \ \ \ \mbox{\hyperlink{struct_tf_lite_tensor}{TfLiteTensor}}\ *\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbcd3bbe90c4644d53fde1ce4e312f437_a7a2a916a8059078c2d7a05f46c7126fd}{output}}\ =\ \mbox{\hyperlink{_inference_allocate_tensor_8cpp_a0d8f3bb5211083760f7c593d57adb17d}{interpreter}}-\/>\mbox{\hyperlink{classtflite_1_1_micro_interpreter_a03736f71506229819aa4d7a79947add3}{output\_tensor}}(0);}
+\DoxyCodeLine{00513\ }
+\DoxyCodeLine{00514\ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src5afb18c45f6346167aa977a363205143_a9cebfb3d6ddd692fbdd268cf4b9ad024}{input}})\ \{}
+\DoxyCodeLine{00515\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{group__ei__returntypes_ggad9580b47a6cd5e74cfc31a03bdfecebeaffedb491b7409e8e885e1ab4abebaeeb}{EI\_IMPULSE\_INPUT\_TENSOR\_WAS\_NULL}};}
+\DoxyCodeLine{00516\ \ \ \ \ \}}
+\DoxyCodeLine{00517\ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbcd3bbe90c4644d53fde1ce4e312f437_a7a2a916a8059078c2d7a05f46c7126fd}{output}})\ \{}
+\DoxyCodeLine{00518\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{group__ei__returntypes_ggad9580b47a6cd5e74cfc31a03bdfecebea044ed37f0ac423223909460bad7850b4}{EI\_IMPULSE\_OUTPUT\_TENSOR\_WAS\_NULL}};}
+\DoxyCodeLine{00519\ \ \ \ \ \}}
+\DoxyCodeLine{00520\ }
+\DoxyCodeLine{00521\ \ \ \ \ \textcolor{keyword}{auto}\ input\_res\ =\ \mbox{\hyperlink{tflite__helper_8h_a055a4032becfb6fe674cae7cd44a30e4}{fill\_input\_tensor\_from\_signal}}(\mbox{\hyperlink{classei_1_1signal}{signal}},\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src5afb18c45f6346167aa977a363205143_a9cebfb3d6ddd692fbdd268cf4b9ad024}{input}});}
+\DoxyCodeLine{00522\ \ \ \ \ \textcolor{keywordflow}{if}\ (input\_res\ !=\ \mbox{\hyperlink{ei__fill__result__struct_8h_a2fb43be102b153d659b668ad295aff40}{EI\_IMPULSE\_OK}})\ \{}
+\DoxyCodeLine{00523\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ input\_res;}
+\DoxyCodeLine{00524\ \ \ \ \ \}}
+\DoxyCodeLine{00525\ }
+\DoxyCodeLine{00526\ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{_simple_web_server_8ino_a6e27f49150e9a14580fb313cc2777e00}{status}}\ =\ \mbox{\hyperlink{_inference_allocate_tensor_8cpp_a0d8f3bb5211083760f7c593d57adb17d}{interpreter}}-\/>\mbox{\hyperlink{classtflite_1_1_micro_interpreter_a2d76c06ba8d41944e185c3d330e3d554}{Invoke}}();}
+\DoxyCodeLine{00527\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{_simple_web_server_8ino_a6e27f49150e9a14580fb313cc2777e00}{status}}\ !=\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361ab25fe210808197f1b6601df8ccdcd699}{kTfLiteOk}})\ \{}
+\DoxyCodeLine{00528\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}ERR:\ interpreter-\/>Invoke()\ failed\ with\ \%d\(\backslash\)n"{}},\ \mbox{\hyperlink{_simple_web_server_8ino_a6e27f49150e9a14580fb313cc2777e00}{status}});}
+\DoxyCodeLine{00529\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{group__ei__returntypes_ggad9580b47a6cd5e74cfc31a03bdfecebeadcc41afc4542dc94f9dcf36d88c1ea31}{EI\_IMPULSE\_TFLITE\_ERROR}};}
+\DoxyCodeLine{00530\ \ \ \ \ \}}
+\DoxyCodeLine{00531\ }
+\DoxyCodeLine{00532\ \ \ \ \ \textcolor{keyword}{auto}\ output\_res\ =\ \mbox{\hyperlink{tflite__helper_8h_a9e3b34d1ab6e54f17b2064eb046b0f1c}{fill\_output\_matrix\_from\_tensor}}(\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbcd3bbe90c4644d53fde1ce4e312f437_a7a2a916a8059078c2d7a05f46c7126fd}{output}},\ \mbox{\hyperlink{akida_8h_aac4d93b158d42bda5829a01a9c507312}{output\_matrix}});}
+\DoxyCodeLine{00533\ \ \ \ \ \textcolor{keywordflow}{if}\ (output\_res\ !=\ \mbox{\hyperlink{ei__fill__result__struct_8h_a2fb43be102b153d659b668ad295aff40}{EI\_IMPULSE\_OK}})\ \{}
+\DoxyCodeLine{00534\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ output\_res;}
+\DoxyCodeLine{00535\ \ \ \ \ \}}
+\DoxyCodeLine{00536\ }
+\DoxyCodeLine{00537\ \ \ \ \ \textcolor{comment}{//\ on\ Linux\ we're\ not\ worried\ about\ free'ing\ (for\ now)}}
+\DoxyCodeLine{00538\ }
+\DoxyCodeLine{00539\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{ei__fill__result__struct_8h_a2fb43be102b153d659b668ad295aff40}{EI\_IMPULSE\_OK}};}
+\DoxyCodeLine{00540\ \}}
+\DoxyCodeLine{00541\ }
+\DoxyCodeLine{00542\ \mbox{\hyperlink{akida_8h_aeeaf5d523ee6a290407328d5e17fa721}{\_\_attribute\_\_}}((unused))\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{engines_8h_a335f8f33ce6e68893a2f4f7915e54cd4}{extract\_tflite\_features}}(\mbox{\hyperlink{structei__signal__t}{signal\_t}}\ *\mbox{\hyperlink{classei_1_1signal}{signal}},\ \mbox{\hyperlink{structei__matrix}{matrix\_t}}\ *\mbox{\hyperlink{akida_8h_aac4d93b158d42bda5829a01a9c507312}{output\_matrix}},\ \textcolor{keywordtype}{void}\ *\mbox{\hyperlink{akida_8h_a3658b236936f6ec57ce82f0fd8cbdabb}{config\_ptr}},\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{float}\ \mbox{\hyperlink{akida_8h_a25c6eab61238d97eb4aaef9fc6d1fa4e}{frequency}})\ \{}
+\DoxyCodeLine{00543\ }
+\DoxyCodeLine{00544\ \ \ \ \ \mbox{\hyperlink{structei__dsp__config__tflite__t}{ei\_dsp\_config\_tflite\_t}}\ *dsp\_config\ =\ (\mbox{\hyperlink{structei__dsp__config__tflite__t}{ei\_dsp\_config\_tflite\_t}}*)\mbox{\hyperlink{akida_8h_a3658b236936f6ec57ce82f0fd8cbdabb}{config\_ptr}};}
+\DoxyCodeLine{00545\ }
+\DoxyCodeLine{00546\ \ \ \ \ \mbox{\hyperlink{structei__config__tflite__graph__t}{ei\_config\_tflite\_graph\_t}}\ \mbox{\hyperlink{akida_8h_a3898ea656a9ba90bf49f93ba3906d1ee}{ei\_config\_tflite\_graph\_0}}\ =\ \{}
+\DoxyCodeLine{00547\ \ \ \ \ \ \ \ \ .implementation\_version\ =\ 1,}
+\DoxyCodeLine{00548\ \ \ \ \ \ \ \ \ .model\ =\ dsp\_config-\/>\mbox{\hyperlink{structei__dsp__config__tflite__t_a123eb13b7717010c84bc6e29a45b573b}{model}},}
+\DoxyCodeLine{00549\ \ \ \ \ \ \ \ \ .model\_size\ =\ dsp\_config-\/>\mbox{\hyperlink{structei__dsp__config__tflite__t_a0990565bb857f0ddf54125a7c27bcf12}{model\_size}},}
+\DoxyCodeLine{00550\ \ \ \ \ \ \ \ \ .arena\_size\ =\ dsp\_config-\/>\mbox{\hyperlink{structei__dsp__config__tflite__t_a1a887092369ac7fba59caaf55788a814}{arena\_size}}}
+\DoxyCodeLine{00551\ \ \ \ \ \};}
+\DoxyCodeLine{00552\ }
+\DoxyCodeLine{00553\ \ \ \ \ \mbox{\hyperlink{structei__learning__block__config__tflite__graph__t}{ei\_learning\_block\_config\_tflite\_graph\_t}}\ \mbox{\hyperlink{akida_8h_ab7daefa6e7828a2d77c57f1b54404881}{ei\_learning\_block\_config}}\ =\ \{}
+\DoxyCodeLine{00554\ \ \ \ \ \ \ \ \ .implementation\_version\ =\ 1,}
+\DoxyCodeLine{00555\ \ \ \ \ \ \ \ \ .classification\_mode\ =\ \mbox{\hyperlink{ei__model__types_8h_a76c13cf6c356590ec9aa183c25b90a5e}{EI\_CLASSIFIER\_CLASSIFICATION\_MODE\_DSP}},}
+\DoxyCodeLine{00556\ \ \ \ \ \ \ \ \ .block\_id\ =\ dsp\_config-\/>\mbox{\hyperlink{structei__dsp__config__tflite__t_a301036544ec7e6b7a09ee37be2ac720d}{block\_id}},}
+\DoxyCodeLine{00557\ \ \ \ \ \ \ \ \ .object\_detection\ =\ \textcolor{keyword}{false},}
+\DoxyCodeLine{00558\ \ \ \ \ \ \ \ \ .object\_detection\_last\_layer\ =\ \mbox{\hyperlink{ei__model__types_8h_a67edebb42ed0ac73b3a4337ae07a281e}{EI\_CLASSIFIER\_LAST\_LAYER\_UNKNOWN}},}
+\DoxyCodeLine{00559\ \ \ \ \ \ \ \ \ .output\_data\_tensor\ =\ 0,}
+\DoxyCodeLine{00560\ \ \ \ \ \ \ \ \ .output\_labels\_tensor\ =\ 255,}
+\DoxyCodeLine{00561\ \ \ \ \ \ \ \ \ .output\_score\_tensor\ =\ 255,}
+\DoxyCodeLine{00562\ \ \ \ \ \ \ \ \ .threshold\ =\ 0,}
+\DoxyCodeLine{00563\ \ \ \ \ \ \ \ \ .quantized\ =\ 0,}
+\DoxyCodeLine{00564\ \ \ \ \ \ \ \ \ .compiled\ =\ 1,}
+\DoxyCodeLine{00565\ \ \ \ \ \ \ \ \ .graph\_config\ =\ \&\mbox{\hyperlink{akida_8h_a3898ea656a9ba90bf49f93ba3906d1ee}{ei\_config\_tflite\_graph\_0}}}
+\DoxyCodeLine{00566\ \ \ \ \ \};}
+\DoxyCodeLine{00567\ }
+\DoxyCodeLine{00568\ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{akida_8h_ab73668665ed1903aab8905ff035a33c5}{x}}\ =\ \mbox{\hyperlink{akida_8h_a85d5688f1dbc536dde02c237f84b5aa0}{run\_nn\_inference\_from\_dsp}}(\&\mbox{\hyperlink{akida_8h_ab7daefa6e7828a2d77c57f1b54404881}{ei\_learning\_block\_config}},\ \mbox{\hyperlink{classei_1_1signal}{signal}},\ \mbox{\hyperlink{akida_8h_aac4d93b158d42bda5829a01a9c507312}{output\_matrix}});}
+\DoxyCodeLine{00569\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{akida_8h_ab73668665ed1903aab8905ff035a33c5}{x}}\ !=\ 0)\ \{}
+\DoxyCodeLine{00570\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{akida_8h_ab73668665ed1903aab8905ff035a33c5}{x}};}
+\DoxyCodeLine{00571\ \ \ \ \ \}}
+\DoxyCodeLine{00572\ }
+\DoxyCodeLine{00573\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{akida_8h_a54eac5b77b39bd93efe5b92bbf779cd8}{EIDSP\_OK}};}
+\DoxyCodeLine{00574\ \}}
+\DoxyCodeLine{00575\ }
+\DoxyCodeLine{00576\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ EI\_CLASSIFIER\_INFERENCING\_ENGINE\ ==\ EI\_CLASSIFIER\_AKIDA}}
+\DoxyCodeLine{00577\ }
+\DoxyCodeLine{00578\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{/*\ EI\_CLASSIFIER\_INFERENCING\_ENGINE\_AKIDA\_H\ */}\textcolor{preprocessor}{}}
+
+\end{DoxyCode}

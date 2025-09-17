@@ -1,0 +1,172 @@
+\doxysection{detect\+\_\+platform.\+h}
+\hypertarget{detect__platform_8h_source}{}\label{detect__platform_8h_source}\index{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/arduino-\/examples-\/main/src/third\_party/gemmlowp/internal/detect\_platform.h@{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/arduino-\/examples-\/main/src/third\_party/gemmlowp/internal/detect\_platform.h}}
+\mbox{\hyperlink{detect__platform_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{//\ Copyright\ 2018\ The\ Gemmlowp\ Authors.\ All\ Rights\ Reserved.}}
+\DoxyCodeLine{00002\ \textcolor{comment}{//}}
+\DoxyCodeLine{00003\ \textcolor{comment}{//\ Licensed\ under\ the\ Apache\ License,\ Version\ 2.0\ (the\ "{}License"{});}}
+\DoxyCodeLine{00004\ \textcolor{comment}{//\ you\ may\ not\ use\ this\ file\ except\ in\ compliance\ with\ the\ License.}}
+\DoxyCodeLine{00005\ \textcolor{comment}{//\ You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{00006\ \textcolor{comment}{//}}
+\DoxyCodeLine{00007\ \textcolor{comment}{//\ \ \ \ \ http://www.apache.org/licenses/LICENSE-\/2.0}}
+\DoxyCodeLine{00008\ \textcolor{comment}{//}}
+\DoxyCodeLine{00009\ \textcolor{comment}{//\ Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ software}}
+\DoxyCodeLine{00010\ \textcolor{comment}{//\ distributed\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,}}
+\DoxyCodeLine{00011\ \textcolor{comment}{//\ WITHOUT\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,\ either\ express\ or\ implied.}}
+\DoxyCodeLine{00012\ \textcolor{comment}{//\ See\ the\ License\ for\ the\ specific\ language\ governing\ permissions\ and}}
+\DoxyCodeLine{00013\ \textcolor{comment}{//\ limitations\ under\ the\ License.}}
+\DoxyCodeLine{00014\ }
+\DoxyCodeLine{00015\ \textcolor{comment}{//\ detect\_platform.h:\ Sets\ up\ macros\ that\ control\ architecture-\/specific}}
+\DoxyCodeLine{00016\ \textcolor{comment}{//\ features\ of\ gemmlowp's\ implementation.}}
+\DoxyCodeLine{00017\ }
+\DoxyCodeLine{00018\ \textcolor{preprocessor}{\#ifndef\ GEMMLOWP\_INTERNAL\_DETECT\_PLATFORM\_H\_}}
+\DoxyCodeLine{00019\ \textcolor{preprocessor}{\#define\ GEMMLOWP\_INTERNAL\_DETECT\_PLATFORM\_H\_}}
+\DoxyCodeLine{00020\ }
+\DoxyCodeLine{00021\ \textcolor{comment}{//\ Our\ inline\ assembly\ path\ assume\ GCC/Clang\ syntax.}}
+\DoxyCodeLine{00022\ \textcolor{comment}{//\ Native\ Client\ doesn't\ seem\ to\ support\ inline\ assembly(?).}}
+\DoxyCodeLine{00023\ \textcolor{preprocessor}{\#if\ defined(\_\_GNUC\_\_)\ \&\&\ !defined(\_\_native\_client\_\_)}}
+\DoxyCodeLine{00024\ \textcolor{preprocessor}{\#define\ GEMMLOWP\_ALLOW\_INLINE\_ASM}}
+\DoxyCodeLine{00025\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00026\ }
+\DoxyCodeLine{00027\ \textcolor{comment}{//\ Define\ macro\ statement\ that\ avoids\ inlining\ for\ GCC.}}
+\DoxyCodeLine{00028\ \textcolor{comment}{//\ For\ non-\/GCC,\ define\ as\ empty\ macro.}}
+\DoxyCodeLine{00029\ \textcolor{preprocessor}{\#if\ defined(\_\_GNUC\_\_)}}
+\DoxyCodeLine{00030\ \textcolor{preprocessor}{\#define\ GEMMLOWP\_NOINLINE\ \_\_attribute\_\_((noinline))}}
+\DoxyCodeLine{00031\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00032\ \textcolor{preprocessor}{\#define\ GEMMLOWP\_NOINLINE}}
+\DoxyCodeLine{00033\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00034\ }
+\DoxyCodeLine{00035\ \textcolor{comment}{//\ Detect\ ARM,\ 32-\/bit\ or\ 64-\/bit}}
+\DoxyCodeLine{00036\ \textcolor{preprocessor}{\#ifdef\ \_\_arm\_\_}}
+\DoxyCodeLine{00037\ \textcolor{preprocessor}{\#define\ GEMMLOWP\_ARM\_32}}
+\DoxyCodeLine{00038\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00039\ }
+\DoxyCodeLine{00040\ \textcolor{preprocessor}{\#ifdef\ \_\_aarch64\_\_}}
+\DoxyCodeLine{00041\ \textcolor{preprocessor}{\#define\ GEMMLOWP\_ARM\_64}}
+\DoxyCodeLine{00042\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00043\ }
+\DoxyCodeLine{00044\ \textcolor{preprocessor}{\#if\ defined(GEMMLOWP\_ARM\_32)\ ||\ defined(GEMMLOWP\_ARM\_64)}}
+\DoxyCodeLine{00045\ \textcolor{preprocessor}{\#define\ GEMMLOWP\_ARM}}
+\DoxyCodeLine{00046\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00047\ }
+\DoxyCodeLine{00048\ \textcolor{comment}{//\ Detect\ MIPS,\ 32-\/bit\ or\ 64-\/bit}}
+\DoxyCodeLine{00049\ \textcolor{preprocessor}{\#if\ defined(\_\_mips)\ \&\&\ !defined(\_\_LP64\_\_)}}
+\DoxyCodeLine{00050\ \textcolor{preprocessor}{\#define\ GEMMLOWP\_MIPS\_32}}
+\DoxyCodeLine{00051\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00052\ }
+\DoxyCodeLine{00053\ \textcolor{preprocessor}{\#if\ defined(\_\_mips)\ \&\&\ defined(\_\_LP64\_\_)}}
+\DoxyCodeLine{00054\ \textcolor{preprocessor}{\#define\ GEMMLOWP\_MIPS\_64}}
+\DoxyCodeLine{00055\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00056\ }
+\DoxyCodeLine{00057\ \textcolor{preprocessor}{\#if\ defined(GEMMLOWP\_MIPS\_32)\ ||\ defined(GEMMLOWP\_MIPS\_64)}}
+\DoxyCodeLine{00058\ \textcolor{preprocessor}{\#define\ GEMMLOWP\_MIPS}}
+\DoxyCodeLine{00059\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00060\ }
+\DoxyCodeLine{00061\ \textcolor{comment}{//\ Detect\ x86,\ 32-\/bit\ or\ 64-\/bit}}
+\DoxyCodeLine{00062\ \textcolor{preprocessor}{\#if\ defined(\_\_i386\_\_)\ ||\ defined(\_M\_IX86)\ ||\ defined(\_X86\_)\ ||\ defined(\_\_i386)}}
+\DoxyCodeLine{00063\ \textcolor{preprocessor}{\#define\ GEMMLOWP\_X86\_32}}
+\DoxyCodeLine{00064\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00065\ }
+\DoxyCodeLine{00066\ \textcolor{preprocessor}{\#if\ defined(\_\_x86\_64\_\_)\ ||\ defined(\_M\_X64)\ ||\ defined(\_\_amd64)}}
+\DoxyCodeLine{00067\ \textcolor{preprocessor}{\#define\ GEMMLOWP\_X86\_64}}
+\DoxyCodeLine{00068\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00069\ }
+\DoxyCodeLine{00070\ \textcolor{preprocessor}{\#if\ defined(GEMMLOWP\_X86\_32)\ ||\ defined(GEMMLOWP\_X86\_64)}}
+\DoxyCodeLine{00071\ \textcolor{preprocessor}{\#define\ GEMMLOWP\_X86}}
+\DoxyCodeLine{00072\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00073\ }
+\DoxyCodeLine{00074\ \textcolor{comment}{//\ Some\ of\ our\ optimized\ paths\ use\ inline\ assembly\ and\ for}}
+\DoxyCodeLine{00075\ \textcolor{comment}{//\ now\ we\ don't\ bother\ enabling\ some\ other\ optimized\ paths\ using\ intrinddics}}
+\DoxyCodeLine{00076\ \textcolor{comment}{//\ where\ we\ can't\ use\ inline\ assembly\ paths.}}
+\DoxyCodeLine{00077\ \textcolor{preprocessor}{\#ifdef\ GEMMLOWP\_ALLOW\_INLINE\_ASM}}
+\DoxyCodeLine{00078\ }
+\DoxyCodeLine{00079\ \textcolor{comment}{//\ Detect\ NEON.\ It's\ important\ to\ check\ for\ both\ tokens.}}
+\DoxyCodeLine{00080\ \textcolor{preprocessor}{\#if\ (defined\ \_\_ARM\_NEON)\ ||\ (defined\ \_\_ARM\_NEON\_\_)}}
+\DoxyCodeLine{00081\ \textcolor{preprocessor}{\#define\ GEMMLOWP\_NEON}}
+\DoxyCodeLine{00082\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00083\ }
+\DoxyCodeLine{00084\ \textcolor{comment}{//\ Convenience\ NEON\ tokens\ for\ 32-\/bit\ or\ 64-\/bit}}
+\DoxyCodeLine{00085\ \textcolor{preprocessor}{\#if\ defined(GEMMLOWP\_NEON)\ \&\&\ defined(GEMMLOWP\_ARM\_32)}}
+\DoxyCodeLine{00086\ \textcolor{preprocessor}{\#define\ GEMMLOWP\_NEON\_32}}
+\DoxyCodeLine{00087\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00088\ }
+\DoxyCodeLine{00089\ \textcolor{preprocessor}{\#if\ defined(GEMMLOWP\_NEON)\ \&\&\ defined(GEMMLOWP\_ARM\_64)}}
+\DoxyCodeLine{00090\ \textcolor{preprocessor}{\#define\ GEMMLOWP\_NEON\_64}}
+\DoxyCodeLine{00091\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00092\ }
+\DoxyCodeLine{00093\ \textcolor{comment}{//\ Detect\ MIPS\ MSA.}}
+\DoxyCodeLine{00094\ \textcolor{comment}{//\ Limit\ MSA\ optimizations\ to\ little-\/endian\ CPUs\ for\ now.}}
+\DoxyCodeLine{00095\ \textcolor{comment}{//\ TODO:\ Perhaps,\ eventually\ support\ MSA\ optimizations\ on\ big-\/endian\ CPUs?}}
+\DoxyCodeLine{00096\ \textcolor{preprocessor}{\#if\ defined(GEMMLOWP\_MIPS)\ \&\&\ (\_\_mips\_isa\_rev\ >=\ 5)\ \&\&\ defined(\_\_mips\_msa)\ \&\&\ \(\backslash\)}}
+\DoxyCodeLine{00097\ \textcolor{preprocessor}{\ \ \ \ defined(\_\_BYTE\_ORDER\_\_)\ \&\&\ (\_\_BYTE\_ORDER\_\_\ ==\ \_\_ORDER\_LITTLE\_ENDIAN\_\_)}}
+\DoxyCodeLine{00098\ \textcolor{preprocessor}{\#define\ GEMMLOWP\_MSA}}
+\DoxyCodeLine{00099\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00100\ }
+\DoxyCodeLine{00101\ \textcolor{comment}{//\ Convenience\ MIPS\ MSA\ tokens\ for\ 32-\/bit\ or\ 64-\/bit.}}
+\DoxyCodeLine{00102\ \textcolor{preprocessor}{\#if\ defined(GEMMLOWP\_MSA)\ \&\&\ defined(GEMMLOWP\_MIPS\_32)}}
+\DoxyCodeLine{00103\ \textcolor{preprocessor}{\#define\ GEMMLOWP\_MSA\_32}}
+\DoxyCodeLine{00104\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00105\ }
+\DoxyCodeLine{00106\ \textcolor{preprocessor}{\#if\ defined(GEMMLOWP\_MSA)\ \&\&\ defined(GEMMLOWP\_MIPS\_64)}}
+\DoxyCodeLine{00107\ \textcolor{preprocessor}{\#define\ GEMMLOWP\_MSA\_64}}
+\DoxyCodeLine{00108\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00109\ }
+\DoxyCodeLine{00110\ \textcolor{comment}{//\ compiler\ define\ for\ AVX2\ -\/D\ GEMMLOWP\_ENABLE\_AVX2}}
+\DoxyCodeLine{00111\ \textcolor{comment}{//\ Detect\ AVX2}}
+\DoxyCodeLine{00112\ \textcolor{preprocessor}{\#if\ defined(\_\_AVX2\_\_)\ \&\&\ defined(GEMMLOWP\_ENABLE\_AVX2)}}
+\DoxyCodeLine{00113\ \textcolor{preprocessor}{\#define\ GEMMLOWP\_AVX2}}
+\DoxyCodeLine{00114\ \textcolor{comment}{//\ Detect\ SSE4.}}
+\DoxyCodeLine{00115\ \textcolor{comment}{//\ MSVC\ does\ not\ have\ \_\_SSE4\_1\_\_\ macro,\ but\ will\ enable\ SSE4}}
+\DoxyCodeLine{00116\ \textcolor{comment}{//\ when\ AVX\ is\ turned\ on.}}
+\DoxyCodeLine{00117\ \textcolor{preprocessor}{\#elif\ defined(\_\_SSE4\_1\_\_)\ ||\ (defined(\_MSC\_VER)\ \&\&\ defined(\_\_AVX\_\_))}}
+\DoxyCodeLine{00118\ \textcolor{preprocessor}{\#define\ GEMMLOWP\_SSE4}}
+\DoxyCodeLine{00119\ \textcolor{comment}{//\ Detect\ SSE3.}}
+\DoxyCodeLine{00120\ \textcolor{preprocessor}{\#elif\ defined(\_\_SSE3\_\_)}}
+\DoxyCodeLine{00121\ \textcolor{preprocessor}{\#define\ GEMMLOWP\_SSE3}}
+\DoxyCodeLine{00122\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00123\ }
+\DoxyCodeLine{00124\ \textcolor{comment}{//\ Convenience\ SSE4\ tokens\ for\ 32-\/bit\ or\ 64-\/bit}}
+\DoxyCodeLine{00125\ \textcolor{preprocessor}{\#if\ defined(GEMMLOWP\_SSE4)\ \&\&\ defined(GEMMLOWP\_X86\_32)\ \&\&\ \(\backslash\)}}
+\DoxyCodeLine{00126\ \textcolor{preprocessor}{\ \ \ \ !defined(GEMMLOWP\_DISABLE\_SSE4)}}
+\DoxyCodeLine{00127\ \textcolor{preprocessor}{\#define\ GEMMLOWP\_SSE4\_32}}
+\DoxyCodeLine{00128\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00129\ }
+\DoxyCodeLine{00130\ \textcolor{preprocessor}{\#if\ defined(GEMMLOWP\_SSE3)\ \&\&\ defined(GEMMLOWP\_X86\_32)}}
+\DoxyCodeLine{00131\ \textcolor{preprocessor}{\#define\ GEMMLOWP\_SSE3\_32}}
+\DoxyCodeLine{00132\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00133\ }
+\DoxyCodeLine{00134\ \textcolor{preprocessor}{\#if\ defined(GEMMLOWP\_SSE4)\ \&\&\ defined(GEMMLOWP\_X86\_64)\ \&\&\ \(\backslash\)}}
+\DoxyCodeLine{00135\ \textcolor{preprocessor}{\ \ \ \ !defined(GEMMLOWP\_DISABLE\_SSE4)}}
+\DoxyCodeLine{00136\ \textcolor{preprocessor}{\#define\ GEMMLOWP\_SSE4\_64}}
+\DoxyCodeLine{00137\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00138\ }
+\DoxyCodeLine{00139\ \textcolor{preprocessor}{\#if\ defined(GEMMLOWP\_SSE3)\ \&\&\ defined(GEMMLOWP\_X86\_64)}}
+\DoxyCodeLine{00140\ \textcolor{preprocessor}{\#define\ GEMMLOWP\_SSE3\_64}}
+\DoxyCodeLine{00141\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00142\ }
+\DoxyCodeLine{00143\ \textcolor{preprocessor}{\#if\ defined(GEMMLOWP\_AVX2)\ \&\&\ defined(GEMMLOWP\_X86\_64)}}
+\DoxyCodeLine{00144\ \textcolor{preprocessor}{\#define\ GEMMLOWP\_AVX2\_64}}
+\DoxyCodeLine{00145\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00146\ }
+\DoxyCodeLine{00147\ \textcolor{preprocessor}{\#if\ defined(\_\_has\_feature)}}
+\DoxyCodeLine{00148\ \textcolor{preprocessor}{\#if\ \_\_has\_feature(memory\_sanitizer)}}
+\DoxyCodeLine{00149\ \textcolor{preprocessor}{\#include\ <sanitizer/msan\_interface.h>}}
+\DoxyCodeLine{00150\ \textcolor{preprocessor}{\#define\ GEMMLOWP\_MARK\_MEMORY\_AS\_INITIALIZED\ \_\_msan\_unpoison}}
+\DoxyCodeLine{00151\ \textcolor{preprocessor}{\#elif\ \_\_has\_feature(address\_sanitizer)}}
+\DoxyCodeLine{00152\ \textcolor{preprocessor}{\#include\ <sanitizer/asan\_interface.h>}}
+\DoxyCodeLine{00153\ \textcolor{preprocessor}{\#define\ GEMMLOWP\_MARK\_MEMORY\_AS\_INITIALIZED\ \_\_asan\_unpoison\_memory\_region}}
+\DoxyCodeLine{00154\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00155\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00156\ }
+\DoxyCodeLine{00157\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ GEMMLOWP\_ALLOW\_INLINE\_ASM}}
+\DoxyCodeLine{00158\ }
+\DoxyCodeLine{00159\ \textcolor{comment}{//\ Detect\ Android.\ Don't\ conflate\ with\ ARM\ -\/\ we\ care\ about\ tuning}}
+\DoxyCodeLine{00160\ \textcolor{comment}{//\ for\ non-\/ARM\ Android\ devices\ too.\ This\ can\ be\ used\ in\ conjunction}}
+\DoxyCodeLine{00161\ \textcolor{comment}{//\ with\ x86\ to\ tune\ differently\ for\ mobile\ x86\ CPUs\ (Atom)\ vs.\ desktop\ x86\ CPUs.}}
+\DoxyCodeLine{00162\ \textcolor{preprocessor}{\#if\ defined(\_\_ANDROID\_\_)\ ||\ defined(ANDROID)}}
+\DoxyCodeLine{00163\ \textcolor{preprocessor}{\#define\ GEMMLOWP\_ANDROID}}
+\DoxyCodeLine{00164\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00165\ }
+\DoxyCodeLine{00166\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ GEMMLOWP\_INTERNAL\_DETECT\_PLATFORM\_H\_}}
+
+\end{DoxyCode}

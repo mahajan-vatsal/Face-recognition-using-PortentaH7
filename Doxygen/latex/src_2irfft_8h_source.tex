@@ -1,0 +1,90 @@
+\doxysection{irfft.\+h}
+\hypertarget{src_2irfft_8h_source}{}\label{src_2irfft_8h_source}\index{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/main/signal/src/irfft.h@{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/main/signal/src/irfft.h}}
+\mbox{\hyperlink{src_2irfft_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{/*\ Copyright\ 2023\ The\ TensorFlow\ Authors.\ All\ Rights\ Reserved.}}
+\DoxyCodeLine{00002\ \textcolor{comment}{}}
+\DoxyCodeLine{00003\ \textcolor{comment}{Licensed\ under\ the\ Apache\ License,\ Version\ 2.0\ (the\ "{}License"{});}}
+\DoxyCodeLine{00004\ \textcolor{comment}{you\ may\ not\ use\ this\ file\ except\ in\ compliance\ with\ the\ License.}}
+\DoxyCodeLine{00005\ \textcolor{comment}{You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{00006\ \textcolor{comment}{}}
+\DoxyCodeLine{00007\ \textcolor{comment}{\ \ \ \ http://www.apache.org/licenses/LICENSE-\/2.0}}
+\DoxyCodeLine{00008\ \textcolor{comment}{}}
+\DoxyCodeLine{00009\ \textcolor{comment}{Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ software}}
+\DoxyCodeLine{00010\ \textcolor{comment}{distributed\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,}}
+\DoxyCodeLine{00011\ \textcolor{comment}{WITHOUT\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,\ either\ express\ or\ implied.}}
+\DoxyCodeLine{00012\ \textcolor{comment}{See\ the\ License\ for\ the\ specific\ language\ governing\ permissions\ and}}
+\DoxyCodeLine{00013\ \textcolor{comment}{limitations\ under\ the\ License.}}
+\DoxyCodeLine{00014\ \textcolor{comment}{==============================================================================*/}}
+\DoxyCodeLine{00015\ }
+\DoxyCodeLine{00016\ \textcolor{preprocessor}{\#ifndef\ SIGNAL\_SRC\_IRFFT\_H\_}}
+\DoxyCodeLine{00017\ \textcolor{preprocessor}{\#define\ SIGNAL\_SRC\_IRFFT\_H\_}}
+\DoxyCodeLine{00018\ }
+\DoxyCodeLine{00019\ \textcolor{preprocessor}{\#include\ <stddef.h>}}
+\DoxyCodeLine{00020\ \textcolor{preprocessor}{\#include\ <stdint.h>}}
+\DoxyCodeLine{00021\ }
+\DoxyCodeLine{00022\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{complex_8h}{signal/src/complex.h}}"{}}}
+\DoxyCodeLine{00023\ }
+\DoxyCodeLine{00024\ \textcolor{comment}{//\ TODO(b/286250473):\ remove\ namespace\ once\ de-\/duped\ libraries}}
+\DoxyCodeLine{00025\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacetflite}{tflite}}\ \{}
+\DoxyCodeLine{00026\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacetflm__signal}{tflm\_signal}}\ \{}
+\DoxyCodeLine{00027\ }
+\DoxyCodeLine{00028\ \textcolor{comment}{//\ IRFFT\ (Inverse\ Real\ Fast\ Fourier\ Transform)}}
+\DoxyCodeLine{00029\ \textcolor{comment}{//\ IFFT\ for\ real\ valued\ time\ domain\ outputs.}}
+\DoxyCodeLine{00030\ }
+\DoxyCodeLine{00031\ \textcolor{comment}{//\ 16-\/bit\ Integer\ input/output}}
+\DoxyCodeLine{00032\ }
+\DoxyCodeLine{00033\ \textcolor{comment}{//\ Returns\ the\ size\ of\ the\ memory\ that\ an\ IRFFT\ of\ \`{}fft\_length`\ needs}}
+\DoxyCodeLine{00034\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{namespacetflite_1_1tflm__signal_a2a6784cc48d3bee8a16a41b5a472401a}{IrfftInt16GetNeededMemory}}(int32\_t\ \mbox{\hyperlink{irfft_8cc_abe2bad6726f6194f0b5165fe4b37a65f}{fft\_length}});}
+\DoxyCodeLine{00035\ }
+\DoxyCodeLine{00036\ \textcolor{comment}{//\ Initialize\ the\ state\ of\ an\ IRFFT\ of\ \`{}fft\_length`}}
+\DoxyCodeLine{00037\ \textcolor{comment}{//\ \`{}state`\ points\ to\ an\ opaque\ state\ of\ size\ \`{}state\_size`,\ which}}
+\DoxyCodeLine{00038\ \textcolor{comment}{//\ \ must\ be\ greater\ or\ equal\ to\ the\ value\ returned\ by}}
+\DoxyCodeLine{00039\ \textcolor{comment}{//\ \ IrfftGetNeededMemory(fft\_length).\ Fails\ if\ it\ isn't.}}
+\DoxyCodeLine{00040\ \textcolor{keywordtype}{void}*\ \mbox{\hyperlink{namespacetflite_1_1tflm__signal_ac1f7f37b08cc5d0b6e0c311de3ed0ced}{IrfftInt16Init}}(int32\_t\ \mbox{\hyperlink{irfft_8cc_abe2bad6726f6194f0b5165fe4b37a65f}{fft\_length}},\ \textcolor{keywordtype}{void}*\ \mbox{\hyperlink{ethosu55__interface_8h_adc6e5733fc3c22f0a7b2914188c49c90}{state}},\ \textcolor{keywordtype}{size\_t}\ state\_size);}
+\DoxyCodeLine{00041\ }
+\DoxyCodeLine{00042\ \textcolor{comment}{//\ Applies\ IRFFT\ to\ \`{}input`\ and\ writes\ the\ result\ to\ \`{}output`}}
+\DoxyCodeLine{00043\ \textcolor{comment}{//\ *\ \`{}input`\ must\ be\ of\ size\ \`{}fft\_length`\ elements\ (see\ IRfftInit)}}
+\DoxyCodeLine{00044\ \textcolor{comment}{//\ *\ \`{}output`\ must\ be\ of\ size\ output}}
+\DoxyCodeLine{00045\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1tflm__signal_a16892bb18e03ef697b45b0cd2121b900}{IrfftInt16Apply}}(\textcolor{keywordtype}{void}*\ \mbox{\hyperlink{ethosu55__interface_8h_adc6e5733fc3c22f0a7b2914188c49c90}{state}},\ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_complex}{Complex<int16\_t>}}*\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src5afb18c45f6346167aa977a363205143_a9cebfb3d6ddd692fbdd268cf4b9ad024}{input}},}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ int16\_t*\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbcd3bbe90c4644d53fde1ce4e312f437_a7a2a916a8059078c2d7a05f46c7126fd}{output}});}
+\DoxyCodeLine{00047\ }
+\DoxyCodeLine{00048\ \textcolor{comment}{//\ 32-\/bit\ Integer\ input/output}}
+\DoxyCodeLine{00049\ }
+\DoxyCodeLine{00050\ \textcolor{comment}{//\ Returns\ the\ size\ of\ the\ memory\ that\ an\ IRFFT\ of\ \`{}fft\_length`\ needs}}
+\DoxyCodeLine{00051\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{namespacetflite_1_1tflm__signal_ab249c62e92beee388824a4030ee9c32a}{IrfftInt32GetNeededMemory}}(int32\_t\ \mbox{\hyperlink{irfft_8cc_abe2bad6726f6194f0b5165fe4b37a65f}{fft\_length}});}
+\DoxyCodeLine{00052\ }
+\DoxyCodeLine{00053\ \textcolor{comment}{//\ Initialize\ the\ state\ of\ an\ IRFFT\ of\ \`{}fft\_length`}}
+\DoxyCodeLine{00054\ \textcolor{comment}{//\ \`{}state`\ points\ to\ an\ opaque\ state\ of\ size\ \`{}state\_size`,\ which}}
+\DoxyCodeLine{00055\ \textcolor{comment}{//\ \ must\ be\ greater\ or\ equal\ to\ the\ value\ returned\ by}}
+\DoxyCodeLine{00056\ \textcolor{comment}{//\ \ IrfftGetNeededMemory(fft\_length).\ Fails\ if\ it\ isn't.}}
+\DoxyCodeLine{00057\ \textcolor{keywordtype}{void}*\ \mbox{\hyperlink{namespacetflite_1_1tflm__signal_a8bab41b2100d9aba7df8a91d278d81e1}{IrfftInt32Init}}(int32\_t\ \mbox{\hyperlink{irfft_8cc_abe2bad6726f6194f0b5165fe4b37a65f}{fft\_length}},\ \textcolor{keywordtype}{void}*\ \mbox{\hyperlink{ethosu55__interface_8h_adc6e5733fc3c22f0a7b2914188c49c90}{state}},\ \textcolor{keywordtype}{size\_t}\ state\_size);}
+\DoxyCodeLine{00058\ }
+\DoxyCodeLine{00059\ \textcolor{comment}{//\ Applies\ IRFFT\ to\ \`{}input`\ and\ writes\ the\ result\ to\ \`{}output`}}
+\DoxyCodeLine{00060\ \textcolor{comment}{//\ *\ \`{}input`\ must\ be\ of\ size\ \`{}fft\_length`\ elements\ (see\ IRfftInit)}}
+\DoxyCodeLine{00061\ \textcolor{comment}{//\ *\ \`{}output`\ must\ be\ of\ size\ output}}
+\DoxyCodeLine{00062\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1tflm__signal_a1525333f930853761eb7e37a52b0fc91}{IrfftInt32Apply}}(\textcolor{keywordtype}{void}*\ \mbox{\hyperlink{ethosu55__interface_8h_adc6e5733fc3c22f0a7b2914188c49c90}{state}},\ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_complex}{Complex<int32\_t>}}*\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src5afb18c45f6346167aa977a363205143_a9cebfb3d6ddd692fbdd268cf4b9ad024}{input}},}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ int32\_t*\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbcd3bbe90c4644d53fde1ce4e312f437_a7a2a916a8059078c2d7a05f46c7126fd}{output}});}
+\DoxyCodeLine{00064\ }
+\DoxyCodeLine{00065\ \textcolor{comment}{//\ Floating\ point\ input/output}}
+\DoxyCodeLine{00066\ }
+\DoxyCodeLine{00067\ \textcolor{comment}{//\ Returns\ the\ size\ of\ the\ memory\ that\ an\ IRFFT\ of\ \`{}fft\_length`\ needs}}
+\DoxyCodeLine{00068\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{namespacetflite_1_1tflm__signal_ab7d1313c78fb71399127df74f72bb254}{IrfftFloatGetNeededMemory}}(int32\_t\ \mbox{\hyperlink{irfft_8cc_abe2bad6726f6194f0b5165fe4b37a65f}{fft\_length}});}
+\DoxyCodeLine{00069\ }
+\DoxyCodeLine{00070\ \textcolor{comment}{//\ Initialize\ the\ state\ of\ an\ IRFFT\ of\ \`{}fft\_length`}}
+\DoxyCodeLine{00071\ \textcolor{comment}{//\ \`{}state`\ points\ to\ an\ opaque\ state\ of\ size\ \`{}state\_size`,\ which}}
+\DoxyCodeLine{00072\ \textcolor{comment}{//\ \ must\ be\ greater\ or\ equal\ to\ the\ value\ returned\ by}}
+\DoxyCodeLine{00073\ \textcolor{comment}{//\ \ IrfftGetNeededMemory(fft\_length).\ Fails\ if\ it\ isn't.}}
+\DoxyCodeLine{00074\ \textcolor{keywordtype}{void}*\ \mbox{\hyperlink{namespacetflite_1_1tflm__signal_a8a3787253f9616deecbc3607115f6912}{IrfftFloatInit}}(int32\_t\ \mbox{\hyperlink{irfft_8cc_abe2bad6726f6194f0b5165fe4b37a65f}{fft\_length}},\ \textcolor{keywordtype}{void}*\ \mbox{\hyperlink{ethosu55__interface_8h_adc6e5733fc3c22f0a7b2914188c49c90}{state}},\ \textcolor{keywordtype}{size\_t}\ state\_size);}
+\DoxyCodeLine{00075\ }
+\DoxyCodeLine{00076\ \textcolor{comment}{//\ Applies\ IRFFT\ to\ \`{}input`\ and\ writes\ the\ result\ to\ \`{}output`}}
+\DoxyCodeLine{00077\ \textcolor{comment}{//\ *\ \`{}input`\ must\ be\ of\ size\ \`{}fft\_length`\ elements\ (see\ IRfftInit)}}
+\DoxyCodeLine{00078\ \textcolor{comment}{//\ *\ \`{}output`\ must\ be\ of\ size\ output}}
+\DoxyCodeLine{00079\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1tflm__signal_ae6914f6910987e2d423fb0084680f523}{IrfftFloatApply}}(\textcolor{keywordtype}{void}*\ \mbox{\hyperlink{ethosu55__interface_8h_adc6e5733fc3c22f0a7b2914188c49c90}{state}},\ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_complex}{Complex<float>}}*\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src5afb18c45f6346167aa977a363205143_a9cebfb3d6ddd692fbdd268cf4b9ad024}{input}},\ \textcolor{keywordtype}{float}*\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbcd3bbe90c4644d53fde1ce4e312f437_a7a2a916a8059078c2d7a05f46c7126fd}{output}});}
+\DoxyCodeLine{00080\ }
+\DoxyCodeLine{00081\ \}\ \ \textcolor{comment}{//\ namespace\ tflm\_signal}}
+\DoxyCodeLine{00082\ \}\ \ \textcolor{comment}{//\ namespace\ tflite}}
+\DoxyCodeLine{00083\ }
+\DoxyCodeLine{00084\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ SIGNAL\_SRC\_IRFFT\_H\_}}
+
+\end{DoxyCode}

@@ -1,0 +1,63 @@
+\doxysection{activation\+\_\+utils.\+h}
+\hypertarget{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2micro_2kernels_2activation__utils_8h_source}{}\label{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2micro_2kernels_2activation__utils_8h_source}\index{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/arduino-\/examples-\/main/src/tensorflow/lite/micro/kernels/activation\_utils.h@{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/arduino-\/examples-\/main/src/tensorflow/lite/micro/kernels/activation\_utils.h}}
+\mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2micro_2kernels_2activation__utils_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{/*\ Copyright\ 2019\ The\ TensorFlow\ Authors.\ All\ Rights\ Reserved.}}
+\DoxyCodeLine{00002\ \textcolor{comment}{}}
+\DoxyCodeLine{00003\ \textcolor{comment}{Licensed\ under\ the\ Apache\ License,\ Version\ 2.0\ (the\ "{}License"{});}}
+\DoxyCodeLine{00004\ \textcolor{comment}{you\ may\ not\ use\ this\ file\ except\ in\ compliance\ with\ the\ License.}}
+\DoxyCodeLine{00005\ \textcolor{comment}{You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{00006\ \textcolor{comment}{}}
+\DoxyCodeLine{00007\ \textcolor{comment}{\ \ \ \ http://www.apache.org/licenses/LICENSE-\/2.0}}
+\DoxyCodeLine{00008\ \textcolor{comment}{}}
+\DoxyCodeLine{00009\ \textcolor{comment}{Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ software}}
+\DoxyCodeLine{00010\ \textcolor{comment}{distributed\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,}}
+\DoxyCodeLine{00011\ \textcolor{comment}{WITHOUT\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,\ either\ express\ or\ implied.}}
+\DoxyCodeLine{00012\ \textcolor{comment}{See\ the\ License\ for\ the\ specific\ language\ governing\ permissions\ and}}
+\DoxyCodeLine{00013\ \textcolor{comment}{limitations\ under\ the\ License.}}
+\DoxyCodeLine{00014\ \textcolor{comment}{==============================================================================*/}}
+\DoxyCodeLine{00015\ }
+\DoxyCodeLine{00016\ \textcolor{preprocessor}{\#ifndef\ TENSORFLOW\_LITE\_MICRO\_KERNELS\_ACTIVATION\_UTILS\_H\_}}
+\DoxyCodeLine{00017\ \textcolor{preprocessor}{\#define\ TENSORFLOW\_LITE\_MICRO\_KERNELS\_ACTIVATION\_UTILS\_H\_}}
+\DoxyCodeLine{00018\ }
+\DoxyCodeLine{00019\ \textcolor{preprocessor}{\#include\ <algorithm>}}
+\DoxyCodeLine{00020\ \textcolor{preprocessor}{\#include\ <cmath>}}
+\DoxyCodeLine{00021\ }
+\DoxyCodeLine{00022\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/c/builtin\_op\_data.h"{}}}
+\DoxyCodeLine{00023\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/kernels/internal/cppmath.h"{}}}
+\DoxyCodeLine{00024\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/kernels/internal/max.h"{}}}
+\DoxyCodeLine{00025\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/kernels/internal/min.h"{}}}
+\DoxyCodeLine{00026\ }
+\DoxyCodeLine{00027\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacetflite}{tflite}}\ \{}
+\DoxyCodeLine{00028\ \textcolor{keyword}{namespace\ }ops\ \{}
+\DoxyCodeLine{00029\ \textcolor{keyword}{namespace\ }micro\ \{}
+\DoxyCodeLine{00030\ }
+\DoxyCodeLine{00031\ \textcolor{comment}{//\ Returns\ the\ floating\ point\ value\ for\ a\ fused\ activation:}}
+\DoxyCodeLine{00032\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{float}\ \mbox{\hyperlink{namespacetflite_1_1ops_1_1micro_aecc3137a6f5e81281eb2a91888f37776}{ActivationValFloat}}(\mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2core_2c_2builtin__op__data_8h_acc9e377dbc009d68bbfa5480d2559565}{TfLiteFusedActivation}}\ act,\ \textcolor{keywordtype}{float}\ a)\ \{}
+\DoxyCodeLine{00033\ \ \ \textcolor{keywordflow}{switch}\ (act)\ \{}
+\DoxyCodeLine{00034\ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2core_2c_2builtin__op__data_8h_acc9e377dbc009d68bbfa5480d2559565a681c59b3a97ac99be2f9d43db5a8a51a}{kTfLiteActNone}}:}
+\DoxyCodeLine{00035\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ a;}
+\DoxyCodeLine{00036\ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2core_2c_2builtin__op__data_8h_acc9e377dbc009d68bbfa5480d2559565aa8815bb5cba3bda48d71be3f1937b8c6}{kTfLiteActRelu}}:}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacetflite_aadc8d4a07c487859fc3260a6956e6811}{TfLiteMax}}(0.0f,\ a);}
+\DoxyCodeLine{00038\ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2core_2c_2builtin__op__data_8h_acc9e377dbc009d68bbfa5480d2559565a40a3d22af1e8b06897c7d1dfeef55fa2}{kTfLiteActReluN1To1}}:}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacetflite_aadc8d4a07c487859fc3260a6956e6811}{TfLiteMax}}(-\/1.0f,\ \mbox{\hyperlink{namespacetflite_aaa4d03ea37553f35095b52de6641d231}{TfLiteMin}}(a,\ 1.0f));}
+\DoxyCodeLine{00040\ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2core_2c_2builtin__op__data_8h_acc9e377dbc009d68bbfa5480d2559565a1aed6f8547fd238e52d0d87f633fc371}{kTfLiteActRelu6}}:}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacetflite_aadc8d4a07c487859fc3260a6956e6811}{TfLiteMax}}(0.0f,\ \mbox{\hyperlink{namespacetflite_aaa4d03ea37553f35095b52de6641d231}{TfLiteMin}}(a,\ 6.0f));}
+\DoxyCodeLine{00042\ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2core_2c_2builtin__op__data_8h_acc9e377dbc009d68bbfa5480d2559565a7e8b7d2496b796e132239ab5dea5835d}{kTfLiteActTanh}}:}
+\DoxyCodeLine{00043\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::tanh(a);}
+\DoxyCodeLine{00044\ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2core_2c_2builtin__op__data_8h_acc9e377dbc009d68bbfa5480d2559565a3623b833887225a271e2b50b463ac09f}{kTfLiteActSignBit}}:}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::signbit(a);}
+\DoxyCodeLine{00046\ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2core_2c_2builtin__op__data_8h_acc9e377dbc009d68bbfa5480d2559565ad6bc4e430896a61a0b2f789ba5e8d4ba}{kTfLiteActSigmoid}}:}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 1.0f\ /\ (1.0f\ +\ std::exp(-\/a));}
+\DoxyCodeLine{00048\ \ \ \}}
+\DoxyCodeLine{00049\ \ \ \textcolor{keywordflow}{return}\ 0.0f;\ \ \textcolor{comment}{//\ To\ indicate\ an\ unsupported\ activation\ (i.e.\ when\ a\ new\ fused}}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ activation\ is\ added\ to\ the\ enum\ and\ not\ handled\ here).}}
+\DoxyCodeLine{00051\ \}}
+\DoxyCodeLine{00052\ }
+\DoxyCodeLine{00053\ \}\ \ \textcolor{comment}{//\ namespace\ micro}}
+\DoxyCodeLine{00054\ \}\ \ \textcolor{comment}{//\ namespace\ ops}}
+\DoxyCodeLine{00055\ \}\ \ \textcolor{comment}{//\ namespace\ tflite}}
+\DoxyCodeLine{00056\ }
+\DoxyCodeLine{00057\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ TENSORFLOW\_LITE\_MICRO\_KERNELS\_ACTIVATION\_UTILS\_H\_}}
+
+\end{DoxyCode}

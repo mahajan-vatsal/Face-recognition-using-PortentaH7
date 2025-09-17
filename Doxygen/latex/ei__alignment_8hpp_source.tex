@@ -1,0 +1,173 @@
+\doxysection{ei\+\_\+alignment.\+hpp}
+\hypertarget{ei__alignment_8hpp_source}{}\label{ei__alignment_8hpp_source}\index{Face\_Access\_inferencing/src/edge-\/impulse-\/sdk/classifier/postprocessing/alignment/ei\_alignment.hpp@{Face\_Access\_inferencing/src/edge-\/impulse-\/sdk/classifier/postprocessing/alignment/ei\_alignment.hpp}}
+\mbox{\hyperlink{ei__alignment_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{00002\ }
+\DoxyCodeLine{00003\ \textcolor{preprocessor}{\#include\ <vector>}}
+\DoxyCodeLine{00004\ \textcolor{preprocessor}{\#include\ <tuple>}}
+\DoxyCodeLine{00005\ \textcolor{preprocessor}{\#include\ <set>}}
+\DoxyCodeLine{00006\ \textcolor{preprocessor}{\#include\ <algorithm>}}
+\DoxyCodeLine{00007\ \textcolor{preprocessor}{\#include\ <cmath>}}
+\DoxyCodeLine{00008\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{rectangular__lsap_8hpp}{rectangular\_lsap.hpp}}"{}}}
+\DoxyCodeLine{00009\ }
+\DoxyCodeLine{00010\ \textcolor{preprocessor}{\#if\ !defined(STANDALONE)}}
+\DoxyCodeLine{00011\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{ei__classifier__types_8h}{edge-\/impulse-\/sdk/classifier/ei\_classifier\_types.h}}"{}}}
+\DoxyCodeLine{00012\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00013\ }
+\DoxyCodeLine{00014\ \mbox{\hyperlink{ei__alignment_8hpp_a2d202d649af43fa311dff933b051c202}{\_\_attribute\_\_}}((unused))\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{bool}\ compare\_tuples(std::tuple<int,\ int,\ float>\ a,\ std::tuple<int,\ int,\ float>\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}})\ \{}
+\DoxyCodeLine{00015\ \ \ \ \ \textcolor{keywordflow}{return}\ std::get<2>(a)\ <\ std::get<2>(\mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}});}
+\DoxyCodeLine{00016\ \}}
+\DoxyCodeLine{00017\ }
+\DoxyCodeLine{00018\ \textcolor{keywordtype}{float}\ \mbox{\hyperlink{ei__alignment_8hpp_a65529a92bb0c1a60291b63fbc347b533}{intersection\_over\_union}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structei__impulse__result__bounding__box__t}{ei\_impulse\_result\_bounding\_box\_t}}\ bbox1,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structei__impulse__result__bounding__box__t}{ei\_impulse\_result\_bounding\_box\_t}}\ bbox2)\ \{}
+\DoxyCodeLine{00019\ \ \ \ \ uint32\_t\ x\_left\ =\ std::max(bbox1.\mbox{\hyperlink{structei__impulse__result__bounding__box__t_aec938e40bb68a95f8a5b5e51d29f3a7b}{x}},\ bbox2.\mbox{\hyperlink{structei__impulse__result__bounding__box__t_aec938e40bb68a95f8a5b5e51d29f3a7b}{x}});}
+\DoxyCodeLine{00020\ \ \ \ \ uint32\_t\ y\_top\ =\ std::max(bbox1.\mbox{\hyperlink{structei__impulse__result__bounding__box__t_a46d1af783fdb0bfb2e207bbaf6063ed4}{y}},\ bbox2.\mbox{\hyperlink{structei__impulse__result__bounding__box__t_a46d1af783fdb0bfb2e207bbaf6063ed4}{y}});}
+\DoxyCodeLine{00021\ \ \ \ \ uint32\_t\ x\_right\ =\ std::min(bbox1.\mbox{\hyperlink{structei__impulse__result__bounding__box__t_aec938e40bb68a95f8a5b5e51d29f3a7b}{x}}\ +\ bbox1.\mbox{\hyperlink{structei__impulse__result__bounding__box__t_a17a605f30dc677e1441b66d38b9e4ade}{width}},\ bbox2.\mbox{\hyperlink{structei__impulse__result__bounding__box__t_aec938e40bb68a95f8a5b5e51d29f3a7b}{x}}\ +\ bbox2.\mbox{\hyperlink{structei__impulse__result__bounding__box__t_a17a605f30dc677e1441b66d38b9e4ade}{width}});}
+\DoxyCodeLine{00022\ \ \ \ \ uint32\_t\ y\_bottom\ =\ std::min(bbox1.\mbox{\hyperlink{structei__impulse__result__bounding__box__t_a46d1af783fdb0bfb2e207bbaf6063ed4}{y}}\ +\ bbox1.\mbox{\hyperlink{structei__impulse__result__bounding__box__t_affdd4d311dc7a74ead2c9cf4554b2204}{height}},\ bbox2.\mbox{\hyperlink{structei__impulse__result__bounding__box__t_a46d1af783fdb0bfb2e207bbaf6063ed4}{y}}\ +\ bbox2.\mbox{\hyperlink{structei__impulse__result__bounding__box__t_affdd4d311dc7a74ead2c9cf4554b2204}{height}});}
+\DoxyCodeLine{00023\ }
+\DoxyCodeLine{00024\ \ \ \ \ \textcolor{keywordflow}{if}\ (x\_right\ <\ x\_left\ ||\ y\_bottom\ <\ y\_top)\ \{}
+\DoxyCodeLine{00025\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0.0;}
+\DoxyCodeLine{00026\ \ \ \ \ \}}
+\DoxyCodeLine{00027\ }
+\DoxyCodeLine{00028\ \ \ \ \ uint32\_t\ intersection\_area\ =\ (x\_right\ -\/\ x\_left)\ *\ (y\_bottom\ -\/\ y\_top);}
+\DoxyCodeLine{00029\ \ \ \ \ uint32\_t\ bbox1\_area\ =\ bbox1.\mbox{\hyperlink{structei__impulse__result__bounding__box__t_a17a605f30dc677e1441b66d38b9e4ade}{width}}\ *\ bbox1.\mbox{\hyperlink{structei__impulse__result__bounding__box__t_affdd4d311dc7a74ead2c9cf4554b2204}{height}};}
+\DoxyCodeLine{00030\ \ \ \ \ uint32\_t\ bbox2\_area\ =\ bbox2.\mbox{\hyperlink{structei__impulse__result__bounding__box__t_a17a605f30dc677e1441b66d38b9e4ade}{width}}\ *\ bbox2.\mbox{\hyperlink{structei__impulse__result__bounding__box__t_affdd4d311dc7a74ead2c9cf4554b2204}{height}};}
+\DoxyCodeLine{00031\ }
+\DoxyCodeLine{00032\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{float}\textcolor{keyword}{>}(intersection\_area)\ /\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{float}\textcolor{keyword}{>}(bbox1\_area\ +\ bbox2\_area\ -\/\ intersection\_area);}
+\DoxyCodeLine{00033\ \}}
+\DoxyCodeLine{00034\ }
+\DoxyCodeLine{00035\ \textcolor{keywordtype}{float}\ \mbox{\hyperlink{ei__alignment_8hpp_aa3873cac3ac2e792fb1a84af716ba29a}{centroid\_euclidean\_distance}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structei__impulse__result__bounding__box__t}{ei\_impulse\_result\_bounding\_box\_t}}\ bbox1,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structei__impulse__result__bounding__box__t}{ei\_impulse\_result\_bounding\_box\_t}}\ bbox2)\ \{}
+\DoxyCodeLine{00036\ \ \ \ \ \textcolor{keywordtype}{float}\ x1\ =\ bbox1.\mbox{\hyperlink{structei__impulse__result__bounding__box__t_aec938e40bb68a95f8a5b5e51d29f3a7b}{x}}\ +\ bbox1.\mbox{\hyperlink{structei__impulse__result__bounding__box__t_a17a605f30dc677e1441b66d38b9e4ade}{width}}\ /\ 2.0f;}
+\DoxyCodeLine{00037\ \ \ \ \ \textcolor{keywordtype}{float}\ y1\ =\ bbox1.\mbox{\hyperlink{structei__impulse__result__bounding__box__t_a46d1af783fdb0bfb2e207bbaf6063ed4}{y}}\ +\ bbox1.\mbox{\hyperlink{structei__impulse__result__bounding__box__t_affdd4d311dc7a74ead2c9cf4554b2204}{height}}\ /\ 2.0f;}
+\DoxyCodeLine{00038\ \ \ \ \ \textcolor{keywordtype}{float}\ x2\ =\ bbox2.\mbox{\hyperlink{structei__impulse__result__bounding__box__t_aec938e40bb68a95f8a5b5e51d29f3a7b}{x}}\ +\ bbox2.\mbox{\hyperlink{structei__impulse__result__bounding__box__t_a17a605f30dc677e1441b66d38b9e4ade}{width}}\ /\ 2.0f;}
+\DoxyCodeLine{00039\ \ \ \ \ \textcolor{keywordtype}{float}\ y2\ =\ bbox2.\mbox{\hyperlink{structei__impulse__result__bounding__box__t_a46d1af783fdb0bfb2e207bbaf6063ed4}{y}}\ +\ bbox2.\mbox{\hyperlink{structei__impulse__result__bounding__box__t_affdd4d311dc7a74ead2c9cf4554b2204}{height}}\ /\ 2.0f;}
+\DoxyCodeLine{00040\ \ \ \ \ \textcolor{keywordtype}{float}\ distance\ =\ std::sqrt(std::pow(x1\ -\/\ x2,\ 2)\ +\ std::pow(y1\ -\/\ y2,\ 2));}
+\DoxyCodeLine{00041\ \ \ \ \ \mbox{\hyperlink{ei__logging_8h_a807a3beed2af012bea0e48165d5161c2}{EI\_LOGD}}(\textcolor{stringliteral}{"{}centroid\_euclidean\_distance:\ x1=\%f\ y1=\%f\ x2=\%f\ y2=\%f\ distance=\%f\(\backslash\)n"{}},\ x1,\ y1,\ x2,\ y2,\ distance);}
+\DoxyCodeLine{00042\ \ \ \ \ \textcolor{keywordflow}{return}\ distance;}
+\DoxyCodeLine{00043\ \}}
+\DoxyCodeLine{00044\ }
+\DoxyCodeLine{00045\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_jonker_volgenant_alignment}{JonkerVolgenantAlignment}}\ \{}
+\DoxyCodeLine{00046\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00047\ \ \ \ \ \mbox{\hyperlink{class_jonker_volgenant_alignment_a6847e9d4f33042be969202f405107e18}{JonkerVolgenantAlignment}}(\textcolor{keywordtype}{float}\ \mbox{\hyperlink{class_jonker_volgenant_alignment_aae5880c83867ccbde89dcbee70072a22}{threshold}},\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{class_jonker_volgenant_alignment_a6d3ae27851cc2a5db0cca08d099a2e9b}{use\_iou}}\ =\ \textcolor{keyword}{true})\ :\ \mbox{\hyperlink{class_jonker_volgenant_alignment_aae5880c83867ccbde89dcbee70072a22}{threshold}}(\mbox{\hyperlink{class_jonker_volgenant_alignment_aae5880c83867ccbde89dcbee70072a22}{threshold}}),\ \mbox{\hyperlink{class_jonker_volgenant_alignment_a6d3ae27851cc2a5db0cca08d099a2e9b}{use\_iou}}(\mbox{\hyperlink{class_jonker_volgenant_alignment_a6d3ae27851cc2a5db0cca08d099a2e9b}{use\_iou}})\ \{}
+\DoxyCodeLine{00048\ \ \ \ \ \}}
+\DoxyCodeLine{00049\ }
+\DoxyCodeLine{00050\ \ \ \ \ std::vector<std::tuple<int,\ int,\ float>>\ \mbox{\hyperlink{class_jonker_volgenant_alignment_a6065d91dda78b5ff16a868cfc91cde4b}{align}}(\textcolor{keyword}{const}\ std::vector<ei\_impulse\_result\_bounding\_box\_t>\ traces,}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ std::vector<ei\_impulse\_result\_bounding\_box\_t>\ detections)\ \{}
+\DoxyCodeLine{00052\ }
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (traces.empty()\ ||\ detections.empty())\ \{}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \{\};}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00056\ }
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \ \ std::vector<double>\ cost\_mtx(traces.size()\ *\ detections.size());}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ trace\_idx\ =\ 0;\ trace\_idx\ <\ traces.size();\ ++trace\_idx)\ \{}
+\DoxyCodeLine{00059\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ detection\_idx\ =\ 0;\ detection\_idx\ <\ detections.size();\ ++detection\_idx)\ \{}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}\ cost\ =\ 0.0;}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{class_jonker_volgenant_alignment_a6d3ae27851cc2a5db0cca08d099a2e9b}{use\_iou}})\ \{}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}\ iou\ =\ \mbox{\hyperlink{ei__alignment_8hpp_a65529a92bb0c1a60291b63fbc347b533}{intersection\_over\_union}}(traces[trace\_idx],\ detections[detection\_idx]);}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ cost\ =\ 1\ -\/\ iou;}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ cost\ =\ \mbox{\hyperlink{ei__alignment_8hpp_aa3873cac3ac2e792fb1a84af716ba29a}{centroid\_euclidean\_distance}}(traces[trace\_idx],\ detections[detection\_idx]);}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__logging_8h_a807a3beed2af012bea0e48165d5161c2}{EI\_LOGD}}(\textcolor{stringliteral}{"{}t\_idx=\%zu\ d\_idx=\%zu\ cost=\%.6f\(\backslash\)n"{}},\ trace\_idx,\ detection\_idx,\ cost);}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ cost\_mtx[trace\_idx\ *\ detections.size()\ +\ detection\_idx]\ =\ cost;}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00071\ }
+\DoxyCodeLine{00072\ \ \ \ \ \ \ \ \ int64\_t\ *alignments\_a\ =\ \textcolor{keyword}{new}\ int64\_t[traces.size()];}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \ \ int64\_t\ *alignments\_b\ =\ \textcolor{keyword}{new}\ int64\_t[detections.size()];}
+\DoxyCodeLine{00074\ }
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{rectangular__lsap_8hpp_aa3a2dd7637dd10dfad7267e45904eb78}{solve}}(traces.size(),\ detections.size(),\ cost\_mtx.data(),\ \textcolor{keyword}{false},\ alignments\_a,\ alignments\_b);}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__logging_8h_a807a3beed2af012bea0e48165d5161c2}{EI\_LOGD}}(\textcolor{stringliteral}{"{}detections\ size\ \%zu\(\backslash\)n"{}},\ detections.size());}
+\DoxyCodeLine{00077\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__logging_8h_a807a3beed2af012bea0e48165d5161c2}{EI\_LOGD}}(\textcolor{stringliteral}{"{}traces\ size\ \%zu\(\backslash\)n"{}},\ traces.size());}
+\DoxyCodeLine{00078\ }
+\DoxyCodeLine{00079\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ traces.size();\ i++)\ \{}
+\DoxyCodeLine{00080\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__logging_8h_a807a3beed2af012bea0e48165d5161c2}{EI\_LOGD}}(\textcolor{stringliteral}{"{}alignments\_a[\%zu]\ \%lld\(\backslash\)n"{}},\ i,\ alignments\_a[i]);}
+\DoxyCodeLine{00081\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00082\ }
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ detections.size();\ i++)\ \{}
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__logging_8h_a807a3beed2af012bea0e48165d5161c2}{EI\_LOGD}}(\textcolor{stringliteral}{"{}alignments\_b[\%zu]\ \%lld\(\backslash\)n"{}},\ i,\ alignments\_b[i]);}
+\DoxyCodeLine{00085\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00086\ }
+\DoxyCodeLine{00087\ \ \ \ \ \ \ \ \ std::vector<std::tuple<int,\ int,\ float>>\ matches;}
+\DoxyCodeLine{00088\ }
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ traces.size();\ i++)\ \{}
+\DoxyCodeLine{00090\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ trace\_idx\ =\ i;}
+\DoxyCodeLine{00091\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ detection\_idx\ =\ alignments\_b[alignments\_a[i]];}
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{class_jonker_volgenant_alignment_a6d3ae27851cc2a5db0cca08d099a2e9b}{use\_iou}})\ \{}
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}\ iou\ =\ 1\ -\/\ cost\_mtx[trace\_idx\ *\ detections.size()\ +\ detection\_idx];}
+\DoxyCodeLine{00094\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (iou\ >\ \mbox{\hyperlink{class_jonker_volgenant_alignment_aae5880c83867ccbde89dcbee70072a22}{threshold}})\ \{}
+\DoxyCodeLine{00095\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ matches.emplace\_back(trace\_idx,\ detection\_idx,\ iou);}
+\DoxyCodeLine{00096\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00097\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00098\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}\ cost\ =\ cost\_mtx[trace\_idx\ *\ detections.size()\ +\ detection\_idx];}
+\DoxyCodeLine{00099\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (cost\ <\ \mbox{\hyperlink{class_jonker_volgenant_alignment_aae5880c83867ccbde89dcbee70072a22}{threshold}})\ \{}
+\DoxyCodeLine{00100\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ matches.emplace\_back(trace\_idx,\ detection\_idx,\ cost);}
+\DoxyCodeLine{00101\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00102\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00103\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00104\ \ \ \ \ \ \ \ \ \textcolor{keyword}{delete}[]\ alignments\_a;}
+\DoxyCodeLine{00105\ \ \ \ \ \ \ \ \ \textcolor{keyword}{delete}[]\ alignments\_b;}
+\DoxyCodeLine{00106\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ matches;}
+\DoxyCodeLine{00107\ \ \ \ \ \}}
+\DoxyCodeLine{00108\ }
+\DoxyCodeLine{00109\ \ \ \ \ \textcolor{keywordtype}{float}\ \mbox{\hyperlink{class_jonker_volgenant_alignment_aae5880c83867ccbde89dcbee70072a22}{threshold}};}
+\DoxyCodeLine{00110\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{class_jonker_volgenant_alignment_a6d3ae27851cc2a5db0cca08d099a2e9b}{use\_iou}};}
+\DoxyCodeLine{00111\ \};}
+\DoxyCodeLine{00112\ }
+\DoxyCodeLine{00113\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_greedy_alignment}{GreedyAlignment}}\ \{}
+\DoxyCodeLine{00114\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00115\ \ \ \ \ \mbox{\hyperlink{class_greedy_alignment_a6010e81efb2a3f83691f16fd7c3e1d2e}{GreedyAlignment}}(\textcolor{keywordtype}{float}\ \mbox{\hyperlink{class_greedy_alignment_a802c6c36638e7c9156201d4c9a27b578}{threshold}},\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{class_greedy_alignment_a1d837d8cde4e319c3c2016b6cf2980f0}{use\_iou}}\ =\ \textcolor{keyword}{true})\ :\ \mbox{\hyperlink{class_greedy_alignment_a802c6c36638e7c9156201d4c9a27b578}{threshold}}(\mbox{\hyperlink{class_greedy_alignment_a802c6c36638e7c9156201d4c9a27b578}{threshold}}),\ \mbox{\hyperlink{class_greedy_alignment_a1d837d8cde4e319c3c2016b6cf2980f0}{use\_iou}}(\mbox{\hyperlink{class_greedy_alignment_a1d837d8cde4e319c3c2016b6cf2980f0}{use\_iou}})\ \{}
+\DoxyCodeLine{00116\ \ \ \ \ \}}
+\DoxyCodeLine{00117\ \ \ \ \ std::vector<std::tuple<int,\ int,\ float>>\ \mbox{\hyperlink{class_greedy_alignment_a60f89e9ad6c00179217da9356e18ddb5}{align}}(\textcolor{keyword}{const}\ std::vector<ei\_impulse\_result\_bounding\_box\_t>\ traces,}
+\DoxyCodeLine{00118\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ std::vector<ei\_impulse\_result\_bounding\_box\_t>\ detections)\ \{}
+\DoxyCodeLine{00119\ }
+\DoxyCodeLine{00120\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (traces.empty()\ ||\ detections.empty())\ \{}
+\DoxyCodeLine{00121\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \{\};}
+\DoxyCodeLine{00122\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00123\ }
+\DoxyCodeLine{00124\ \ \ \ \ \ \ \ \ std::vector<std::tuple<int,\ int,\ float>>\ alignments;}
+\DoxyCodeLine{00125\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ trace\_idx\ =\ 0;\ trace\_idx\ <\ traces.size();\ ++trace\_idx)\ \{}
+\DoxyCodeLine{00126\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ detection\_idx\ =\ 0;\ detection\_idx\ <\ detections.size();\ ++detection\_idx)\ \{}
+\DoxyCodeLine{00127\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{class_greedy_alignment_a1d837d8cde4e319c3c2016b6cf2980f0}{use\_iou}})\ \{}
+\DoxyCodeLine{00128\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}\ iou\ =\ \mbox{\hyperlink{ei__alignment_8hpp_a65529a92bb0c1a60291b63fbc347b533}{intersection\_over\_union}}(traces[trace\_idx],\ detections[detection\_idx]);}
+\DoxyCodeLine{00129\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (iou\ >\ \mbox{\hyperlink{class_greedy_alignment_a802c6c36638e7c9156201d4c9a27b578}{threshold}})\ \{}
+\DoxyCodeLine{00130\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ alignments.emplace\_back(trace\_idx,\ detection\_idx,\ 1\ -\/\ iou);}
+\DoxyCodeLine{00131\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00132\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00133\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}\ cost\ =\ \mbox{\hyperlink{ei__alignment_8hpp_aa3873cac3ac2e792fb1a84af716ba29a}{centroid\_euclidean\_distance}}(traces[trace\_idx],\ detections[detection\_idx]);}
+\DoxyCodeLine{00134\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (cost\ <\ \mbox{\hyperlink{class_greedy_alignment_a802c6c36638e7c9156201d4c9a27b578}{threshold}})\ \{}
+\DoxyCodeLine{00135\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ alignments.emplace\_back(trace\_idx,\ detection\_idx,\ cost);}
+\DoxyCodeLine{00136\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00137\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00138\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00139\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00140\ }
+\DoxyCodeLine{00141\ \ \ \ \ \ \ \ \ std::sort(alignments.begin(),\ alignments.end(),\ compare\_tuples);}
+\DoxyCodeLine{00142\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__logging_8h_a807a3beed2af012bea0e48165d5161c2}{EI\_LOGD}}(\textcolor{stringliteral}{"{}alignments.size()\ \%zu\(\backslash\)n"{}},\ alignments.size());}
+\DoxyCodeLine{00143\ \ \ \ \ \ \ \ \ std::vector<std::tuple<int,\ int,\ float>>\ matches;}
+\DoxyCodeLine{00144\ \ \ \ \ \ \ \ \ std::set<int>\ trace\_idxs\_matched;}
+\DoxyCodeLine{00145\ \ \ \ \ \ \ \ \ std::set<int>\ detection\_idxs\_matched;}
+\DoxyCodeLine{00146\ }
+\DoxyCodeLine{00147\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ alignments.size();\ i++)\ \{}
+\DoxyCodeLine{00148\ \ \ \ \ \ \ \ \ \ \ \ \ uint32\_t\ trace\_idx\ =\ std::get<0>(alignments[i]);}
+\DoxyCodeLine{00149\ \ \ \ \ \ \ \ \ \ \ \ \ uint32\_t\ detection\_idx\ =\ std::get<1>(alignments[i]);}
+\DoxyCodeLine{00150\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}\ cost\ =\ std::get<2>(alignments[i]);}
+\DoxyCodeLine{00151\ }
+\DoxyCodeLine{00152\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (trace\_idxs\_matched.find(trace\_idx)\ ==\ trace\_idxs\_matched.end()\ \&\&\ detection\_idxs\_matched.find(detection\_idx)\ ==\ detection\_idxs\_matched.end())\ \{}
+\DoxyCodeLine{00153\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ (1\ -\/\ cost)\ to\ get\ iou}}
+\DoxyCodeLine{00154\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ matches.emplace\_back(trace\_idx,\ detection\_idx,\ \mbox{\hyperlink{class_greedy_alignment_a1d837d8cde4e319c3c2016b6cf2980f0}{use\_iou}}\ ?\ 1\ -\/\ cost\ :\ cost);}
+\DoxyCodeLine{00155\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ trace\_idxs\_matched.insert(trace\_idx);}
+\DoxyCodeLine{00156\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (trace\_idxs\_matched.size()\ ==\ traces.size())\ \textcolor{keywordflow}{return}\ matches;}
+\DoxyCodeLine{00157\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ detection\_idxs\_matched.insert(detection\_idx);}
+\DoxyCodeLine{00158\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (detection\_idxs\_matched.size()\ ==\ detections.size())\ \textcolor{keywordflow}{return}\ matches;}
+\DoxyCodeLine{00159\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00160\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00161\ }
+\DoxyCodeLine{00162\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ matches;}
+\DoxyCodeLine{00163\ \ \ \ \ \}}
+\DoxyCodeLine{00164\ }
+\DoxyCodeLine{00165\ \ \ \ \ \textcolor{keywordtype}{float}\ \mbox{\hyperlink{class_greedy_alignment_a802c6c36638e7c9156201d4c9a27b578}{threshold}};}
+\DoxyCodeLine{00166\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{class_greedy_alignment_a1d837d8cde4e319c3c2016b6cf2980f0}{use\_iou}};}
+\DoxyCodeLine{00167\ \};}
+
+\end{DoxyCode}

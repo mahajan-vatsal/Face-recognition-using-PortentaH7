@@ -1,0 +1,261 @@
+\doxysection{rectangular\+\_\+lsap.\+hpp}
+\hypertarget{rectangular__lsap_8hpp_source}{}\label{rectangular__lsap_8hpp_source}\index{Face\_Access\_inferencing/src/edge-\/impulse-\/sdk/classifier/postprocessing/alignment/rectangular\_lsap.hpp@{Face\_Access\_inferencing/src/edge-\/impulse-\/sdk/classifier/postprocessing/alignment/rectangular\_lsap.hpp}}
+\mbox{\hyperlink{rectangular__lsap_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{00002\ \textcolor{comment}{Redistribution\ and\ use\ in\ source\ and\ binary\ forms,\ with\ or\ without}}
+\DoxyCodeLine{00003\ \textcolor{comment}{modification,\ are\ permitted\ provided\ that\ the\ following\ conditions}}
+\DoxyCodeLine{00004\ \textcolor{comment}{are\ met:}}
+\DoxyCodeLine{00005\ \textcolor{comment}{}}
+\DoxyCodeLine{00006\ \textcolor{comment}{1.\ Redistributions\ of\ source\ code\ must\ retain\ the\ above\ copyright}}
+\DoxyCodeLine{00007\ \textcolor{comment}{\ \ \ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer.}}
+\DoxyCodeLine{00008\ \textcolor{comment}{}}
+\DoxyCodeLine{00009\ \textcolor{comment}{2.\ Redistributions\ in\ binary\ form\ must\ reproduce\ the\ above}}
+\DoxyCodeLine{00010\ \textcolor{comment}{\ \ \ copyright\ notice,\ this\ list\ of\ conditions\ and\ the\ following}}
+\DoxyCodeLine{00011\ \textcolor{comment}{\ \ \ disclaimer\ in\ the\ documentation\ and/or\ other\ materials\ provided}}
+\DoxyCodeLine{00012\ \textcolor{comment}{\ \ \ with\ the\ distribution.}}
+\DoxyCodeLine{00013\ \textcolor{comment}{}}
+\DoxyCodeLine{00014\ \textcolor{comment}{3.\ Neither\ the\ name\ of\ the\ copyright\ holder\ nor\ the\ names\ of\ its}}
+\DoxyCodeLine{00015\ \textcolor{comment}{\ \ \ contributors\ may\ be\ used\ to\ endorse\ or\ promote\ products\ derived}}
+\DoxyCodeLine{00016\ \textcolor{comment}{\ \ \ from\ this\ software\ without\ specific\ prior\ written\ permission.}}
+\DoxyCodeLine{00017\ \textcolor{comment}{}}
+\DoxyCodeLine{00018\ \textcolor{comment}{THIS\ SOFTWARE\ IS\ PROVIDED\ BY\ THE\ COPYRIGHT\ HOLDERS\ AND\ CONTRIBUTORS}}
+\DoxyCodeLine{00019\ \textcolor{comment}{"{}AS\ IS"{}\ AND\ ANY\ EXPRESS\ OR\ IMPLIED\ WARRANTIES,\ INCLUDING,\ BUT\ NOT}}
+\DoxyCodeLine{00020\ \textcolor{comment}{LIMITED\ TO,\ THE\ IMPLIED\ WARRANTIES\ OF\ MERCHANTABILITY\ AND\ FITNESS\ FOR}}
+\DoxyCodeLine{00021\ \textcolor{comment}{A\ PARTICULAR\ PURPOSE\ ARE\ DISCLAIMED.\ IN\ NO\ EVENT\ SHALL\ THE\ COPYRIGHT}}
+\DoxyCodeLine{00022\ \textcolor{comment}{OWNER\ OR\ CONTRIBUTORS\ BE\ LIABLE\ FOR\ ANY\ DIRECT,\ INDIRECT,\ INCIDENTAL,}}
+\DoxyCodeLine{00023\ \textcolor{comment}{SPECIAL,\ EXEMPLARY,\ OR\ CONSEQUENTIAL\ DAMAGES\ (INCLUDING,\ BUT\ NOT}}
+\DoxyCodeLine{00024\ \textcolor{comment}{LIMITED\ TO,\ PROCUREMENT\ OF\ SUBSTITUTE\ GOODS\ OR\ SERVICES;\ LOSS\ OF\ USE,}}
+\DoxyCodeLine{00025\ \textcolor{comment}{DATA,\ OR\ PROFITS;\ OR\ BUSINESS\ INTERRUPTION)\ HOWEVER\ CAUSED\ AND\ ON\ ANY}}
+\DoxyCodeLine{00026\ \textcolor{comment}{THEORY\ OF\ LIABILITY,\ WHETHER\ IN\ CONTRACT,\ STRICT\ LIABILITY,\ OR\ TORT}}
+\DoxyCodeLine{00027\ \textcolor{comment}{(INCLUDING\ NEGLIGENCE\ OR\ OTHERWISE)\ ARISING\ IN\ ANY\ WAY\ OUT\ OF\ THE\ USE}}
+\DoxyCodeLine{00028\ \textcolor{comment}{OF\ THIS\ SOFTWARE,\ EVEN\ IF\ ADVISED\ OF\ THE\ POSSIBILITY\ OF\ SUCH\ DAMAGE.}}
+\DoxyCodeLine{00029\ \textcolor{comment}{}}
+\DoxyCodeLine{00030\ \textcolor{comment}{}}
+\DoxyCodeLine{00031\ \textcolor{comment}{This\ code\ implements\ the\ shortest\ augmenting\ path\ algorithm\ for\ the}}
+\DoxyCodeLine{00032\ \textcolor{comment}{rectangular\ assignment\ problem.\ \ This\ implementation\ is\ based\ on\ the}}
+\DoxyCodeLine{00033\ \textcolor{comment}{pseudocode\ described\ in\ pages\ 1685-\/1686\ of:}}
+\DoxyCodeLine{00034\ \textcolor{comment}{}}
+\DoxyCodeLine{00035\ \textcolor{comment}{\ \ \ \ DF\ Crouse.\ On\ implementing\ 2D\ rectangular\ assignment\ algorithms.}}
+\DoxyCodeLine{00036\ \textcolor{comment}{\ \ \ \ IEEE\ Transactions\ on\ Aerospace\ and\ Electronic\ Systems}}
+\DoxyCodeLine{00037\ \textcolor{comment}{\ \ \ \ 52(4):1679-\/1696,\ August\ 2016}}
+\DoxyCodeLine{00038\ \textcolor{comment}{\ \ \ \ doi:\ 10.1109/TAES.2016.140952}}
+\DoxyCodeLine{00039\ \textcolor{comment}{}}
+\DoxyCodeLine{00040\ \textcolor{comment}{Author:\ PM\ Larsen}}
+\DoxyCodeLine{00041\ \textcolor{comment}{*/}}
+\DoxyCodeLine{00042\ }
+\DoxyCodeLine{00043\ \textcolor{preprocessor}{\#include\ <cmath>}}
+\DoxyCodeLine{00044\ \textcolor{preprocessor}{\#include\ <vector>}}
+\DoxyCodeLine{00045\ \textcolor{preprocessor}{\#include\ <numeric>}}
+\DoxyCodeLine{00046\ \textcolor{preprocessor}{\#include\ <algorithm>}}
+\DoxyCodeLine{00047\ }
+\DoxyCodeLine{00048\ \textcolor{preprocessor}{\#define\ RECTANGULAR\_LSAP\_INFEASIBLE\ -\/1}}
+\DoxyCodeLine{00049\ \textcolor{preprocessor}{\#define\ RECTANGULAR\_LSAP\_INVALID\ -\/2}}
+\DoxyCodeLine{00050\ }
+\DoxyCodeLine{00051\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T>\ std::vector<intptr\_t>\ \mbox{\hyperlink{rectangular__lsap_8hpp_a8b4a8e4115005ac49b738188fbedc815}{argsort\_iter}}(\textcolor{keyword}{const}\ std::vector<T>\ \&v)}
+\DoxyCodeLine{00052\ \{}
+\DoxyCodeLine{00053\ \ \ \ \ std::vector<intptr\_t>\ index(v.size());}
+\DoxyCodeLine{00054\ \ \ \ \ std::iota(index.begin(),\ index.end(),\ 0);}
+\DoxyCodeLine{00055\ \ \ \ \ std::sort(index.begin(),\ index.end(),\ [\&v](intptr\_t\ i,\ intptr\_t\ j)}
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{return\ v[i]\ <\ v[j];\});}
+\DoxyCodeLine{00057\ \ \ \ \ \textcolor{keywordflow}{return}\ index;}
+\DoxyCodeLine{00058\ \}}
+\DoxyCodeLine{00059\ }
+\DoxyCodeLine{00060\ \textcolor{keyword}{static}\ intptr\_t}
+\DoxyCodeLine{00061\ \mbox{\hyperlink{rectangular__lsap_8hpp_ae1fe1f8256c9c8f44d05c918e5b6983f}{augmenting\_path}}(intptr\_t\ nc,\ \textcolor{keywordtype}{double}\ *cost,\ std::vector<double>\&\ u,}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::vector<double>\&\ v,\ std::vector<intptr\_t>\&\ path,}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::vector<intptr\_t>\&\ row4col,}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::vector<double>\&\ shortestPathCosts,\ intptr\_t\ i,}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::vector<bool>\&\ SR,\ std::vector<bool>\&\ SC,}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::vector<intptr\_t>\&\ remaining,\ \textcolor{keywordtype}{double}*\ p\_minVal)}
+\DoxyCodeLine{00067\ \{}
+\DoxyCodeLine{00068\ \ \ \ \ \textcolor{keywordtype}{double}\ minVal\ =\ 0;}
+\DoxyCodeLine{00069\ }
+\DoxyCodeLine{00070\ \ \ \ \ \textcolor{comment}{//\ Crouse's\ pseudocode\ uses\ set\ complements\ to\ keep\ track\ of\ remaining}}
+\DoxyCodeLine{00071\ \ \ \ \ \textcolor{comment}{//\ nodes.\ \ Here\ we\ use\ a\ vector,\ as\ it\ is\ more\ efficient\ in\ C++.}}
+\DoxyCodeLine{00072\ \ \ \ \ intptr\_t\ num\_remaining\ =\ nc;}
+\DoxyCodeLine{00073\ \ \ \ \ \textcolor{keywordflow}{for}\ (intptr\_t\ it\ =\ 0;\ it\ <\ nc;\ it++)\ \{}
+\DoxyCodeLine{00074\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Filling\ this\ up\ in\ reverse\ order\ ensures\ that\ the\ solution\ of\ a}}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ constant\ cost\ matrix\ is\ the\ identity\ matrix\ (c.f.\ \#11602).}}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ remaining[it]\ =\ nc\ -\/\ it\ -\/\ 1;}
+\DoxyCodeLine{00077\ \ \ \ \ \}}
+\DoxyCodeLine{00078\ }
+\DoxyCodeLine{00079\ \ \ \ \ std::fill(SR.begin(),\ SR.end(),\ \textcolor{keyword}{false});}
+\DoxyCodeLine{00080\ \ \ \ \ std::fill(SC.begin(),\ SC.end(),\ \textcolor{keyword}{false});}
+\DoxyCodeLine{00081\ \ \ \ \ std::fill(shortestPathCosts.begin(),\ shortestPathCosts.end(),\ INFINITY);}
+\DoxyCodeLine{00082\ }
+\DoxyCodeLine{00083\ \ \ \ \ \textcolor{comment}{//\ find\ shortest\ augmenting\ path}}
+\DoxyCodeLine{00084\ \ \ \ \ intptr\_t\ sink\ =\ -\/1;}
+\DoxyCodeLine{00085\ \ \ \ \ \textcolor{keywordflow}{while}\ (sink\ ==\ -\/1)\ \{}
+\DoxyCodeLine{00086\ }
+\DoxyCodeLine{00087\ \ \ \ \ \ \ \ \ intptr\_t\ index\ =\ -\/1;}
+\DoxyCodeLine{00088\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{double}\ lowest\ =\ INFINITY;}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \ \ SR[i]\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00090\ }
+\DoxyCodeLine{00091\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (intptr\_t\ it\ =\ 0;\ it\ <\ num\_remaining;\ it++)\ \{}
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \ \ \ \ \ \ intptr\_t\ j\ =\ remaining[it];}
+\DoxyCodeLine{00093\ }
+\DoxyCodeLine{00094\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{double}\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_acab531abaa74a7e664e3986f2522b33a}{r}}\ =\ minVal\ +\ cost[i\ *\ nc\ +\ j]\ -\/\ u[i]\ -\/\ v[j];}
+\DoxyCodeLine{00095\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_acab531abaa74a7e664e3986f2522b33a}{r}}\ <\ shortestPathCosts[j])\ \{}
+\DoxyCodeLine{00096\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ path[j]\ =\ i;}
+\DoxyCodeLine{00097\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ shortestPathCosts[j]\ =\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_acab531abaa74a7e664e3986f2522b33a}{r}};}
+\DoxyCodeLine{00098\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00099\ }
+\DoxyCodeLine{00100\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ When\ multiple\ nodes\ have\ the\ minimum\ cost,\ we\ select\ one\ which}}
+\DoxyCodeLine{00101\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ gives\ us\ a\ new\ sink\ node.\ This\ is\ particularly\ important\ for}}
+\DoxyCodeLine{00102\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ integer\ cost\ matrices\ with\ small\ co-\/efficients.}}
+\DoxyCodeLine{00103\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (shortestPathCosts[j]\ <\ lowest\ ||}
+\DoxyCodeLine{00104\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (shortestPathCosts[j]\ ==\ lowest\ \&\&\ row4col[j]\ ==\ -\/1))\ \{}
+\DoxyCodeLine{00105\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ lowest\ =\ shortestPathCosts[j];}
+\DoxyCodeLine{00106\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ index\ =\ it;}
+\DoxyCodeLine{00107\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00108\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00109\ }
+\DoxyCodeLine{00110\ \ \ \ \ \ \ \ \ minVal\ =\ lowest;}
+\DoxyCodeLine{00111\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (minVal\ ==\ INFINITY)\ \{\ \textcolor{comment}{//\ infeasible\ cost\ matrix}}
+\DoxyCodeLine{00112\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ -\/1;}
+\DoxyCodeLine{00113\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00114\ }
+\DoxyCodeLine{00115\ \ \ \ \ \ \ \ \ intptr\_t\ j\ =\ remaining[index];}
+\DoxyCodeLine{00116\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (row4col[j]\ ==\ -\/1)\ \{}
+\DoxyCodeLine{00117\ \ \ \ \ \ \ \ \ \ \ \ \ sink\ =\ j;}
+\DoxyCodeLine{00118\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00119\ \ \ \ \ \ \ \ \ \ \ \ \ i\ =\ row4col[j];}
+\DoxyCodeLine{00120\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00121\ }
+\DoxyCodeLine{00122\ \ \ \ \ \ \ \ \ SC[j]\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00123\ \ \ \ \ \ \ \ \ remaining[index]\ =\ remaining[-\/-\/num\_remaining];}
+\DoxyCodeLine{00124\ \ \ \ \ \}}
+\DoxyCodeLine{00125\ }
+\DoxyCodeLine{00126\ \ \ \ \ *p\_minVal\ =\ minVal;}
+\DoxyCodeLine{00127\ \ \ \ \ \textcolor{keywordflow}{return}\ sink;}
+\DoxyCodeLine{00128\ \}}
+\DoxyCodeLine{00129\ }
+\DoxyCodeLine{00130\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{rectangular__lsap_8hpp_aa3a2dd7637dd10dfad7267e45904eb78}{solve}}(intptr\_t\ nr,\ intptr\_t\ nc,\ \textcolor{keywordtype}{double}*\ cost,\ \textcolor{keywordtype}{bool}\ maximize,}
+\DoxyCodeLine{00131\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ int64\_t*\ a,\ int64\_t*\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}})\ \{}
+\DoxyCodeLine{00132\ \ \ \ \ \textcolor{comment}{//\ handle\ trivial\ inputs}}
+\DoxyCodeLine{00133\ \ \ \ \ \textcolor{keywordflow}{if}\ (nr\ ==\ 0\ ||\ nc\ ==\ 0)\ \{}
+\DoxyCodeLine{00134\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00135\ \ \ \ \ \}}
+\DoxyCodeLine{00136\ }
+\DoxyCodeLine{00137\ \ \ \ \ \textcolor{comment}{//\ tall\ rectangular\ cost\ matrix\ must\ be\ transposed}}
+\DoxyCodeLine{00138\ \ \ \ \ \textcolor{keywordtype}{bool}\ transpose\ =\ nc\ <\ nr;}
+\DoxyCodeLine{00139\ }
+\DoxyCodeLine{00140\ \ \ \ \ \textcolor{comment}{//\ make\ a\ copy\ of\ the\ cost\ matrix\ if\ we\ need\ to\ modify\ it}}
+\DoxyCodeLine{00141\ \ \ \ \ std::vector<double>\ \mbox{\hyperlink{nicla__sense__fusion_8ino_ae6219c1117781a1dbbb7839946bca32c}{temp}};}
+\DoxyCodeLine{00142\ \ \ \ \ \textcolor{keywordflow}{if}\ (transpose\ ||\ maximize)\ \{}
+\DoxyCodeLine{00143\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{nicla__sense__fusion_8ino_ae6219c1117781a1dbbb7839946bca32c}{temp}}.resize(nr\ *\ nc);}
+\DoxyCodeLine{00144\ }
+\DoxyCodeLine{00145\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (transpose)\ \{}
+\DoxyCodeLine{00146\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (intptr\_t\ i\ =\ 0;\ i\ <\ nr;\ i++)\ \{}
+\DoxyCodeLine{00147\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (intptr\_t\ j\ =\ 0;\ j\ <\ nc;\ j++)\ \{}
+\DoxyCodeLine{00148\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{nicla__sense__fusion_8ino_ae6219c1117781a1dbbb7839946bca32c}{temp}}[j\ *\ nr\ +\ i]\ =\ cost[i\ *\ nc\ +\ j];}
+\DoxyCodeLine{00149\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00150\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00151\ }
+\DoxyCodeLine{00152\ \ \ \ \ \ \ \ \ \ \ \ \ std::swap(nr,\ nc);}
+\DoxyCodeLine{00153\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00154\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00155\ \ \ \ \ \ \ \ \ \ \ \ \ std::copy(cost,\ cost\ +\ nr\ *\ nc,\ \mbox{\hyperlink{nicla__sense__fusion_8ino_ae6219c1117781a1dbbb7839946bca32c}{temp}}.begin());}
+\DoxyCodeLine{00156\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00157\ }
+\DoxyCodeLine{00158\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ negate\ cost\ matrix\ for\ maximization}}
+\DoxyCodeLine{00159\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (maximize)\ \{}
+\DoxyCodeLine{00160\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (intptr\_t\ i\ =\ 0;\ i\ <\ nr\ *\ nc;\ i++)\ \{}
+\DoxyCodeLine{00161\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{nicla__sense__fusion_8ino_ae6219c1117781a1dbbb7839946bca32c}{temp}}[i]\ =\ -\/\mbox{\hyperlink{nicla__sense__fusion_8ino_ae6219c1117781a1dbbb7839946bca32c}{temp}}[i];}
+\DoxyCodeLine{00162\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00163\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00164\ }
+\DoxyCodeLine{00165\ \ \ \ \ \ \ \ \ cost\ =\ \mbox{\hyperlink{nicla__sense__fusion_8ino_ae6219c1117781a1dbbb7839946bca32c}{temp}}.data();}
+\DoxyCodeLine{00166\ \ \ \ \ \}}
+\DoxyCodeLine{00167\ }
+\DoxyCodeLine{00168\ \ \ \ \ \textcolor{comment}{//\ test\ for\ NaN\ and\ -\/inf\ entries}}
+\DoxyCodeLine{00169\ \ \ \ \ \textcolor{keywordflow}{for}\ (intptr\_t\ i\ =\ 0;\ i\ <\ nr\ *\ nc;\ i++)\ \{}
+\DoxyCodeLine{00170\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (cost[i]\ !=\ cost[i]\ ||\ cost[i]\ ==\ -\/INFINITY)\ \{}
+\DoxyCodeLine{00171\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{rectangular__lsap_8hpp_a30594c1886cae3d379933f702a0e5818}{RECTANGULAR\_LSAP\_INVALID}};}
+\DoxyCodeLine{00172\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00173\ \ \ \ \ \}}
+\DoxyCodeLine{00174\ }
+\DoxyCodeLine{00175\ \ \ \ \ \textcolor{comment}{//\ initialize\ variables}}
+\DoxyCodeLine{00176\ \ \ \ \ std::vector<double>\ u(nr,\ 0);}
+\DoxyCodeLine{00177\ \ \ \ \ std::vector<double>\ v(nc,\ 0);}
+\DoxyCodeLine{00178\ \ \ \ \ std::vector<double>\ shortestPathCosts(nc);}
+\DoxyCodeLine{00179\ \ \ \ \ std::vector<intptr\_t>\ path(nc,\ -\/1);}
+\DoxyCodeLine{00180\ \ \ \ \ std::vector<intptr\_t>\ col4row(nr,\ -\/1);}
+\DoxyCodeLine{00181\ \ \ \ \ std::vector<intptr\_t>\ row4col(nc,\ -\/1);}
+\DoxyCodeLine{00182\ \ \ \ \ std::vector<bool>\ SR(nr);}
+\DoxyCodeLine{00183\ \ \ \ \ std::vector<bool>\ SC(nc);}
+\DoxyCodeLine{00184\ \ \ \ \ std::vector<intptr\_t>\ remaining(nc);}
+\DoxyCodeLine{00185\ }
+\DoxyCodeLine{00186\ \ \ \ \ \textcolor{comment}{//\ iteratively\ build\ the\ solution}}
+\DoxyCodeLine{00187\ \ \ \ \ \textcolor{keywordflow}{for}\ (intptr\_t\ curRow\ =\ 0;\ curRow\ <\ nr;\ curRow++)\ \{}
+\DoxyCodeLine{00188\ }
+\DoxyCodeLine{00189\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{double}\ minVal;}
+\DoxyCodeLine{00190\ \ \ \ \ \ \ \ \ intptr\_t\ sink\ =\ \mbox{\hyperlink{rectangular__lsap_8hpp_ae1fe1f8256c9c8f44d05c918e5b6983f}{augmenting\_path}}(nc,\ cost,\ u,\ v,\ path,\ row4col,}
+\DoxyCodeLine{00191\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ shortestPathCosts,\ curRow,\ SR,\ SC,}
+\DoxyCodeLine{00192\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ remaining,\ \&minVal);}
+\DoxyCodeLine{00193\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (sink\ <\ 0)\ \{}
+\DoxyCodeLine{00194\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{rectangular__lsap_8hpp_a1694669831401f3d3191c80dfd0ea0de}{RECTANGULAR\_LSAP\_INFEASIBLE}};}
+\DoxyCodeLine{00195\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00196\ }
+\DoxyCodeLine{00197\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ update\ dual\ variables}}
+\DoxyCodeLine{00198\ \ \ \ \ \ \ \ \ u[curRow]\ +=\ minVal;}
+\DoxyCodeLine{00199\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (intptr\_t\ i\ =\ 0;\ i\ <\ nr;\ i++)\ \{}
+\DoxyCodeLine{00200\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (SR[i]\ \&\&\ i\ !=\ curRow)\ \{}
+\DoxyCodeLine{00201\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ u[i]\ +=\ minVal\ -\/\ shortestPathCosts[col4row[i]];}
+\DoxyCodeLine{00202\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00203\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00204\ }
+\DoxyCodeLine{00205\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (intptr\_t\ j\ =\ 0;\ j\ <\ nc;\ j++)\ \{}
+\DoxyCodeLine{00206\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (SC[j])\ \{}
+\DoxyCodeLine{00207\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ v[j]\ -\/=\ minVal\ -\/\ shortestPathCosts[j];}
+\DoxyCodeLine{00208\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00209\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00210\ }
+\DoxyCodeLine{00211\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ augment\ previous\ solution}}
+\DoxyCodeLine{00212\ \ \ \ \ \ \ \ \ intptr\_t\ j\ =\ sink;}
+\DoxyCodeLine{00213\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (1)\ \{}
+\DoxyCodeLine{00214\ \ \ \ \ \ \ \ \ \ \ \ \ intptr\_t\ i\ =\ path[j];}
+\DoxyCodeLine{00215\ \ \ \ \ \ \ \ \ \ \ \ \ row4col[j]\ =\ i;}
+\DoxyCodeLine{00216\ \ \ \ \ \ \ \ \ \ \ \ \ std::swap(col4row[i],\ j);}
+\DoxyCodeLine{00217\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (i\ ==\ curRow)\ \{}
+\DoxyCodeLine{00218\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00219\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00220\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00221\ \ \ \ \ \}}
+\DoxyCodeLine{00222\ }
+\DoxyCodeLine{00223\ \ \ \ \ \textcolor{keywordflow}{if}\ (transpose)\ \{}
+\DoxyCodeLine{00224\ \ \ \ \ \ \ \ \ intptr\_t\ i\ =\ 0;}
+\DoxyCodeLine{00225\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{auto}\ v:\ \mbox{\hyperlink{rectangular__lsap_8hpp_a8b4a8e4115005ac49b738188fbedc815}{argsort\_iter}}(col4row))\ \{}
+\DoxyCodeLine{00226\ \ \ \ \ \ \ \ \ \ \ \ \ a[i]\ =\ col4row[v];}
+\DoxyCodeLine{00227\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}}[i]\ =\ v;}
+\DoxyCodeLine{00228\ \ \ \ \ \ \ \ \ \ \ \ \ i++;}
+\DoxyCodeLine{00229\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00230\ \ \ \ \ \}}
+\DoxyCodeLine{00231\ \ \ \ \ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00232\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (intptr\_t\ i\ =\ 0;\ i\ <\ nr;\ i++)\ \{}
+\DoxyCodeLine{00233\ \ \ \ \ \ \ \ \ \ \ \ \ a[i]\ =\ i;}
+\DoxyCodeLine{00234\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}}[i]\ =\ col4row[i];}
+\DoxyCodeLine{00235\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00236\ \ \ \ \ \}}
+\DoxyCodeLine{00237\ }
+\DoxyCodeLine{00238\ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00239\ \}}
+\DoxyCodeLine{00240\ }
+\DoxyCodeLine{00241\ \textcolor{preprocessor}{\#ifdef\ \_\_cplusplus}}
+\DoxyCodeLine{00242\ \textcolor{keyword}{extern}\ \textcolor{stringliteral}{"{}C"{}}\ \{}
+\DoxyCodeLine{00243\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00244\ }
+\DoxyCodeLine{00245\ \textcolor{keywordtype}{int}}
+\DoxyCodeLine{00246\ \mbox{\hyperlink{rectangular__lsap_8hpp_af7af92c3b1b0affa7c17d40249272093}{solve\_rectangular\_linear\_sum\_assignment}}(intptr\_t\ nr,\ intptr\_t\ nc,}
+\DoxyCodeLine{00247\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{double}*\ input\_cost,\ \textcolor{keywordtype}{bool}\ maximize,}
+\DoxyCodeLine{00248\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ int64\_t*\ a,\ int64\_t*\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}})}
+\DoxyCodeLine{00249\ \{}
+\DoxyCodeLine{00250\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{rectangular__lsap_8hpp_aa3a2dd7637dd10dfad7267e45904eb78}{solve}}(nr,\ nc,\ input\_cost,\ maximize,\ a,\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}});}
+\DoxyCodeLine{00251\ \}}
+\DoxyCodeLine{00252\ }
+\DoxyCodeLine{00253\ \textcolor{preprocessor}{\#ifdef\ \_\_cplusplus}}
+\DoxyCodeLine{00254\ \}}
+\DoxyCodeLine{00255\ \textcolor{preprocessor}{\#endif}}
+
+\end{DoxyCode}

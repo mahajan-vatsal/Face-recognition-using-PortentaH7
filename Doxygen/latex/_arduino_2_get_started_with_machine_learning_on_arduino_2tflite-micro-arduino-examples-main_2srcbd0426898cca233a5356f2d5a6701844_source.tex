@@ -1,0 +1,906 @@
+\doxysection{fixedpoint.\+h}
+\hypertarget{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbd0426898cca233a5356f2d5a6701844_source}{}\label{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbd0426898cca233a5356f2d5a6701844_source}\index{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/arduino-\/examples-\/main/src/third\_party/gemmlowp/fixedpoint/fixedpoint.h@{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/arduino-\/examples-\/main/src/third\_party/gemmlowp/fixedpoint/fixedpoint.h}}
+\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbd0426898cca233a5356f2d5a6701844}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{//\ Copyright\ 2015\ The\ Gemmlowp\ Authors.\ All\ Rights\ Reserved.}}
+\DoxyCodeLine{00002\ \textcolor{comment}{//}}
+\DoxyCodeLine{00003\ \textcolor{comment}{//\ Licensed\ under\ the\ Apache\ License,\ Version\ 2.0\ (the\ "{}License"{});}}
+\DoxyCodeLine{00004\ \textcolor{comment}{//\ you\ may\ not\ use\ this\ file\ except\ in\ compliance\ with\ the\ License.}}
+\DoxyCodeLine{00005\ \textcolor{comment}{//\ You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{00006\ \textcolor{comment}{//}}
+\DoxyCodeLine{00007\ \textcolor{comment}{//\ \ \ \ \ http://www.apache.org/licenses/LICENSE-\/2.0}}
+\DoxyCodeLine{00008\ \textcolor{comment}{//}}
+\DoxyCodeLine{00009\ \textcolor{comment}{//\ Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ software}}
+\DoxyCodeLine{00010\ \textcolor{comment}{//\ distributed\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,}}
+\DoxyCodeLine{00011\ \textcolor{comment}{//\ WITHOUT\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,\ either\ express\ or\ implied.}}
+\DoxyCodeLine{00012\ \textcolor{comment}{//\ See\ the\ License\ for\ the\ specific\ language\ governing\ permissions\ and}}
+\DoxyCodeLine{00013\ \textcolor{comment}{//\ limitations\ under\ the\ License.}}
+\DoxyCodeLine{00014\ }
+\DoxyCodeLine{00015\ \textcolor{comment}{//\ fixedpoint.h:\ fixed-\/point\ arithmetic,\ with\ basic\ operations\ and}}
+\DoxyCodeLine{00016\ \textcolor{comment}{//\ a\ few\ math\ functions\ such\ as\ tanh.}}
+\DoxyCodeLine{00017\ }
+\DoxyCodeLine{00018\ \textcolor{preprocessor}{\#ifndef\ GEMMLOWP\_INTERNAL\_FIXEDPOINT\_H\_}}
+\DoxyCodeLine{00019\ \textcolor{preprocessor}{\#define\ GEMMLOWP\_INTERNAL\_FIXEDPOINT\_H\_}}
+\DoxyCodeLine{00020\ }
+\DoxyCodeLine{00021\ \textcolor{preprocessor}{\#include\ <algorithm>}}
+\DoxyCodeLine{00022\ \textcolor{preprocessor}{\#include\ <cassert>}}
+\DoxyCodeLine{00023\ \textcolor{preprocessor}{\#include\ <cmath>}}
+\DoxyCodeLine{00024\ \textcolor{preprocessor}{\#include\ <cstdint>}}
+\DoxyCodeLine{00025\ \textcolor{preprocessor}{\#include\ <limits>}}
+\DoxyCodeLine{00026\ }
+\DoxyCodeLine{00027\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcc6773912be209dfc37e8f06a7787e15d}{../internal/detect\_platform.h}}"{}}}
+\DoxyCodeLine{00028\ }
+\DoxyCodeLine{00029\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacegemmlowp}{gemmlowp}}\ \{}
+\DoxyCodeLine{00030\ }
+\DoxyCodeLine{00031\ \textcolor{comment}{//\ Part\ 1:\ Low-\/level\ integer-\/arithmetic\ primitives.}}
+\DoxyCodeLine{00032\ \textcolor{comment}{//\ The\ implementations\ here\ are\ generic\ implementations\ valid\ for}}
+\DoxyCodeLine{00033\ \textcolor{comment}{//\ scalar\ types\ (e.g.\ std::int32\_t).\ Architecture-\/specific\ SIMD\ types}}
+\DoxyCodeLine{00034\ \textcolor{comment}{//\ (e.g.\ NEON\ int32x4\_t)\ may\ be\ supported\ by\ providing}}
+\DoxyCodeLine{00035\ \textcolor{comment}{//\ specializations\ for\ them\ in\ separate\ files.}}
+\DoxyCodeLine{00036\ \textcolor{comment}{//}}
+\DoxyCodeLine{00037\ \textcolor{comment}{//\ The\ purpose\ of\ these\ primitives\ is\ two-\/fold:}}
+\DoxyCodeLine{00038\ \textcolor{comment}{//\ \ -\/\ They\ will\ be\ used\ to\ implement\ higher-\/level\ fixed-\/point}}
+\DoxyCodeLine{00039\ \textcolor{comment}{//\ \ \ \ abstractions,\ namely\ the\ FixedPoint\ class\ and\ its\ arithmetic}}
+\DoxyCodeLine{00040\ \textcolor{comment}{//\ \ \ \ operators.}}
+\DoxyCodeLine{00041\ \textcolor{comment}{//\ \ -\/\ They\ will\ be\ directly\ used\ to\ implement\ some\ more\ involved}}
+\DoxyCodeLine{00042\ \textcolor{comment}{//\ \ \ \ fixed-\/point\ computations,\ e.g.\ the\ fixed-\/point\ implementation}}
+\DoxyCodeLine{00043\ \textcolor{comment}{//\ \ \ \ of\ math\ functions\ such\ as\ tanh.}}
+\DoxyCodeLine{00044\ }
+\DoxyCodeLine{00045\ \textcolor{comment}{//\ Some\ compile-\/time\ traits\ around\ raw\ types\ to\ handle\ SIMD\ aspects:}}
+\DoxyCodeLine{00046\ \textcolor{comment}{//\ number\ of\ lanes,\ underlying\ scalar\ type.}}
+\DoxyCodeLine{00047\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ tIntegerType>}
+\DoxyCodeLine{00048\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structgemmlowp_1_1_fixed_point_raw_type_traits}{FixedPointRawTypeTraits}}\ \{\};}
+\DoxyCodeLine{00049\ }
+\DoxyCodeLine{00050\ \textcolor{keyword}{template}\ <>}
+\DoxyCodeLine{00051\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structgemmlowp_1_1_fixed_point_raw_type_traits}{FixedPointRawTypeTraits}}<std::int32\_t>\ \{}
+\DoxyCodeLine{00052\ \ \ \textcolor{keyword}{typedef}\ std::int32\_t\ \mbox{\hyperlink{structgemmlowp_1_1_fixed_point_raw_type_traits_3_01std_1_1int32__t_01_4_ac08bbf1ae10b900faa52ad1d3cf1e3a2}{ScalarRawType}};}
+\DoxyCodeLine{00053\ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{int}\ kLanes\ =\ 1;}
+\DoxyCodeLine{00054\ \};}
+\DoxyCodeLine{00055\ }
+\DoxyCodeLine{00056\ \textcolor{keyword}{template}\ <>}
+\DoxyCodeLine{00057\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structgemmlowp_1_1_fixed_point_raw_type_traits}{FixedPointRawTypeTraits}}<std::int16\_t>\ \{}
+\DoxyCodeLine{00058\ \ \ \textcolor{keyword}{typedef}\ std::int16\_t\ \mbox{\hyperlink{structgemmlowp_1_1_fixed_point_raw_type_traits_3_01std_1_1int16__t_01_4_acc17ec06150e8d1fab22257930df257c}{ScalarRawType}};}
+\DoxyCodeLine{00059\ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{int}\ kLanes\ =\ 1;}
+\DoxyCodeLine{00060\ \};}
+\DoxyCodeLine{00061\ }
+\DoxyCodeLine{00062\ \textcolor{comment}{//\ Returns\ a\ SIMD\ value\ duplicating\ a\ scalar\ value\ across\ all\ lanes.}}
+\DoxyCodeLine{00063\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ tRawType>}
+\DoxyCodeLine{00064\ tRawType\ \mbox{\hyperlink{namespacegemmlowp_af414df67b77d1c8673b681247cb6d91d}{Dup}}(\textcolor{keyword}{typename}\ \mbox{\hyperlink{structgemmlowp_1_1_fixed_point_raw_type_traits}{FixedPointRawTypeTraits<tRawType>::ScalarRawType}}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a6150e0515f7202e2fb518f7206ed97dc}{x}})\ \{}
+\DoxyCodeLine{00065\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a6150e0515f7202e2fb518f7206ed97dc}{x}};}
+\DoxyCodeLine{00066\ \}}
+\DoxyCodeLine{00067\ }
+\DoxyCodeLine{00068\ \textcolor{comment}{//\ Plain\ bit-\/wise\ AND}}
+\DoxyCodeLine{00069\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ tIntegerType>}
+\DoxyCodeLine{00070\ tIntegerType\ \mbox{\hyperlink{namespacegemmlowp_ac30d505e781fb7914208c2430df65e3a}{BitAnd}}(tIntegerType\ a,\ tIntegerType\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}})\ \{}
+\DoxyCodeLine{00071\ \ \ \textcolor{keywordflow}{return}\ a\ \&\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}};}
+\DoxyCodeLine{00072\ \}}
+\DoxyCodeLine{00073\ }
+\DoxyCodeLine{00074\ \textcolor{comment}{//\ Plain\ bit-\/wise\ OR}}
+\DoxyCodeLine{00075\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ tIntegerType>}
+\DoxyCodeLine{00076\ tIntegerType\ \mbox{\hyperlink{namespacegemmlowp_ae92b62afd3351e776f9aa10121ed211b}{BitOr}}(tIntegerType\ a,\ tIntegerType\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}})\ \{}
+\DoxyCodeLine{00077\ \ \ \textcolor{keywordflow}{return}\ a\ |\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}};}
+\DoxyCodeLine{00078\ \}}
+\DoxyCodeLine{00079\ }
+\DoxyCodeLine{00080\ \textcolor{comment}{//\ Plain\ bit-\/wise\ XOR}}
+\DoxyCodeLine{00081\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ tIntegerType>}
+\DoxyCodeLine{00082\ tIntegerType\ \mbox{\hyperlink{namespacegemmlowp_acddfe6d594b0034b193a09e6d3e55241}{BitXor}}(tIntegerType\ a,\ tIntegerType\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}})\ \{}
+\DoxyCodeLine{00083\ \ \ \textcolor{keywordflow}{return}\ a\ \string^\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}};}
+\DoxyCodeLine{00084\ \}}
+\DoxyCodeLine{00085\ }
+\DoxyCodeLine{00086\ \textcolor{comment}{//\ Plain\ bit-\/wise\ NOT}}
+\DoxyCodeLine{00087\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ tIntegerType>}
+\DoxyCodeLine{00088\ tIntegerType\ \mbox{\hyperlink{namespacegemmlowp_a5e1591034bb01e6f23e8b7e7aeb17600}{BitNot}}(tIntegerType\ a)\ \{}
+\DoxyCodeLine{00089\ \ \ \textcolor{keywordflow}{return}\ \string~a;}
+\DoxyCodeLine{00090\ \}}
+\DoxyCodeLine{00091\ }
+\DoxyCodeLine{00092\ \textcolor{comment}{//\ Integer\ addition.\ Not\ saturating.\ Overflow\ is\ undefined\ behavior.}}
+\DoxyCodeLine{00093\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ tIntegerType>}
+\DoxyCodeLine{00094\ tIntegerType\ \mbox{\hyperlink{namespacegemmlowp_af16b123f9b09573c1ea8fadcd0aec5b7}{Add}}(tIntegerType\ a,\ tIntegerType\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}})\ \{}
+\DoxyCodeLine{00095\ \ \ \textcolor{keywordflow}{return}\ a\ +\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}};}
+\DoxyCodeLine{00096\ \}}
+\DoxyCodeLine{00097\ }
+\DoxyCodeLine{00098\ \textcolor{comment}{//\ Integer\ subtraction.\ Not\ saturating.\ Overflow\ is\ undefined\ behavior.}}
+\DoxyCodeLine{00099\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ tIntegerType>}
+\DoxyCodeLine{00100\ tIntegerType\ \mbox{\hyperlink{namespacegemmlowp_a20cd00d97d43dff772207a00df5f77b2}{Mul}}(tIntegerType\ a,\ tIntegerType\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}})\ \{}
+\DoxyCodeLine{00101\ \ \ \textcolor{keywordflow}{return}\ a\ *\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}};}
+\DoxyCodeLine{00102\ \}}
+\DoxyCodeLine{00103\ }
+\DoxyCodeLine{00104\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ tIntegerType>}
+\DoxyCodeLine{00105\ tIntegerType\ \mbox{\hyperlink{namespacegemmlowp_a079b2c49b32e8161085f5993d80e2f07}{Sub}}(tIntegerType\ a,\ tIntegerType\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}})\ \{}
+\DoxyCodeLine{00106\ \ \ \textcolor{keywordflow}{return}\ a\ -\/\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}};}
+\DoxyCodeLine{00107\ \}}
+\DoxyCodeLine{00108\ }
+\DoxyCodeLine{00109\ \textcolor{comment}{//\ Integer\ unary\ negative.\ Not\ saturating.\ Overflow\ is\ undefined\ behavior.}}
+\DoxyCodeLine{00110\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ tIntegerType>}
+\DoxyCodeLine{00111\ tIntegerType\ \mbox{\hyperlink{namespacegemmlowp_a7bf5635dca3f76f608df6337ff7884ac}{Neg}}(tIntegerType\ a)\ \{}
+\DoxyCodeLine{00112\ \ \ \textcolor{keywordflow}{return}\ -\/a;}
+\DoxyCodeLine{00113\ \}}
+\DoxyCodeLine{00114\ }
+\DoxyCodeLine{00115\ \textcolor{comment}{//\ Integer\ arithmetic\ left-\/shift,\ equivalent\ to\ multiplying\ with\ a\ power\ of\ two.}}
+\DoxyCodeLine{00116\ \textcolor{comment}{//\ Negative\ values\ are\ OK.\ In\ case\ of\ overflow,\ no\ Undefined}}
+\DoxyCodeLine{00117\ \textcolor{comment}{//\ Behavior,\ but\ the\ results\ are\ implementation-\/defined\ (in\ practice,}}
+\DoxyCodeLine{00118\ \textcolor{comment}{//\ they\ currently\ are\ saturated,\ but\ we\ make\ no\ commitment\ to\ that).\ The\ idea}}
+\DoxyCodeLine{00119\ \textcolor{comment}{//\ is\ that\ the\ caller\ will\ want\ to\ implement\ the\ overflowing\ cases\ with}}
+\DoxyCodeLine{00120\ \textcolor{comment}{//\ saturation\ with\ compare-\/and-\/mask,\ so\ we\ don't\ care\ about\ the\ results}}
+\DoxyCodeLine{00121\ \textcolor{comment}{//\ in\ the\ overflow\ case,\ we\ just\ want\ to\ avoid\ undefined\ behavior.}}
+\DoxyCodeLine{00122\ \textcolor{comment}{//}}
+\DoxyCodeLine{00123\ \textcolor{comment}{//\ tIntegerType\ may\ be\ int32\ or\ any\ narrower\ signed\ type.}}
+\DoxyCodeLine{00124\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ tIntegerType>}
+\DoxyCodeLine{00125\ tIntegerType\ \mbox{\hyperlink{namespacegemmlowp_a980262a3a56242e79e4d8f93dfefd5ae}{ShiftLeft}}(tIntegerType\ a,\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcaf138809236f667e9686fdd4aaf17705_aed7ea92f45bd273dde380a45ddced592}{offset}})\ \{}
+\DoxyCodeLine{00126\ \ \ \textcolor{keyword}{const}\ std::int64\_t\ wide\_a\ =\ \textcolor{keyword}{static\_cast<}std::int64\_t\textcolor{keyword}{>}(a);}
+\DoxyCodeLine{00127\ \ \ \textcolor{keyword}{const}\ std::int64\_t\ wide\_shifted\ =\ wide\_a\ *\ (1\ <<\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcaf138809236f667e9686fdd4aaf17705_aed7ea92f45bd273dde380a45ddced592}{offset}});}
+\DoxyCodeLine{00128\ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ \mbox{\hyperlink{common__functions_8h_ac6afabdc09a49a433ee19d8a9486056d}{min}}\ =\ std::numeric\_limits<tIntegerType>::min();}
+\DoxyCodeLine{00129\ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ \mbox{\hyperlink{common__functions_8h_affe776513b24d84b39af8ab0930fef7f}{max}}\ =\ std::numeric\_limits<tIntegerType>::max();}
+\DoxyCodeLine{00130\ \ \ \textcolor{keywordflow}{return}\ wide\_shifted\ <\ \mbox{\hyperlink{common__functions_8h_ac6afabdc09a49a433ee19d8a9486056d}{min}}}
+\DoxyCodeLine{00131\ \ \ \ \ \ \ \ \ \ \ \ \ \ ?\ \mbox{\hyperlink{common__functions_8h_ac6afabdc09a49a433ee19d8a9486056d}{min}}}
+\DoxyCodeLine{00132\ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ wide\_shifted\ >\ \mbox{\hyperlink{common__functions_8h_affe776513b24d84b39af8ab0930fef7f}{max}}\ ?\ \mbox{\hyperlink{common__functions_8h_affe776513b24d84b39af8ab0930fef7f}{max}}}
+\DoxyCodeLine{00133\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ \textcolor{keyword}{static\_cast<}tIntegerType\textcolor{keyword}{>}(wide\_shifted);}
+\DoxyCodeLine{00134\ \}}
+\DoxyCodeLine{00135\ }
+\DoxyCodeLine{00136\ \textcolor{comment}{//\ Integer\ arithmetic\ right-\/shift.\ Not\ rounding.}}
+\DoxyCodeLine{00137\ \textcolor{comment}{//\ Relying\ on\ implementation-\/defined,\ but\ in-\/practice-\/consistent,}}
+\DoxyCodeLine{00138\ \textcolor{comment}{//\ C++\ compiler\ behavior.}}
+\DoxyCodeLine{00139\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ tIntegerType>}
+\DoxyCodeLine{00140\ tIntegerType\ \mbox{\hyperlink{namespacegemmlowp_a94fb8cb6ab638dd8c67a688ce81be00d}{ShiftRight}}(tIntegerType\ a,\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcaf138809236f667e9686fdd4aaf17705_aed7ea92f45bd273dde380a45ddced592}{offset}})\ \{}
+\DoxyCodeLine{00141\ \ \ \textcolor{keywordflow}{return}\ a\ >>\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcaf138809236f667e9686fdd4aaf17705_aed7ea92f45bd273dde380a45ddced592}{offset}};}
+\DoxyCodeLine{00142\ \}}
+\DoxyCodeLine{00143\ }
+\DoxyCodeLine{00144\ \textcolor{comment}{//\ Each\ bit\ of\ the\ result\ is\ set\ to\ the\ corresponding\ bit\ of\ either\ then\_val\ or}}
+\DoxyCodeLine{00145\ \textcolor{comment}{//\ else\_val\ depending\ on\ whether\ the\ corresponding\ bit\ of\ if\_mask\ is\ set.}}
+\DoxyCodeLine{00146\ \textcolor{comment}{//\ Equivalent\ to\ the\ VBSL\ instruction\ in\ ARM\ NEON.}}
+\DoxyCodeLine{00147\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ tIntegerType>}
+\DoxyCodeLine{00148\ tIntegerType\ \mbox{\hyperlink{namespacegemmlowp_a9200374a9481b271d4ce140e9a449976}{SelectUsingMask}}(tIntegerType\ if\_mask,\ tIntegerType\ then\_val,}
+\DoxyCodeLine{00149\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ tIntegerType\ else\_val)\ \{}
+\DoxyCodeLine{00150\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacegemmlowp_acddfe6d594b0034b193a09e6d3e55241}{BitXor}}(\mbox{\hyperlink{namespacegemmlowp_ac30d505e781fb7914208c2430df65e3a}{BitAnd}}(if\_mask,\ then\_val),\ \mbox{\hyperlink{namespacegemmlowp_ac30d505e781fb7914208c2430df65e3a}{BitAnd}}(\mbox{\hyperlink{namespacegemmlowp_a5e1591034bb01e6f23e8b7e7aeb17600}{BitNot}}(if\_mask),\ else\_val));}
+\DoxyCodeLine{00151\ \}}
+\DoxyCodeLine{00152\ }
+\DoxyCodeLine{00153\ \textcolor{comment}{//\ For\ each\ input\ scalar,\ the\ corresponding\ bits\ of\ the\ result\ are\ set\ if\ the}}
+\DoxyCodeLine{00154\ \textcolor{comment}{//\ input\ scalar\ is\ non-\/zero.}}
+\DoxyCodeLine{00155\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ tIntegerType>}
+\DoxyCodeLine{00156\ tIntegerType\ \mbox{\hyperlink{namespacegemmlowp_abc6b9204dc901bcd9b6797955d605622}{MaskIfNonZero}}(tIntegerType\ a)\ \{}
+\DoxyCodeLine{00157\ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ tIntegerType\ zero\ =\ 0;}
+\DoxyCodeLine{00158\ \ \ \textcolor{keywordflow}{return}\ a\ ?\ \mbox{\hyperlink{namespacegemmlowp_a5e1591034bb01e6f23e8b7e7aeb17600}{BitNot}}(zero)\ :\ zero;}
+\DoxyCodeLine{00159\ \}}
+\DoxyCodeLine{00160\ }
+\DoxyCodeLine{00161\ \textcolor{comment}{//\ For\ each\ input\ scalar,\ the\ corresponding\ bits\ of\ the\ result\ are\ set\ if\ the}}
+\DoxyCodeLine{00162\ \textcolor{comment}{//\ input\ scalar\ is\ zero.}}
+\DoxyCodeLine{00163\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ tIntegerType>}
+\DoxyCodeLine{00164\ tIntegerType\ \mbox{\hyperlink{namespacegemmlowp_ae6984b5cd9abc82bf0c5c074bed0ebe3}{MaskIfZero}}(tIntegerType\ a)\ \{}
+\DoxyCodeLine{00165\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacegemmlowp_abc6b9204dc901bcd9b6797955d605622}{MaskIfNonZero<tIntegerType>}}(!a);}
+\DoxyCodeLine{00166\ \}}
+\DoxyCodeLine{00167\ }
+\DoxyCodeLine{00168\ \textcolor{comment}{//\ For\ each\ pair\ of\ input\ scalars,\ the\ corresponding\ bits\ of\ the\ result\ are}}
+\DoxyCodeLine{00169\ \textcolor{comment}{//\ set\ if\ the\ input\ scalars\ are\ equal.}}
+\DoxyCodeLine{00170\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ tIntegerType>}
+\DoxyCodeLine{00171\ tIntegerType\ \mbox{\hyperlink{namespacegemmlowp_acd42c48b5d493c5837bd4538561b7008}{MaskIfEqual}}(tIntegerType\ a,\ tIntegerType\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}})\ \{}
+\DoxyCodeLine{00172\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacegemmlowp_abc6b9204dc901bcd9b6797955d605622}{MaskIfNonZero<tIntegerType>}}(a\ ==\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}});}
+\DoxyCodeLine{00173\ \}}
+\DoxyCodeLine{00174\ }
+\DoxyCodeLine{00175\ \textcolor{comment}{//\ For\ each\ pair\ of\ input\ scalars,\ the\ corresponding\ bits\ of\ the\ result\ are}}
+\DoxyCodeLine{00176\ \textcolor{comment}{//\ set\ if\ the\ input\ scalars\ are\ not\ equal.}}
+\DoxyCodeLine{00177\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ tIntegerType>}
+\DoxyCodeLine{00178\ tIntegerType\ \mbox{\hyperlink{namespacegemmlowp_a4f32c03d344a34f8e711bb874ff99fa2}{MaskIfNotEqual}}(tIntegerType\ a,\ tIntegerType\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}})\ \{}
+\DoxyCodeLine{00179\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacegemmlowp_abc6b9204dc901bcd9b6797955d605622}{MaskIfNonZero<tIntegerType>}}(a\ !=\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}});}
+\DoxyCodeLine{00180\ \}}
+\DoxyCodeLine{00181\ }
+\DoxyCodeLine{00182\ \textcolor{comment}{//\ For\ each\ pair\ of\ input\ scalars,\ the\ corresponding\ bits\ of\ the\ result\ are}}
+\DoxyCodeLine{00183\ \textcolor{comment}{//\ set\ if\ the\ input\ scalars\ a,\ b\ satisfy\ a\ >\ b.}}
+\DoxyCodeLine{00184\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ tIntegerType>}
+\DoxyCodeLine{00185\ tIntegerType\ \mbox{\hyperlink{namespacegemmlowp_a1e955db8aed2ffb796737651b688da6f}{MaskIfGreaterThan}}(tIntegerType\ a,\ tIntegerType\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}})\ \{}
+\DoxyCodeLine{00186\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacegemmlowp_abc6b9204dc901bcd9b6797955d605622}{MaskIfNonZero<tIntegerType>}}(a\ >\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}});}
+\DoxyCodeLine{00187\ \}}
+\DoxyCodeLine{00188\ }
+\DoxyCodeLine{00189\ \textcolor{comment}{//\ For\ each\ pair\ of\ input\ scalars,\ the\ corresponding\ bits\ of\ the\ result\ are}}
+\DoxyCodeLine{00190\ \textcolor{comment}{//\ set\ if\ the\ input\ scalars\ a,\ b\ satisfy\ a\ >=\ b.}}
+\DoxyCodeLine{00191\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ tIntegerType>}
+\DoxyCodeLine{00192\ tIntegerType\ \mbox{\hyperlink{namespacegemmlowp_ab71e9056506cbf329cf53b7f55bdb6a7}{MaskIfGreaterThanOrEqual}}(tIntegerType\ a,\ tIntegerType\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}})\ \{}
+\DoxyCodeLine{00193\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacegemmlowp_abc6b9204dc901bcd9b6797955d605622}{MaskIfNonZero<tIntegerType>}}(a\ >=\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}});}
+\DoxyCodeLine{00194\ \}}
+\DoxyCodeLine{00195\ }
+\DoxyCodeLine{00196\ \textcolor{comment}{//\ For\ each\ pair\ of\ input\ scalars,\ the\ corresponding\ bits\ of\ the\ result\ are}}
+\DoxyCodeLine{00197\ \textcolor{comment}{//\ set\ if\ the\ input\ scalars\ a,\ b\ satisfy\ a\ <\ b.}}
+\DoxyCodeLine{00198\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ tIntegerType>}
+\DoxyCodeLine{00199\ tIntegerType\ \mbox{\hyperlink{namespacegemmlowp_a03d0a1a3d2937ae240dc38420e8a4edd}{MaskIfLessThan}}(tIntegerType\ a,\ tIntegerType\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}})\ \{}
+\DoxyCodeLine{00200\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacegemmlowp_abc6b9204dc901bcd9b6797955d605622}{MaskIfNonZero<tIntegerType>}}(a\ <\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}});}
+\DoxyCodeLine{00201\ \}}
+\DoxyCodeLine{00202\ }
+\DoxyCodeLine{00203\ \textcolor{comment}{//\ For\ each\ pair\ of\ input\ scalars,\ the\ corresponding\ bits\ of\ the\ result\ are}}
+\DoxyCodeLine{00204\ \textcolor{comment}{//\ set\ if\ the\ input\ scalars\ a,\ b\ satisfy\ a\ <=\ b.}}
+\DoxyCodeLine{00205\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ tIntegerType>}
+\DoxyCodeLine{00206\ tIntegerType\ \mbox{\hyperlink{namespacegemmlowp_a249ceb96980ceeae65983cd1cfff1a50}{MaskIfLessThanOrEqual}}(tIntegerType\ a,\ tIntegerType\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}})\ \{}
+\DoxyCodeLine{00207\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacegemmlowp_abc6b9204dc901bcd9b6797955d605622}{MaskIfNonZero<tIntegerType>}}(a\ <=\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}});}
+\DoxyCodeLine{00208\ \}}
+\DoxyCodeLine{00209\ }
+\DoxyCodeLine{00210\ \textcolor{comment}{//\ Returns\ true\ if\ all\ of\ the\ input\ scalars\ are\ nonzero.}}
+\DoxyCodeLine{00211\ \textcolor{comment}{//\ This\ function\ may\ currently\ assume\ that\ each\ of\ the\ input\ scalars\ has\ either}}
+\DoxyCodeLine{00212\ \textcolor{comment}{//\ all\ or\ none\ of\ its\ bits\ set.\ Otherwise,\ its\ behavior\ is\ currently\ undefined.}}
+\DoxyCodeLine{00213\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ tIntegerType>}
+\DoxyCodeLine{00214\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespacegemmlowp_a5e4fa9c14974ac6106725cd824c13d06}{All}}(tIntegerType\ a)\ \{}
+\DoxyCodeLine{00215\ \ \ \textcolor{keywordflow}{return}\ a;}
+\DoxyCodeLine{00216\ \}}
+\DoxyCodeLine{00217\ }
+\DoxyCodeLine{00218\ \textcolor{comment}{//\ Returns\ true\ if\ any\ of\ the\ input\ scalars\ are\ nonzero.}}
+\DoxyCodeLine{00219\ \textcolor{comment}{//\ This\ function\ may\ currently\ assume\ that\ each\ of\ the\ input\ scalars\ has\ either}}
+\DoxyCodeLine{00220\ \textcolor{comment}{//\ all\ or\ none\ of\ its\ bits\ set.\ Otherwise,\ its\ behavior\ is\ currently\ undefined.}}
+\DoxyCodeLine{00221\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ tIntegerType>}
+\DoxyCodeLine{00222\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespacegemmlowp_ad3d8f3086dbbef0f71218b6ae19c9e47}{Any}}(tIntegerType\ a)\ \{}
+\DoxyCodeLine{00223\ \ \ \textcolor{keywordflow}{return}\ a;}
+\DoxyCodeLine{00224\ \}}
+\DoxyCodeLine{00225\ }
+\DoxyCodeLine{00226\ \textcolor{comment}{//\ Returns\ (a+b)/2,\ rounded\ to\ the\ nearest\ integer.}}
+\DoxyCodeLine{00227\ \textcolor{comment}{//\ Equivalent\ to\ VRHADD\ in\ the\ ARM\ NEON\ instruction\ set.}}
+\DoxyCodeLine{00228\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ IntegerType>}
+\DoxyCodeLine{00229\ IntegerType\ \mbox{\hyperlink{namespacegemmlowp_a34891a7112dcf0d89456b754c5633e01}{RoundingHalfSum}}(IntegerType\ a,\ IntegerType\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}})\ \{}
+\DoxyCodeLine{00230\ \ \ \textcolor{keyword}{static\_assert}(std::is\_same<IntegerType,\ void>::value,\ \textcolor{stringliteral}{"{}unimplemented"{}});}
+\DoxyCodeLine{00231\ \ \ (void)\mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}};}
+\DoxyCodeLine{00232\ \ \ \textcolor{keywordflow}{return}\ a;}
+\DoxyCodeLine{00233\ \}}
+\DoxyCodeLine{00234\ }
+\DoxyCodeLine{00235\ \textcolor{keyword}{template}\ <>}
+\DoxyCodeLine{00236\ \textcolor{keyword}{inline}\ std::int32\_t\ \mbox{\hyperlink{namespacegemmlowp_a34891a7112dcf0d89456b754c5633e01}{RoundingHalfSum}}(std::int32\_t\ a,\ std::int32\_t\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}})\ \{}
+\DoxyCodeLine{00237\ \ \ std::int64\_t\ a64\ =\ a;}
+\DoxyCodeLine{00238\ \ \ std::int64\_t\ b64\ =\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}};}
+\DoxyCodeLine{00239\ \ \ std::int64\_t\ sum\ =\ a64\ +\ b64;}
+\DoxyCodeLine{00240\ \ \ std::int64\_t\ sign\ =\ sum\ >=\ 0\ ?\ 1\ :\ -\/1;}
+\DoxyCodeLine{00241\ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{static\_cast<}std::int32\_t\textcolor{keyword}{>}((sum\ +\ sign)\ /\ 2);}
+\DoxyCodeLine{00242\ \}}
+\DoxyCodeLine{00243\ }
+\DoxyCodeLine{00244\ \textcolor{keyword}{template}\ <>}
+\DoxyCodeLine{00245\ \textcolor{keyword}{inline}\ std::int16\_t\ \mbox{\hyperlink{namespacegemmlowp_a34891a7112dcf0d89456b754c5633e01}{RoundingHalfSum}}(std::int16\_t\ a,\ std::int16\_t\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}})\ \{}
+\DoxyCodeLine{00246\ \ \ std::int32\_t\ a32\ =\ a;}
+\DoxyCodeLine{00247\ \ \ std::int32\_t\ b32\ =\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}};}
+\DoxyCodeLine{00248\ \ \ std::int32\_t\ sum\ =\ a32\ +\ b32;}
+\DoxyCodeLine{00249\ \ \ std::int32\_t\ sign\ =\ sum\ >=\ 0\ ?\ 1\ :\ -\/1;}
+\DoxyCodeLine{00250\ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{static\_cast<}std::int16\_t\textcolor{keyword}{>}((sum\ +\ sign)\ /\ 2);}
+\DoxyCodeLine{00251\ \}}
+\DoxyCodeLine{00252\ }
+\DoxyCodeLine{00253\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ IntegerType>}
+\DoxyCodeLine{00254\ IntegerType\ \mbox{\hyperlink{namespacegemmlowp_a33e1293a634924e4de112fa4214d0e0a}{SaturatingAdd}}(IntegerType\ a,\ IntegerType\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}})\ \{}
+\DoxyCodeLine{00255\ \ \ \textcolor{keyword}{static\_assert}(std::is\_same<IntegerType,\ void>::value,\ \textcolor{stringliteral}{"{}unimplemented"{}});}
+\DoxyCodeLine{00256\ \ \ (void)\mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}};}
+\DoxyCodeLine{00257\ \ \ \textcolor{keywordflow}{return}\ a;}
+\DoxyCodeLine{00258\ \}}
+\DoxyCodeLine{00259\ }
+\DoxyCodeLine{00260\ \textcolor{comment}{//\ So\ far\ this\ is\ only\ needed\ for\ int16.}}
+\DoxyCodeLine{00261\ \textcolor{keyword}{template}\ <>}
+\DoxyCodeLine{00262\ \textcolor{keyword}{inline}\ std::int16\_t\ \mbox{\hyperlink{namespacegemmlowp_a33e1293a634924e4de112fa4214d0e0a}{SaturatingAdd}}(std::int16\_t\ a,\ std::int16\_t\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}})\ \{}
+\DoxyCodeLine{00263\ \ \ std::int32\_t\ a32\ =\ a;}
+\DoxyCodeLine{00264\ \ \ std::int32\_t\ b32\ =\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}};}
+\DoxyCodeLine{00265\ \ \ std::int32\_t\ sum\ =\ a32\ +\ b32;}
+\DoxyCodeLine{00266\ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{static\_cast<}std::int16\_t\textcolor{keyword}{>}(}
+\DoxyCodeLine{00267\ \ \ \ \ \ \ std::min(\textcolor{keyword}{static\_cast<}std::int32\_t\textcolor{keyword}{>}(32767),}
+\DoxyCodeLine{00268\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::max(\textcolor{keyword}{static\_cast<}std::int32\_t\textcolor{keyword}{>}(-\/32768),\ sum)));}
+\DoxyCodeLine{00269\ \}}
+\DoxyCodeLine{00270\ }
+\DoxyCodeLine{00271\ \textcolor{comment}{//\ Returns\ a+b,\ saturating\ if\ the\ integers\ are\ 16bit\ or\ narrower,}}
+\DoxyCodeLine{00272\ \textcolor{comment}{//\ otherwise\ just\ a\ plain\ addition.}}
+\DoxyCodeLine{00273\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ IntegerType,\ \textcolor{keywordtype}{bool}\ Is16Bit>}
+\DoxyCodeLine{00274\ \textcolor{keyword}{struct\ }AddSaturatingIf16BitImpl\ \{}
+\DoxyCodeLine{00275\ \ \ \textcolor{keyword}{static}\ IntegerType\ \mbox{\hyperlink{structgemmlowp_1_1_add_saturating_if16_bit_impl_a8e26fd2c04e2d40b3929e2cf2f6f86c0}{Run}}(IntegerType\ a,\ IntegerType\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}})\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacegemmlowp_af16b123f9b09573c1ea8fadcd0aec5b7}{Add}}(a,\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}});\ \}}
+\DoxyCodeLine{00276\ \};}
+\DoxyCodeLine{00277\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ IntegerType>}
+\DoxyCodeLine{00278\ \textcolor{keyword}{struct\ }AddSaturatingIf16BitImpl<IntegerType,\ \mbox{\hyperlink{ei__fill__result__struct_8h_a930920b2bc42824a5c03be681830f4b2}{true}}>\ \{}
+\DoxyCodeLine{00279\ \ \ \textcolor{keyword}{static}\ IntegerType\ \mbox{\hyperlink{structgemmlowp_1_1_add_saturating_if16_bit_impl_3_01_integer_type_00_01true_01_4_a8fa45ee07ff228073668e318eb14c9a3}{Run}}(IntegerType\ a,\ IntegerType\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}})\ \{}
+\DoxyCodeLine{00280\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacegemmlowp_a33e1293a634924e4de112fa4214d0e0a}{SaturatingAdd}}(a,\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}});}
+\DoxyCodeLine{00281\ \ \ \}}
+\DoxyCodeLine{00282\ \};}
+\DoxyCodeLine{00283\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ IntegerType>}
+\DoxyCodeLine{00284\ IntegerType\ \mbox{\hyperlink{namespacegemmlowp_a35b0c007b412620a530048a738877b21}{AddSaturatingIf16Bit}}(IntegerType\ a,\ IntegerType\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}})\ \{}
+\DoxyCodeLine{00285\ \ \ \textcolor{keyword}{using\ }ScalarType\ =}
+\DoxyCodeLine{00286\ \ \ \ \ \ \ \textcolor{keyword}{typename}\ \mbox{\hyperlink{structgemmlowp_1_1_fixed_point_raw_type_traits}{FixedPointRawTypeTraits<IntegerType>::ScalarRawType}};}
+\DoxyCodeLine{00287\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structgemmlowp_1_1_add_saturating_if16_bit_impl}{AddSaturatingIf16BitImpl}}<IntegerType,\ \textcolor{keyword}{sizeof}(ScalarType)\ ==\ 2>::Run(a,}
+\DoxyCodeLine{00288\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}});}
+\DoxyCodeLine{00289\ \}}
+\DoxyCodeLine{00290\ }
+\DoxyCodeLine{00291\ \textcolor{comment}{//\ Returns\ the\ integer\ that\ represents\ the\ product\ of\ two\ fixed-\/point}}
+\DoxyCodeLine{00292\ \textcolor{comment}{//\ numbers,\ interpreting\ all\ integers\ as\ fixed-\/point\ values\ in\ the}}
+\DoxyCodeLine{00293\ \textcolor{comment}{//\ interval\ [-\/1,\ 1),\ rounding\ to\ the\ nearest\ value,\ and\ saturating}}
+\DoxyCodeLine{00294\ \textcolor{comment}{//\ -\/1\ *\ -\/1\ to\ the\ maximum\ value\ (since\ 1\ is\ not\ in\ the\ half-\/open}}
+\DoxyCodeLine{00295\ \textcolor{comment}{//\ interval\ [-\/1,\ 1)).}}
+\DoxyCodeLine{00296\ \textcolor{comment}{//}}
+\DoxyCodeLine{00297\ \textcolor{comment}{//\ [The\ explanation\ below\ specializes\ to\ std::int32\_t\ for\ example\ purpose.]}}
+\DoxyCodeLine{00298\ \textcolor{comment}{//}}
+\DoxyCodeLine{00299\ \textcolor{comment}{//\ The\ mapping\ between\ IntegerType\ and\ the\ interval\ [-\/1,\ 1)\ is\ unique\ and}}
+\DoxyCodeLine{00300\ \textcolor{comment}{//\ implied\ by\ IntegerType,\ which\ is\ assumed\ to\ be\ signed.\ For\ example,}}
+\DoxyCodeLine{00301\ \textcolor{comment}{//\ for\ IntegerType==std::int32\_t,\ the\ mapping\ is}}
+\DoxyCodeLine{00302\ \textcolor{comment}{//\ \ \ real\_value\ =\ integer\_value\ /\ 2\string^31.}}
+\DoxyCodeLine{00303\ \textcolor{comment}{//\ So\ in\ this\ case,\ and\ leaving\ aside\ rounding\ and\ saturating,\ this}}
+\DoxyCodeLine{00304\ \textcolor{comment}{//\ function\ computes\ ((a\ /\ 2\string^31)\ *\ (b\ /\ 2\string^31))\ *\ 2\string^31,\ which\ simplifies\ to}}
+\DoxyCodeLine{00305\ \textcolor{comment}{//\ \ \ (a\ *\ b)\ /\ 2\string^31.}}
+\DoxyCodeLine{00306\ \textcolor{comment}{//}}
+\DoxyCodeLine{00307\ \textcolor{comment}{//\ The\ 'doubling'\ part\ in\ the\ name\ of\ this\ function\ comes\ from\ the\ fact\ that}}
+\DoxyCodeLine{00308\ \textcolor{comment}{//\ this\ operation\ is\ very\ close\ to\ a\ "{}multiply-\/high"{}\ operation,\ keeping\ only}}
+\DoxyCodeLine{00309\ \textcolor{comment}{//\ the\ top\ half\ bits,\ except\ that\ that\ would\ be\ effectively\ computing}}
+\DoxyCodeLine{00310\ \textcolor{comment}{//\ \ \ (a\ *\ b)\ /\ 2\string^32,}}
+\DoxyCodeLine{00311\ \textcolor{comment}{//\ so\ here\ we\ are\ computing\ 2x\ that,\ since}}
+\DoxyCodeLine{00312\ \textcolor{comment}{//\ \ \ 1/2\string^31\ =\ 2\ *\ 1/2\string^32.}}
+\DoxyCodeLine{00313\ \textcolor{comment}{//\ The\ idea\ is\ to\ use\ all\ of\ the\ available\ 32\ bits\ in\ the\ destination\ int32}}
+\DoxyCodeLine{00314\ \textcolor{comment}{//\ value.}}
+\DoxyCodeLine{00315\ \textcolor{comment}{//}}
+\DoxyCodeLine{00316\ \textcolor{comment}{//\ [End\ of\ the\ explanation\ specializing\ to\ int32.]}}
+\DoxyCodeLine{00317\ \textcolor{comment}{//}}
+\DoxyCodeLine{00318\ \textcolor{comment}{//\ This\ is\ equivalent\ to\ the\ VQRDMULH\ instruction\ in\ ARM\ NEON.}}
+\DoxyCodeLine{00319\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ IntegerType>}
+\DoxyCodeLine{00320\ IntegerType\ \mbox{\hyperlink{namespacegemmlowp_a7ef1c7121f41059f08e28aad77e2736f}{SaturatingRoundingDoublingHighMul}}(IntegerType\ a,\ IntegerType\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}})\ \{}
+\DoxyCodeLine{00321\ \ \ \textcolor{keyword}{static\_assert}(std::is\_same<IntegerType,\ void>::value,\ \textcolor{stringliteral}{"{}unimplemented"{}});}
+\DoxyCodeLine{00322\ \ \ (void)\mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}};}
+\DoxyCodeLine{00323\ \ \ \textcolor{keywordflow}{return}\ a;}
+\DoxyCodeLine{00324\ \}}
+\DoxyCodeLine{00325\ }
+\DoxyCodeLine{00326\ \textcolor{comment}{//\ This\ function\ implements\ the\ same\ computation\ as\ the\ ARMv7\ NEON\ VQRDMULH}}
+\DoxyCodeLine{00327\ \textcolor{comment}{//\ instruction.}}
+\DoxyCodeLine{00328\ \textcolor{keyword}{template}\ <>}
+\DoxyCodeLine{00329\ \textcolor{keyword}{inline}\ std::int32\_t\ \mbox{\hyperlink{namespacegemmlowp_a7ef1c7121f41059f08e28aad77e2736f}{SaturatingRoundingDoublingHighMul}}(std::int32\_t\ a,}
+\DoxyCodeLine{00330\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::int32\_t\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}})\ \{}
+\DoxyCodeLine{00331\ \ \ \textcolor{keywordtype}{bool}\ overflow\ =\ a\ ==\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}}\ \&\&\ a\ ==\ std::numeric\_limits<std::int32\_t>::min();}
+\DoxyCodeLine{00332\ \ \ std::int64\_t\ a\_64(a);}
+\DoxyCodeLine{00333\ \ \ std::int64\_t\ b\_64(\mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}});}
+\DoxyCodeLine{00334\ \ \ std::int64\_t\ ab\_64\ =\ a\_64\ *\ b\_64;}
+\DoxyCodeLine{00335\ \ \ std::int32\_t\ nudge\ =\ ab\_64\ >=\ 0\ ?\ (1\ <<\ 30)\ :\ (1\ -\/\ (1\ <<\ 30));}
+\DoxyCodeLine{00336\ \ \ std::int32\_t\ ab\_x2\_high32\ =}
+\DoxyCodeLine{00337\ \ \ \ \ \ \ \textcolor{keyword}{static\_cast<}std::int32\_t\textcolor{keyword}{>}((ab\_64\ +\ nudge)\ /\ (1ll\ <<\ 31));}
+\DoxyCodeLine{00338\ \ \ \textcolor{keywordflow}{return}\ overflow\ ?\ std::numeric\_limits<std::int32\_t>::max()\ :\ ab\_x2\_high32;}
+\DoxyCodeLine{00339\ \}}
+\DoxyCodeLine{00340\ }
+\DoxyCodeLine{00341\ \textcolor{keyword}{template}\ <>}
+\DoxyCodeLine{00342\ \textcolor{keyword}{inline}\ std::int16\_t\ \mbox{\hyperlink{namespacegemmlowp_a7ef1c7121f41059f08e28aad77e2736f}{SaturatingRoundingDoublingHighMul}}(std::int16\_t\ a,}
+\DoxyCodeLine{00343\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::int16\_t\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}})\ \{}
+\DoxyCodeLine{00344\ \ \ \textcolor{keywordtype}{bool}\ overflow\ =\ a\ ==\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}}\ \&\&\ a\ ==\ std::numeric\_limits<std::int16\_t>::min();}
+\DoxyCodeLine{00345\ \ \ std::int32\_t\ a\_32(a);}
+\DoxyCodeLine{00346\ \ \ std::int32\_t\ b\_32(\mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}});}
+\DoxyCodeLine{00347\ \ \ std::int32\_t\ ab\_32\ =\ a\_32\ *\ b\_32;}
+\DoxyCodeLine{00348\ \ \ std::int16\_t\ nudge\ =\ ab\_32\ >=\ 0\ ?\ (1\ <<\ 14)\ :\ (1\ -\/\ (1\ <<\ 14));}
+\DoxyCodeLine{00349\ \ \ std::int16\_t\ ab\_x2\_high16\ =}
+\DoxyCodeLine{00350\ \ \ \ \ \ \ \textcolor{keyword}{static\_cast<}std::int16\_t\textcolor{keyword}{>}((ab\_32\ +\ nudge)\ /\ (1\ <<\ 15));}
+\DoxyCodeLine{00351\ \ \ \textcolor{keywordflow}{return}\ overflow\ ?\ std::numeric\_limits<std::int16\_t>::max()\ :\ ab\_x2\_high16;}
+\DoxyCodeLine{00352\ \}}
+\DoxyCodeLine{00353\ }
+\DoxyCodeLine{00354\ \textcolor{comment}{//\ Correctly-\/rounded-\/to-\/nearest\ division\ by\ a\ power-\/of-\/two.}}
+\DoxyCodeLine{00355\ \textcolor{comment}{//\ Also\ known\ as\ a\ rounding\ arithmetic\ right\ shift.}}
+\DoxyCodeLine{00356\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ IntegerType>}
+\DoxyCodeLine{00357\ \textcolor{keyword}{inline}\ IntegerType\ \mbox{\hyperlink{namespacegemmlowp_a7d5169f4bc71a22c6a5adf9c1b73267d}{RoundingDivideByPOT}}(IntegerType\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a6150e0515f7202e2fb518f7206ed97dc}{x}},\ \textcolor{keywordtype}{int}\ exponent)\ \{}
+\DoxyCodeLine{00358\ \ \ \mbox{\hyperlink{ei__aligned__malloc_8h_a95cd4fa643ce672b347744b35c5b7056}{assert}}(exponent\ >=\ 0);}
+\DoxyCodeLine{00359\ \ \ \mbox{\hyperlink{ei__aligned__malloc_8h_a95cd4fa643ce672b347744b35c5b7056}{assert}}(exponent\ <=\ 31);}
+\DoxyCodeLine{00360\ \ \ \textcolor{keyword}{const}\ IntegerType\ \mbox{\hyperlink{wm8960__regs_8h_aa8c909ec5613d6178530fd55e62024c7}{mask}}\ =\ \mbox{\hyperlink{namespacegemmlowp_af414df67b77d1c8673b681247cb6d91d}{Dup<IntegerType>}}((1ll\ <<\ exponent)\ -\/\ 1);}
+\DoxyCodeLine{00361\ \ \ \textcolor{keyword}{const}\ IntegerType\ zero\ =\ \mbox{\hyperlink{namespacegemmlowp_af414df67b77d1c8673b681247cb6d91d}{Dup<IntegerType>}}(0);}
+\DoxyCodeLine{00362\ \ \ \textcolor{keyword}{const}\ IntegerType\ one\ =\ \mbox{\hyperlink{namespacegemmlowp_af414df67b77d1c8673b681247cb6d91d}{Dup<IntegerType>}}(1);}
+\DoxyCodeLine{00363\ \ \ \textcolor{keyword}{const}\ IntegerType\ remainder\ =\ \mbox{\hyperlink{namespacegemmlowp_ac30d505e781fb7914208c2430df65e3a}{BitAnd}}(\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a6150e0515f7202e2fb518f7206ed97dc}{x}},\ \mbox{\hyperlink{wm8960__regs_8h_aa8c909ec5613d6178530fd55e62024c7}{mask}});}
+\DoxyCodeLine{00364\ \ \ \textcolor{keyword}{const}\ IntegerType\ threshold\ =}
+\DoxyCodeLine{00365\ \ \ \ \ \ \ \mbox{\hyperlink{namespacegemmlowp_af16b123f9b09573c1ea8fadcd0aec5b7}{Add}}(\mbox{\hyperlink{namespacegemmlowp_a94fb8cb6ab638dd8c67a688ce81be00d}{ShiftRight}}(\mbox{\hyperlink{wm8960__regs_8h_aa8c909ec5613d6178530fd55e62024c7}{mask}},\ 1),\ \mbox{\hyperlink{namespacegemmlowp_ac30d505e781fb7914208c2430df65e3a}{BitAnd}}(\mbox{\hyperlink{namespacegemmlowp_a03d0a1a3d2937ae240dc38420e8a4edd}{MaskIfLessThan}}(\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a6150e0515f7202e2fb518f7206ed97dc}{x}},\ zero),\ one));}
+\DoxyCodeLine{00366\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacegemmlowp_af16b123f9b09573c1ea8fadcd0aec5b7}{Add}}(\mbox{\hyperlink{namespacegemmlowp_a94fb8cb6ab638dd8c67a688ce81be00d}{ShiftRight}}(\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a6150e0515f7202e2fb518f7206ed97dc}{x}},\ exponent),}
+\DoxyCodeLine{00367\ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacegemmlowp_ac30d505e781fb7914208c2430df65e3a}{BitAnd}}(\mbox{\hyperlink{namespacegemmlowp_a1e955db8aed2ffb796737651b688da6f}{MaskIfGreaterThan}}(remainder,\ threshold),\ one));}
+\DoxyCodeLine{00368\ \}}
+\DoxyCodeLine{00369\ }
+\DoxyCodeLine{00370\ \textcolor{comment}{//\ Returns\ the\ product\ of\ a\ run-\/time\ integer\ value\ by\ a\ compile-\/time\ power}}
+\DoxyCodeLine{00371\ \textcolor{comment}{//\ of\ two,\ with\ either\ a\ positive\ exponent\ (equivalent\ to\ an\ arithmetic}}
+\DoxyCodeLine{00372\ \textcolor{comment}{//\ left\ shift,\ saturating)\ or\ a\ negative\ exponent\ (equivalent\ to\ an\ arithmetic}}
+\DoxyCodeLine{00373\ \textcolor{comment}{//\ right\ shift,\ rounding\ to\ nearest).}}
+\DoxyCodeLine{00374\ \textcolor{keyword}{template}\ <\textcolor{keywordtype}{int}\ Exponent,\ \textcolor{keyword}{typename}\ IntegerType,}
+\DoxyCodeLine{00375\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ ExponentSign\ =\ (Exponent\ >\ 0\ ?\ 1\ :\ Exponent\ <\ 0\ ?\ -\/1\ :\ 0)>}
+\DoxyCodeLine{00376\ \textcolor{keyword}{struct}\ ImplSaturatingRoundingMultiplyByPOT\ \{\};}
+\DoxyCodeLine{00377\ }
+\DoxyCodeLine{00378\ \textcolor{keyword}{template}\ <\textcolor{keywordtype}{int}\ Exponent,\ \textcolor{keyword}{typename}\ IntegerType>}
+\DoxyCodeLine{00379\ \textcolor{keyword}{struct\ }ImplSaturatingRoundingMultiplyByPOT<Exponent,\ IntegerType,\ 0>\ \{}
+\DoxyCodeLine{00380\ \ \ \textcolor{keyword}{static}\ IntegerType\ \mbox{\hyperlink{structgemmlowp_1_1_impl_saturating_rounding_multiply_by_p_o_t_3_01_exponent_00_01_integer_type_00_010_01_4_a4a1dc87b3e294bf3eb3a9fbd24b38046}{eval}}(IntegerType\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a6150e0515f7202e2fb518f7206ed97dc}{x}})\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a6150e0515f7202e2fb518f7206ed97dc}{x}};\ \}}
+\DoxyCodeLine{00381\ \};}
+\DoxyCodeLine{00382\ }
+\DoxyCodeLine{00383\ \textcolor{keyword}{template}\ <\textcolor{keywordtype}{int}\ Exponent,\ \textcolor{keyword}{typename}\ IntegerType>}
+\DoxyCodeLine{00384\ \textcolor{keyword}{struct\ }ImplSaturatingRoundingMultiplyByPOT<Exponent,\ IntegerType,\ 1>\ \{}
+\DoxyCodeLine{00385\ \ \ \textcolor{keyword}{static}\ IntegerType\ \mbox{\hyperlink{structgemmlowp_1_1_impl_saturating_rounding_multiply_by_p_o_t_3_01_exponent_00_01_integer_type_00_011_01_4_a9a5da6f9113430bf4dca4936e78efa4d}{eval}}(IntegerType\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a6150e0515f7202e2fb518f7206ed97dc}{x}})\ \{}
+\DoxyCodeLine{00386\ \ \ \ \ \textcolor{keyword}{using\ }ScalarIntegerType\ =}
+\DoxyCodeLine{00387\ \ \ \ \ \ \ \ \ \textcolor{keyword}{typename}\ \mbox{\hyperlink{structgemmlowp_1_1_fixed_point_raw_type_traits}{FixedPointRawTypeTraits<IntegerType>::ScalarRawType}};}
+\DoxyCodeLine{00388\ \ \ \ \ \textcolor{keyword}{const}\ IntegerType\ \mbox{\hyperlink{common__functions_8h_ac6afabdc09a49a433ee19d8a9486056d}{min}}\ =}
+\DoxyCodeLine{00389\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacegemmlowp_af414df67b77d1c8673b681247cb6d91d}{Dup<IntegerType>}}(std::numeric\_limits<ScalarIntegerType>::min());}
+\DoxyCodeLine{00390\ \ \ \ \ \textcolor{keyword}{const}\ IntegerType\ \mbox{\hyperlink{common__functions_8h_affe776513b24d84b39af8ab0930fef7f}{max}}\ =}
+\DoxyCodeLine{00391\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacegemmlowp_af414df67b77d1c8673b681247cb6d91d}{Dup<IntegerType>}}(std::numeric\_limits<ScalarIntegerType>::max());}
+\DoxyCodeLine{00392\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ ScalarIntegerTypeBits\ =\ 8\ *\ \textcolor{keyword}{sizeof}(ScalarIntegerType);}
+\DoxyCodeLine{00393\ }
+\DoxyCodeLine{00394\ \ \ \ \ \textcolor{keyword}{const}\ std::int32\_t\ threshold\ =}
+\DoxyCodeLine{00395\ \ \ \ \ \ \ \ \ ((1\ <<\ (ScalarIntegerTypeBits\ -\/\ 1\ -\/\ Exponent))\ -\/\ 1);}
+\DoxyCodeLine{00396\ \ \ \ \ \textcolor{keyword}{const}\ IntegerType\ positive\_mask\ =}
+\DoxyCodeLine{00397\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacegemmlowp_a1e955db8aed2ffb796737651b688da6f}{MaskIfGreaterThan}}(\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a6150e0515f7202e2fb518f7206ed97dc}{x}},\ \mbox{\hyperlink{namespacegemmlowp_af414df67b77d1c8673b681247cb6d91d}{Dup<IntegerType>}}(threshold));}
+\DoxyCodeLine{00398\ \ \ \ \ \textcolor{keyword}{const}\ IntegerType\ negative\_mask\ =}
+\DoxyCodeLine{00399\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacegemmlowp_a03d0a1a3d2937ae240dc38420e8a4edd}{MaskIfLessThan}}(\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a6150e0515f7202e2fb518f7206ed97dc}{x}},\ \mbox{\hyperlink{namespacegemmlowp_af414df67b77d1c8673b681247cb6d91d}{Dup<IntegerType>}}(-\/threshold));}
+\DoxyCodeLine{00400\ }
+\DoxyCodeLine{00401\ \ \ \ \ IntegerType\ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}}\ =\ \mbox{\hyperlink{namespacegemmlowp_a980262a3a56242e79e4d8f93dfefd5ae}{ShiftLeft}}(\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a6150e0515f7202e2fb518f7206ed97dc}{x}},\ Exponent);}
+\DoxyCodeLine{00402\ \ \ \ \ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}}\ =\ \mbox{\hyperlink{namespacegemmlowp_a9200374a9481b271d4ce140e9a449976}{SelectUsingMask}}(positive\_mask,\ \mbox{\hyperlink{common__functions_8h_affe776513b24d84b39af8ab0930fef7f}{max}},\ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}});}
+\DoxyCodeLine{00403\ \ \ \ \ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}}\ =\ \mbox{\hyperlink{namespacegemmlowp_a9200374a9481b271d4ce140e9a449976}{SelectUsingMask}}(negative\_mask,\ \mbox{\hyperlink{common__functions_8h_ac6afabdc09a49a433ee19d8a9486056d}{min}},\ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}});}
+\DoxyCodeLine{00404\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}};}
+\DoxyCodeLine{00405\ \ \ \}}
+\DoxyCodeLine{00406\ \};}
+\DoxyCodeLine{00407\ }
+\DoxyCodeLine{00408\ \textcolor{keyword}{template}\ <\textcolor{keywordtype}{int}\ Exponent,\ \textcolor{keyword}{typename}\ IntegerType>}
+\DoxyCodeLine{00409\ \textcolor{keyword}{struct\ }ImplSaturatingRoundingMultiplyByPOT<Exponent,\ IntegerType,\ -\/1>\ \{}
+\DoxyCodeLine{00410\ \ \ \textcolor{keyword}{static}\ IntegerType\ \mbox{\hyperlink{structgemmlowp_1_1_impl_saturating_rounding_multiply_by_p_o_t_3_01_exponent_00_01_integer_type_00_01-1_01_4_a2693e5ce6148ea70d1d75139aa166a9f}{eval}}(IntegerType\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a6150e0515f7202e2fb518f7206ed97dc}{x}})\ \{}
+\DoxyCodeLine{00411\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacegemmlowp_a7d5169f4bc71a22c6a5adf9c1b73267d}{RoundingDivideByPOT<IntegerType>}}(\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a6150e0515f7202e2fb518f7206ed97dc}{x}},\ -\/Exponent);}
+\DoxyCodeLine{00412\ \ \ \}}
+\DoxyCodeLine{00413\ \};}
+\DoxyCodeLine{00414\ }
+\DoxyCodeLine{00415\ \textcolor{keyword}{template}\ <\textcolor{keywordtype}{int}\ Exponent,\ \textcolor{keyword}{typename}\ IntegerType>}
+\DoxyCodeLine{00416\ IntegerType\ \mbox{\hyperlink{namespacegemmlowp_a79cd39a0e9ebaea7b0bc35f6ac1a675e}{SaturatingRoundingMultiplyByPOT}}(IntegerType\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a6150e0515f7202e2fb518f7206ed97dc}{x}})\ \{}
+\DoxyCodeLine{00417\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structgemmlowp_1_1_impl_saturating_rounding_multiply_by_p_o_t}{ImplSaturatingRoundingMultiplyByPOT<Exponent,\ IntegerType>::eval}}(\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a6150e0515f7202e2fb518f7206ed97dc}{x}});}
+\DoxyCodeLine{00418\ \}}
+\DoxyCodeLine{00419\ }
+\DoxyCodeLine{00420\ \textcolor{comment}{//\ Part\ 2:\ the\ FixedPoint\ class.}}
+\DoxyCodeLine{00421\ }
+\DoxyCodeLine{00422\ \textcolor{comment}{//\ A\ FixedPoint\ object\ represents\ a\ fixed-\/point\ value\ stored\ in\ the\ underlying}}
+\DoxyCodeLine{00423\ \textcolor{comment}{//\ integer\ type\ tRawType,\ if\ tRawType\ is\ a\ plain\ scalar\ integer\ type.}}
+\DoxyCodeLine{00424\ \textcolor{comment}{//\ Alternatively,\ tRawType\ may\ be\ a\ SIMD\ type\ (e.g.\ NEON\ int32x4\_t)\ in\ which}}
+\DoxyCodeLine{00425\ \textcolor{comment}{//\ case\ a\ FixedPoint\ object\ represents\ a\ corresponding\ SIMD\ vector\ of\ fixed}}
+\DoxyCodeLine{00426\ \textcolor{comment}{//\ point\ values.}}
+\DoxyCodeLine{00427\ \textcolor{comment}{//}}
+\DoxyCodeLine{00428\ \textcolor{comment}{//\ tIntegerBits\ describes\ the\ range\ of\ the\ fixed-\/point\ format:\ if}}
+\DoxyCodeLine{00429\ \textcolor{comment}{//\ tIntegerBits\ ==\ m\ then\ the\ range\ of\ representable\ values\ is\ the\ half-\/open}}
+\DoxyCodeLine{00430\ \textcolor{comment}{//\ interval\ [-\/2\string^m;\ 2\string^m)\ where\ the\ open\ boundary\ on\ the\ right\ side\ means\ that}}
+\DoxyCodeLine{00431\ \textcolor{comment}{//\ 2\string^m\ is\ not\ representable\ (how\ close\ the\ maximum\ representable\ value\ is\ to}}
+\DoxyCodeLine{00432\ \textcolor{comment}{//\ it,\ depends\ on\ bit-\/depth\ of\ tRawType).}}
+\DoxyCodeLine{00433\ \textcolor{comment}{//}}
+\DoxyCodeLine{00434\ \textcolor{comment}{//\ In\ "{}Q\ format\ notation"{},}}
+\DoxyCodeLine{00435\ \textcolor{comment}{//\ \ \ https://en.wikipedia.org/wiki/Q\_(number\_format)}}
+\DoxyCodeLine{00436\ \textcolor{comment}{//\ we\ are\ describing\ the\ format}}
+\DoxyCodeLine{00437\ \textcolor{comment}{//\ \ \ Qm.n}}
+\DoxyCodeLine{00438\ \textcolor{comment}{//\ where}}
+\DoxyCodeLine{00439\ \textcolor{comment}{//\ \ \ m\ =\ tIntegerBits}}
+\DoxyCodeLine{00440\ \textcolor{comment}{//\ and}}
+\DoxyCodeLine{00441\ \textcolor{comment}{//\ \ \ n\ =\ NumberOfBits(tRawType)\ -\/\ (m\ +\ 1)}}
+\DoxyCodeLine{00442\ \textcolor{comment}{//\ Note\ that\ the\ (m\ +\ 1)\ in\ the\ above\ line\ is\ because\ we\ adopt\ the\ convention}}
+\DoxyCodeLine{00443\ \textcolor{comment}{//\ that\ we\ count\ the\ integer\ bits\ exclusively\ of\ the\ sign\ bit;\ so\ (m\ +\ 1)\ is}}
+\DoxyCodeLine{00444\ \textcolor{comment}{//\ the\ total\ number\ of\ integer\ bits\ inclusive\ of\ the\ sign\ bit.}}
+\DoxyCodeLine{00445\ \textcolor{comment}{//}}
+\DoxyCodeLine{00446\ \textcolor{comment}{//\ Accordingly,\ the\ number\ of\ integral\ representable\ values\ in\ our\ range}}
+\DoxyCodeLine{00447\ \textcolor{comment}{//\ \ \ [-\/2\string^m\ ;\ 2\string^m)}}
+\DoxyCodeLine{00448\ \textcolor{comment}{//\ is\ equal\ to\ 2\string^(m+1).}}
+\DoxyCodeLine{00449\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ tRawType,\ \textcolor{keywordtype}{int}\ tIntegerBits>}
+\DoxyCodeLine{00450\ \textcolor{keyword}{class\ }FixedPoint\ \{}
+\DoxyCodeLine{00451\ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00452\ \ \ \textcolor{keyword}{typedef}\ tRawType\ \mbox{\hyperlink{classgemmlowp_1_1_fixed_point_af53fa316bf62e308ca4710d4350a981e}{RawType}};}
+\DoxyCodeLine{00453\ }
+\DoxyCodeLine{00454\ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{structgemmlowp_1_1_fixed_point_raw_type_traits}{FixedPointRawTypeTraits<RawType>}}\ \mbox{\hyperlink{classgemmlowp_1_1_fixed_point_aff647892acab7d33e5726fc233461391}{RawTypeTraits}};}
+\DoxyCodeLine{00455\ \ \ \textcolor{keyword}{typedef}\ \textcolor{keyword}{typename}\ RawTypeTraits::ScalarRawType\ \mbox{\hyperlink{classgemmlowp_1_1_fixed_point_ac22fe0b11b919727fadf61e87b0f7e47}{ScalarRawType}};}
+\DoxyCodeLine{00456\ }
+\DoxyCodeLine{00457\ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{classgemmlowp_1_1_fixed_point_ae7bf75bec09ef6f39e7a3f4a62519587}{kTotalBits}}\ =\ 8\ *\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{classgemmlowp_1_1_fixed_point_ac22fe0b11b919727fadf61e87b0f7e47}{ScalarRawType}});}
+\DoxyCodeLine{00458\ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{classgemmlowp_1_1_fixed_point_a2a0a2730f29e51cf9f361c8454c5ab4d}{kIntegerBits}}\ =\ tIntegerBits;}
+\DoxyCodeLine{00459\ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{classgemmlowp_1_1_fixed_point_ad56f3780f64f44cdf0252176384f5b9f}{kFractionalBits}}\ =\ \mbox{\hyperlink{classgemmlowp_1_1_fixed_point_ae7bf75bec09ef6f39e7a3f4a62519587}{kTotalBits}}\ -\/\ 1\ -\/\ \mbox{\hyperlink{classgemmlowp_1_1_fixed_point_a2a0a2730f29e51cf9f361c8454c5ab4d}{kIntegerBits}};}
+\DoxyCodeLine{00460\ \ \ \textcolor{keyword}{static\_assert}(\mbox{\hyperlink{classgemmlowp_1_1_fixed_point_a2a0a2730f29e51cf9f361c8454c5ab4d}{kIntegerBits}}\ >=\ 0\ \&\&\ \mbox{\hyperlink{classgemmlowp_1_1_fixed_point_a2a0a2730f29e51cf9f361c8454c5ab4d}{kIntegerBits}}\ <\ \mbox{\hyperlink{classgemmlowp_1_1_fixed_point_ae7bf75bec09ef6f39e7a3f4a62519587}{kTotalBits}},}
+\DoxyCodeLine{00461\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}bad\ IntegerBits"{}});}
+\DoxyCodeLine{00462\ }
+\DoxyCodeLine{00463\ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classgemmlowp_1_1_fixed_point}{FixedPoint<ScalarRawType,\ kIntegerBits>}}\ \mbox{\hyperlink{classgemmlowp_1_1_fixed_point_a11cc865a34b2ea96e9764a227efd1989}{ScalarFixedPointType}};}
+\DoxyCodeLine{00464\ }
+\DoxyCodeLine{00465\ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classgemmlowp_1_1_fixed_point_ac22fe0b11b919727fadf61e87b0f7e47}{ScalarRawType}}\ \mbox{\hyperlink{classgemmlowp_1_1_fixed_point_a066294f084368c2e00e73bed38ad9a5e}{ScalarRawMin}}()\ \{}
+\DoxyCodeLine{00466\ \ \ \ \ \textcolor{keywordflow}{return}\ std::numeric\_limits<ScalarRawType>::min();}
+\DoxyCodeLine{00467\ \ \ \}}
+\DoxyCodeLine{00468\ }
+\DoxyCodeLine{00469\ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classgemmlowp_1_1_fixed_point_ac22fe0b11b919727fadf61e87b0f7e47}{ScalarRawType}}\ \mbox{\hyperlink{classgemmlowp_1_1_fixed_point_aa1be974ae142cdb16683b7987f7e3acb}{ScalarRawMax}}()\ \{}
+\DoxyCodeLine{00470\ \ \ \ \ \textcolor{keywordflow}{return}\ std::numeric\_limits<ScalarRawType>::max();}
+\DoxyCodeLine{00471\ \ \ \}}
+\DoxyCodeLine{00472\ }
+\DoxyCodeLine{00473\ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classgemmlowp_1_1_fixed_point_ac22fe0b11b919727fadf61e87b0f7e47}{ScalarRawType}}\ \mbox{\hyperlink{classgemmlowp_1_1_fixed_point_a5b6824f27ec2710c193842f6796715dc}{RawMin}}()\ \{}
+\DoxyCodeLine{00474\ \ \ \ \ \textcolor{keywordflow}{return}\ VectorFromScalar(\mbox{\hyperlink{classgemmlowp_1_1_fixed_point_a066294f084368c2e00e73bed38ad9a5e}{ScalarRawMin}}());}
+\DoxyCodeLine{00475\ \ \ \}}
+\DoxyCodeLine{00476\ }
+\DoxyCodeLine{00477\ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classgemmlowp_1_1_fixed_point_ac22fe0b11b919727fadf61e87b0f7e47}{ScalarRawType}}\ \mbox{\hyperlink{classgemmlowp_1_1_fixed_point_a3fcc68fc2f70ea5275992a222f442d9e}{RawMax}}()\ \{}
+\DoxyCodeLine{00478\ \ \ \ \ \textcolor{keywordflow}{return}\ VectorFromScalar(\mbox{\hyperlink{classgemmlowp_1_1_fixed_point_aa1be974ae142cdb16683b7987f7e3acb}{ScalarRawMax}}());}
+\DoxyCodeLine{00479\ \ \ \}}
+\DoxyCodeLine{00480\ }
+\DoxyCodeLine{00481\ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{classgemmlowp_1_1_fixed_point}{FixedPoint}}\ \mbox{\hyperlink{classgemmlowp_1_1_fixed_point_a9cf050964da422f90d3394604486a19b}{FromRaw}}(\mbox{\hyperlink{classgemmlowp_1_1_fixed_point_af53fa316bf62e308ca4710d4350a981e}{RawType}}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a6150e0515f7202e2fb518f7206ed97dc}{x}})\ \{}
+\DoxyCodeLine{00482\ \ \ \ \ \mbox{\hyperlink{classgemmlowp_1_1_fixed_point}{FixedPoint}}\ retval;}
+\DoxyCodeLine{00483\ \ \ \ \ retval.raw()\ =\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a6150e0515f7202e2fb518f7206ed97dc}{x}};}
+\DoxyCodeLine{00484\ \ \ \ \ \textcolor{keywordflow}{return}\ retval;}
+\DoxyCodeLine{00485\ \ \ \}}
+\DoxyCodeLine{00486\ }
+\DoxyCodeLine{00487\ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{classgemmlowp_1_1_fixed_point}{FixedPoint}}\ \mbox{\hyperlink{classgemmlowp_1_1_fixed_point_ac1c3104d1b9bdbd1c13aa1cd964e9094}{FromScalarRaw}}(\mbox{\hyperlink{classgemmlowp_1_1_fixed_point_ac22fe0b11b919727fadf61e87b0f7e47}{ScalarRawType}}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a6150e0515f7202e2fb518f7206ed97dc}{x}})\ \{}
+\DoxyCodeLine{00488\ \ \ \ \ \mbox{\hyperlink{classgemmlowp_1_1_fixed_point}{FixedPoint}}\ retval;}
+\DoxyCodeLine{00489\ \ \ \ \ retval.raw()\ =\ \mbox{\hyperlink{namespacegemmlowp_af414df67b77d1c8673b681247cb6d91d}{Dup<RawType>}}(\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a6150e0515f7202e2fb518f7206ed97dc}{x}});}
+\DoxyCodeLine{00490\ \ \ \ \ \textcolor{keywordflow}{return}\ retval;}
+\DoxyCodeLine{00491\ \ \ \}}
+\DoxyCodeLine{00492\ }
+\DoxyCodeLine{00493\ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{classgemmlowp_1_1_fixed_point}{FixedPoint}}\ \mbox{\hyperlink{classgemmlowp_1_1_fixed_point_ae907a31596b8fc9afd430a5e69c98db3}{FromScalarFixedPoint}}(\mbox{\hyperlink{classgemmlowp_1_1_fixed_point}{ScalarFixedPointType}}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a6150e0515f7202e2fb518f7206ed97dc}{x}})\ \{}
+\DoxyCodeLine{00494\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classgemmlowp_1_1_fixed_point_ac1c3104d1b9bdbd1c13aa1cd964e9094}{FromScalarRaw}}(\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a6150e0515f7202e2fb518f7206ed97dc}{x}}.raw());}
+\DoxyCodeLine{00495\ \ \ \}}
+\DoxyCodeLine{00496\ }
+\DoxyCodeLine{00497\ \ \ \textcolor{keyword}{template}\ <\textcolor{keywordtype}{int}\ Exponent>}
+\DoxyCodeLine{00498\ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{classgemmlowp_1_1_fixed_point}{FixedPoint}}\ \mbox{\hyperlink{classgemmlowp_1_1_fixed_point_af4f0697989712071def6b9d311c4f369}{ConstantPOT}}()\ \{}
+\DoxyCodeLine{00499\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{int}\ kOffset\ =\ \mbox{\hyperlink{classgemmlowp_1_1_fixed_point_ad56f3780f64f44cdf0252176384f5b9f}{kFractionalBits}}\ +\ Exponent;}
+\DoxyCodeLine{00500\ \ \ \ \ \textcolor{keyword}{static\_assert}(}
+\DoxyCodeLine{00501\ \ \ \ \ \ \ \ \ kOffset\ <\ 31,}
+\DoxyCodeLine{00502\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Constant\ not\ exactly\ representable\ in\ this\ fixed-\/point\ format"{}});}
+\DoxyCodeLine{00503\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classgemmlowp_1_1_fixed_point_ac1c3104d1b9bdbd1c13aa1cd964e9094}{FromScalarRaw}}(\mbox{\hyperlink{classgemmlowp_1_1_fixed_point_ac22fe0b11b919727fadf61e87b0f7e47}{ScalarRawType}}(1)\ <<\ kOffset);}
+\DoxyCodeLine{00504\ \ \ \}}
+\DoxyCodeLine{00505\ }
+\DoxyCodeLine{00506\ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{classgemmlowp_1_1_fixed_point}{FixedPoint}}\ \mbox{\hyperlink{classgemmlowp_1_1_fixed_point_a1839adde509531743fa50926f3546903}{Zero}}()\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classgemmlowp_1_1_fixed_point_ac1c3104d1b9bdbd1c13aa1cd964e9094}{FromScalarRaw}}(0);\ \}}
+\DoxyCodeLine{00507\ }
+\DoxyCodeLine{00508\ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{classgemmlowp_1_1_fixed_point}{FixedPoint}}\ \mbox{\hyperlink{classgemmlowp_1_1_fixed_point_ad0a39cb14406e651087286763080a7c3}{One}}()\ \{}
+\DoxyCodeLine{00509\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classgemmlowp_1_1_fixed_point_ac1c3104d1b9bdbd1c13aa1cd964e9094}{FromScalarRaw}}(}
+\DoxyCodeLine{00510\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classgemmlowp_1_1_fixed_point_a2a0a2730f29e51cf9f361c8454c5ab4d}{kIntegerBits}}\ ==\ 0}
+\DoxyCodeLine{00511\ \ \ \ \ \ \ \ \ \ \ \ \ ?\ \mbox{\hyperlink{classgemmlowp_1_1_fixed_point_aa1be974ae142cdb16683b7987f7e3acb}{ScalarRawMax}}()}
+\DoxyCodeLine{00512\ \ \ \ \ \ \ \ \ \ \ \ \ :\ (\mbox{\hyperlink{classgemmlowp_1_1_fixed_point_ac22fe0b11b919727fadf61e87b0f7e47}{ScalarRawType}}(1)\ <<\ (\mbox{\hyperlink{classgemmlowp_1_1_fixed_point_a2a0a2730f29e51cf9f361c8454c5ab4d}{kIntegerBits}}\ ==\ 0\ ?\ 0\ :\ \mbox{\hyperlink{classgemmlowp_1_1_fixed_point_ad56f3780f64f44cdf0252176384f5b9f}{kFractionalBits}})));}
+\DoxyCodeLine{00513\ \ \ \}}
+\DoxyCodeLine{00514\ }
+\DoxyCodeLine{00515\ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{classgemmlowp_1_1_fixed_point}{FixedPoint}}\ \mbox{\hyperlink{classgemmlowp_1_1_fixed_point_a2f228a9ad77e11e2eb4f03d2003367d6}{FromDouble}}(\textcolor{keywordtype}{double}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a6150e0515f7202e2fb518f7206ed97dc}{x}})\ \{}
+\DoxyCodeLine{00516\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{double}\ min\_bound\ =\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{double}\textcolor{keyword}{>}(\mbox{\hyperlink{classgemmlowp_1_1_fixed_point_a066294f084368c2e00e73bed38ad9a5e}{ScalarRawMin}}());}
+\DoxyCodeLine{00517\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{double}\ max\_bound\ =\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{double}\textcolor{keyword}{>}(\mbox{\hyperlink{classgemmlowp_1_1_fixed_point_aa1be974ae142cdb16683b7987f7e3acb}{ScalarRawMax}}());}
+\DoxyCodeLine{00518\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classgemmlowp_1_1_fixed_point_ac1c3104d1b9bdbd1c13aa1cd964e9094}{FromScalarRaw}}(\textcolor{keyword}{static\_cast<}\mbox{\hyperlink{classgemmlowp_1_1_fixed_point_ac22fe0b11b919727fadf61e87b0f7e47}{ScalarRawType}}\textcolor{keyword}{>}(std::min(}
+\DoxyCodeLine{00519\ \ \ \ \ \ \ \ \ std::max(round(\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a6150e0515f7202e2fb518f7206ed97dc}{x}}\ *\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{double}\textcolor{keyword}{>}(1ll\ <<\ \mbox{\hyperlink{classgemmlowp_1_1_fixed_point_ad56f3780f64f44cdf0252176384f5b9f}{kFractionalBits}})),}
+\DoxyCodeLine{00520\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ min\_bound),}
+\DoxyCodeLine{00521\ \ \ \ \ \ \ \ \ max\_bound)));}
+\DoxyCodeLine{00522\ \ \ \}}
+\DoxyCodeLine{00523\ }
+\DoxyCodeLine{00524\ \ \ \mbox{\hyperlink{classgemmlowp_1_1_fixed_point_af53fa316bf62e308ca4710d4350a981e}{RawType}}\ \mbox{\hyperlink{classgemmlowp_1_1_fixed_point_a2a1d836acd30cc363e4b453e4f038457}{raw}}()\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classgemmlowp_1_1_fixed_point_a7036769e2407f452874c2bc40a8bf5e7}{i\_}};\ \}}
+\DoxyCodeLine{00525\ \ \ \mbox{\hyperlink{classgemmlowp_1_1_fixed_point_af53fa316bf62e308ca4710d4350a981e}{RawType}}\&\ \mbox{\hyperlink{classgemmlowp_1_1_fixed_point_abe84a257abebb238d55146d2589bf388}{raw}}()\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classgemmlowp_1_1_fixed_point_a7036769e2407f452874c2bc40a8bf5e7}{i\_}};\ \}}
+\DoxyCodeLine{00526\ }
+\DoxyCodeLine{00527\ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{00528\ \ \ \mbox{\hyperlink{classgemmlowp_1_1_fixed_point_af53fa316bf62e308ca4710d4350a981e}{RawType}}\ \mbox{\hyperlink{classgemmlowp_1_1_fixed_point_a7036769e2407f452874c2bc40a8bf5e7}{i\_}};}
+\DoxyCodeLine{00529\ \};}
+\DoxyCodeLine{00530\ }
+\DoxyCodeLine{00531\ \textcolor{comment}{//\ Part\ 3:\ implementation\ of\ arithmetic\ operators\ for\ the}}
+\DoxyCodeLine{00532\ \textcolor{comment}{//\ FixedPoint\ class,\ and\ a\ few\ related\ functions.}}
+\DoxyCodeLine{00533\ }
+\DoxyCodeLine{00534\ \textcolor{comment}{//\ A\ FixedPoint\ multiplication\ is\ just\ a}}
+\DoxyCodeLine{00535\ \textcolor{comment}{//\ SaturatingRoundingDoublingHighMul\ operation\ on\ the\ underlying}}
+\DoxyCodeLine{00536\ \textcolor{comment}{//\ raw\ integer\ values.\ The\ IntegerBits\ simply\ add\ up,\ as\ is\ obvious}}
+\DoxyCodeLine{00537\ \textcolor{comment}{//\ from\ the\ fact\ that\ the\ range\ is\ [-\/2\string^IntegerBits,\ 2\string^IntegerBits).}}
+\DoxyCodeLine{00538\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ tRawType,\ \textcolor{keywordtype}{int}\ tIntegerBits\_a,\ \textcolor{keywordtype}{int}\ tIntegerBits\_b>}
+\DoxyCodeLine{00539\ \mbox{\hyperlink{classgemmlowp_1_1_fixed_point}{FixedPoint<tRawType,\ tIntegerBits\_a\ +\ tIntegerBits\_b>}}\ \mbox{\hyperlink{namespacegemmlowp_a103cb7a952d5cff47161be7e30ac3be5}{operator*}}(}
+\DoxyCodeLine{00540\ \ \ \ \ \mbox{\hyperlink{classgemmlowp_1_1_fixed_point}{FixedPoint<tRawType,\ tIntegerBits\_a>}}\ a,}
+\DoxyCodeLine{00541\ \ \ \ \ \mbox{\hyperlink{classgemmlowp_1_1_fixed_point}{FixedPoint<tRawType,\ tIntegerBits\_b>}}\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}})\ \{}
+\DoxyCodeLine{00542\ \ \ \mbox{\hyperlink{classgemmlowp_1_1_fixed_point}{FixedPoint<tRawType,\ tIntegerBits\_a\ +\ tIntegerBits\_b>}}\ c;}
+\DoxyCodeLine{00543\ \ \ c.raw()\ =\ \mbox{\hyperlink{namespacegemmlowp_a7ef1c7121f41059f08e28aad77e2736f}{SaturatingRoundingDoublingHighMul}}(a.raw(),\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}}.raw());}
+\DoxyCodeLine{00544\ \ \ \textcolor{keywordflow}{return}\ c;}
+\DoxyCodeLine{00545\ \}}
+\DoxyCodeLine{00546\ }
+\DoxyCodeLine{00547\ \textcolor{comment}{//\ Tweaking\ IntegerBits\ gives\ exact\ multiplication\ by\ a\ power\ of\ two.}}
+\DoxyCodeLine{00548\ \textcolor{keyword}{template}\ <\textcolor{keywordtype}{int}\ tExponent,\ \textcolor{keyword}{typename}\ tRawType,\ \textcolor{keywordtype}{int}\ tIntegerBits>}
+\DoxyCodeLine{00549\ \mbox{\hyperlink{classgemmlowp_1_1_fixed_point}{FixedPoint<tRawType,\ tExponent\ +\ tIntegerBits>}}\ \mbox{\hyperlink{namespacegemmlowp_ae936bbec3266517088ef70cfd4efcf4b}{ExactMulByPot}}(}
+\DoxyCodeLine{00550\ \ \ \ \ \mbox{\hyperlink{classgemmlowp_1_1_fixed_point}{FixedPoint<tRawType,\ tIntegerBits>}}\ a)\ \{}
+\DoxyCodeLine{00551\ \ \ \mbox{\hyperlink{classgemmlowp_1_1_fixed_point}{FixedPoint<tRawType,\ tExponent\ +\ tIntegerBits>}}\ c;}
+\DoxyCodeLine{00552\ \ \ c.raw()\ =\ a.raw();}
+\DoxyCodeLine{00553\ \ \ \textcolor{keywordflow}{return}\ c;}
+\DoxyCodeLine{00554\ \}}
+\DoxyCodeLine{00555\ }
+\DoxyCodeLine{00556\ \textcolor{comment}{//\ If\ we\ want\ to\ leave\ IntegerBits\ fixed,\ then\ multiplication}}
+\DoxyCodeLine{00557\ \textcolor{comment}{//\ by\ a\ power\ of\ two\ has\ to\ be\ saturating/rounding,\ not\ exact\ anymore.}}
+\DoxyCodeLine{00558\ \textcolor{keyword}{template}\ <\textcolor{keywordtype}{int}\ tExponent,\ \textcolor{keyword}{typename}\ tRawType,\ \textcolor{keywordtype}{int}\ tIntegerBits>}
+\DoxyCodeLine{00559\ \mbox{\hyperlink{classgemmlowp_1_1_fixed_point}{FixedPoint<tRawType,\ tIntegerBits>}}\ \mbox{\hyperlink{namespacegemmlowp_a79cd39a0e9ebaea7b0bc35f6ac1a675e}{SaturatingRoundingMultiplyByPOT}}(}
+\DoxyCodeLine{00560\ \ \ \ \ \mbox{\hyperlink{classgemmlowp_1_1_fixed_point}{FixedPoint<tRawType,\ tIntegerBits>}}\ a)\ \{}
+\DoxyCodeLine{00561\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classgemmlowp_1_1_fixed_point_a9cf050964da422f90d3394604486a19b}{FixedPoint<tRawType,\ tIntegerBits>::FromRaw}}(}
+\DoxyCodeLine{00562\ \ \ \ \ \ \ \mbox{\hyperlink{namespacegemmlowp_a79cd39a0e9ebaea7b0bc35f6ac1a675e}{SaturatingRoundingMultiplyByPOT<tExponent>}}(a.raw()));}
+\DoxyCodeLine{00563\ \}}
+\DoxyCodeLine{00564\ }
+\DoxyCodeLine{00565\ \textcolor{comment}{//\ Generic\ arithmetic\ operators.}}
+\DoxyCodeLine{00566\ }
+\DoxyCodeLine{00567\ \textcolor{preprocessor}{\#define\ MAKE\_FIXEDPOINT\_UNARY\_FUNC(FuncName,\ ImplFuncName)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00568\ \textcolor{preprocessor}{\ \ template\ <typename\ tRawType,\ int\ tIntegerBits>\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00569\ \textcolor{preprocessor}{\ \ FixedPoint<tRawType,\ tIntegerBits>\ FuncName(\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00570\ \textcolor{preprocessor}{\ \ \ \ \ \ FixedPoint<tRawType,\ tIntegerBits>\ a)\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00571\ \textcolor{preprocessor}{\ \ \ \ return\ FixedPoint<tRawType,\ tIntegerBits>::FromRaw(ImplFuncName(a.raw()));\ \(\backslash\)}}
+\DoxyCodeLine{00572\ \textcolor{preprocessor}{\ \ \}}}
+\DoxyCodeLine{00573\ }
+\DoxyCodeLine{00574\ \textcolor{preprocessor}{\#define\ MAKE\_FIXEDPOINT\_BINARY\_FUNC(FuncName,\ ImplFuncName)\ \(\backslash\)}}
+\DoxyCodeLine{00575\ \textcolor{preprocessor}{\ \ template\ <typename\ tRawType,\ int\ tIntegerBits>\ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00576\ \textcolor{preprocessor}{\ \ FixedPoint<tRawType,\ tIntegerBits>\ FuncName(\ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00577\ \textcolor{preprocessor}{\ \ \ \ \ \ FixedPoint<tRawType,\ tIntegerBits>\ a,\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00578\ \textcolor{preprocessor}{\ \ \ \ \ \ FixedPoint<tRawType,\ tIntegerBits>\ b)\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00579\ \textcolor{preprocessor}{\ \ \ \ return\ FixedPoint<tRawType,\ tIntegerBits>::FromRaw(\ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00580\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ ImplFuncName(a.raw(),\ b.raw()));\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00581\ \textcolor{preprocessor}{\ \ \}}}
+\DoxyCodeLine{00582\ }
+\DoxyCodeLine{00583\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbd0426898cca233a5356f2d5a6701844_a74b75ddf35b37d5c0b589536031c5976}{MAKE\_FIXEDPOINT\_UNARY\_FUNC}}(\textcolor{keyword}{operator}-\/,\ \mbox{\hyperlink{namespacegemmlowp_a7bf5635dca3f76f608df6337ff7884ac}{Neg}})}
+\DoxyCodeLine{00584\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbd0426898cca233a5356f2d5a6701844_a74b75ddf35b37d5c0b589536031c5976}{MAKE\_FIXEDPOINT\_UNARY\_FUNC}}(\textcolor{keyword}{operator}\string~,\ \mbox{\hyperlink{namespacegemmlowp_a5e1591034bb01e6f23e8b7e7aeb17600}{BitNot}})}
+\DoxyCodeLine{00585\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbd0426898cca233a5356f2d5a6701844_a281d3d1311cd43190cb88e55b221100b}{MAKE\_FIXEDPOINT\_BINARY\_FUNC}}(\textcolor{keyword}{operator}+,\ \mbox{\hyperlink{namespacegemmlowp_af16b123f9b09573c1ea8fadcd0aec5b7}{Add}})}
+\DoxyCodeLine{00586\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbd0426898cca233a5356f2d5a6701844_a281d3d1311cd43190cb88e55b221100b}{MAKE\_FIXEDPOINT\_BINARY\_FUNC}}(\textcolor{keyword}{operator}-\/,\ \mbox{\hyperlink{namespacegemmlowp_a079b2c49b32e8161085f5993d80e2f07}{Sub}})}
+\DoxyCodeLine{00587\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbd0426898cca233a5356f2d5a6701844_a281d3d1311cd43190cb88e55b221100b}{MAKE\_FIXEDPOINT\_BINARY\_FUNC}}(\textcolor{keyword}{operator}\&,\ \mbox{\hyperlink{namespacegemmlowp_ac30d505e781fb7914208c2430df65e3a}{BitAnd}})}
+\DoxyCodeLine{00588\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbd0426898cca233a5356f2d5a6701844_a281d3d1311cd43190cb88e55b221100b}{MAKE\_FIXEDPOINT\_BINARY\_FUNC}}(\textcolor{keyword}{operator}\string^,\ \mbox{\hyperlink{namespacegemmlowp_acddfe6d594b0034b193a09e6d3e55241}{BitXor}})}
+\DoxyCodeLine{00589\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbd0426898cca233a5356f2d5a6701844_a281d3d1311cd43190cb88e55b221100b}{MAKE\_FIXEDPOINT\_BINARY\_FUNC}}(\textcolor{keyword}{operator}|,\ \mbox{\hyperlink{namespacegemmlowp_ae92b62afd3351e776f9aa10121ed211b}{BitOr}})}
+\DoxyCodeLine{00590\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbd0426898cca233a5356f2d5a6701844_a281d3d1311cd43190cb88e55b221100b}{MAKE\_FIXEDPOINT\_BINARY\_FUNC}}(\mbox{\hyperlink{namespacegemmlowp_a34891a7112dcf0d89456b754c5633e01}{RoundingHalfSum}},\ \mbox{\hyperlink{namespacegemmlowp_a34891a7112dcf0d89456b754c5633e01}{RoundingHalfSum}})}
+\DoxyCodeLine{00591\ }
+\DoxyCodeLine{00592\ \textcolor{preprocessor}{\#undef\ MAKE\_FIXEDPOINT\_UNARY\_FUNC}}
+\DoxyCodeLine{00593\ \textcolor{preprocessor}{\#undef\ MAKE\_FIXEDPOINT\_BINARY\_FUNC}}
+\DoxyCodeLine{00594\ }
+\DoxyCodeLine{00595\ \textcolor{preprocessor}{\#define\ MAKE\_FIXEDPOINT\_UNARY\_FUNC\_RETURNING\_RAW(FuncName)\ \ \(\backslash\)}}
+\DoxyCodeLine{00596\ \textcolor{preprocessor}{\ \ template\ <typename\ tRawType,\ int\ tIntegerBits>\ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00597\ \textcolor{preprocessor}{\ \ tRawType\ FuncName(FixedPoint<tRawType,\ tIntegerBits>\ a)\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00598\ \textcolor{preprocessor}{\ \ \ \ return\ FuncName(a.raw());\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00599\ \textcolor{preprocessor}{\ \ \}}}
+\DoxyCodeLine{00600\ }
+\DoxyCodeLine{00601\ \textcolor{preprocessor}{\#define\ MAKE\_FIXEDPOINT\_BINARY\_FUNC\_RETURNING\_RAW(FuncName)\ \(\backslash\)}}
+\DoxyCodeLine{00602\ \textcolor{preprocessor}{\ \ template\ <typename\ tRawType,\ int\ tIntegerBits>\ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00603\ \textcolor{preprocessor}{\ \ tRawType\ FuncName(FixedPoint<tRawType,\ tIntegerBits>\ a,\ \ \ \(\backslash\)}}
+\DoxyCodeLine{00604\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ FixedPoint<tRawType,\ tIntegerBits>\ b)\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00605\ \textcolor{preprocessor}{\ \ \ \ return\ FuncName(a.raw(),\ b.raw());\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00606\ \textcolor{preprocessor}{\ \ \}}}
+\DoxyCodeLine{00607\ }
+\DoxyCodeLine{00608\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbd0426898cca233a5356f2d5a6701844_ac1c7ec272648e2357f888743a1b39c6a}{MAKE\_FIXEDPOINT\_UNARY\_FUNC\_RETURNING\_RAW}}(\mbox{\hyperlink{namespacegemmlowp_ae6984b5cd9abc82bf0c5c074bed0ebe3}{MaskIfZero}})}
+\DoxyCodeLine{00609\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbd0426898cca233a5356f2d5a6701844_ac1c7ec272648e2357f888743a1b39c6a}{MAKE\_FIXEDPOINT\_UNARY\_FUNC\_RETURNING\_RAW}}(\mbox{\hyperlink{namespacegemmlowp_abc6b9204dc901bcd9b6797955d605622}{MaskIfNonZero}})}
+\DoxyCodeLine{00610\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbd0426898cca233a5356f2d5a6701844_a6a957da3d034b1c05d09223d869468d4}{MAKE\_FIXEDPOINT\_BINARY\_FUNC\_RETURNING\_RAW}}(\mbox{\hyperlink{namespacegemmlowp_acd42c48b5d493c5837bd4538561b7008}{MaskIfEqual}})}
+\DoxyCodeLine{00611\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbd0426898cca233a5356f2d5a6701844_a6a957da3d034b1c05d09223d869468d4}{MAKE\_FIXEDPOINT\_BINARY\_FUNC\_RETURNING\_RAW}}(\mbox{\hyperlink{namespacegemmlowp_a4f32c03d344a34f8e711bb874ff99fa2}{MaskIfNotEqual}})}
+\DoxyCodeLine{00612\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbd0426898cca233a5356f2d5a6701844_a6a957da3d034b1c05d09223d869468d4}{MAKE\_FIXEDPOINT\_BINARY\_FUNC\_RETURNING\_RAW}}(\mbox{\hyperlink{namespacegemmlowp_a1e955db8aed2ffb796737651b688da6f}{MaskIfGreaterThan}})}
+\DoxyCodeLine{00613\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbd0426898cca233a5356f2d5a6701844_a6a957da3d034b1c05d09223d869468d4}{MAKE\_FIXEDPOINT\_BINARY\_FUNC\_RETURNING\_RAW}}(\mbox{\hyperlink{namespacegemmlowp_ab71e9056506cbf329cf53b7f55bdb6a7}{MaskIfGreaterThanOrEqual}})}
+\DoxyCodeLine{00614\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbd0426898cca233a5356f2d5a6701844_a6a957da3d034b1c05d09223d869468d4}{MAKE\_FIXEDPOINT\_BINARY\_FUNC\_RETURNING\_RAW}}(\mbox{\hyperlink{namespacegemmlowp_a03d0a1a3d2937ae240dc38420e8a4edd}{MaskIfLessThan}})}
+\DoxyCodeLine{00615\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbd0426898cca233a5356f2d5a6701844_a6a957da3d034b1c05d09223d869468d4}{MAKE\_FIXEDPOINT\_BINARY\_FUNC\_RETURNING\_RAW}}(\mbox{\hyperlink{namespacegemmlowp_a249ceb96980ceeae65983cd1cfff1a50}{MaskIfLessThanOrEqual}})}
+\DoxyCodeLine{00616\ }
+\DoxyCodeLine{00617\ \textcolor{preprocessor}{\#undef\ MAKE\_FIXEDPOINT\_UNARY\_FUNC\_RETURNING\_RAW}}
+\DoxyCodeLine{00618\ \textcolor{preprocessor}{\#undef\ MAKE\_FIXEDPOINT\_BINARY\_FUNC\_RETURNING\_RAW}}
+\DoxyCodeLine{00619\ }
+\DoxyCodeLine{00620\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ tRawType,\ \textcolor{keywordtype}{int}\ tIntegerBits>}
+\DoxyCodeLine{00621\ \mbox{\hyperlink{classgemmlowp_1_1_fixed_point}{FixedPoint<tRawType,\ tIntegerBits>}}\ \mbox{\hyperlink{namespacegemmlowp_a9200374a9481b271d4ce140e9a449976}{SelectUsingMask}}(}
+\DoxyCodeLine{00622\ \ \ \ \ tRawType\ if\_mask,\ \mbox{\hyperlink{classgemmlowp_1_1_fixed_point}{FixedPoint<tRawType,\ tIntegerBits>}}\ then\_val,}
+\DoxyCodeLine{00623\ \ \ \ \ \mbox{\hyperlink{classgemmlowp_1_1_fixed_point}{FixedPoint<tRawType,\ tIntegerBits>}}\ else\_val)\ \{}
+\DoxyCodeLine{00624\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classgemmlowp_1_1_fixed_point_a9cf050964da422f90d3394604486a19b}{FixedPoint<tRawType,\ tIntegerBits>::FromRaw}}(}
+\DoxyCodeLine{00625\ \ \ \ \ \ \ \mbox{\hyperlink{namespacegemmlowp_a9200374a9481b271d4ce140e9a449976}{SelectUsingMask}}(if\_mask,\ then\_val.raw(),\ else\_val.raw()));}
+\DoxyCodeLine{00626\ \}}
+\DoxyCodeLine{00627\ }
+\DoxyCodeLine{00628\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ tRawType,\ \textcolor{keywordtype}{int}\ tIntegerBits>}
+\DoxyCodeLine{00629\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespacegemmlowp_aacb0e2c2d760c350e645c632e39892e5}{operator==}}(\mbox{\hyperlink{classgemmlowp_1_1_fixed_point}{FixedPoint<tRawType,\ tIntegerBits>}}\ a,}
+\DoxyCodeLine{00630\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classgemmlowp_1_1_fixed_point}{FixedPoint<tRawType,\ tIntegerBits>}}\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}})\ \{}
+\DoxyCodeLine{00631\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacegemmlowp_a5e4fa9c14974ac6106725cd824c13d06}{All}}(\mbox{\hyperlink{namespacegemmlowp_acd42c48b5d493c5837bd4538561b7008}{MaskIfEqual}}(a.raw(),\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}}.raw()));}
+\DoxyCodeLine{00632\ \}}
+\DoxyCodeLine{00633\ }
+\DoxyCodeLine{00634\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ tRawType,\ \textcolor{keywordtype}{int}\ tIntegerBits>}
+\DoxyCodeLine{00635\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespacegemmlowp_a328124e9ac4fe08dbca36af724182e26}{operator!=}}(\mbox{\hyperlink{classgemmlowp_1_1_fixed_point}{FixedPoint<tRawType,\ tIntegerBits>}}\ a,}
+\DoxyCodeLine{00636\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classgemmlowp_1_1_fixed_point}{FixedPoint<tRawType,\ tIntegerBits>}}\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}})\ \{}
+\DoxyCodeLine{00637\ \ \ \textcolor{keywordflow}{return}\ !(a\ ==\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}});}
+\DoxyCodeLine{00638\ \}}
+\DoxyCodeLine{00639\ }
+\DoxyCodeLine{00640\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ tRawType,\ \textcolor{keywordtype}{int}\ tIntegerBits>}
+\DoxyCodeLine{00641\ \mbox{\hyperlink{classgemmlowp_1_1_fixed_point}{FixedPoint<tRawType,\ tIntegerBits>}}\ \mbox{\hyperlink{namespacegemmlowp_a33e1293a634924e4de112fa4214d0e0a}{SaturatingAdd}}(}
+\DoxyCodeLine{00642\ \ \ \ \ \mbox{\hyperlink{classgemmlowp_1_1_fixed_point}{FixedPoint<tRawType,\ tIntegerBits>}}\ a,}
+\DoxyCodeLine{00643\ \ \ \ \ \mbox{\hyperlink{classgemmlowp_1_1_fixed_point}{FixedPoint<tRawType,\ tIntegerBits>}}\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}})\ \{}
+\DoxyCodeLine{00644\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classgemmlowp_1_1_fixed_point_a9cf050964da422f90d3394604486a19b}{FixedPoint<tRawType,\ tIntegerBits>::FromRaw}}(}
+\DoxyCodeLine{00645\ \ \ \ \ \ \ \mbox{\hyperlink{namespacegemmlowp_a33e1293a634924e4de112fa4214d0e0a}{SaturatingAdd}}(a.raw(),\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}}.raw()));}
+\DoxyCodeLine{00646\ \}}
+\DoxyCodeLine{00647\ }
+\DoxyCodeLine{00648\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ tRawType,\ \textcolor{keywordtype}{int}\ tIntegerBits>}
+\DoxyCodeLine{00649\ \mbox{\hyperlink{classgemmlowp_1_1_fixed_point}{FixedPoint<tRawType,\ tIntegerBits>}}\ \mbox{\hyperlink{namespacegemmlowp_a35b0c007b412620a530048a738877b21}{AddSaturatingIf16Bit}}(}
+\DoxyCodeLine{00650\ \ \ \ \ \mbox{\hyperlink{classgemmlowp_1_1_fixed_point}{FixedPoint<tRawType,\ tIntegerBits>}}\ a,}
+\DoxyCodeLine{00651\ \ \ \ \ \mbox{\hyperlink{classgemmlowp_1_1_fixed_point}{FixedPoint<tRawType,\ tIntegerBits>}}\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}})\ \{}
+\DoxyCodeLine{00652\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classgemmlowp_1_1_fixed_point_a9cf050964da422f90d3394604486a19b}{FixedPoint<tRawType,\ tIntegerBits>::FromRaw}}(}
+\DoxyCodeLine{00653\ \ \ \ \ \ \ \mbox{\hyperlink{namespacegemmlowp_a35b0c007b412620a530048a738877b21}{AddSaturatingIf16Bit}}(a.raw(),\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}}.raw()));}
+\DoxyCodeLine{00654\ \}}
+\DoxyCodeLine{00655\ }
+\DoxyCodeLine{00656\ \textcolor{comment}{//\ Conversion\ to\ floating-\/point.}}
+\DoxyCodeLine{00657\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ tRawType,\ \textcolor{keywordtype}{int}\ tIntegerBits>}
+\DoxyCodeLine{00658\ \textcolor{keywordtype}{double}\ \mbox{\hyperlink{namespacegemmlowp_a3915b1445226f3fdbc40c526ccb80564}{ToDouble}}(\mbox{\hyperlink{classgemmlowp_1_1_fixed_point}{FixedPoint<tRawType,\ tIntegerBits>}}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a6150e0515f7202e2fb518f7206ed97dc}{x}})\ \{}
+\DoxyCodeLine{00659\ \ \ \textcolor{keyword}{static\_assert}(\mbox{\hyperlink{structgemmlowp_1_1_fixed_point_raw_type_traits}{FixedPointRawTypeTraits<tRawType>::kLanes}}\ ==\ 1,}
+\DoxyCodeLine{00660\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}not\ applicable\ to\ SIMD\ types"{}});}
+\DoxyCodeLine{00661\ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classgemmlowp_1_1_fixed_point}{FixedPoint<tRawType,\ tIntegerBits>}}\ F;}
+\DoxyCodeLine{00662\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a6150e0515f7202e2fb518f7206ed97dc}{x}}.\mbox{\hyperlink{classgemmlowp_1_1_fixed_point_a2a1d836acd30cc363e4b453e4f038457}{raw}}()\ /\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{double}\textcolor{keyword}{>}(1ll\ <<\ F::kFractionalBits);}
+\DoxyCodeLine{00663\ \}}
+\DoxyCodeLine{00664\ }
+\DoxyCodeLine{00665\ \textcolor{comment}{//\ Rescale\ changes\ the\ number\ of\ IntegerBits\ and\ updates\ the\ underlying}}
+\DoxyCodeLine{00666\ \textcolor{comment}{//\ raw\ integer\ value\ accordingly.}}
+\DoxyCodeLine{00667\ \textcolor{keyword}{template}\ <\textcolor{keywordtype}{int}\ tIntegerBitsDst,\ \textcolor{keyword}{typename}\ tRawType,\ \textcolor{keywordtype}{int}\ tIntegerBitsSrc>}
+\DoxyCodeLine{00668\ \mbox{\hyperlink{classgemmlowp_1_1_fixed_point}{FixedPoint<tRawType,\ tIntegerBitsDst>}}\ \mbox{\hyperlink{namespacegemmlowp_a3187e2ee96777e8d15e8b77a2feccf79}{Rescale}}(}
+\DoxyCodeLine{00669\ \ \ \ \ \mbox{\hyperlink{classgemmlowp_1_1_fixed_point}{FixedPoint<tRawType,\ tIntegerBitsSrc>}}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a6150e0515f7202e2fb518f7206ed97dc}{x}})\ \{}
+\DoxyCodeLine{00670\ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{int}\ kExponent\ =\ tIntegerBitsSrc\ -\/\ tIntegerBitsDst;}
+\DoxyCodeLine{00671\ \ \ \mbox{\hyperlink{classgemmlowp_1_1_fixed_point}{FixedPoint<tRawType,\ tIntegerBitsDst>}}\ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}};}
+\DoxyCodeLine{00672\ \ \ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}}.raw()\ =\ \mbox{\hyperlink{namespacegemmlowp_a79cd39a0e9ebaea7b0bc35f6ac1a675e}{SaturatingRoundingMultiplyByPOT<kExponent>}}(\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a6150e0515f7202e2fb518f7206ed97dc}{x}}.raw());}
+\DoxyCodeLine{00673\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}};}
+\DoxyCodeLine{00674\ \}}
+\DoxyCodeLine{00675\ }
+\DoxyCodeLine{00676\ \textcolor{comment}{//\ CheckedFixedPointConstant\ allows\ to\ specify\ fixed-\/point\ constants}}
+\DoxyCodeLine{00677\ \textcolor{comment}{//\ initialized\ as\ real\ numbers,\ in\ a\ way\ that\ does\ not\ compile\ floating-\/point}}
+\DoxyCodeLine{00678\ \textcolor{comment}{//\ arithmetic\ in\ production\ code,\ yet\ still\ checks\ agreement\ with\ the}}
+\DoxyCodeLine{00679\ \textcolor{comment}{//\ floating-\/point\ expressions\ when\ asserts\ are\ enabled.}}
+\DoxyCodeLine{00680\ \textcolor{comment}{//}}
+\DoxyCodeLine{00681\ \textcolor{comment}{//\ The\ raw\ integer\ value\ provided\ is\ always\ a\ int32,\ encoding\ a\ 32-\/bit}}
+\DoxyCodeLine{00682\ \textcolor{comment}{//\ fixed-\/point\ value,\ regardless\ of\ the\ actual\ Scalar\ type.\ This\ allows}}
+\DoxyCodeLine{00683\ \textcolor{comment}{//\ writing\ generic\ code\ that\ applies\ just\ as\ well\ to\ the\ 32-\/bit\ and\ 16-\/bit}}
+\DoxyCodeLine{00684\ \textcolor{comment}{//\ cases.\ In\ the\ 16-\/bit\ case,\ the\ raw\ integer\ value\ is\ internally}}
+\DoxyCodeLine{00685\ \textcolor{comment}{//\ rounding-\/shifted\ by\ 16\ bits\ to\ the\ right.}}
+\DoxyCodeLine{00686\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ FixedPo\textcolor{keywordtype}{int}Type>}
+\DoxyCodeLine{00687\ \textcolor{keyword}{inline}\ \textcolor{keyword}{typename}\ FixedPointType::ScalarRawType\ \mbox{\hyperlink{namespacegemmlowp_ad9f18178fc304c793fdc91ea1b48b37f}{RescaleConstantInitializer}}(}
+\DoxyCodeLine{00688\ \ \ \ \ std::int32\_t\ int32\_value)\ \{}
+\DoxyCodeLine{00689\ \ \ \textcolor{keyword}{typedef}\ \textcolor{keyword}{typename}\ FixedPointType::ScalarRawType\ ScalarRawType;}
+\DoxyCodeLine{00690\ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{int}\ ScalarTypeBits\ =\ 8\ *\ \textcolor{keyword}{sizeof}(ScalarRawType);}
+\DoxyCodeLine{00691\ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{static\_cast<}ScalarRawType\textcolor{keyword}{>}(}
+\DoxyCodeLine{00692\ \ \ \ \ \ \ \mbox{\hyperlink{namespacegemmlowp_a7d5169f4bc71a22c6a5adf9c1b73267d}{RoundingDivideByPOT<std::int32\_t>}}(int32\_value,\ 32\ -\/\ ScalarTypeBits));}
+\DoxyCodeLine{00693\ \}}
+\DoxyCodeLine{00694\ \textcolor{preprocessor}{\#ifdef\ GEMMLOWP\_ENABLE\_FIXEDPOINT\_CONSTANTS\_CHECKS}}
+\DoxyCodeLine{00695\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ FixedPo\textcolor{keywordtype}{int}Type>}
+\DoxyCodeLine{00696\ FixedPointType\ CheckedFixedPointConstant(std::int32\_t\ raw\_value,}
+\DoxyCodeLine{00697\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{double}\ double\_value)\ \{}
+\DoxyCodeLine{00698\ \ \ \textcolor{keyword}{const}\ FixedPointType\ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}}\ =\ FixedPointType::FromScalarRaw(raw\_value);}
+\DoxyCodeLine{00699\ \ \ \mbox{\hyperlink{ei__aligned__malloc_8h_a95cd4fa643ce672b347744b35c5b7056}{assert}}(\mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}}\ ==\ FixedPointType::FromDouble(double\_value));}
+\DoxyCodeLine{00700\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}};}
+\DoxyCodeLine{00701\ \}}
+\DoxyCodeLine{00702\ \textcolor{preprocessor}{\#define\ GEMMLOWP\_CHECKED\_FIXEDPOINT\_CONSTANT(FixedPointType,\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00703\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ScalarRawInt32Value,\ DoubleValue)\ \(\backslash\)}}
+\DoxyCodeLine{00704\ \textcolor{preprocessor}{\ \ (gemmlowp::CheckedFixedPointConstant<FixedPointType>(\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00705\ \textcolor{preprocessor}{\ \ \ \ \ \ gemmlowp::RescaleConstantInitializer<FixedPointType>(\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00706\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ ScalarRawInt32Value),\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00707\ \textcolor{preprocessor}{\ \ \ \ \ \ DoubleValue))}}
+\DoxyCodeLine{00708\ }
+\DoxyCodeLine{00709\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00710\ \textcolor{preprocessor}{\#define\ GEMMLOWP\_CHECKED\_FIXEDPOINT\_CONSTANT(FixedPointType,\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00711\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ScalarRawInt32Value,\ DoubleValue)\ \(\backslash\)}}
+\DoxyCodeLine{00712\ \textcolor{preprocessor}{\ \ (FixedPointType::FromScalarRaw(\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00713\ \textcolor{preprocessor}{\ \ \ \ \ \ gemmlowp::RescaleConstantInitializer<FixedPointType>(\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00714\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ ScalarRawInt32Value)))}}
+\DoxyCodeLine{00715\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00716\ }
+\DoxyCodeLine{00717\ \textcolor{comment}{//\ Implementation\ of\ exponential\ function.}}
+\DoxyCodeLine{00718\ }
+\DoxyCodeLine{00719\ \textcolor{comment}{//\ Returns\ exp(x)\ for\ x\ in\ [-\/1/4,\ 0).}}
+\DoxyCodeLine{00720\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ tRawType>}
+\DoxyCodeLine{00721\ \mbox{\hyperlink{classgemmlowp_1_1_fixed_point}{FixedPoint<tRawType,\ 0>}}\ \mbox{\hyperlink{namespacegemmlowp_ac94492919e3aa9d819a28c6e8724be68}{exp\_on\_interval\_between\_negative\_one\_quarter\_and\_0\_excl}}(}
+\DoxyCodeLine{00722\ \ \ \ \ \mbox{\hyperlink{classgemmlowp_1_1_fixed_point}{FixedPoint<tRawType,\ 0>}}\ a)\ \{}
+\DoxyCodeLine{00723\ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classgemmlowp_1_1_fixed_point}{FixedPoint<tRawType,\ 0>}}\ F;}
+\DoxyCodeLine{00724\ \ \ \textcolor{keyword}{const}\ F\ constant\_term\ =}
+\DoxyCodeLine{00725\ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbd0426898cca233a5356f2d5a6701844_a0311ef9b909d7a0d03b91d4e25a28a35}{GEMMLOWP\_CHECKED\_FIXEDPOINT\_CONSTANT}}(F,\ 1895147668,\ std::exp(-\/1.0\ /\ 8.0));}
+\DoxyCodeLine{00726\ \ \ \textcolor{keyword}{const}\ F\ constant\_1\_over\_3\ =}
+\DoxyCodeLine{00727\ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbd0426898cca233a5356f2d5a6701844_a0311ef9b909d7a0d03b91d4e25a28a35}{GEMMLOWP\_CHECKED\_FIXEDPOINT\_CONSTANT}}(F,\ 715827883,\ 1.0\ /\ 3.0);}
+\DoxyCodeLine{00728\ \ \ \textcolor{comment}{//\ We're\ evaluating\ a\ Taylor\ expansion\ around\ -\/1/8,\ so\ we\ do\ the\ change\ of}}
+\DoxyCodeLine{00729\ \ \ \textcolor{comment}{//\ variable:\ x\ =\ a\ +\ 1/8.}}
+\DoxyCodeLine{00730\ \ \ \textcolor{comment}{//\ In\ fixed-\/point\ with\ 0\ integer\ bits,\ 1/8\ is\ represented\ by\ 1\ <<\ 28.}}
+\DoxyCodeLine{00731\ \ \ F\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a6150e0515f7202e2fb518f7206ed97dc}{x}}\ =\ a\ +\ F::template\ ConstantPOT<-\/3>();}
+\DoxyCodeLine{00732\ \ \ F\ x2\ =\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a6150e0515f7202e2fb518f7206ed97dc}{x}}\ *\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a6150e0515f7202e2fb518f7206ed97dc}{x}};}
+\DoxyCodeLine{00733\ \ \ F\ x3\ =\ x2\ *\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a6150e0515f7202e2fb518f7206ed97dc}{x}};}
+\DoxyCodeLine{00734\ \ \ F\ x4\ =\ x2\ *\ x2;}
+\DoxyCodeLine{00735\ \ \ F\ x4\_over\_4\ =\ \mbox{\hyperlink{namespacegemmlowp_a79cd39a0e9ebaea7b0bc35f6ac1a675e}{SaturatingRoundingMultiplyByPOT}}<-\/2>(x4);}
+\DoxyCodeLine{00736\ \ \ F\ x4\_over\_24\_plus\_x3\_over\_6\_plus\_x2\_over\_2\ =}
+\DoxyCodeLine{00737\ \ \ \ \ \ \ \mbox{\hyperlink{namespacegemmlowp_a79cd39a0e9ebaea7b0bc35f6ac1a675e}{SaturatingRoundingMultiplyByPOT}}<-\/1>(}
+\DoxyCodeLine{00738\ \ \ \ \ \ \ \ \ \ \ ((x4\_over\_4\ +\ x3)\ *\ constant\_1\_over\_3)\ +\ x2);}
+\DoxyCodeLine{00739\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacegemmlowp_a35b0c007b412620a530048a738877b21}{AddSaturatingIf16Bit}}(}
+\DoxyCodeLine{00740\ \ \ \ \ \ \ constant\_term,}
+\DoxyCodeLine{00741\ \ \ \ \ \ \ constant\_term\ *\ (\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a6150e0515f7202e2fb518f7206ed97dc}{x}}\ +\ x4\_over\_24\_plus\_x3\_over\_6\_plus\_x2\_over\_2));}
+\DoxyCodeLine{00742\ \}}
+\DoxyCodeLine{00743\ }
+\DoxyCodeLine{00744\ \textcolor{comment}{//\ Returns\ exp(x)\ for\ x\ <\ 0.}}
+\DoxyCodeLine{00745\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ tRawType,\ \textcolor{keywordtype}{int}\ tIntegerBits>}
+\DoxyCodeLine{00746\ \mbox{\hyperlink{classgemmlowp_1_1_fixed_point}{FixedPoint<tRawType,\ 0>}}\ \mbox{\hyperlink{namespacegemmlowp_adf031604736a631732ae483636417f29}{exp\_on\_negative\_values}}(}
+\DoxyCodeLine{00747\ \ \ \ \ \mbox{\hyperlink{classgemmlowp_1_1_fixed_point}{FixedPoint<tRawType,\ tIntegerBits>}}\ a)\ \{}
+\DoxyCodeLine{00748\ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classgemmlowp_1_1_fixed_point}{FixedPoint<tRawType,\ tIntegerBits>}}\ InputF;}
+\DoxyCodeLine{00749\ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classgemmlowp_1_1_fixed_point}{FixedPoint<tRawType,\ 0>}}\ ResultF;}
+\DoxyCodeLine{00750\ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{int}\ kFractionalBits\ =\ InputF::kFractionalBits;}
+\DoxyCodeLine{00751\ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{int}\ kIntegerBits\ =\ InputF::kIntegerBits;}
+\DoxyCodeLine{00752\ \ \ \textcolor{keyword}{const}\ InputF\ kOneQuarter\ =\ InputF::template\ ConstantPOT<-\/2>();}
+\DoxyCodeLine{00753\ \ \ InputF\ \mbox{\hyperlink{wm8960__regs_8h_aa8c909ec5613d6178530fd55e62024c7}{mask}}\ =\ kOneQuarter\ -\/\ InputF::FromScalarRaw(1);}
+\DoxyCodeLine{00754\ \ \ InputF\ a\_mod\_quarter\_minus\_one\_quarter\ =\ (a\ \&\ \mbox{\hyperlink{wm8960__regs_8h_aa8c909ec5613d6178530fd55e62024c7}{mask}})\ -\/\ kOneQuarter;}
+\DoxyCodeLine{00755\ \ \ ResultF\ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}}\ =\ \mbox{\hyperlink{namespacegemmlowp_ac94492919e3aa9d819a28c6e8724be68}{exp\_on\_interval\_between\_negative\_one\_quarter\_and\_0\_excl}}(}
+\DoxyCodeLine{00756\ \ \ \ \ \ \ \mbox{\hyperlink{namespacegemmlowp_a3187e2ee96777e8d15e8b77a2feccf79}{Rescale<0>}}(a\_mod\_quarter\_minus\_one\_quarter));}
+\DoxyCodeLine{00757\ \ \ tRawType\ remainder\ =\ (a\_mod\_quarter\_minus\_one\_quarter\ -\/\ a).raw();}
+\DoxyCodeLine{00758\ }
+\DoxyCodeLine{00759\ \textcolor{preprocessor}{\#define\ GEMMLOWP\_EXP\_BARREL\_SHIFTER(Exponent,\ FixedPointMultiplier)\ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00760\ \textcolor{preprocessor}{\ \ if\ (kIntegerBits\ >\ Exponent)\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00761\ \textcolor{preprocessor}{\ \ \ \ const\ ResultF\ kMultiplier\ =\ GEMMLOWP\_CHECKED\_FIXEDPOINT\_CONSTANT(\ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00762\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ ResultF,\ FixedPointMultiplier,\ std::exp(-\/std::pow(2.0,\ Exponent)));\ \(\backslash\)}}
+\DoxyCodeLine{00763\ \textcolor{preprocessor}{\ \ \ \ static\ constexpr\ int\ kShiftAmount\ =\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00764\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ kIntegerBits\ >\ Exponent\ ?\ kFractionalBits\ +\ Exponent\ :\ 0;\ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00765\ \textcolor{preprocessor}{\ \ \ \ result\ =\ SelectUsingMask(\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00766\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ MaskIfNonZero(BitAnd(remainder,\ Dup<tRawType>(1\ <<\ kShiftAmount))),\ \(\backslash\)}}
+\DoxyCodeLine{00767\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ result\ *\ kMultiplier,\ result);\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00768\ \textcolor{preprocessor}{\ \ \}}}
+\DoxyCodeLine{00769\ }
+\DoxyCodeLine{00770\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbd0426898cca233a5356f2d5a6701844_a78ec31814a3ca5798092ddc785535a40}{GEMMLOWP\_EXP\_BARREL\_SHIFTER}}(-\/2,\ 1672461947);}
+\DoxyCodeLine{00771\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbd0426898cca233a5356f2d5a6701844_a78ec31814a3ca5798092ddc785535a40}{GEMMLOWP\_EXP\_BARREL\_SHIFTER}}(-\/1,\ 1302514674);}
+\DoxyCodeLine{00772\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbd0426898cca233a5356f2d5a6701844_a78ec31814a3ca5798092ddc785535a40}{GEMMLOWP\_EXP\_BARREL\_SHIFTER}}(+0,\ 790015084);}
+\DoxyCodeLine{00773\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbd0426898cca233a5356f2d5a6701844_a78ec31814a3ca5798092ddc785535a40}{GEMMLOWP\_EXP\_BARREL\_SHIFTER}}(+1,\ 290630308);}
+\DoxyCodeLine{00774\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbd0426898cca233a5356f2d5a6701844_a78ec31814a3ca5798092ddc785535a40}{GEMMLOWP\_EXP\_BARREL\_SHIFTER}}(+2,\ 39332535);}
+\DoxyCodeLine{00775\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbd0426898cca233a5356f2d5a6701844_a78ec31814a3ca5798092ddc785535a40}{GEMMLOWP\_EXP\_BARREL\_SHIFTER}}(+3,\ 720401);}
+\DoxyCodeLine{00776\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbd0426898cca233a5356f2d5a6701844_a78ec31814a3ca5798092ddc785535a40}{GEMMLOWP\_EXP\_BARREL\_SHIFTER}}(+4,\ 242);}
+\DoxyCodeLine{00777\ }
+\DoxyCodeLine{00778\ \textcolor{preprocessor}{\#undef\ GEMMLOWP\_EXP\_BARREL\_SHIFTER}}
+\DoxyCodeLine{00779\ }
+\DoxyCodeLine{00780\ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{int}\ clampB\ =\ kIntegerBits\ >\ 5\ ?\ 36\ -\/\ kIntegerBits\ :\ 0;}
+\DoxyCodeLine{00781\ \ \ \textcolor{keywordflow}{if}\ (kIntegerBits\ >\ 5)\ \{}
+\DoxyCodeLine{00782\ \ \ \ \ \textcolor{keyword}{const}\ InputF\ clamp\ =}
+\DoxyCodeLine{00783\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbd0426898cca233a5356f2d5a6701844_a0311ef9b909d7a0d03b91d4e25a28a35}{GEMMLOWP\_CHECKED\_FIXEDPOINT\_CONSTANT}}(InputF,\ -\/(1\ <<\ clampB),\ -\/32.0);}
+\DoxyCodeLine{00784\ \ \ \ \ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}}\ =\ \mbox{\hyperlink{namespacegemmlowp_a9200374a9481b271d4ce140e9a449976}{SelectUsingMask}}(\mbox{\hyperlink{namespacegemmlowp_a03d0a1a3d2937ae240dc38420e8a4edd}{MaskIfLessThan}}(a,\ clamp),\ ResultF::Zero(),\ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}});}
+\DoxyCodeLine{00785\ \ \ \}}
+\DoxyCodeLine{00786\ }
+\DoxyCodeLine{00787\ \ \ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}}\ =\ \mbox{\hyperlink{namespacegemmlowp_a9200374a9481b271d4ce140e9a449976}{SelectUsingMask}}(\mbox{\hyperlink{namespacegemmlowp_ae6984b5cd9abc82bf0c5c074bed0ebe3}{MaskIfZero}}(a),\ ResultF::One(),\ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}});}
+\DoxyCodeLine{00788\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}};}
+\DoxyCodeLine{00789\ \}}
+\DoxyCodeLine{00790\ }
+\DoxyCodeLine{00791\ \textcolor{comment}{//\ Implementation\ of\ tanh:\ (1\ -\/\ exp(-\/2x))\ /\ (1\ +\ exp(-\/2x)).}}
+\DoxyCodeLine{00792\ }
+\DoxyCodeLine{00793\ \textcolor{comment}{//\ Returns\ (1\ -\/\ x)\ /\ (1\ +\ x)\ for\ x\ in\ (0,\ 1).}}
+\DoxyCodeLine{00794\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ tRawType>}
+\DoxyCodeLine{00795\ \mbox{\hyperlink{classgemmlowp_1_1_fixed_point}{FixedPoint<tRawType,\ 0>}}\ \mbox{\hyperlink{namespacegemmlowp_af084490677119e467dc0e323151b0af5}{one\_minus\_x\_over\_one\_plus\_x\_for\_x\_in\_0\_1}}(}
+\DoxyCodeLine{00796\ \ \ \ \ \mbox{\hyperlink{classgemmlowp_1_1_fixed_point}{FixedPoint<tRawType,\ 0>}}\ a)\ \{}
+\DoxyCodeLine{00797\ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classgemmlowp_1_1_fixed_point}{FixedPoint<tRawType,\ 0>}}\ F0;}
+\DoxyCodeLine{00798\ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classgemmlowp_1_1_fixed_point}{FixedPoint<tRawType,\ 2>}}\ F2;}
+\DoxyCodeLine{00799\ \ \ F0\ half\_denominator\ =\ \mbox{\hyperlink{namespacegemmlowp_a34891a7112dcf0d89456b754c5633e01}{RoundingHalfSum}}(a,\ F0::One());}
+\DoxyCodeLine{00800\ \ \ \textcolor{comment}{//\ Newton-\/Raphson\ division}}
+\DoxyCodeLine{00801\ \ \ \textcolor{comment}{//\ https://en.wikipedia.org/wiki/Division\_algorithm\#Newton.E2.80.93Raphson\_division}}
+\DoxyCodeLine{00802\ \ \ \textcolor{comment}{//\ Refer\ to\ that\ page\ for\ the\ logic\ behind\ the\ 48/17\ and\ 32/17\ constants.}}
+\DoxyCodeLine{00803\ \ \ \textcolor{keyword}{const}\ F2\ constant\_48\_over\_17\ =}
+\DoxyCodeLine{00804\ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbd0426898cca233a5356f2d5a6701844_a0311ef9b909d7a0d03b91d4e25a28a35}{GEMMLOWP\_CHECKED\_FIXEDPOINT\_CONSTANT}}(F2,\ 1515870810,\ 48.0\ /\ 17.0);}
+\DoxyCodeLine{00805\ \ \ \textcolor{keyword}{const}\ F2\ constant\_neg\_32\_over\_17\ =}
+\DoxyCodeLine{00806\ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbd0426898cca233a5356f2d5a6701844_a0311ef9b909d7a0d03b91d4e25a28a35}{GEMMLOWP\_CHECKED\_FIXEDPOINT\_CONSTANT}}(F2,\ -\/1010580540,\ -\/32.0\ /\ 17.0);}
+\DoxyCodeLine{00807\ \ \ F2\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a6150e0515f7202e2fb518f7206ed97dc}{x}}\ =\ constant\_48\_over\_17\ +\ half\_denominator\ *\ constant\_neg\_32\_over\_17;}
+\DoxyCodeLine{00808\ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ 3;\ i++)\ \{}
+\DoxyCodeLine{00809\ \ \ \ \ F2\ half\_denominator\_times\_x\ =\ half\_denominator\ *\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a6150e0515f7202e2fb518f7206ed97dc}{x}};}
+\DoxyCodeLine{00810\ \ \ \ \ F2\ one\_minus\_half\_denominator\_times\_x\ =}
+\DoxyCodeLine{00811\ \ \ \ \ \ \ \ \ F2::One()\ -\/\ half\_denominator\_times\_x;}
+\DoxyCodeLine{00812\ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a6150e0515f7202e2fb518f7206ed97dc}{x}}\ =\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a6150e0515f7202e2fb518f7206ed97dc}{x}}\ +\ \mbox{\hyperlink{namespacegemmlowp_a3187e2ee96777e8d15e8b77a2feccf79}{Rescale<2>}}(\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a6150e0515f7202e2fb518f7206ed97dc}{x}}\ *\ one\_minus\_half\_denominator\_times\_x);}
+\DoxyCodeLine{00813\ \ \ \}}
+\DoxyCodeLine{00814\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacegemmlowp_a3187e2ee96777e8d15e8b77a2feccf79}{Rescale<0>}}(\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a6150e0515f7202e2fb518f7206ed97dc}{x}}\ -\/\ F2::One());}
+\DoxyCodeLine{00815\ \}}
+\DoxyCodeLine{00816\ }
+\DoxyCodeLine{00817\ \textcolor{comment}{//\ Returns\ -\/tanh(x)\ for\ x\ <\ 0.}}
+\DoxyCodeLine{00818\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ tRawType,\ \textcolor{keywordtype}{int}\ tIntegerBits>}
+\DoxyCodeLine{00819\ \mbox{\hyperlink{classgemmlowp_1_1_fixed_point}{FixedPoint<tRawType,\ 0>}}\ \mbox{\hyperlink{namespacegemmlowp_ad48db6e3402ee4ca3f1915e9af323f30}{neg\_tanh\_on\_negative\_values}}(}
+\DoxyCodeLine{00820\ \ \ \ \ \mbox{\hyperlink{classgemmlowp_1_1_fixed_point}{FixedPoint<tRawType,\ tIntegerBits>}}\ a)\ \{}
+\DoxyCodeLine{00821\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacegemmlowp_af084490677119e467dc0e323151b0af5}{one\_minus\_x\_over\_one\_plus\_x\_for\_x\_in\_0\_1}}(}
+\DoxyCodeLine{00822\ \ \ \ \ \ \ \mbox{\hyperlink{namespacegemmlowp_adf031604736a631732ae483636417f29}{exp\_on\_negative\_values}}(\mbox{\hyperlink{namespacegemmlowp_ae936bbec3266517088ef70cfd4efcf4b}{ExactMulByPot<1>}}(a)));}
+\DoxyCodeLine{00823\ \}}
+\DoxyCodeLine{00824\ }
+\DoxyCodeLine{00825\ \textcolor{comment}{//\ Returns\ tanh(x)\ for\ any\ x.}}
+\DoxyCodeLine{00826\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ tRawType,\ \textcolor{keywordtype}{int}\ tIntegerBits>}
+\DoxyCodeLine{00827\ \mbox{\hyperlink{classgemmlowp_1_1_fixed_point}{FixedPoint<tRawType,\ 0>}}\ \mbox{\hyperlink{namespacegemmlowp_a41ee1b2d062cc678fe2b378f74b57a1e}{tanh}}(\mbox{\hyperlink{classgemmlowp_1_1_fixed_point}{FixedPoint<tRawType,\ tIntegerBits>}}\ a)\ \{}
+\DoxyCodeLine{00828\ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classgemmlowp_1_1_fixed_point}{FixedPoint<tRawType,\ tIntegerBits>}}\ InputF;}
+\DoxyCodeLine{00829\ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classgemmlowp_1_1_fixed_point}{FixedPoint<tRawType,\ 0>}}\ ResultF;}
+\DoxyCodeLine{00830\ \ \ tRawType\ mask\_if\_negative\ =\ \mbox{\hyperlink{namespacegemmlowp_a03d0a1a3d2937ae240dc38420e8a4edd}{MaskIfLessThan}}(a,\ InputF::Zero());}
+\DoxyCodeLine{00831\ \ \ tRawType\ mask\_if\_zero\ =\ \mbox{\hyperlink{namespacegemmlowp_ae6984b5cd9abc82bf0c5c074bed0ebe3}{MaskIfZero}}(a);}
+\DoxyCodeLine{00832\ \ \ InputF\ n\ =\ \mbox{\hyperlink{namespacegemmlowp_a9200374a9481b271d4ce140e9a449976}{SelectUsingMask}}(mask\_if\_negative,\ a,\ -\/a);}
+\DoxyCodeLine{00833\ \ \ ResultF\ t\ =\ \mbox{\hyperlink{namespacegemmlowp_ad48db6e3402ee4ca3f1915e9af323f30}{neg\_tanh\_on\_negative\_values}}(n);}
+\DoxyCodeLine{00834\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacegemmlowp_a9200374a9481b271d4ce140e9a449976}{SelectUsingMask}}(mask\_if\_zero,\ ResultF::Zero(),}
+\DoxyCodeLine{00835\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacegemmlowp_a9200374a9481b271d4ce140e9a449976}{SelectUsingMask}}(mask\_if\_negative,\ -\/t,\ t));}
+\DoxyCodeLine{00836\ \}}
+\DoxyCodeLine{00837\ }
+\DoxyCodeLine{00838\ \textcolor{comment}{//\ Implementation\ of\ logistic\ function.}}
+\DoxyCodeLine{00839\ }
+\DoxyCodeLine{00840\ \textcolor{comment}{//\ Returns\ 1\ /\ (1\ +\ x)\ for\ x\ in\ (0,\ 1).}}
+\DoxyCodeLine{00841\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ tRawType>}
+\DoxyCodeLine{00842\ \mbox{\hyperlink{classgemmlowp_1_1_fixed_point}{FixedPoint<tRawType,\ 0>}}\ \mbox{\hyperlink{namespacegemmlowp_a11e5e1e83d8440636572761481946a40}{one\_over\_one\_plus\_x\_for\_x\_in\_0\_1}}(}
+\DoxyCodeLine{00843\ \ \ \ \ \mbox{\hyperlink{classgemmlowp_1_1_fixed_point}{FixedPoint<tRawType,\ 0>}}\ a)\ \{}
+\DoxyCodeLine{00844\ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classgemmlowp_1_1_fixed_point}{FixedPoint<tRawType,\ 0>}}\ F0;}
+\DoxyCodeLine{00845\ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classgemmlowp_1_1_fixed_point}{FixedPoint<tRawType,\ 2>}}\ F2;}
+\DoxyCodeLine{00846\ \ \ F0\ half\_denominator\ =\ \mbox{\hyperlink{namespacegemmlowp_a34891a7112dcf0d89456b754c5633e01}{RoundingHalfSum}}(a,\ F0::One());}
+\DoxyCodeLine{00847\ \ \ \textcolor{comment}{//\ Newton-\/Raphson\ division}}
+\DoxyCodeLine{00848\ \ \ \textcolor{comment}{//\ https://en.wikipedia.org/wiki/Division\_algorithm\#Newton.E2.80.93Raphson\_division}}
+\DoxyCodeLine{00849\ \ \ \textcolor{comment}{//\ Refer\ to\ that\ page\ for\ the\ logic\ behind\ the\ 48/17\ and\ 32/17\ constants.}}
+\DoxyCodeLine{00850\ \ \ \textcolor{keyword}{const}\ F2\ constant\_48\_over\_17\ =}
+\DoxyCodeLine{00851\ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbd0426898cca233a5356f2d5a6701844_a0311ef9b909d7a0d03b91d4e25a28a35}{GEMMLOWP\_CHECKED\_FIXEDPOINT\_CONSTANT}}(F2,\ 1515870810,\ 48.0\ /\ 17.0);}
+\DoxyCodeLine{00852\ \ \ \textcolor{keyword}{const}\ F2\ constant\_neg\_32\_over\_17\ =}
+\DoxyCodeLine{00853\ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbd0426898cca233a5356f2d5a6701844_a0311ef9b909d7a0d03b91d4e25a28a35}{GEMMLOWP\_CHECKED\_FIXEDPOINT\_CONSTANT}}(F2,\ -\/1010580540,\ -\/32.0\ /\ 17.0);}
+\DoxyCodeLine{00854\ \ \ F2\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a6150e0515f7202e2fb518f7206ed97dc}{x}}\ =\ constant\_48\_over\_17\ +\ half\_denominator\ *\ constant\_neg\_32\_over\_17;}
+\DoxyCodeLine{00855\ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ 3;\ i++)\ \{}
+\DoxyCodeLine{00856\ \ \ \ \ F2\ half\_denominator\_times\_x\ =\ half\_denominator\ *\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a6150e0515f7202e2fb518f7206ed97dc}{x}};}
+\DoxyCodeLine{00857\ \ \ \ \ F2\ one\_minus\_half\_denominator\_times\_x\ =}
+\DoxyCodeLine{00858\ \ \ \ \ \ \ \ \ F2::One()\ -\/\ half\_denominator\_times\_x;}
+\DoxyCodeLine{00859\ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a6150e0515f7202e2fb518f7206ed97dc}{x}}\ =\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a6150e0515f7202e2fb518f7206ed97dc}{x}}\ +\ \mbox{\hyperlink{namespacegemmlowp_a3187e2ee96777e8d15e8b77a2feccf79}{Rescale<2>}}(\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a6150e0515f7202e2fb518f7206ed97dc}{x}}\ *\ one\_minus\_half\_denominator\_times\_x);}
+\DoxyCodeLine{00860\ \ \ \}}
+\DoxyCodeLine{00861\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacegemmlowp_a3187e2ee96777e8d15e8b77a2feccf79}{Rescale<0>}}(\mbox{\hyperlink{namespacegemmlowp_ae936bbec3266517088ef70cfd4efcf4b}{ExactMulByPot<-\/1>}}(\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a6150e0515f7202e2fb518f7206ed97dc}{x}}));}
+\DoxyCodeLine{00862\ \}}
+\DoxyCodeLine{00863\ }
+\DoxyCodeLine{00864\ \textcolor{comment}{//\ Returns\ logistic(x)\ =\ 1\ /\ (1\ +\ exp(-\/x))\ for\ x\ >\ 0.}}
+\DoxyCodeLine{00865\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ tRawType,\ \textcolor{keywordtype}{int}\ tIntegerBits>}
+\DoxyCodeLine{00866\ \mbox{\hyperlink{classgemmlowp_1_1_fixed_point}{FixedPoint<tRawType,\ 0>}}\ \mbox{\hyperlink{namespacegemmlowp_a387067f743a4277e5e6f66caef3cc324}{logistic\_on\_positive\_values}}(}
+\DoxyCodeLine{00867\ \ \ \ \ \mbox{\hyperlink{classgemmlowp_1_1_fixed_point}{FixedPoint<tRawType,\ tIntegerBits>}}\ a)\ \{}
+\DoxyCodeLine{00868\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacegemmlowp_a11e5e1e83d8440636572761481946a40}{one\_over\_one\_plus\_x\_for\_x\_in\_0\_1}}(\mbox{\hyperlink{namespacegemmlowp_adf031604736a631732ae483636417f29}{exp\_on\_negative\_values}}(-\/a));}
+\DoxyCodeLine{00869\ \}}
+\DoxyCodeLine{00870\ }
+\DoxyCodeLine{00871\ \textcolor{comment}{//\ Returns\ logistic(x)\ =\ 1\ /\ (1\ +\ exp(-\/x))\ for\ any\ x.}}
+\DoxyCodeLine{00872\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ tRawType,\ \textcolor{keywordtype}{int}\ tIntegerBits>}
+\DoxyCodeLine{00873\ \mbox{\hyperlink{classgemmlowp_1_1_fixed_point}{FixedPoint<tRawType,\ 0>}}\ \mbox{\hyperlink{namespacegemmlowp_a5d47140a7399ebb6f11d4c7eb9a7112c}{logistic}}(\mbox{\hyperlink{classgemmlowp_1_1_fixed_point}{FixedPoint<tRawType,\ tIntegerBits>}}\ a)\ \{}
+\DoxyCodeLine{00874\ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classgemmlowp_1_1_fixed_point}{FixedPoint<tRawType,\ tIntegerBits>}}\ InputF;}
+\DoxyCodeLine{00875\ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classgemmlowp_1_1_fixed_point}{FixedPoint<tRawType,\ 0>}}\ ResultF;}
+\DoxyCodeLine{00876\ \ \ tRawType\ mask\_if\_positive\ =\ \mbox{\hyperlink{namespacegemmlowp_a1e955db8aed2ffb796737651b688da6f}{MaskIfGreaterThan}}(a,\ InputF::Zero());}
+\DoxyCodeLine{00877\ \ \ tRawType\ mask\_if\_zero\ =\ \mbox{\hyperlink{namespacegemmlowp_ae6984b5cd9abc82bf0c5c074bed0ebe3}{MaskIfZero}}(a);}
+\DoxyCodeLine{00878\ \ \ InputF\ abs\_input\ =\ \mbox{\hyperlink{namespacegemmlowp_a9200374a9481b271d4ce140e9a449976}{SelectUsingMask}}(mask\_if\_positive,\ a,\ -\/a);}
+\DoxyCodeLine{00879\ \ \ ResultF\ result\_if\_positive\ =\ \mbox{\hyperlink{namespacegemmlowp_a387067f743a4277e5e6f66caef3cc324}{logistic\_on\_positive\_values}}(abs\_input);}
+\DoxyCodeLine{00880\ \ \ ResultF\ result\_if\_negative\ =\ ResultF::One()\ -\/\ result\_if\_positive;}
+\DoxyCodeLine{00881\ \ \ \textcolor{keyword}{const}\ ResultF\ one\_half\ =}
+\DoxyCodeLine{00882\ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbd0426898cca233a5356f2d5a6701844_a0311ef9b909d7a0d03b91d4e25a28a35}{GEMMLOWP\_CHECKED\_FIXEDPOINT\_CONSTANT}}(ResultF,\ 1\ <<\ 30,\ 0.5);}
+\DoxyCodeLine{00883\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacegemmlowp_a9200374a9481b271d4ce140e9a449976}{SelectUsingMask}}(mask\_if\_zero,\ one\_half,}
+\DoxyCodeLine{00884\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacegemmlowp_a9200374a9481b271d4ce140e9a449976}{SelectUsingMask}}(mask\_if\_positive,\ result\_if\_positive,}
+\DoxyCodeLine{00885\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ result\_if\_negative));}
+\DoxyCodeLine{00886\ \}}
+\DoxyCodeLine{00887\ }
+\DoxyCodeLine{00888\ \}\ \ \textcolor{comment}{//\ end\ namespace\ gemmlowp}}
+\DoxyCodeLine{00889\ }
+\DoxyCodeLine{00890\ \textcolor{preprocessor}{\#ifdef\ GEMMLOWP\_NEON}}
+\DoxyCodeLine{00891\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcb397fda51f958b9e4dadf76446eb4591}{./fixedpoint\_neon.h}}"{}}}
+\DoxyCodeLine{00892\ \textcolor{preprocessor}{\#elif\ defined(GEMMLOWP\_AVX2)}}
+\DoxyCodeLine{00893\ \textcolor{preprocessor}{\#include\ "{}./fixedpoint\_avx.h"{}}}
+\DoxyCodeLine{00894\ \textcolor{preprocessor}{\#elif\ defined(GEMMLOWP\_SSE4)}}
+\DoxyCodeLine{00895\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcb79d145fe7d1f3b5eb92e32d64b05dca}{./fixedpoint\_sse.h}}"{}}}
+\DoxyCodeLine{00896\ \textcolor{preprocessor}{\#elif\ defined(GEMMLOWP\_MSA)}}
+\DoxyCodeLine{00897\ \textcolor{preprocessor}{\#include\ "{}./fixedpoint\_msa.h"{}}}
+\DoxyCodeLine{00898\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00899\ }
+\DoxyCodeLine{00900\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ GEMMLOWP\_INTERNAL\_FIXEDPOINT\_H\_}}
+
+\end{DoxyCode}

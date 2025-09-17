@@ -1,0 +1,57 @@
+\chapter{python}
+\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2docs_2python}{}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2docs_2python}\index{python@{python}}
+
+\begin{DoxyItemize}
+\item Using Bazel
+\item Manual Setup Illustration
+\end{DoxyItemize}
+
+Writing and using Python scripts from the TFLM repository is currently in the prototyping stage. As such, the instructions below are somewhat sparse and subject to change.
+
+
+\begin{DoxyItemize}
+\item \href{https://www.tensorflow.org/community/contribute/code_style\#python_style}{\texttt{ Tensor\+Flow Python style guide}}
+\end{DoxyItemize}\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2docs_2python_autotoc_md111}{}\doxysection{\texorpdfstring{Using Bazel}{Using Bazel}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2docs_2python_autotoc_md111}
+We use Bazel as our default build system for Python and the continuous integration infrastrucutre only runs the Python unit tests via Bazel.
+
+When using Bazel with Python, all the environment setup is handled as part of the build.
+
+Some example commands\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{bazel\ test\ tensorflow/lite/tools:flatbuffer\_utils\_test}
+\DoxyCodeLine{bazel\ build\ tensorflow/lite/tools:visualize}
+\DoxyCodeLine{}
+\DoxyCodeLine{bazel-\/bin/tensorflow/lite/tools/visualize\ tensorflow/lite/micro/models/person\_detect.tflite\ tensorflow/lite/micro/models/person\_detect.tflite.html}
+
+\end{DoxyCode}
+\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2docs_2python_autotoc_md112}{}\doxysection{\texorpdfstring{Manual Setup Illustration}{Manual Setup Illustration}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2docs_2python_autotoc_md112}
+For advanced users that would like to use the Python code in the TFLM repository independent of bazel, here is one approach.
+
+Please note that this setup is unsupported and will need users to debug various issues on their own. It is described here for illustrative purposes only.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\#\ The\ cloned\ tflite-\/micro\ folder\ needs\ to\ be\ renamed\ to\ tflite\_micro}
+\DoxyCodeLine{mv\ tflite-\/micro\ tflite\_micro}
+\DoxyCodeLine{\#\ To\ set\ up\ a\ specific\ Python\ version,\ make\ sure\ \`{}python`\ is\ pointed\ to\ the}
+\DoxyCodeLine{\#\ desired\ version.\ For\ example,\ call\ \`{}python3.11\ -\/m\ venv\ tflite\_micro/venv`.}
+\DoxyCodeLine{python\ -\/m\ venv\ tflite\_micro/venv}
+\DoxyCodeLine{echo\ "{}export\ PYTHONPATH=\(\backslash\)\$\{PYTHONPATH\}:\$\{PWD\}"{}\ >>\ tflite\_micro/venv/bin/activate}
+\DoxyCodeLine{cd\ tflite\_micro}
+\DoxyCodeLine{source\ venv/bin/activate}
+\DoxyCodeLine{pip\ install\ -\/-\/upgrade\ pip}
+\DoxyCodeLine{pip\ install\ -\/r\ third\_party/python\_requirements.txt}
+\DoxyCodeLine{}
+\DoxyCodeLine{\#\ (Optional)}
+\DoxyCodeLine{pip\ install\ ipython}
+
+\end{DoxyCode}
+
+
+Run some tests and binaries\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{python\ tensorflow/lite/tools/flatbuffer\_utils\_test.py}
+\DoxyCodeLine{python\ tensorflow/lite/tools/visualize.py\ tensorflow/lite/micro/models/person\_detect.tflite\ tensorflow/lite/micro/models/person\_detect.tflite.html}
+
+\end{DoxyCode}
+ 

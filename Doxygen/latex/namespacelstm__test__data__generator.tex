@@ -1,0 +1,184 @@
+\doxysection{lstm\+\_\+test\+\_\+data\+\_\+generator Namespace Reference}
+\hypertarget{namespacelstm__test__data__generator}{}\label{namespacelstm__test__data__generator}\index{lstm\_test\_data\_generator@{lstm\_test\_data\_generator}}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{namespacelstm__test__data__generator_a1f4f9c59786d0bcc2b0c8e30f8183122}{print\+\_\+tensor\+\_\+quantization\+\_\+params}} (tensor\+\_\+name, tensor)
+\item 
+\mbox{\hyperlink{namespacelstm__test__data__generator_aa5fa4f317b70472bc76ad73191830925}{print\+\_\+gate\+\_\+tensor\+\_\+params}} (gate\+\_\+name, gate)
+\item 
+\mbox{\hyperlink{namespacelstm__test__data__generator_a5b14db58f6a96381408ee6a9dce79276}{print\+\_\+quantization\+\_\+settings}} (lstm\+\_\+debugger)
+\item 
+\mbox{\hyperlink{namespacelstm__test__data__generator_a3f22c0cdd41fd953335042acba7baaa1}{print\+\_\+one\+\_\+step}} (lstm\+\_\+debugger)
+\item 
+\mbox{\hyperlink{namespacelstm__test__data__generator_a31b16c109f0d668c331253c82e5daeba}{print\+\_\+multi\+\_\+step}} (lstm\+\_\+debugger, \mbox{\hyperlink{ei__fill__result__struct_8h_a881f62341b5a41a3c5707268bd537be1}{debug}}=False)
+\item 
+\mbox{\hyperlink{namespacelstm__test__data__generator_a8d23ed6fda3a86aa1aafe5dc955b2924}{main}} (\+\_\+)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+dict \mbox{\hyperlink{namespacelstm__test__data__generator_ab89a02f8c89e9ef97585c1460d52493c}{\+\_\+\+KERNEL\+\_\+\+CONFIG}}
+\item 
+dict \mbox{\hyperlink{namespacelstm__test__data__generator_ad62b2636ce57cddfb8f0bc470e299f41}{\+\_\+\+KERNEL\+\_\+\+PARAMETERS}}
+\item 
+dict \mbox{\hyperlink{namespacelstm__test__data__generator_ab7d5b7b777e6b5c047ec996c82e39bbd}{\+\_\+\+GATE\+\_\+\+TEST\+\_\+\+DATA}}
+\item 
+dict \mbox{\hyperlink{namespacelstm__test__data__generator_a24c380d28083ee35c5c864944a36f9f6}{\+\_\+\+MULTISTEP\+\_\+\+TEST\+\_\+\+DATA}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\begin{DoxyVerb} Generate the LSTM kernel test data settings in lstm_test_data.cc
+1. Print the quantization settings for the test model (Get2X2Int8LstmQuantizationSettings in .cc)
+2. Print the intermediate step outputs inside the LSTM for a single step LSTM invocation (Get2X2GateOutputCheckData in .cc)
+3. Print the outputs for multi-step LSTM invocation (Get2X2LstmEvalCheckData in .cc)
+
+Every invocation gives three types information:
+1. Quantized output: kernel output in integer
+2. Dequantized output: Quantized output in floating point representation
+3. Float output: output from the floating point computation (i.e., float kernel)
+
+Note:
+1. Change quantization settings in _KERNEL_CONFIG to see the outcomes from various quantization schema (e.g., 8x8 Vs. 16x8)
+2. Only single batch inference is supporte here. Change _GATE_TEST_DATA or _MULTISTEP_TEST_DATA to see kernel outputs on different input data
+3. The quantization computation here is not the exact as the c++ implementation. The integer calculation is emulated here using floating point.
+No fixed point math is implemented here. The purpose is to illustrate the computation procedure and possible quantization error accumulation, not for bit exactness.
+\end{DoxyVerb}
+ 
+
+\doxysubsection{Function Documentation}
+\Hypertarget{namespacelstm__test__data__generator_a8d23ed6fda3a86aa1aafe5dc955b2924}\index{lstm\_test\_data\_generator@{lstm\_test\_data\_generator}!main@{main}}
+\index{main@{main}!lstm\_test\_data\_generator@{lstm\_test\_data\_generator}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily \label{namespacelstm__test__data__generator_a8d23ed6fda3a86aa1aafe5dc955b2924} 
+lstm\+\_\+test\+\_\+data\+\_\+generator.\+main (\begin{DoxyParamCaption}\item[{}]{\+\_\+}{}\end{DoxyParamCaption})}
+
+\Hypertarget{namespacelstm__test__data__generator_aa5fa4f317b70472bc76ad73191830925}\index{lstm\_test\_data\_generator@{lstm\_test\_data\_generator}!print\_gate\_tensor\_params@{print\_gate\_tensor\_params}}
+\index{print\_gate\_tensor\_params@{print\_gate\_tensor\_params}!lstm\_test\_data\_generator@{lstm\_test\_data\_generator}}
+\doxysubsubsection{\texorpdfstring{print\_gate\_tensor\_params()}{print\_gate\_tensor\_params()}}
+{\footnotesize\ttfamily \label{namespacelstm__test__data__generator_aa5fa4f317b70472bc76ad73191830925} 
+lstm\+\_\+test\+\_\+data\+\_\+generator.\+print\+\_\+gate\+\_\+tensor\+\_\+params (\begin{DoxyParamCaption}\item[{}]{gate\+\_\+name}{, }\item[{}]{gate}{}\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Print the quantization information for a gate (input/forget/cell/output gate)\end{DoxyVerb}
+ \Hypertarget{namespacelstm__test__data__generator_a31b16c109f0d668c331253c82e5daeba}\index{lstm\_test\_data\_generator@{lstm\_test\_data\_generator}!print\_multi\_step@{print\_multi\_step}}
+\index{print\_multi\_step@{print\_multi\_step}!lstm\_test\_data\_generator@{lstm\_test\_data\_generator}}
+\doxysubsubsection{\texorpdfstring{print\_multi\_step()}{print\_multi\_step()}}
+{\footnotesize\ttfamily \label{namespacelstm__test__data__generator_a31b16c109f0d668c331253c82e5daeba} 
+lstm\+\_\+test\+\_\+data\+\_\+generator.\+print\+\_\+multi\+\_\+step (\begin{DoxyParamCaption}\item[{}]{lstm\+\_\+debugger}{, }\item[{}]{debug}{ = {\ttfamily False}}\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Print the output of every step for multi step LSTM invocation (Get2X2LstmEvalCheckData in .cc)\end{DoxyVerb}
+ \Hypertarget{namespacelstm__test__data__generator_a3f22c0cdd41fd953335042acba7baaa1}\index{lstm\_test\_data\_generator@{lstm\_test\_data\_generator}!print\_one\_step@{print\_one\_step}}
+\index{print\_one\_step@{print\_one\_step}!lstm\_test\_data\_generator@{lstm\_test\_data\_generator}}
+\doxysubsubsection{\texorpdfstring{print\_one\_step()}{print\_one\_step()}}
+{\footnotesize\ttfamily \label{namespacelstm__test__data__generator_a3f22c0cdd41fd953335042acba7baaa1} 
+lstm\+\_\+test\+\_\+data\+\_\+generator.\+print\+\_\+one\+\_\+step (\begin{DoxyParamCaption}\item[{}]{lstm\+\_\+debugger}{}\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Print the intermediate calculation results for one step LSTM invocation (Get2X2GateOutputCheckData in .cc)\end{DoxyVerb}
+ \Hypertarget{namespacelstm__test__data__generator_a5b14db58f6a96381408ee6a9dce79276}\index{lstm\_test\_data\_generator@{lstm\_test\_data\_generator}!print\_quantization\_settings@{print\_quantization\_settings}}
+\index{print\_quantization\_settings@{print\_quantization\_settings}!lstm\_test\_data\_generator@{lstm\_test\_data\_generator}}
+\doxysubsubsection{\texorpdfstring{print\_quantization\_settings()}{print\_quantization\_settings()}}
+{\footnotesize\ttfamily \label{namespacelstm__test__data__generator_a5b14db58f6a96381408ee6a9dce79276} 
+lstm\+\_\+test\+\_\+data\+\_\+generator.\+print\+\_\+quantization\+\_\+settings (\begin{DoxyParamCaption}\item[{}]{lstm\+\_\+debugger}{}\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Print the quantization information for a LSTM kernel\end{DoxyVerb}
+ \Hypertarget{namespacelstm__test__data__generator_a1f4f9c59786d0bcc2b0c8e30f8183122}\index{lstm\_test\_data\_generator@{lstm\_test\_data\_generator}!print\_tensor\_quantization\_params@{print\_tensor\_quantization\_params}}
+\index{print\_tensor\_quantization\_params@{print\_tensor\_quantization\_params}!lstm\_test\_data\_generator@{lstm\_test\_data\_generator}}
+\doxysubsubsection{\texorpdfstring{print\_tensor\_quantization\_params()}{print\_tensor\_quantization\_params()}}
+{\footnotesize\ttfamily \label{namespacelstm__test__data__generator_a1f4f9c59786d0bcc2b0c8e30f8183122} 
+lstm\+\_\+test\+\_\+data\+\_\+generator.\+print\+\_\+tensor\+\_\+quantization\+\_\+params (\begin{DoxyParamCaption}\item[{}]{tensor\+\_\+name}{, }\item[{}]{tensor}{}\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Print the tensor quantization information (scale and zero point)\end{DoxyVerb}
+ 
+
+\doxysubsection{Variable Documentation}
+\Hypertarget{namespacelstm__test__data__generator_ab7d5b7b777e6b5c047ec996c82e39bbd}\index{lstm\_test\_data\_generator@{lstm\_test\_data\_generator}!\_GATE\_TEST\_DATA@{\_GATE\_TEST\_DATA}}
+\index{\_GATE\_TEST\_DATA@{\_GATE\_TEST\_DATA}!lstm\_test\_data\_generator@{lstm\_test\_data\_generator}}
+\doxysubsubsection{\texorpdfstring{\_GATE\_TEST\_DATA}{\_GATE\_TEST\_DATA}}
+{\footnotesize\ttfamily \label{namespacelstm__test__data__generator_ab7d5b7b777e6b5c047ec996c82e39bbd} 
+dict lstm\+\_\+test\+\_\+data\+\_\+generator.\+\_\+\+GATE\+\_\+\+TEST\+\_\+\+DATA\hspace{0.3cm}{\ttfamily [protected]}}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ =\ \ \{}
+\DoxyCodeLine{00002\ \ \ \ \ \textcolor{stringliteral}{'init\_hidden\_state\_vals'}:\ [-\/0.1,\ 0.2],}
+\DoxyCodeLine{00003\ \ \ \ \ \textcolor{stringliteral}{'init\_cell\_state\_vals'}:\ [-\/1.3,\ 6.2],}
+\DoxyCodeLine{00004\ \ \ \ \ \textcolor{stringliteral}{'input\_data'}:\ [0.2,\ 0.3],}
+\DoxyCodeLine{00005\ \ \ \ \ \textcolor{stringliteral}{'hidden\_state\_range'}:\ (-\/0.5,\ 0.7),}
+\DoxyCodeLine{00006\ \ \ \ \ \textcolor{stringliteral}{'cell\_state\_range'}:\ [-\/8,\ 8],}
+\DoxyCodeLine{00007\ \ \ \ \ \textcolor{stringliteral}{'input\_data\_range'}:\ [-\/1,\ 1]}
+\DoxyCodeLine{00008\ \}}
+
+\end{DoxyCode}
+\Hypertarget{namespacelstm__test__data__generator_ab89a02f8c89e9ef97585c1460d52493c}\index{lstm\_test\_data\_generator@{lstm\_test\_data\_generator}!\_KERNEL\_CONFIG@{\_KERNEL\_CONFIG}}
+\index{\_KERNEL\_CONFIG@{\_KERNEL\_CONFIG}!lstm\_test\_data\_generator@{lstm\_test\_data\_generator}}
+\doxysubsubsection{\texorpdfstring{\_KERNEL\_CONFIG}{\_KERNEL\_CONFIG}}
+{\footnotesize\ttfamily \label{namespacelstm__test__data__generator_ab89a02f8c89e9ef97585c1460d52493c} 
+dict lstm\+\_\+test\+\_\+data\+\_\+generator.\+\_\+\+KERNEL\+\_\+\+CONFIG\hspace{0.3cm}{\ttfamily [protected]}}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ =\ \ \{}
+\DoxyCodeLine{00002\ \ \ \ \ \textcolor{stringliteral}{'quantization\_settings'}:\ \{}
+\DoxyCodeLine{00003\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'weight\_bits'}:\ 8,}
+\DoxyCodeLine{00004\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'activation\_bits'}:\ 8,}
+\DoxyCodeLine{00005\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'bias\_bits'}:\ 32,}
+\DoxyCodeLine{00006\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'cell\_bits'}:\ 16,}
+\DoxyCodeLine{00007\ \ \ \ \ \},}
+\DoxyCodeLine{00008\ \ \ \ \ \textcolor{stringliteral}{'shape\_info'}:\ \{}
+\DoxyCodeLine{00009\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'input\_dim'}:\ 2,}
+\DoxyCodeLine{00010\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'state\_dim'}:\ 2}
+\DoxyCodeLine{00011\ \ \ \ \ \}}
+\DoxyCodeLine{00012\ \}}
+
+\end{DoxyCode}
+\Hypertarget{namespacelstm__test__data__generator_ad62b2636ce57cddfb8f0bc470e299f41}\index{lstm\_test\_data\_generator@{lstm\_test\_data\_generator}!\_KERNEL\_PARAMETERS@{\_KERNEL\_PARAMETERS}}
+\index{\_KERNEL\_PARAMETERS@{\_KERNEL\_PARAMETERS}!lstm\_test\_data\_generator@{lstm\_test\_data\_generator}}
+\doxysubsubsection{\texorpdfstring{\_KERNEL\_PARAMETERS}{\_KERNEL\_PARAMETERS}}
+{\footnotesize\ttfamily \label{namespacelstm__test__data__generator_ad62b2636ce57cddfb8f0bc470e299f41} 
+dict lstm\+\_\+test\+\_\+data\+\_\+generator.\+\_\+\+KERNEL\+\_\+\+PARAMETERS\hspace{0.3cm}{\ttfamily [protected]}}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ =\ \ \{}
+\DoxyCodeLine{00002\ \ \ \ \ \textcolor{stringliteral}{'forget\_gate\_data'}:\ \{}
+\DoxyCodeLine{00003\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'activation\_weight\_data'}:\ [-\/10,\ -\/10,\ -\/20,\ -\/20],}
+\DoxyCodeLine{00004\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'recurrent\_weight\_data'}:\ [-\/10,\ -\/10,\ -\/20,\ -\/20],}
+\DoxyCodeLine{00005\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'bias\_data'}:\ [1,\ 2],}
+\DoxyCodeLine{00006\ \ \ \ \ \},}
+\DoxyCodeLine{00007\ \ \ \ \ \textcolor{stringliteral}{'input\_gate\_data'}:\ \{}
+\DoxyCodeLine{00008\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'activation\_weight\_data'}:\ [10,\ 10,\ 20,\ 20],}
+\DoxyCodeLine{00009\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'recurrent\_weight\_data'}:\ [10,\ 10,\ 20,\ 20],}
+\DoxyCodeLine{00010\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'bias\_data'}:\ [-\/1,\ -\/2],}
+\DoxyCodeLine{00011\ \ \ \ \ \},}
+\DoxyCodeLine{00012\ \ \ \ \ \textcolor{stringliteral}{'cell\_gate\_data'}:\ \{}
+\DoxyCodeLine{00013\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'activation\_weight\_data'}:\ [1,\ 1,\ 1,\ 1],}
+\DoxyCodeLine{00014\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'recurrent\_weight\_data'}:\ [1,\ 1,\ 1,\ 1],}
+\DoxyCodeLine{00015\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'bias\_data'}:\ [0,\ 0],}
+\DoxyCodeLine{00016\ \ \ \ \ \},}
+\DoxyCodeLine{00017\ \ \ \ \ \textcolor{stringliteral}{'output\_gate\_data'}:\ \{}
+\DoxyCodeLine{00018\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'activation\_weight\_data'}:\ [1,\ 1,\ 1,\ 1],}
+\DoxyCodeLine{00019\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'recurrent\_weight\_data'}:\ [1,\ 1,\ 1,\ 1],}
+\DoxyCodeLine{00020\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'bias\_data'}:\ [0,\ 0],}
+\DoxyCodeLine{00021\ \ \ \ \ \},}
+\DoxyCodeLine{00022\ \}}
+
+\end{DoxyCode}
+\Hypertarget{namespacelstm__test__data__generator_a24c380d28083ee35c5c864944a36f9f6}\index{lstm\_test\_data\_generator@{lstm\_test\_data\_generator}!\_MULTISTEP\_TEST\_DATA@{\_MULTISTEP\_TEST\_DATA}}
+\index{\_MULTISTEP\_TEST\_DATA@{\_MULTISTEP\_TEST\_DATA}!lstm\_test\_data\_generator@{lstm\_test\_data\_generator}}
+\doxysubsubsection{\texorpdfstring{\_MULTISTEP\_TEST\_DATA}{\_MULTISTEP\_TEST\_DATA}}
+{\footnotesize\ttfamily \label{namespacelstm__test__data__generator_a24c380d28083ee35c5c864944a36f9f6} 
+dict lstm\+\_\+test\+\_\+data\+\_\+generator.\+\_\+\+MULTISTEP\+\_\+\+TEST\+\_\+\+DATA\hspace{0.3cm}{\ttfamily [protected]}}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ =\ \ \{}
+\DoxyCodeLine{00002\ \ \ \ \ \textcolor{stringliteral}{'init\_hidden\_state\_vals'}:\ [0,\ 0],}
+\DoxyCodeLine{00003\ \ \ \ \ \textcolor{stringliteral}{'init\_cell\_state\_vals'}:\ [0,\ 0],}
+\DoxyCodeLine{00004\ \ \ \ \ \textcolor{stringliteral}{'input\_data'}:\ [0.2,\ 0.3,\ 0.2,\ 0.3,\ 0.2,\ 0.3],\ \ \textcolor{comment}{\#\ three\ time\ steps}}
+\DoxyCodeLine{00005\ \ \ \ \ \textcolor{stringliteral}{'hidden\_state\_range'}:\ (-\/0.5,\ 0.7),}
+\DoxyCodeLine{00006\ \ \ \ \ \textcolor{stringliteral}{'cell\_state\_range'}:\ [-\/8,\ 8],}
+\DoxyCodeLine{00007\ \ \ \ \ \textcolor{stringliteral}{'input\_data\_range'}:\ [-\/1,\ 1]}
+\DoxyCodeLine{00008\ \}}
+
+\end{DoxyCode}

@@ -1,0 +1,106 @@
+\doxysection{ibuffer\+\_\+allocator.\+h}
+\hypertarget{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_2mid99374c4a5c25d81bb89c7274eca4375_source}{}\label{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_2mid99374c4a5c25d81bb89c7274eca4375_source}\index{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/main/tensorflow/lite/micro/arena\_allocator/ibuffer\_allocator.h@{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/main/tensorflow/lite/micro/arena\_allocator/ibuffer\_allocator.h}}
+\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_2mid99374c4a5c25d81bb89c7274eca4375}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{/*\ Copyright\ 2022\ The\ TensorFlow\ Authors.\ All\ Rights\ Reserved.}}
+\DoxyCodeLine{00002\ \textcolor{comment}{}}
+\DoxyCodeLine{00003\ \textcolor{comment}{Licensed\ under\ the\ Apache\ License,\ Version\ 2.0\ (the\ "{}License"{});}}
+\DoxyCodeLine{00004\ \textcolor{comment}{you\ may\ not\ use\ this\ file\ except\ in\ compliance\ with\ the\ License.}}
+\DoxyCodeLine{00005\ \textcolor{comment}{You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{00006\ \textcolor{comment}{}}
+\DoxyCodeLine{00007\ \textcolor{comment}{\ \ \ \ http://www.apache.org/licenses/LICENSE-\/2.0}}
+\DoxyCodeLine{00008\ \textcolor{comment}{}}
+\DoxyCodeLine{00009\ \textcolor{comment}{Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ software}}
+\DoxyCodeLine{00010\ \textcolor{comment}{distributed\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,}}
+\DoxyCodeLine{00011\ \textcolor{comment}{WITHOUT\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,\ either\ express\ or\ implied.}}
+\DoxyCodeLine{00012\ \textcolor{comment}{See\ the\ License\ for\ the\ specific\ language\ governing\ permissions\ and}}
+\DoxyCodeLine{00013\ \textcolor{comment}{limitations\ under\ the\ License.}}
+\DoxyCodeLine{00014\ \textcolor{comment}{==============================================================================*/}}
+\DoxyCodeLine{00015\ \textcolor{preprocessor}{\#ifndef\ TENSORFLOW\_LITE\_MICRO\_ARENA\_ALLOCATOR\_IBUFFER\_ALLOCATOR\_H\_}}
+\DoxyCodeLine{00016\ \textcolor{preprocessor}{\#define\ TENSORFLOW\_LITE\_MICRO\_ARENA\_ALLOCATOR\_IBUFFER\_ALLOCATOR\_H\_}}
+\DoxyCodeLine{00017\ }
+\DoxyCodeLine{00018\ \textcolor{preprocessor}{\#include\ <cstddef>}}
+\DoxyCodeLine{00019\ \textcolor{preprocessor}{\#include\ <cstdint>}}
+\DoxyCodeLine{00020\ }
+\DoxyCodeLine{00021\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/c/c\_api\_types.h"{}}}
+\DoxyCodeLine{00022\ }
+\DoxyCodeLine{00023\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacetflite}{tflite}}\ \{}
+\DoxyCodeLine{00024\ \textcolor{comment}{//\ Interface\ classes\ that\ the\ TFLM\ framework\ relies\ on\ to\ get\ buffers\ it\ needs.}}
+\DoxyCodeLine{00025\ \textcolor{comment}{//\ There\ are\ two\ types\ of\ buffers\ that\ the\ TFLM\ framework\ requires:\ persistent}}
+\DoxyCodeLine{00026\ \textcolor{comment}{//\ and\ non-\/persistent.\ Persistent\ buffers,\ once\ allocated,\ are\ never\ freed\ by}}
+\DoxyCodeLine{00027\ \textcolor{comment}{//\ the\ TFLM\ framework.\ Non-\/persist\ buffers\ can\ be\ allocated\ and\ deallocated\ by}}
+\DoxyCodeLine{00028\ \textcolor{comment}{//\ the\ TFLM\ framework.\ This\ file\ defines\ two\ interfaces\ classes\ that\ TFLM}}
+\DoxyCodeLine{00029\ \textcolor{comment}{//\ framework\ will\ rely\ on\ to\ manage\ these\ buffers.}}
+\DoxyCodeLine{00030\ }
+\DoxyCodeLine{00031\ \textcolor{comment}{//\ Interface\ class\ for\ managing\ persistent\ buffers.}}
+\DoxyCodeLine{00032\ \textcolor{keyword}{class\ }IPersistentBufferAllocator\ \{}
+\DoxyCodeLine{00033\ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00034\ \ \ \mbox{\hyperlink{classtflite_1_1_i_persistent_buffer_allocator_aabd08feb270b23f3aca4c1113378fc30}{IPersistentBufferAllocator}}()\ \{\}}
+\DoxyCodeLine{00035\ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{classtflite_1_1_i_persistent_buffer_allocator_a472d0d3eb3b22dbd949c858e2b428653}{\string~IPersistentBufferAllocator}}()\ \{\}}
+\DoxyCodeLine{00036\ }
+\DoxyCodeLine{00037\ \ \ \textcolor{comment}{//\ Allocates\ persistent\ memory.\ The\ persistent\ buffer\ is\ never\ freed.}}
+\DoxyCodeLine{00038\ \ \ \textcolor{keyword}{virtual}\ uint8\_t*\ \mbox{\hyperlink{classtflite_1_1_i_persistent_buffer_allocator_af15f2551d4c9e1887216a7ef5de03b8f}{AllocatePersistentBuffer}}(\textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{hello__world__model_8cc_a439227feff9d7f55384e8780cfc2eb82}{size}},\ \textcolor{keywordtype}{size\_t}\ alignment)\ =\ 0;}
+\DoxyCodeLine{00039\ }
+\DoxyCodeLine{00040\ \ \ \textcolor{comment}{//\ Returns\ the\ size\ of\ all\ persistent\ allocations\ in\ bytes.}}
+\DoxyCodeLine{00041\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{classtflite_1_1_i_persistent_buffer_allocator_a8a547e9d32434468ed34344c33de2bfd}{GetPersistentUsedBytes}}()\ \textcolor{keyword}{const}\ =\ 0;}
+\DoxyCodeLine{00042\ \};}
+\DoxyCodeLine{00043\ }
+\DoxyCodeLine{00044\ \textcolor{comment}{//\ Interface\ class\ for\ managing\ non-\/persistent\ buffers.}}
+\DoxyCodeLine{00045\ \textcolor{comment}{//\ The\ default\ non-\/persistent\ buffers\ are\ temp\ buffers\ that\ are\ not\ resizable.}}
+\DoxyCodeLine{00046\ \textcolor{comment}{//\ Support\ of\ at\ least\ one\ resizable\ buffer\ is\ required.}}
+\DoxyCodeLine{00047\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classtflite_1_1_i_non_persistent_buffer_allocator}{INonPersistentBufferAllocator}}\ \{}
+\DoxyCodeLine{00048\ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00049\ \ \ \mbox{\hyperlink{classtflite_1_1_i_non_persistent_buffer_allocator_a45934d78a2f419111bf0d2852c8ef846}{INonPersistentBufferAllocator}}()\ \{\}}
+\DoxyCodeLine{00050\ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{classtflite_1_1_i_non_persistent_buffer_allocator_ae4b80092db5cba0866bef658a3f6493b}{\string~INonPersistentBufferAllocator}}()\ \{\}}
+\DoxyCodeLine{00051\ }
+\DoxyCodeLine{00052\ \ \ \textcolor{comment}{//\ Allocates\ a\ temporary\ buffer.\ This\ buffer\ is\ not\ resizable.}}
+\DoxyCodeLine{00053\ \ \ \textcolor{keyword}{virtual}\ uint8\_t*\ \mbox{\hyperlink{classtflite_1_1_i_non_persistent_buffer_allocator_a2dafe8ce3a3ce80f937c00aa94142b7d}{AllocateTemp}}(\textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{hello__world__model_8cc_a439227feff9d7f55384e8780cfc2eb82}{size}},\ \textcolor{keywordtype}{size\_t}\ alignment)\ =\ 0;}
+\DoxyCodeLine{00054\ }
+\DoxyCodeLine{00055\ \ \ \textcolor{comment}{//\ Signals\ that\ a\ temporary\ buffer\ is\ no\ longer\ needed.}}
+\DoxyCodeLine{00056\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classtflite_1_1_i_non_persistent_buffer_allocator_abe3d3872b8a7f5482ad8497687552199}{DeallocateTemp}}(uint8\_t*\ buf)\ =\ 0;}
+\DoxyCodeLine{00057\ }
+\DoxyCodeLine{00058\ \ \ \textcolor{comment}{//\ Returns\ true\ if\ all\ temporary\ buffers\ are\ already\ deallocated.}}
+\DoxyCodeLine{00059\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classtflite_1_1_i_non_persistent_buffer_allocator_aa068e3160cfa49c7888a7c007e09df00}{IsAllTempDeallocated}}()\ =\ 0;}
+\DoxyCodeLine{00060\ }
+\DoxyCodeLine{00061\ \ \ \textcolor{comment}{//\ Signals\ that\ all\ temporary\ allocations\ can\ be\ reclaimed.\ TFLM\ calls\ this}}
+\DoxyCodeLine{00062\ \ \ \textcolor{comment}{//\ API\ when\ it\ knows\ that\ all\ temporary\ buffers\ that\ it\ requested\ has\ been}}
+\DoxyCodeLine{00063\ \ \ \textcolor{comment}{//\ deallocated.\ The\ goal\ of\ API\ is\ to\ facilitate\ implementations\ of}}
+\DoxyCodeLine{00064\ \ \ \textcolor{comment}{//\ INonPersistentBufferAllocator\ can\ reuse\ buffer\ with\ some\ reasonable}}
+\DoxyCodeLine{00065\ \ \ \textcolor{comment}{//\ complexity.}}
+\DoxyCodeLine{00066\ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_i_non_persistent_buffer_allocator_ab19f3f8ea9803727cf28c706778031a7}{ResetTempAllocations}}()\ =\ 0;}
+\DoxyCodeLine{00067\ }
+\DoxyCodeLine{00068\ \ \ \textcolor{comment}{//\ Returns\ a\ buffer\ that\ is\ resizable\ viable\ ResizeBuffer().}}
+\DoxyCodeLine{00069\ \ \ \textcolor{keyword}{virtual}\ uint8\_t*\ \mbox{\hyperlink{classtflite_1_1_i_non_persistent_buffer_allocator_a276cdebc4bba136e4edf73c7659e403e}{AllocateResizableBuffer}}(\textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{hello__world__model_8cc_a439227feff9d7f55384e8780cfc2eb82}{size}},\ \textcolor{keywordtype}{size\_t}\ alignment)\ =\ 0;}
+\DoxyCodeLine{00070\ }
+\DoxyCodeLine{00071\ \ \ \textcolor{comment}{//\ Resizes\ a\ buffer\ that\ is\ previously\ returned\ by\ the}}
+\DoxyCodeLine{00072\ \ \ \textcolor{comment}{//\ AllocateResizableBuffer.}}
+\DoxyCodeLine{00073\ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_i_non_persistent_buffer_allocator_ab686a3f99bde4842972f807b255a0d66}{ResizeBuffer}}(uint8\_t*\ resizable\_buf,\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{hello__world__model_8cc_a439227feff9d7f55384e8780cfc2eb82}{size}},}
+\DoxyCodeLine{00074\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ alignment)\ =\ 0;}
+\DoxyCodeLine{00075\ }
+\DoxyCodeLine{00076\ \ \ \textcolor{comment}{//\ Frees\ up\ the\ memory\ occupied\ by\ the\ resizable\ buffer.}}
+\DoxyCodeLine{00077\ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_i_non_persistent_buffer_allocator_a1fa018f05068c1119bbb1e45d9c62745}{DeallocateResizableBuffer}}(uint8\_t*\ resizable\_buf)\ =\ 0;}
+\DoxyCodeLine{00078\ }
+\DoxyCodeLine{00079\ \ \ \textcolor{comment}{//\ Returns\ a\ pointer\ pointing\ to\ the\ start\ of\ the\ overlay\ memory,\ which\ is}}
+\DoxyCodeLine{00080\ \ \ \textcolor{comment}{//\ used\ for\ activation\ tensors\ and\ scratch\ buffers\ by\ kernels\ at\ Invoke\ stage.}}
+\DoxyCodeLine{00081\ \ \ \textcolor{keyword}{virtual}\ uint8\_t*\ \mbox{\hyperlink{classtflite_1_1_i_non_persistent_buffer_allocator_a5bab5c5ff76a4dab71a2094ccfacc842}{GetOverlayMemoryAddress}}()\ \textcolor{keyword}{const}\ =\ 0;}
+\DoxyCodeLine{00082\ }
+\DoxyCodeLine{00083\ \ \ \textcolor{comment}{//\ Reserves\ the\ size\ of\ the\ overlay\ memory.\ This\ overlay\ is\ reserved\ for\ the}}
+\DoxyCodeLine{00084\ \ \ \textcolor{comment}{//\ kernels\ at\ Invoke\ stage.\ This\ is\ referred\ to\ as\ the\ overlay\ because\ before}}
+\DoxyCodeLine{00085\ \ \ \textcolor{comment}{//\ Invoket\ state,\ the\ same\ memory\ can\ be\ used\ for\ temp\ buffers.\ The\ layout\ of}}
+\DoxyCodeLine{00086\ \ \ \textcolor{comment}{//\ the\ memory\ is\ planned\ by\ the\ memory\ planner\ separately\ at\ Invoke\ stage.}}
+\DoxyCodeLine{00087\ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_i_non_persistent_buffer_allocator_a26fba07f3b830b07ef3cb5a4eaecf9d9}{ReserveNonPersistentOverlayMemory}}(\textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{hello__world__model_8cc_a439227feff9d7f55384e8780cfc2eb82}{size}},}
+\DoxyCodeLine{00088\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ alignment)\ =\ 0;}
+\DoxyCodeLine{00089\ }
+\DoxyCodeLine{00090\ \ \ \textcolor{comment}{//\ Returns\ the\ size\ of\ non-\/persistent\ buffer\ in\ use.}}
+\DoxyCodeLine{00091\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{classtflite_1_1_i_non_persistent_buffer_allocator_a08221ca775045b985aa416a2569bb3ed}{GetNonPersistentUsedBytes}}()\ \textcolor{keyword}{const}\ =\ 0;}
+\DoxyCodeLine{00092\ }
+\DoxyCodeLine{00093\ \ \ \textcolor{comment}{//\ Returns\ the\ number\ of\ bytes\ available\ with\ a\ given\ alignment.\ This\ number}}
+\DoxyCodeLine{00094\ \ \ \textcolor{comment}{//\ takes\ in\ account\ any\ temporary\ allocations.}}
+\DoxyCodeLine{00095\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{classtflite_1_1_i_non_persistent_buffer_allocator_ae4ae92226b36fd2fa422ae7e9b2da256}{GetAvailableMemory}}(\textcolor{keywordtype}{size\_t}\ alignment)\ \textcolor{keyword}{const}\ =\ 0;}
+\DoxyCodeLine{00096\ \};}
+\DoxyCodeLine{00097\ }
+\DoxyCodeLine{00098\ \}\ \ \textcolor{comment}{//\ namespace\ tflite}}
+\DoxyCodeLine{00099\ }
+\DoxyCodeLine{00100\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ TENSORFLOW\_LITE\_MICRO\_ARENA\_ALLOCATOR\_IBUFFER\_ALLOCATOR\_H\_}}
+
+\end{DoxyCode}

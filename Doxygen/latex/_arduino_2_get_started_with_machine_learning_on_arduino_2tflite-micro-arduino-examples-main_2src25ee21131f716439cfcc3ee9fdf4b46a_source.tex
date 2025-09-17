@@ -1,0 +1,423 @@
+\doxysection{lstm\+\_\+eval.\+h}
+\hypertarget{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src25ee21131f716439cfcc3ee9fdf4b46a_source}{}\label{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src25ee21131f716439cfcc3ee9fdf4b46a_source}\index{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/arduino-\/examples-\/main/src/tensorflow/lite/micro/kernels/lstm\_eval.h@{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/arduino-\/examples-\/main/src/tensorflow/lite/micro/kernels/lstm\_eval.h}}
+\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src25ee21131f716439cfcc3ee9fdf4b46a}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{/*\ Copyright\ 2023\ The\ TensorFlow\ Authors.\ All\ Rights\ Reserved.}}
+\DoxyCodeLine{00002\ \textcolor{comment}{}}
+\DoxyCodeLine{00003\ \textcolor{comment}{Licensed\ under\ the\ Apache\ License,\ Version\ 2.0\ (the\ "{}License"{});}}
+\DoxyCodeLine{00004\ \textcolor{comment}{you\ may\ not\ use\ this\ file\ except\ in\ compliance\ with\ the\ License.}}
+\DoxyCodeLine{00005\ \textcolor{comment}{You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{00006\ \textcolor{comment}{}}
+\DoxyCodeLine{00007\ \textcolor{comment}{\ \ \ \ http://www.apache.org/licenses/LICENSE-\/2.0}}
+\DoxyCodeLine{00008\ \textcolor{comment}{}}
+\DoxyCodeLine{00009\ \textcolor{comment}{Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ software}}
+\DoxyCodeLine{00010\ \textcolor{comment}{distributed\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,}}
+\DoxyCodeLine{00011\ \textcolor{comment}{WITHOUT\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,\ either\ express\ or\ implied.}}
+\DoxyCodeLine{00012\ \textcolor{comment}{See\ the\ License\ for\ the\ specific\ language\ governing\ permissions\ and}}
+\DoxyCodeLine{00013\ \textcolor{comment}{limitations\ under\ the\ License.}}
+\DoxyCodeLine{00014\ \textcolor{comment}{==============================================================================*/}}
+\DoxyCodeLine{00015\ }
+\DoxyCodeLine{00016\ \textcolor{comment}{//\ Functions\ to\ perform\ integer\ evaulation\ for\ standard\ LSTM\ (e.g.,\ defined\ in}}
+\DoxyCodeLine{00017\ \textcolor{comment}{//\ the\ keras\ lstm\ layer,\ no\ peephole\ etc.).\ Currently\ used\ by\ the\ 16\ bits}}
+\DoxyCodeLine{00018\ \textcolor{comment}{//\ activation\ case\ only}}
+\DoxyCodeLine{00019\ }
+\DoxyCodeLine{00020\ \textcolor{preprocessor}{\#ifndef\ TENSORFLOW\_LITE\_MICRO\_KERNELS\_LSTM\_EVAL\_GENERAL\_H\_}}
+\DoxyCodeLine{00021\ \textcolor{preprocessor}{\#define\ TENSORFLOW\_LITE\_MICRO\_KERNELS\_LSTM\_EVAL\_GENERAL\_H\_}}
+\DoxyCodeLine{00022\ \textcolor{preprocessor}{\#include\ <algorithm>}}
+\DoxyCodeLine{00023\ \textcolor{preprocessor}{\#include\ <cstdint>}}
+\DoxyCodeLine{00024\ }
+\DoxyCodeLine{00025\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/c/builtin\_op\_data.h"{}}}
+\DoxyCodeLine{00026\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/c/common.h"{}}}
+\DoxyCodeLine{00027\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/micro/kernels/kernel\_util.h"{}}}
+\DoxyCodeLine{00028\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/micro/kernels/lstm\_shared.h"{}}}
+\DoxyCodeLine{00029\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/micro/micro\_log.h"{}}}
+\DoxyCodeLine{00030\ }
+\DoxyCodeLine{00031\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacetflite}{tflite}}\ \{}
+\DoxyCodeLine{00032\ \textcolor{comment}{//\ Since\ LSTM\ includes\ multiple\ intermediate\ stages,\ introducing\ the\ internal}}
+\DoxyCodeLine{00033\ \textcolor{comment}{//\ namespace\ to\ expose\ them\ for\ testing}}
+\DoxyCodeLine{00034\ \textcolor{keyword}{namespace\ }lstm\_internal\ \{}
+\DoxyCodeLine{00035\ }
+\DoxyCodeLine{00036\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1lstm__internal_a2ab5b518daf335bf4b9a64d454f28b77}{Sigmoid}}(\textcolor{keyword}{const}\ RuntimeShape\&\ data\_shape,\ int16\_t*\ \mbox{\hyperlink{hello__world__model_8cc_ab2a9259b73b53c0bb06a6b242aa7ae32}{data}});}
+\DoxyCodeLine{00037\ }
+\DoxyCodeLine{00038\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1lstm__internal_a2ab5b518daf335bf4b9a64d454f28b77}{Sigmoid}}(\textcolor{keyword}{const}\ RuntimeShape\&\ data\_shape,\ \textcolor{keywordtype}{float}*\ \mbox{\hyperlink{hello__world__model_8cc_ab2a9259b73b53c0bb06a6b242aa7ae32}{data}});}
+\DoxyCodeLine{00039\ }
+\DoxyCodeLine{00040\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1lstm__internal_a8fbb23414ca480074319492882242bf3}{Tanh}}(int32\_t\ cell\_state\_scale\_power,\ \textcolor{keyword}{const}\ RuntimeShape\&\ input\_data\_shape,}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \ \ \ \ int16\_t*\ \mbox{\hyperlink{add__n__test_8cc_a5612ba79d1f0b544c7aeae4621166fea}{input\_data}},\ \textcolor{keyword}{const}\ RuntimeShape\&\ output\_data\_shape,}
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \ \ \ \ int16\_t*\ \mbox{\hyperlink{add__n__test_8cc_a3305b43869c4b837b0a33c12cff5069b}{output\_data}});}
+\DoxyCodeLine{00043\ }
+\DoxyCodeLine{00044\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1lstm__internal_a8fbb23414ca480074319492882242bf3}{Tanh}}(int32\_t\ cell\_state\_scale\_power,\ \textcolor{keyword}{const}\ RuntimeShape\&\ input\_data\_shape,}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}*\ \mbox{\hyperlink{add__n__test_8cc_a5612ba79d1f0b544c7aeae4621166fea}{input\_data}},\ \textcolor{keyword}{const}\ RuntimeShape\&\ output\_data\_shape,}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}*\ \mbox{\hyperlink{add__n__test_8cc_a3305b43869c4b837b0a33c12cff5069b}{output\_data}});}
+\DoxyCodeLine{00047\ }
+\DoxyCodeLine{00048\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1lstm__internal_a0830563b6c438d7d5951324edaef9910}{Mul}}(\textcolor{keyword}{const}\ RuntimeShape\&\ shape,\ \textcolor{keyword}{const}\ ArithmeticParams\&\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src4cbee0bfdfed30e8771023cedb1bab0d_a434686eb00eea897154eb5c3f9364ef7}{params}},}
+\DoxyCodeLine{00049\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ int16\_t*\ \mbox{\hyperlink{div__test_8cc_aaa3dc5d0e541e598f33e079b201185f9}{input1\_data}},\ \textcolor{keyword}{const}\ int16\_t*\ \mbox{\hyperlink{div__test_8cc_a70b003e7ad90ac4daa3f400c2a022d50}{input2\_data}},}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \ \ \ int8\_t*\ \mbox{\hyperlink{add__n__test_8cc_a3305b43869c4b837b0a33c12cff5069b}{output\_data}});}
+\DoxyCodeLine{00051\ }
+\DoxyCodeLine{00052\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1lstm__internal_a0830563b6c438d7d5951324edaef9910}{Mul}}(\textcolor{keyword}{const}\ RuntimeShape\&\ shape,\ \textcolor{keyword}{const}\ ArithmeticParams\&\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src4cbee0bfdfed30e8771023cedb1bab0d_a434686eb00eea897154eb5c3f9364ef7}{params}},}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ int16\_t*\ \mbox{\hyperlink{div__test_8cc_aaa3dc5d0e541e598f33e079b201185f9}{input1\_data}},\ \textcolor{keyword}{const}\ int16\_t*\ \mbox{\hyperlink{div__test_8cc_a70b003e7ad90ac4daa3f400c2a022d50}{input2\_data}},}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \ \ \ int16\_t*\ \mbox{\hyperlink{add__n__test_8cc_a3305b43869c4b837b0a33c12cff5069b}{output\_data}});}
+\DoxyCodeLine{00055\ }
+\DoxyCodeLine{00056\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1lstm__internal_a0830563b6c438d7d5951324edaef9910}{Mul}}(\textcolor{keyword}{const}\ RuntimeShape\&\ shape,\ \textcolor{keyword}{const}\ ArithmeticParams\&\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src4cbee0bfdfed30e8771023cedb1bab0d_a434686eb00eea897154eb5c3f9364ef7}{params}},}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{float}*\ \mbox{\hyperlink{div__test_8cc_aaa3dc5d0e541e598f33e079b201185f9}{input1\_data}},\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{float}*\ \mbox{\hyperlink{div__test_8cc_a70b003e7ad90ac4daa3f400c2a022d50}{input2\_data}},}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}*\ \mbox{\hyperlink{add__n__test_8cc_a3305b43869c4b837b0a33c12cff5069b}{output\_data}});}
+\DoxyCodeLine{00059\ }
+\DoxyCodeLine{00060\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1lstm__internal_a40804f45071c0d614c8aa91f5a223508}{FullyConnected}}(\textcolor{keyword}{const}\ FullyConnectedParams\&\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src4cbee0bfdfed30e8771023cedb1bab0d_a434686eb00eea897154eb5c3f9364ef7}{params}},}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ RuntimeShape\&\ \mbox{\hyperlink{akida_8h_a0792621910eb31f95019ddc94eb3dece}{input\_shape}},\ \textcolor{keyword}{const}\ int8\_t*\ \mbox{\hyperlink{add__n__test_8cc_a5612ba79d1f0b544c7aeae4621166fea}{input\_data}},}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ RuntimeShape\&\ filter\_shape,\ \textcolor{keyword}{const}\ int8\_t*\ filter\_data,}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ RuntimeShape\&\ bias\_shape,\ \textcolor{keyword}{const}\ int32\_t*\ bias\_data,}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ RuntimeShape\&\ output\_shape,\ int16\_t*\ \mbox{\hyperlink{add__n__test_8cc_a3305b43869c4b837b0a33c12cff5069b}{output\_data}});}
+\DoxyCodeLine{00065\ }
+\DoxyCodeLine{00066\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1lstm__internal_a40804f45071c0d614c8aa91f5a223508}{FullyConnected}}(\textcolor{keyword}{const}\ FullyConnectedParams\&\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src4cbee0bfdfed30e8771023cedb1bab0d_a434686eb00eea897154eb5c3f9364ef7}{params}},}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ RuntimeShape\&\ \mbox{\hyperlink{akida_8h_a0792621910eb31f95019ddc94eb3dece}{input\_shape}},\ \textcolor{keyword}{const}\ int16\_t*\ \mbox{\hyperlink{add__n__test_8cc_a5612ba79d1f0b544c7aeae4621166fea}{input\_data}},}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ RuntimeShape\&\ filter\_shape,\ \textcolor{keyword}{const}\ int8\_t*\ filter\_data,}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ RuntimeShape\&\ bias\_shape,\ \textcolor{keyword}{const}\ int64\_t*\ bias\_data,}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ RuntimeShape\&\ output\_shape,\ int16\_t*\ \mbox{\hyperlink{add__n__test_8cc_a3305b43869c4b837b0a33c12cff5069b}{output\_data}});}
+\DoxyCodeLine{00071\ }
+\DoxyCodeLine{00072\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1lstm__internal_a40804f45071c0d614c8aa91f5a223508}{FullyConnected}}(\textcolor{keyword}{const}\ FullyConnectedParams\&\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src4cbee0bfdfed30e8771023cedb1bab0d_a434686eb00eea897154eb5c3f9364ef7}{params}},}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ RuntimeShape\&\ \mbox{\hyperlink{akida_8h_a0792621910eb31f95019ddc94eb3dece}{input\_shape}},\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{float}*\ \mbox{\hyperlink{add__n__test_8cc_a5612ba79d1f0b544c7aeae4621166fea}{input\_data}},}
+\DoxyCodeLine{00074\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ RuntimeShape\&\ filter\_shape,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{float}*\ filter\_data,}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ RuntimeShape\&\ bias\_shape,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{float}*\ bias\_data,}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ RuntimeShape\&\ output\_shape,\ \textcolor{keywordtype}{float}*\ \mbox{\hyperlink{add__n__test_8cc_a3305b43869c4b837b0a33c12cff5069b}{output\_data}});}
+\DoxyCodeLine{00077\ }
+\DoxyCodeLine{00078\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1lstm__internal_a389edc4b1c9bd4c32ef107ae22cc6627}{AddElementWise}}(\textcolor{keyword}{const}\ int16\_t*\ input\_1,\ \textcolor{keyword}{const}\ int16\_t*\ input\_2,\ \textcolor{keywordtype}{int}\ n\_batch,}
+\DoxyCodeLine{00079\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ n\_input,\ int16\_t*\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbcd3bbe90c4644d53fde1ce4e312f437_a7a2a916a8059078c2d7a05f46c7126fd}{output}});}
+\DoxyCodeLine{00080\ }
+\DoxyCodeLine{00081\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1lstm__internal_a389edc4b1c9bd4c32ef107ae22cc6627}{AddElementWise}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{float}*\ input\_1,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{float}*\ input\_2,\ \textcolor{keywordtype}{int}\ n\_batch,}
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ n\_input,\ \textcolor{keywordtype}{float}*\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbcd3bbe90c4644d53fde1ce4e312f437_a7a2a916a8059078c2d7a05f46c7126fd}{output}});}
+\DoxyCodeLine{00083\ }
+\DoxyCodeLine{00084\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1lstm__internal_a774c4ad3bc70673b78e206cafcab2311}{Clipping}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ v\_size,\ \textcolor{keyword}{const}\ CellStateInfo\&\ cell\_state\_info,}
+\DoxyCodeLine{00085\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ int16\_t*\ vector);}
+\DoxyCodeLine{00086\ }
+\DoxyCodeLine{00087\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1lstm__internal_a774c4ad3bc70673b78e206cafcab2311}{Clipping}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ v\_size,\ \textcolor{keyword}{const}\ CellStateInfo\&\ cell\_state\_info,}
+\DoxyCodeLine{00088\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}*\ vector);}
+\DoxyCodeLine{00089\ }
+\DoxyCodeLine{00090\ \textcolor{comment}{//\ Manages\ the\ slice\ position\ (offset),\ slice\ length\ (sliced\ tensor\ shape),}}
+\DoxyCodeLine{00091\ \textcolor{comment}{//\ and\ update\ rules\ for\ input/output/hidden\ state/cell\ state\ tensors\ at\ each}}
+\DoxyCodeLine{00092\ \textcolor{comment}{//\ time\ step.}}
+\DoxyCodeLine{00093\ \textcolor{keyword}{class\ }LstmStepManager\ \{}
+\DoxyCodeLine{00094\ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00095\ \ \ \mbox{\hyperlink{classtflite_1_1lstm__internal_1_1_lstm_step_manager_ad05cd13445fb46fb82914ba52a1a2650}{LstmStepManager}}()\ =\ \textcolor{keyword}{delete};}
+\DoxyCodeLine{00096\ \ \ \textcolor{comment}{//\ Does\ not\ take\ any\ ownership,\ and\ all\ pointers\ must\ refer\ to\ valid\ objects}}
+\DoxyCodeLine{00097\ \ \ \textcolor{comment}{//\ that\ outlive\ the\ one\ constructed.}}
+\DoxyCodeLine{00098\ \ \ \textcolor{keyword}{explicit}\ \mbox{\hyperlink{classtflite_1_1lstm__internal_1_1_lstm_step_manager_a506c981d50ecd7d6a28238e9deefa611}{LstmStepManager}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structtflite_1_1_lstm_size_info}{LstmSizeInfo}}*\ size\_info)}
+\DoxyCodeLine{00099\ \ \ \ \ \ \ :\ \mbox{\hyperlink{classtflite_1_1lstm__internal_1_1_lstm_step_manager_ab1bc7c8ba2b4726bab9d93160ce8aa8e}{size\_info\_}}(*size\_info)\ \{\}}
+\DoxyCodeLine{00100\ }
+\DoxyCodeLine{00101\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classtflite_1_1lstm__internal_1_1_lstm_step_manager_aab817304266cafc306951f3b80742891}{UpdateTime}}();}
+\DoxyCodeLine{00102\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classtflite_1_1lstm__internal_1_1_lstm_step_manager_a31fc36486a01a153abe8d26f7470bd4f}{UpdateBatch}}();}
+\DoxyCodeLine{00103\ }
+\DoxyCodeLine{00104\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classtflite_1_1lstm__internal_1_1_lstm_step_manager_add4d1f0c1be11645e50e36731df28039}{ResetTime}}()\ \{\ \mbox{\hyperlink{classtflite_1_1lstm__internal_1_1_lstm_step_manager_a76d0322d2708ffd7726377efac1dea5c}{current\_time\_}}\ =\ 0;\ \}}
+\DoxyCodeLine{00105\ \ \ \mbox{\hyperlink{classtflite_1_1_runtime_shape}{RuntimeShape}}\ \mbox{\hyperlink{classtflite_1_1lstm__internal_1_1_lstm_step_manager_ab4414f8f24ad580a8a575745c3918680}{InputShape}}()\ \textcolor{keyword}{const};}
+\DoxyCodeLine{00106\ \ \ \mbox{\hyperlink{classtflite_1_1_runtime_shape}{RuntimeShape}}\ \mbox{\hyperlink{classtflite_1_1lstm__internal_1_1_lstm_step_manager_ac1f3f91e4f217341497c122a6435458c}{StateShape}}()\ \textcolor{keyword}{const};}
+\DoxyCodeLine{00107\ }
+\DoxyCodeLine{00108\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{classtflite_1_1lstm__internal_1_1_lstm_step_manager_ac3fe9ec3ca348d54a50d9b5ea568393b}{InputOffset}}()\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1lstm__internal_1_1_lstm_step_manager_ad1713d1145bfaa8433470cce9c70c153}{input\_offset\_}};\ \}}
+\DoxyCodeLine{00109\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{classtflite_1_1lstm__internal_1_1_lstm_step_manager_ac768554134a80611df0af319c2580d59}{OutputOffset}}()\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1lstm__internal_1_1_lstm_step_manager_af6269a2d2c0fd797381aa142c707ca07}{output\_offset\_}};\ \}}
+\DoxyCodeLine{00110\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{classtflite_1_1lstm__internal_1_1_lstm_step_manager_ad365550d4fdab0eb5a01b5f6c606cf7d}{HiddenStateOffset}}()\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1lstm__internal_1_1_lstm_step_manager_acf58a666f9b99548766087738fe258f3}{hidden\_state\_offset\_}};\ \}}
+\DoxyCodeLine{00111\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{classtflite_1_1lstm__internal_1_1_lstm_step_manager_ad15087baea46dd019cd69450c5851832}{CellStateOffset}}()\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1lstm__internal_1_1_lstm_step_manager_ae66a02519386ed2dc4d08c44ea0d0f75}{cell\_state\_offset\_}};\ \}}
+\DoxyCodeLine{00112\ }
+\DoxyCodeLine{00113\ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{00114\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{classtflite_1_1lstm__internal_1_1_lstm_step_manager_a76d0322d2708ffd7726377efac1dea5c}{current\_time\_}}\ =\ 0;}
+\DoxyCodeLine{00115\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{classtflite_1_1lstm__internal_1_1_lstm_step_manager_a352b41f76db8eaac5205276c054cb6ab}{current\_batch\_}}\ =\ 0;}
+\DoxyCodeLine{00116\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{classtflite_1_1lstm__internal_1_1_lstm_step_manager_ad1713d1145bfaa8433470cce9c70c153}{input\_offset\_}}\ =\ 0;}
+\DoxyCodeLine{00117\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{classtflite_1_1lstm__internal_1_1_lstm_step_manager_af6269a2d2c0fd797381aa142c707ca07}{output\_offset\_}}\ =\ 0;}
+\DoxyCodeLine{00118\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{classtflite_1_1lstm__internal_1_1_lstm_step_manager_acf58a666f9b99548766087738fe258f3}{hidden\_state\_offset\_}}\ =\ 0;}
+\DoxyCodeLine{00119\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{classtflite_1_1lstm__internal_1_1_lstm_step_manager_ae66a02519386ed2dc4d08c44ea0d0f75}{cell\_state\_offset\_}}\ =\ 0;}
+\DoxyCodeLine{00120\ \ \ \textcolor{comment}{//\ Sizeinfo\ is\ from\ LstmOpData,\ which\ reside\ in\ the\ memory\ arena}}
+\DoxyCodeLine{00121\ \ \ \textcolor{comment}{//\ (guarante\ to\ outlast\ LSTMStepManager,\ which\ reside\ in\ stack)}}
+\DoxyCodeLine{00122\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structtflite_1_1_lstm_size_info}{LstmSizeInfo}}\&\ \mbox{\hyperlink{classtflite_1_1lstm__internal_1_1_lstm_step_manager_ab1bc7c8ba2b4726bab9d93160ce8aa8e}{size\_info\_}};}
+\DoxyCodeLine{00123\ \};}
+\DoxyCodeLine{00124\ }
+\DoxyCodeLine{00125\ \textcolor{comment}{//\ Calculates\ a\ single\ LSTM\ gate.}}
+\DoxyCodeLine{00126\ \textcolor{comment}{//\ Implements\ the\ following\ formula:}}
+\DoxyCodeLine{00127\ \textcolor{comment}{//\ \ \ gate\ =\ activate(FC(input)\ +\ FC(recurrent))}}
+\DoxyCodeLine{00128\ \textcolor{comment}{//\ Activation\ is\ sigmoid\ except\ for\ the\ "{}cell"{}\ gate\ (configurable,\ usually\ tanh)}}
+\DoxyCodeLine{00129\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ ActivationType,\ \textcolor{keyword}{typename}\ WeightType,\ \textcolor{keyword}{typename}\ CellType,}
+\DoxyCodeLine{00130\ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{typename}\ BiasType>}
+\DoxyCodeLine{00131\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1lstm__internal_a42929f9e8d019e307f936322363a2ed7}{CalculateLstmGate}}(}
+\DoxyCodeLine{00132\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classtflite_1_1lstm__internal_1_1_lstm_step_manager}{LstmStepManager}}\&\ step\_info,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structtflite_1_1_gate_parameters}{GateParameters}}\&\ gate\_params,}
+\DoxyCodeLine{00133\ \ \ \ \ \textcolor{comment}{//\ Input\ FC}}
+\DoxyCodeLine{00134\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_tf_lite_eval_tensor}{TfLiteEvalTensor}}*\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src5afb18c45f6346167aa977a363205143_a9cebfb3d6ddd692fbdd268cf4b9ad024}{input}},\ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_tf_lite_eval_tensor}{TfLiteEvalTensor}}*\ input\_weight,}
+\DoxyCodeLine{00135\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_tf_lite_eval_tensor}{TfLiteEvalTensor}}*\ input\_bias,}
+\DoxyCodeLine{00136\ \ \ \ \ \textcolor{comment}{//\ Recurrent\ FC}}
+\DoxyCodeLine{00137\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_tf_lite_eval_tensor}{TfLiteEvalTensor}}*\ recurrent,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_tf_lite_eval_tensor}{TfLiteEvalTensor}}*\ recurrent\_weight,}
+\DoxyCodeLine{00138\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_tf_lite_eval_tensor}{TfLiteEvalTensor}}*\ recurrent\_bias,}
+\DoxyCodeLine{00139\ \ \ \ \ \textcolor{comment}{//\ Output}}
+\DoxyCodeLine{00140\ \ \ \ \ CellType*\ gate\_output,}
+\DoxyCodeLine{00141\ \ \ \ \ \textcolor{comment}{//\ Scratch\ arrays}}
+\DoxyCodeLine{00142\ \ \ \ \ CellType*\ fc\_output\_buffer,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src7f67a4373e2a0d20daf1d1ff4e1f4339_acc9e377dbc009d68bbfa5480d2559565}{TfLiteFusedActivation}}\ \mbox{\hyperlink{l2__pool__2d__test_8cc_a77ea056afd837c816867a0a9887131b6}{activation}})\ \{}
+\DoxyCodeLine{00143\ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ gate\_output\_shape\ =\ step\_info.StateShape();}
+\DoxyCodeLine{00144\ \ \ \textcolor{comment}{//\ Check\ offset\ validity\ to\ avoid\ memory\ overflow}}
+\DoxyCodeLine{00145\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src82599f02174ce2f1c2fd003f3eee8b73_a153a4c7bc866139ad88ebf7cb7f4c400}{TFLITE\_DCHECK\_LE}}(step\_info.InputOffset()\ +\ step\_info.InputShape().FlatSize(),}
+\DoxyCodeLine{00146\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_1_1micro_ae8825f2d7a82d8f1c2194e05b929e1cb}{tflite::micro::GetTensorShape}}(\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src5afb18c45f6346167aa977a363205143_a9cebfb3d6ddd692fbdd268cf4b9ad024}{input}}).\mbox{\hyperlink{classtflite_1_1_runtime_shape_a73fb2c2df1c833850d88faf428c65630}{FlatSize}}());}
+\DoxyCodeLine{00147\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src82599f02174ce2f1c2fd003f3eee8b73_a153a4c7bc866139ad88ebf7cb7f4c400}{TFLITE\_DCHECK\_LE}}(}
+\DoxyCodeLine{00148\ \ \ \ \ \ \ step\_info.HiddenStateOffset()\ +\ step\_info.StateShape().FlatSize(),}
+\DoxyCodeLine{00149\ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_1_1micro_ae8825f2d7a82d8f1c2194e05b929e1cb}{tflite::micro::GetTensorShape}}(recurrent).\mbox{\hyperlink{classtflite_1_1_runtime_shape_a73fb2c2df1c833850d88faf428c65630}{FlatSize}}());}
+\DoxyCodeLine{00150\ }
+\DoxyCodeLine{00151\ \ \ \textcolor{comment}{//\ Input\ FC}}
+\DoxyCodeLine{00152\ \ \ \mbox{\hyperlink{namespacetflite_1_1lstm__internal_a40804f45071c0d614c8aa91f5a223508}{FullyConnected}}(gate\_params.\mbox{\hyperlink{structtflite_1_1_gate_parameters_aab65796622836af884d2f10c8924924d}{input\_fc\_params}},\ step\_info.InputShape(),}
+\DoxyCodeLine{00153\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_1_1micro_a0e66bf95a19a5f5522df24cc23afc68f}{tflite::micro::GetTensorData<ActivationType>}}(\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src5afb18c45f6346167aa977a363205143_a9cebfb3d6ddd692fbdd268cf4b9ad024}{input}})\ +}
+\DoxyCodeLine{00154\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ step\_info.InputOffset(),}
+\DoxyCodeLine{00155\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_1_1micro_ae8825f2d7a82d8f1c2194e05b929e1cb}{micro::GetTensorShape}}(input\_weight),}
+\DoxyCodeLine{00156\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_1_1micro_a0e66bf95a19a5f5522df24cc23afc68f}{tflite::micro::GetTensorData<WeightType>}}(input\_weight),}
+\DoxyCodeLine{00157\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_1_1micro_ae8825f2d7a82d8f1c2194e05b929e1cb}{tflite::micro::GetTensorShape}}(input\_bias),}
+\DoxyCodeLine{00158\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_1_1micro_a4e2b1594676312ed778976adc0f243ab}{tflite::micro::GetOptionalTensorData<BiasType>}}(input\_bias),}
+\DoxyCodeLine{00159\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ gate\_output\_shape,\ gate\_output);}
+\DoxyCodeLine{00160\ }
+\DoxyCodeLine{00161\ \ \ \textcolor{comment}{//\ Recurrent\ FC}}
+\DoxyCodeLine{00162\ \ \ \mbox{\hyperlink{namespacetflite_1_1lstm__internal_a40804f45071c0d614c8aa91f5a223508}{FullyConnected}}(gate\_params.\mbox{\hyperlink{structtflite_1_1_gate_parameters_ab86410c8768e1d39ae70b7cf87eca425}{recurrent\_fc\_params}},\ step\_info.StateShape(),}
+\DoxyCodeLine{00163\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_1_1micro_a0e66bf95a19a5f5522df24cc23afc68f}{tflite::micro::GetTensorData<ActivationType>}}(recurrent)\ +}
+\DoxyCodeLine{00164\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ step\_info.HiddenStateOffset(),}
+\DoxyCodeLine{00165\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_1_1micro_ae8825f2d7a82d8f1c2194e05b929e1cb}{tflite::micro::GetTensorShape}}(recurrent\_weight),}
+\DoxyCodeLine{00166\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_1_1micro_a0e66bf95a19a5f5522df24cc23afc68f}{tflite::micro::GetTensorData<WeightType>}}(recurrent\_weight),}
+\DoxyCodeLine{00167\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_1_1micro_ae8825f2d7a82d8f1c2194e05b929e1cb}{tflite::micro::GetTensorShape}}(recurrent\_bias),}
+\DoxyCodeLine{00168\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_1_1micro_a4e2b1594676312ed778976adc0f243ab}{tflite::micro::GetOptionalTensorData<BiasType>}}(recurrent\_bias),}
+\DoxyCodeLine{00169\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ gate\_output\_shape,\ fc\_output\_buffer);}
+\DoxyCodeLine{00170\ }
+\DoxyCodeLine{00171\ \ \ \mbox{\hyperlink{namespacetflite_1_1lstm__internal_a389edc4b1c9bd4c32ef107ae22cc6627}{AddElementWise}}(gate\_output,\ fc\_output\_buffer,}
+\DoxyCodeLine{00172\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{/*n\_batch=*/}gate\_output\_shape.DimsData()[0],}
+\DoxyCodeLine{00173\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{/*n\_state=*/}gate\_output\_shape.DimsData()[1],\ gate\_output);}
+\DoxyCodeLine{00174\ \ \ \textcolor{comment}{//\ Apply\ activation}}
+\DoxyCodeLine{00175\ \ \ \textcolor{keywordflow}{switch}\ (\mbox{\hyperlink{l2__pool__2d__test_8cc_a77ea056afd837c816867a0a9887131b6}{activation}})\ \{}
+\DoxyCodeLine{00176\ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src7f67a4373e2a0d20daf1d1ff4e1f4339_acc9e377dbc009d68bbfa5480d2559565ad6bc4e430896a61a0b2f789ba5e8d4ba}{kTfLiteActSigmoid}}:}
+\DoxyCodeLine{00177\ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_1_1lstm__internal_a2ab5b518daf335bf4b9a64d454f28b77}{Sigmoid}}(gate\_output\_shape,\ gate\_output);}
+\DoxyCodeLine{00178\ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00179\ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src7f67a4373e2a0d20daf1d1ff4e1f4339_acc9e377dbc009d68bbfa5480d2559565a7e8b7d2496b796e132239ab5dea5835d}{kTfLiteActTanh}}:\ \{}
+\DoxyCodeLine{00180\ \ \ \ \ \ \ \textcolor{comment}{//\ Set\ the\ scale\ power\ to\ -\/12\ to\ avoid\ shift}}
+\DoxyCodeLine{00181\ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_1_1lstm__internal_a8fbb23414ca480074319492882242bf3}{Tanh}}(\textcolor{comment}{/*cell\_state\_scale\_power=*/}-\/12,\ gate\_output\_shape,\ gate\_output,}
+\DoxyCodeLine{00182\ \ \ \ \ \ \ \ \ \ \ \ gate\_output\_shape,\ gate\_output);}
+\DoxyCodeLine{00183\ \ \ \ \ \}\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00184\ \ \ \ \ \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{00185\ \ \ \ \ \ \ \textcolor{comment}{//\ Only\ Sigmoid\ or\ Tanh\ is\ used.}}
+\DoxyCodeLine{00186\ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src42c086e4473e7d05e4bf9eb4ee8591b1_aa99af520330799bd4a06c056ec8f7113}{TFLITE\_ASSERT\_FALSE}};}
+\DoxyCodeLine{00187\ \ \ \}}
+\DoxyCodeLine{00188\ \}}
+\DoxyCodeLine{00189\ }
+\DoxyCodeLine{00190\ \textcolor{comment}{//\ Update\ the\ cell\ state\ using\ the\ output\ from\ the\ forget\ gate,\ input\ gate,\ and}}
+\DoxyCodeLine{00191\ \textcolor{comment}{//\ cell\ gate\ Formula:\ updated\_cell\_state\ =\ forget\_gate\_output*cell\_state\ +}}
+\DoxyCodeLine{00192\ \textcolor{comment}{//\ input\_gate\_output\ *\ cell\_gate\_output,\ where\ *\ denotes\ element\ wise}}
+\DoxyCodeLine{00193\ \textcolor{comment}{//\ multiplication}}
+\DoxyCodeLine{00194\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ CellType>}
+\DoxyCodeLine{00195\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1lstm__internal_acb42394e584f69ccf4fb07c30707b7c2}{UpdateLstmCell}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classtflite_1_1lstm__internal_1_1_lstm_step_manager}{LstmStepManager}}\&\ step\_info,}
+\DoxyCodeLine{00196\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_tf_lite_eval_tensor}{TfLiteEvalTensor}}*\ cell\_state,}
+\DoxyCodeLine{00197\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Gate\ outputs}}
+\DoxyCodeLine{00198\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ CellType*\ forget\_gate\_output,}
+\DoxyCodeLine{00199\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ CellType*\ input\_gate\_output,}
+\DoxyCodeLine{00200\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ CellType*\ cell\_gate\_output,}
+\DoxyCodeLine{00201\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Mul\ parameters}}
+\DoxyCodeLine{00202\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structtflite_1_1_arithmetic_params}{ArithmeticParams}}\&\ forget\_cell\_mul\_params,}
+\DoxyCodeLine{00203\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structtflite_1_1_arithmetic_params}{ArithmeticParams}}\&\ input\_mul\_params,}
+\DoxyCodeLine{00204\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structtflite_1_1_cell_state_info}{CellStateInfo}}\&\ cell\_state\_info,\ CellType*\ \mbox{\hyperlink{nano__ble33__sense__accelerometer__continuous_8ino_a221f01f29c6cba77d9479aba615283f5}{buffer}})\ \{}
+\DoxyCodeLine{00205\ \ \ \textcolor{comment}{//\ Check\ offset\ validity\ to\ avoid\ memory\ overflow}}
+\DoxyCodeLine{00206\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src82599f02174ce2f1c2fd003f3eee8b73_a153a4c7bc866139ad88ebf7cb7f4c400}{TFLITE\_DCHECK\_LE}}(}
+\DoxyCodeLine{00207\ \ \ \ \ \ \ step\_info.CellStateOffset()\ +\ step\_info.StateShape().FlatSize(),}
+\DoxyCodeLine{00208\ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_1_1micro_ae8825f2d7a82d8f1c2194e05b929e1cb}{tflite::micro::GetTensorShape}}(cell\_state).\mbox{\hyperlink{classtflite_1_1_runtime_shape_a73fb2c2df1c833850d88faf428c65630}{FlatSize}}());}
+\DoxyCodeLine{00209\ }
+\DoxyCodeLine{00210\ \ \ \textcolor{keyword}{auto}\ cell\_state\_shape\ =\ step\_info.StateShape();}
+\DoxyCodeLine{00211\ \ \ \textcolor{comment}{//\ Forget\ Gate\ x\ Cell\ State}}
+\DoxyCodeLine{00212\ \ \ \mbox{\hyperlink{namespacetflite_1_1lstm__internal_a0830563b6c438d7d5951324edaef9910}{Mul}}(cell\_state\_shape,\ forget\_cell\_mul\_params,\ forget\_gate\_output,}
+\DoxyCodeLine{00213\ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_1_1micro_a0e66bf95a19a5f5522df24cc23afc68f}{tflite::micro::GetTensorData<CellType>}}(cell\_state)\ +}
+\DoxyCodeLine{00214\ \ \ \ \ \ \ \ \ \ \ step\_info.CellStateOffset(),}
+\DoxyCodeLine{00215\ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_1_1micro_a0e66bf95a19a5f5522df24cc23afc68f}{tflite::micro::GetTensorData<CellType>}}(cell\_state)\ +}
+\DoxyCodeLine{00216\ \ \ \ \ \ \ \ \ \ \ step\_info.CellStateOffset());}
+\DoxyCodeLine{00217\ \ \ \textcolor{comment}{//\ Input\ Gate\ x\ Cell\ Gate}}
+\DoxyCodeLine{00218\ \ \ \mbox{\hyperlink{namespacetflite_1_1lstm__internal_a0830563b6c438d7d5951324edaef9910}{Mul}}(cell\_state\_shape,\ input\_mul\_params,\ input\_gate\_output,\ cell\_gate\_output,}
+\DoxyCodeLine{00219\ \ \ \ \ \ \ \mbox{\hyperlink{nano__ble33__sense__accelerometer__continuous_8ino_a221f01f29c6cba77d9479aba615283f5}{buffer}});}
+\DoxyCodeLine{00220\ }
+\DoxyCodeLine{00221\ \ \ \textcolor{comment}{//\ Update\ the\ cell\ state}}
+\DoxyCodeLine{00222\ \ \ \mbox{\hyperlink{namespacetflite_1_1lstm__internal_a389edc4b1c9bd4c32ef107ae22cc6627}{AddElementWise}}(\mbox{\hyperlink{namespacetflite_1_1micro_a0e66bf95a19a5f5522df24cc23afc68f}{tflite::micro::GetTensorData<CellType>}}(cell\_state)\ +}
+\DoxyCodeLine{00223\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ step\_info.CellStateOffset(),}
+\DoxyCodeLine{00224\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{nano__ble33__sense__accelerometer__continuous_8ino_a221f01f29c6cba77d9479aba615283f5}{buffer}},}
+\DoxyCodeLine{00225\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{/*n\_batch=*/}cell\_state\_shape.DimsData()[0],}
+\DoxyCodeLine{00226\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{/*n\_state=*/}cell\_state\_shape.DimsData()[1],}
+\DoxyCodeLine{00227\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_1_1micro_a0e66bf95a19a5f5522df24cc23afc68f}{tflite::micro::GetTensorData<CellType>}}(cell\_state)\ +}
+\DoxyCodeLine{00228\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ step\_info.CellStateOffset());}
+\DoxyCodeLine{00229\ }
+\DoxyCodeLine{00230\ \ \ \textcolor{keywordflow}{if}\ (cell\_state\_info.\mbox{\hyperlink{structtflite_1_1_cell_state_info_a7f16c0cdeaf5b2d37e6a0d4e725c80c6}{cell\_clip}}\ >\ 0)\ \{}
+\DoxyCodeLine{00231\ \ \ \ \ \mbox{\hyperlink{namespacetflite_1_1lstm__internal_a774c4ad3bc70673b78e206cafcab2311}{Clipping}}(cell\_state\_shape.FlatSize(),\ cell\_state\_info,}
+\DoxyCodeLine{00232\ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_1_1micro_a0e66bf95a19a5f5522df24cc23afc68f}{tflite::micro::GetTensorData<CellType>}}(cell\_state)\ +}
+\DoxyCodeLine{00233\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ step\_info.CellStateOffset());}
+\DoxyCodeLine{00234\ \ \ \}}
+\DoxyCodeLine{00235\ \}}
+\DoxyCodeLine{00236\ }
+\DoxyCodeLine{00237\ \textcolor{comment}{//\ Update\ the\ hidden\ state\ of\ the\ LSTM\ kernel\ using\ the\ following\ formula:}}
+\DoxyCodeLine{00238\ \textcolor{comment}{//\ updated\_hidden\_state\ =\ Tanh(updated\_cell\_state)\ *\ output\_gate\_output,\ *\ means}}
+\DoxyCodeLine{00239\ \textcolor{comment}{//\ element\ wise\ multiplication}}
+\DoxyCodeLine{00240\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ CellType,\ \textcolor{keyword}{typename}\ ActivationType>}
+\DoxyCodeLine{00241\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1lstm__internal_ab9e01015b847c8876960057591f8f3ae}{UpdateLstmHidden}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classtflite_1_1lstm__internal_1_1_lstm_step_manager}{LstmStepManager}}\&\ step\_info,}
+\DoxyCodeLine{00242\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_tf_lite_eval_tensor}{TfLiteEvalTensor}}*\ cell\_state,}
+\DoxyCodeLine{00243\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_tf_lite_eval_tensor}{TfLiteEvalTensor}}*\ hidden\_state,}
+\DoxyCodeLine{00244\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ CellType*\ output\_gate\_output,}
+\DoxyCodeLine{00245\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structtflite_1_1_arithmetic_params}{ArithmeticParams}}\&\ mul\_params,}
+\DoxyCodeLine{00246\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ int32\_t\ cell\_state\_scale\_power,\ CellType*\ \mbox{\hyperlink{nano__ble33__sense__accelerometer__continuous_8ino_a221f01f29c6cba77d9479aba615283f5}{buffer}})\ \{}
+\DoxyCodeLine{00247\ \ \ \textcolor{comment}{//\ Check\ offset\ validity\ to\ avoid\ memory\ overflow}}
+\DoxyCodeLine{00248\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src82599f02174ce2f1c2fd003f3eee8b73_a153a4c7bc866139ad88ebf7cb7f4c400}{TFLITE\_DCHECK\_LE}}(}
+\DoxyCodeLine{00249\ \ \ \ \ \ \ step\_info.CellStateOffset()\ +\ step\_info.StateShape().FlatSize(),}
+\DoxyCodeLine{00250\ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_1_1micro_ae8825f2d7a82d8f1c2194e05b929e1cb}{tflite::micro::GetTensorShape}}(cell\_state).\mbox{\hyperlink{classtflite_1_1_runtime_shape_a73fb2c2df1c833850d88faf428c65630}{FlatSize}}());}
+\DoxyCodeLine{00251\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src82599f02174ce2f1c2fd003f3eee8b73_a153a4c7bc866139ad88ebf7cb7f4c400}{TFLITE\_DCHECK\_LE}}(}
+\DoxyCodeLine{00252\ \ \ \ \ \ \ step\_info.HiddenStateOffset()\ +\ step\_info.StateShape().FlatSize(),}
+\DoxyCodeLine{00253\ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_1_1micro_ae8825f2d7a82d8f1c2194e05b929e1cb}{tflite::micro::GetTensorShape}}(hidden\_state).\mbox{\hyperlink{classtflite_1_1_runtime_shape_a73fb2c2df1c833850d88faf428c65630}{FlatSize}}());}
+\DoxyCodeLine{00254\ }
+\DoxyCodeLine{00255\ \ \ \textcolor{keyword}{auto}\ cell\_state\_shape\ =\ step\_info.StateShape();}
+\DoxyCodeLine{00256\ \ \ CellType*\ cell\_state\_data\ =}
+\DoxyCodeLine{00257\ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_1_1micro_a0e66bf95a19a5f5522df24cc23afc68f}{tflite::micro::GetTensorData<CellType>}}(cell\_state)\ +}
+\DoxyCodeLine{00258\ \ \ \ \ \ \ step\_info.CellStateOffset();}
+\DoxyCodeLine{00259\ \ \ \textcolor{comment}{//\ Tanh(cell\_state)}}
+\DoxyCodeLine{00260\ \ \ \mbox{\hyperlink{namespacetflite_1_1lstm__internal_a8fbb23414ca480074319492882242bf3}{Tanh}}(cell\_state\_scale\_power,\ cell\_state\_shape,\ cell\_state\_data,}
+\DoxyCodeLine{00261\ \ \ \ \ \ \ \ cell\_state\_shape,\ \mbox{\hyperlink{nano__ble33__sense__accelerometer__continuous_8ino_a221f01f29c6cba77d9479aba615283f5}{buffer}});}
+\DoxyCodeLine{00262\ \ \ \textcolor{comment}{//\ Update\ the\ hidden\ state}}
+\DoxyCodeLine{00263\ \ \ \mbox{\hyperlink{namespacetflite_1_1lstm__internal_a0830563b6c438d7d5951324edaef9910}{Mul}}(cell\_state\_shape,\ mul\_params,\ \mbox{\hyperlink{nano__ble33__sense__accelerometer__continuous_8ino_a221f01f29c6cba77d9479aba615283f5}{buffer}},\ output\_gate\_output,}
+\DoxyCodeLine{00264\ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_1_1micro_a0e66bf95a19a5f5522df24cc23afc68f}{tflite::micro::GetTensorData<ActivationType>}}(hidden\_state)\ +}
+\DoxyCodeLine{00265\ \ \ \ \ \ \ \ \ \ \ step\_info.HiddenStateOffset());}
+\DoxyCodeLine{00266\ \}}
+\DoxyCodeLine{00267\ }
+\DoxyCodeLine{00268\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ ActivationType,\ \textcolor{keyword}{typename}\ WeightType,\ \textcolor{keyword}{typename}\ CellType,}
+\DoxyCodeLine{00269\ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{typename}\ BiasType>}
+\DoxyCodeLine{00270\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1lstm__internal_ad50254b56d53794905b0647d002911e4}{LstmStep}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classtflite_1_1lstm__internal_1_1_lstm_step_manager}{LstmStepManager}}\&\ step\_info,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structtflite_1_1_op_data_l_s_t_m}{OpDataLSTM}}\&\ \mbox{\hyperlink{batch__matmul_8cc_a0f851164a16c8d772c43d8da3ec4be95}{op\_data}},}
+\DoxyCodeLine{00271\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structtflite_1_1_l_s_t_m_kernel_contents}{LSTMKernelContents}}\&\ kernel\_content,}
+\DoxyCodeLine{00272\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structtflite_1_1_l_s_t_m_buffers}{LSTMBuffers<CellType>}}\&\ buffers)\ \{}
+\DoxyCodeLine{00273\ \ \ \textcolor{comment}{/*Step1:\ Calculate\ gate\ outputs\ to\ prepare\ cell\ state\ update*/}}
+\DoxyCodeLine{00274\ \ \ CellType*\ gate\_internal\_buffer\ =\ buffers.\mbox{\hyperlink{structtflite_1_1_l_s_t_m_buffers_a7a80066ceb619414b3c518d45e164b6c}{buffer3}};}
+\DoxyCodeLine{00275\ \ \ CellType*\ forget\_gate\_output\ =\ buffers.\mbox{\hyperlink{structtflite_1_1_l_s_t_m_buffers_a4d9144196d473e154c3f662e038a9dc9}{buffer0}};}
+\DoxyCodeLine{00276\ \ \ \mbox{\hyperlink{namespacetflite_1_1lstm__internal_a42929f9e8d019e307f936322363a2ed7}{CalculateLstmGate<ActivationType,\ WeightType,\ CellType,\ BiasType>}}(}
+\DoxyCodeLine{00277\ \ \ \ \ \ \ step\_info,\ \mbox{\hyperlink{batch__matmul_8cc_a0f851164a16c8d772c43d8da3ec4be95}{op\_data}}.forget\_gate\_parameters,}
+\DoxyCodeLine{00278\ \ \ \ \ \ \ \textcolor{comment}{//\ Input\ FC}}
+\DoxyCodeLine{00279\ \ \ \ \ \ \ kernel\_content.\mbox{\hyperlink{structtflite_1_1_l_s_t_m_kernel_contents_a5e27d365bf34987cc50039dd5544caad}{GetInternalTensor}}(\mbox{\hyperlink{namespacetflite_a0d543ffd50ba6ad339fbc52e8a794464}{tflite::kLstmInputTensor}}),}
+\DoxyCodeLine{00280\ \ \ \ \ \ \ kernel\_content.\mbox{\hyperlink{structtflite_1_1_l_s_t_m_kernel_contents_a5e27d365bf34987cc50039dd5544caad}{GetInternalTensor}}(\mbox{\hyperlink{namespacetflite_a925381bc9bd766738a79b6f283cddf30}{tflite::kLstmInputToForgetWeightsTensor}}),}
+\DoxyCodeLine{00281\ \ \ \ \ \ \ kernel\_content.\mbox{\hyperlink{structtflite_1_1_l_s_t_m_kernel_contents_a5e27d365bf34987cc50039dd5544caad}{GetInternalTensor}}(\mbox{\hyperlink{namespacetflite_aeb1e7ea3b1d025a81fd7e66e8a117fd4}{tflite::kLstmForgetGateBiasTensor}}),}
+\DoxyCodeLine{00282\ \ \ \ \ \ \ \textcolor{comment}{//\ Recurrent\ FC}}
+\DoxyCodeLine{00283\ \ \ \ \ \ \ kernel\_content.\mbox{\hyperlink{structtflite_1_1_l_s_t_m_kernel_contents_ab949e03ed5b4b581d6dab624cdcc3a3d}{HiddenStateTensor}}(),}
+\DoxyCodeLine{00284\ \ \ \ \ \ \ kernel\_content.\mbox{\hyperlink{structtflite_1_1_l_s_t_m_kernel_contents_a5e27d365bf34987cc50039dd5544caad}{GetInternalTensor}}(}
+\DoxyCodeLine{00285\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_a818c88048026b3f09e45c58f37642218}{tflite::kLstmRecurrentToForgetWeightsTensor}}),}
+\DoxyCodeLine{00286\ \ \ \ \ \ \ \textcolor{comment}{/*recurrent\_bias*/}\ \textcolor{keyword}{nullptr},}
+\DoxyCodeLine{00287\ \ \ \ \ \ \ \textcolor{comment}{//\ Output}}
+\DoxyCodeLine{00288\ \ \ \ \ \ \ forget\_gate\_output,}
+\DoxyCodeLine{00289\ \ \ \ \ \ \ \textcolor{comment}{//\ Scratch\ arrays}}
+\DoxyCodeLine{00290\ \ \ \ \ \ \ gate\_internal\_buffer,\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src7f67a4373e2a0d20daf1d1ff4e1f4339_acc9e377dbc009d68bbfa5480d2559565ad6bc4e430896a61a0b2f789ba5e8d4ba}{kTfLiteActSigmoid}});}
+\DoxyCodeLine{00291\ }
+\DoxyCodeLine{00292\ \ \ \textcolor{comment}{//\ Input\ Gate\ calculation;}}
+\DoxyCodeLine{00293\ \ \ CellType*\ input\_gate\_output\ =\ buffers.\mbox{\hyperlink{structtflite_1_1_l_s_t_m_buffers_a4ba62782cd42abef526312a4f23585bf}{buffer1}};}
+\DoxyCodeLine{00294\ \ \ \mbox{\hyperlink{namespacetflite_1_1lstm__internal_a42929f9e8d019e307f936322363a2ed7}{CalculateLstmGate<ActivationType,\ WeightType,\ CellType,\ BiasType>}}(}
+\DoxyCodeLine{00295\ \ \ \ \ \ \ step\_info,\ \mbox{\hyperlink{batch__matmul_8cc_a0f851164a16c8d772c43d8da3ec4be95}{op\_data}}.input\_gate\_parameters,}
+\DoxyCodeLine{00296\ \ \ \ \ \ \ \textcolor{comment}{//\ Input\ FC}}
+\DoxyCodeLine{00297\ \ \ \ \ \ \ kernel\_content.\mbox{\hyperlink{structtflite_1_1_l_s_t_m_kernel_contents_a5e27d365bf34987cc50039dd5544caad}{GetInternalTensor}}(\mbox{\hyperlink{namespacetflite_a0d543ffd50ba6ad339fbc52e8a794464}{tflite::kLstmInputTensor}}),}
+\DoxyCodeLine{00298\ \ \ \ \ \ \ kernel\_content.\mbox{\hyperlink{structtflite_1_1_l_s_t_m_kernel_contents_a5e27d365bf34987cc50039dd5544caad}{GetInternalTensor}}(\mbox{\hyperlink{namespacetflite_a70ac6f91cf3d2a90cdc2dec1ffef7721}{tflite::kLstmInputToInputWeightsTensor}}),}
+\DoxyCodeLine{00299\ \ \ \ \ \ \ kernel\_content.\mbox{\hyperlink{structtflite_1_1_l_s_t_m_kernel_contents_a5e27d365bf34987cc50039dd5544caad}{GetInternalTensor}}(\mbox{\hyperlink{namespacetflite_aa68401a0fd81bb1294d483da8e3cd3ee}{tflite::kLstmInputGateBiasTensor}}),}
+\DoxyCodeLine{00300\ \ \ \ \ \ \ \textcolor{comment}{//\ Recurrent\ FC}}
+\DoxyCodeLine{00301\ \ \ \ \ \ \ kernel\_content.\mbox{\hyperlink{structtflite_1_1_l_s_t_m_kernel_contents_ab949e03ed5b4b581d6dab624cdcc3a3d}{HiddenStateTensor}}(),}
+\DoxyCodeLine{00302\ \ \ \ \ \ \ kernel\_content.\mbox{\hyperlink{structtflite_1_1_l_s_t_m_kernel_contents_a5e27d365bf34987cc50039dd5544caad}{GetInternalTensor}}(}
+\DoxyCodeLine{00303\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_ad894a248e3c08cb48e79ccf07dd9e4af}{tflite::kLstmRecurrentToInputWeightsTensor}}),}
+\DoxyCodeLine{00304\ \ \ \ \ \ \ \textcolor{comment}{/*recurrent\_bias*/}\ \textcolor{keyword}{nullptr},}
+\DoxyCodeLine{00305\ \ \ \ \ \ \ \textcolor{comment}{//\ Output}}
+\DoxyCodeLine{00306\ \ \ \ \ \ \ input\_gate\_output,}
+\DoxyCodeLine{00307\ \ \ \ \ \ \ \textcolor{comment}{//\ Scratch\ arrays}}
+\DoxyCodeLine{00308\ \ \ \ \ \ \ gate\_internal\_buffer,\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src7f67a4373e2a0d20daf1d1ff4e1f4339_acc9e377dbc009d68bbfa5480d2559565ad6bc4e430896a61a0b2f789ba5e8d4ba}{kTfLiteActSigmoid}});}
+\DoxyCodeLine{00309\ }
+\DoxyCodeLine{00310\ \ \ \textcolor{comment}{//\ Cell\ Gate\ calculation}}
+\DoxyCodeLine{00311\ \ \ CellType*\ cell\_gate\_output\ =\ buffers.\mbox{\hyperlink{structtflite_1_1_l_s_t_m_buffers_a5d4eee348dc5cd04c28c62d6fc955e2f}{buffer2}};}
+\DoxyCodeLine{00312\ \ \ \mbox{\hyperlink{namespacetflite_1_1lstm__internal_a42929f9e8d019e307f936322363a2ed7}{CalculateLstmGate<ActivationType,\ WeightType,\ CellType,\ BiasType>}}(}
+\DoxyCodeLine{00313\ \ \ \ \ \ \ step\_info,\ \mbox{\hyperlink{batch__matmul_8cc_a0f851164a16c8d772c43d8da3ec4be95}{op\_data}}.cell\_gate\_parameters,}
+\DoxyCodeLine{00314\ \ \ \ \ \ \ \textcolor{comment}{//\ Input\ FC}}
+\DoxyCodeLine{00315\ \ \ \ \ \ \ kernel\_content.\mbox{\hyperlink{structtflite_1_1_l_s_t_m_kernel_contents_a5e27d365bf34987cc50039dd5544caad}{GetInternalTensor}}(\mbox{\hyperlink{namespacetflite_a0d543ffd50ba6ad339fbc52e8a794464}{tflite::kLstmInputTensor}}),}
+\DoxyCodeLine{00316\ \ \ \ \ \ \ kernel\_content.\mbox{\hyperlink{structtflite_1_1_l_s_t_m_kernel_contents_a5e27d365bf34987cc50039dd5544caad}{GetInternalTensor}}(\mbox{\hyperlink{namespacetflite_ac673b42d7a9a1c014a7e2a9f6006fa57}{tflite::kLstmInputToCellWeightsTensor}}),}
+\DoxyCodeLine{00317\ \ \ \ \ \ \ kernel\_content.\mbox{\hyperlink{structtflite_1_1_l_s_t_m_kernel_contents_a5e27d365bf34987cc50039dd5544caad}{GetInternalTensor}}(\mbox{\hyperlink{namespacetflite_a483156fb3ce48333d464c3cbdc220739}{tflite::kLstmCellGateBiasTensor}}),}
+\DoxyCodeLine{00318\ \ \ \ \ \ \ \textcolor{comment}{//\ Recurrent\ FC}}
+\DoxyCodeLine{00319\ \ \ \ \ \ \ kernel\_content.\mbox{\hyperlink{structtflite_1_1_l_s_t_m_kernel_contents_ab949e03ed5b4b581d6dab624cdcc3a3d}{HiddenStateTensor}}(),}
+\DoxyCodeLine{00320\ \ \ \ \ \ \ kernel\_content.\mbox{\hyperlink{structtflite_1_1_l_s_t_m_kernel_contents_a5e27d365bf34987cc50039dd5544caad}{GetInternalTensor}}(}
+\DoxyCodeLine{00321\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_a1e09e035ffa219ffae9554361910fd6d}{tflite::kLstmRecurrentToCellWeightsTensor}}),}
+\DoxyCodeLine{00322\ \ \ \ \ \ \ \textcolor{comment}{/*recurrent\_bias*/}\ \textcolor{keyword}{nullptr},}
+\DoxyCodeLine{00323\ \ \ \ \ \ \ \textcolor{comment}{//\ Output}}
+\DoxyCodeLine{00324\ \ \ \ \ \ \ cell\_gate\_output,}
+\DoxyCodeLine{00325\ \ \ \ \ \ \ \textcolor{comment}{//\ Scratch\ arrays}}
+\DoxyCodeLine{00326\ \ \ \ \ \ \ gate\_internal\_buffer,\ \mbox{\hyperlink{batch__matmul_8cc_a0f851164a16c8d772c43d8da3ec4be95}{op\_data}}.cell\_gate\_nonlinear\_type);}
+\DoxyCodeLine{00327\ }
+\DoxyCodeLine{00328\ \ \ \textcolor{comment}{/*Step2:\ update\ the\ cell\ state\ */}}
+\DoxyCodeLine{00329\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structtflite_1_1_inter_gate_parameters}{InterGateParameters}}\&\ inter\_gate\_params\ =\ \mbox{\hyperlink{batch__matmul_8cc_a0f851164a16c8d772c43d8da3ec4be95}{op\_data}}.inter\_gate\_parameters;}
+\DoxyCodeLine{00330\ \ \ CellType*\ updated\_input\_buffer\ =\ buffers.\mbox{\hyperlink{structtflite_1_1_l_s_t_m_buffers_a4ba62782cd42abef526312a4f23585bf}{buffer1}};\ \ \textcolor{comment}{//\ reuse\ buffer}}
+\DoxyCodeLine{00331\ }
+\DoxyCodeLine{00332\ \ \ \mbox{\hyperlink{namespacetflite_1_1lstm__internal_acb42394e584f69ccf4fb07c30707b7c2}{UpdateLstmCell<CellType>}}(step\_info,\ kernel\_content.\mbox{\hyperlink{structtflite_1_1_l_s_t_m_kernel_contents_a8deed9ec1f3c5bfd7317dbd3854181fc}{CellStateTensor}}(),}
+\DoxyCodeLine{00333\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ forget\_gate\_output,\ input\_gate\_output,}
+\DoxyCodeLine{00334\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ cell\_gate\_output,}
+\DoxyCodeLine{00335\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ inter\_gate\_params.\mbox{\hyperlink{structtflite_1_1_inter_gate_parameters_a05b187ed2b5c89992df6c055eaa082b5}{forget\_cell\_mul\_params}},}
+\DoxyCodeLine{00336\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ inter\_gate\_params.\mbox{\hyperlink{structtflite_1_1_inter_gate_parameters_adbfc74c3008bc9f3e8c247bf95e92ccc}{input\_mul\_params}},}
+\DoxyCodeLine{00337\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{batch__matmul_8cc_a0f851164a16c8d772c43d8da3ec4be95}{op\_data}}.cell\_state\_info,\ updated\_input\_buffer);}
+\DoxyCodeLine{00338\ }
+\DoxyCodeLine{00339\ \ \ \textcolor{comment}{/*Step3:\ update\ the\ hidden\ state\ */}}
+\DoxyCodeLine{00340\ \ \ CellType*\ output\_gate\_output\ =\ buffers.\mbox{\hyperlink{structtflite_1_1_l_s_t_m_buffers_a4ba62782cd42abef526312a4f23585bf}{buffer1}};\ \ \textcolor{comment}{//\ reuse\ buffer}}
+\DoxyCodeLine{00341\ \ \ \mbox{\hyperlink{namespacetflite_1_1lstm__internal_a42929f9e8d019e307f936322363a2ed7}{CalculateLstmGate<ActivationType,\ WeightType,\ CellType,\ BiasType>}}(}
+\DoxyCodeLine{00342\ \ \ \ \ \ \ step\_info,\ \mbox{\hyperlink{batch__matmul_8cc_a0f851164a16c8d772c43d8da3ec4be95}{op\_data}}.output\_gate\_parameters,}
+\DoxyCodeLine{00343\ \ \ \ \ \ \ \textcolor{comment}{//\ Input\ FC}}
+\DoxyCodeLine{00344\ \ \ \ \ \ \ kernel\_content.\mbox{\hyperlink{structtflite_1_1_l_s_t_m_kernel_contents_a5e27d365bf34987cc50039dd5544caad}{GetInternalTensor}}(\mbox{\hyperlink{namespacetflite_a0d543ffd50ba6ad339fbc52e8a794464}{tflite::kLstmInputTensor}}),}
+\DoxyCodeLine{00345\ \ \ \ \ \ \ kernel\_content.\mbox{\hyperlink{structtflite_1_1_l_s_t_m_kernel_contents_a5e27d365bf34987cc50039dd5544caad}{GetInternalTensor}}(\mbox{\hyperlink{namespacetflite_a43be7892b85e0722fdab31b8f46cb307}{tflite::kLstmInputToOutputWeightsTensor}}),}
+\DoxyCodeLine{00346\ \ \ \ \ \ \ kernel\_content.\mbox{\hyperlink{structtflite_1_1_l_s_t_m_kernel_contents_a5e27d365bf34987cc50039dd5544caad}{GetInternalTensor}}(\mbox{\hyperlink{namespacetflite_ac291e27747f1bcec3796f91332e247f5}{tflite::kLstmOutputGateBiasTensor}}),}
+\DoxyCodeLine{00347\ \ \ \ \ \ \ \textcolor{comment}{//\ Recurrent\ FC}}
+\DoxyCodeLine{00348\ \ \ \ \ \ \ kernel\_content.\mbox{\hyperlink{structtflite_1_1_l_s_t_m_kernel_contents_ab949e03ed5b4b581d6dab624cdcc3a3d}{HiddenStateTensor}}(),}
+\DoxyCodeLine{00349\ \ \ \ \ \ \ kernel\_content.\mbox{\hyperlink{structtflite_1_1_l_s_t_m_kernel_contents_a5e27d365bf34987cc50039dd5544caad}{GetInternalTensor}}(}
+\DoxyCodeLine{00350\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_af8bab5715b38a29112bd4fa262b466e2}{tflite::kLstmRecurrentToOutputWeightsTensor}}),}
+\DoxyCodeLine{00351\ \ \ \ \ \ \ \textcolor{comment}{/*recurrent\_bias*/}\ \textcolor{keyword}{nullptr},}
+\DoxyCodeLine{00352\ \ \ \ \ \ \ \textcolor{comment}{//\ Output}}
+\DoxyCodeLine{00353\ \ \ \ \ \ \ output\_gate\_output,}
+\DoxyCodeLine{00354\ \ \ \ \ \ \ \textcolor{comment}{//\ Scratch\ arrays}}
+\DoxyCodeLine{00355\ \ \ \ \ \ \ gate\_internal\_buffer,\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src7f67a4373e2a0d20daf1d1ff4e1f4339_acc9e377dbc009d68bbfa5480d2559565ad6bc4e430896a61a0b2f789ba5e8d4ba}{kTfLiteActSigmoid}});}
+\DoxyCodeLine{00356\ }
+\DoxyCodeLine{00357\ \ \ CellType*\ tanh\_activated\_cell\_buffer\ =\ buffers.\mbox{\hyperlink{structtflite_1_1_l_s_t_m_buffers_a4d9144196d473e154c3f662e038a9dc9}{buffer0}};\ \ \textcolor{comment}{//\ reuse\ buffer}}
+\DoxyCodeLine{00358\ \ \ \mbox{\hyperlink{namespacetflite_1_1lstm__internal_ab9e01015b847c8876960057591f8f3ae}{tflite::lstm\_internal::UpdateLstmHidden<CellType,\ ActivationType>}}(}
+\DoxyCodeLine{00359\ \ \ \ \ \ \ step\_info,\ kernel\_content.\mbox{\hyperlink{structtflite_1_1_l_s_t_m_kernel_contents_a8deed9ec1f3c5bfd7317dbd3854181fc}{CellStateTensor}}(),}
+\DoxyCodeLine{00360\ \ \ \ \ \ \ kernel\_content.\mbox{\hyperlink{structtflite_1_1_l_s_t_m_kernel_contents_ab949e03ed5b4b581d6dab624cdcc3a3d}{HiddenStateTensor}}(),\ output\_gate\_output,}
+\DoxyCodeLine{00361\ \ \ \ \ \ \ inter\_gate\_params.\mbox{\hyperlink{structtflite_1_1_inter_gate_parameters_ad36d74da5dc77ff2384dd8f32341ee6d}{output\_mul\_params}},}
+\DoxyCodeLine{00362\ \ \ \ \ \ \ \mbox{\hyperlink{batch__matmul_8cc_a0f851164a16c8d772c43d8da3ec4be95}{op\_data}}.cell\_state\_info.cell\_state\_scale\_power,}
+\DoxyCodeLine{00363\ \ \ \ \ \ \ tanh\_activated\_cell\_buffer);}
+\DoxyCodeLine{00364\ }
+\DoxyCodeLine{00365\ \ \ \textcolor{comment}{/*Step4:\ copy\ the\ update\ the\ hidden\ state\ to\ output*/}}
+\DoxyCodeLine{00366\ \ \ \textcolor{comment}{//\ Check\ offset\ validity\ to\ avoid\ memory\ overflow}}
+\DoxyCodeLine{00367\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src82599f02174ce2f1c2fd003f3eee8b73_a153a4c7bc866139ad88ebf7cb7f4c400}{TFLITE\_DCHECK\_LE}}(}
+\DoxyCodeLine{00368\ \ \ \ \ \ \ step\_info.OutputOffset()\ +\ step\_info.StateShape().FlatSize(),}
+\DoxyCodeLine{00369\ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_1_1micro_ae8825f2d7a82d8f1c2194e05b929e1cb}{tflite::micro::GetTensorShape}}(kernel\_content.\mbox{\hyperlink{structtflite_1_1_l_s_t_m_kernel_contents_a11b0adf11bdab5d1598e395574ea9853}{output\_tensor}}).\mbox{\hyperlink{classtflite_1_1_runtime_shape_a73fb2c2df1c833850d88faf428c65630}{FlatSize}}());}
+\DoxyCodeLine{00370\ \ \ \textcolor{comment}{//\ record\ the\ output\ (from\ the\ updated\ hidden\ state)}}
+\DoxyCodeLine{00371\ \ \ ActivationType*\ output\_ptr\ =\ \mbox{\hyperlink{namespacetflite_1_1micro_a0e66bf95a19a5f5522df24cc23afc68f}{tflite::micro::GetTensorData<ActivationType>}}(}
+\DoxyCodeLine{00372\ \ \ \ \ \ \ kernel\_content.\mbox{\hyperlink{structtflite_1_1_l_s_t_m_kernel_contents_a11b0adf11bdab5d1598e395574ea9853}{output\_tensor}});}
+\DoxyCodeLine{00373\ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}*\ hidden\_state\ =\ kernel\_content.\mbox{\hyperlink{structtflite_1_1_l_s_t_m_kernel_contents_ab949e03ed5b4b581d6dab624cdcc3a3d}{HiddenStateTensor}}();}
+\DoxyCodeLine{00374\ \ \ std::memcpy(output\_ptr\ +\ step\_info.OutputOffset(),}
+\DoxyCodeLine{00375\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_1_1micro_a0e66bf95a19a5f5522df24cc23afc68f}{tflite::micro::GetTensorData<ActivationType>}}(hidden\_state)\ +}
+\DoxyCodeLine{00376\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ step\_info.HiddenStateOffset(),}
+\DoxyCodeLine{00377\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ step\_info.StateShape().FlatSize()\ *\ \textcolor{keyword}{sizeof}(ActivationType));}
+\DoxyCodeLine{00378\ \}}
+\DoxyCodeLine{00379\ }
+\DoxyCodeLine{00380\ \}\ \ \textcolor{comment}{//\ namespace\ lstm\_internal}}
+\DoxyCodeLine{00381\ }
+\DoxyCodeLine{00382\ \textcolor{comment}{//\ Evaulate\ the\ LSTM\ kernel\ with\ (potential)\ multi-\/steps\ and\ multi-\/batch\ input}}
+\DoxyCodeLine{00383\ \textcolor{comment}{//\ Since}}
+\DoxyCodeLine{00384\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ ActivationType,\ \textcolor{keyword}{typename}\ WeightType,\ \textcolor{keyword}{typename}\ CellType,}
+\DoxyCodeLine{00385\ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{typename}\ BiasType>}
+\DoxyCodeLine{00386\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_a770a9c24334214a28286c0fd7765592f}{EvalLstm}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structtflite_1_1_op_data_l_s_t_m}{OpDataLSTM}}\&\ \mbox{\hyperlink{batch__matmul_8cc_a0f851164a16c8d772c43d8da3ec4be95}{op\_data}},}
+\DoxyCodeLine{00387\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structtflite_1_1_l_s_t_m_kernel_contents}{LSTMKernelContents}}\&\ kernel\_content,}
+\DoxyCodeLine{00388\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structtflite_1_1_l_s_t_m_buffers}{LSTMBuffers<CellType>}}\&\ buffers)\ \{}
+\DoxyCodeLine{00389\ \ \ \mbox{\hyperlink{classtflite_1_1lstm__internal_1_1_lstm_step_manager}{lstm\_internal::LstmStepManager}}\ step\_info(\&\mbox{\hyperlink{batch__matmul_8cc_a0f851164a16c8d772c43d8da3ec4be95}{op\_data}}.size\_info);}
+\DoxyCodeLine{00390\ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ size\_info\ =\ \mbox{\hyperlink{batch__matmul_8cc_a0f851164a16c8d772c43d8da3ec4be95}{op\_data}}.size\_info;}
+\DoxyCodeLine{00391\ \ \ \textcolor{comment}{//\ time\ is\ the\ first\ dimention,\ enable\ batch\ computation}}
+\DoxyCodeLine{00392\ \ \ \textcolor{keywordflow}{if}\ (size\_info.time\_major)\ \{}
+\DoxyCodeLine{00393\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ t\ =\ 0;\ t\ <\ size\_info.time\_steps;\ t++)\ \{}
+\DoxyCodeLine{00394\ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_1_1lstm__internal_ad50254b56d53794905b0647d002911e4}{lstm\_internal::LstmStep<ActivationType,\ WeightType,\ CellType,\ BiasType>}}(}
+\DoxyCodeLine{00395\ \ \ \ \ \ \ \ \ \ \ step\_info,\ \mbox{\hyperlink{batch__matmul_8cc_a0f851164a16c8d772c43d8da3ec4be95}{op\_data}},\ kernel\_content,\ buffers);}
+\DoxyCodeLine{00396\ \ \ \ \ \ \ \textcolor{comment}{//\ prepare\ for\ the\ next\ time\ step}}
+\DoxyCodeLine{00397\ \ \ \ \ \ \ step\_info.\mbox{\hyperlink{classtflite_1_1lstm__internal_1_1_lstm_step_manager_aab817304266cafc306951f3b80742891}{UpdateTime}}();}
+\DoxyCodeLine{00398\ \ \ \ \ \}}
+\DoxyCodeLine{00399\ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00400\ \ \ \ \ \textcolor{comment}{//\ batch\ first,\ unable\ to\ size\ the\ input\ data.\ single\ batch\ inference}}
+\DoxyCodeLine{00401\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}}\ =\ 0;\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}}\ <\ size\_info.batch\_size;\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}}++)\ \{}
+\DoxyCodeLine{00402\ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ t\ =\ 0;\ t\ <\ size\_info.time\_steps;\ t++)\ \{}
+\DoxyCodeLine{00403\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_1_1lstm__internal_ad50254b56d53794905b0647d002911e4}{lstm\_internal::LstmStep<ActivationType,\ WeightType,\ CellType,\ BiasType>}}(}
+\DoxyCodeLine{00404\ \ \ \ \ \ \ \ \ \ \ \ \ step\_info,\ \mbox{\hyperlink{batch__matmul_8cc_a0f851164a16c8d772c43d8da3ec4be95}{op\_data}},\ kernel\_content,\ buffers);}
+\DoxyCodeLine{00405\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ prepare\ for\ the\ next\ time\ step}}
+\DoxyCodeLine{00406\ \ \ \ \ \ \ \ \ step\_info.\mbox{\hyperlink{classtflite_1_1lstm__internal_1_1_lstm_step_manager_aab817304266cafc306951f3b80742891}{UpdateTime}}();}
+\DoxyCodeLine{00407\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00408\ \ \ \ \ \ \ \textcolor{comment}{//\ prepare\ for\ the\ next\ batch}}
+\DoxyCodeLine{00409\ \ \ \ \ \ \ step\_info.\mbox{\hyperlink{classtflite_1_1lstm__internal_1_1_lstm_step_manager_a31fc36486a01a153abe8d26f7470bd4f}{UpdateBatch}}();}
+\DoxyCodeLine{00410\ \ \ \ \ \ \ step\_info.\mbox{\hyperlink{classtflite_1_1lstm__internal_1_1_lstm_step_manager_add4d1f0c1be11645e50e36731df28039}{ResetTime}}();}
+\DoxyCodeLine{00411\ \ \ \ \ \}}
+\DoxyCodeLine{00412\ \ \ \}}
+\DoxyCodeLine{00413\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361ab25fe210808197f1b6601df8ccdcd699}{kTfLiteOk}};}
+\DoxyCodeLine{00414\ \}}
+\DoxyCodeLine{00415\ \}\ \ \textcolor{comment}{//\ namespace\ tflite}}
+\DoxyCodeLine{00416\ }
+\DoxyCodeLine{00417\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ TENSORFLOW\_LITE\_MICRO\_KERNELS\_LSTM\_EVAL\_16ACT\_H\_}}
+
+\end{DoxyCode}

@@ -1,0 +1,96 @@
+\doxysection{micro\+\_\+codegen\+\_\+context.\+h}
+\hypertarget{micro__codegen__context_8h_source}{}\label{micro__codegen__context_8h_source}\index{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/main/codegen/runtime/micro\_codegen\_context.h@{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/main/codegen/runtime/micro\_codegen\_context.h}}
+\mbox{\hyperlink{micro__codegen__context_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{/*\ Copyright\ 2023\ The\ TensorFlow\ Authors.\ All\ Rights\ Reserved.}}
+\DoxyCodeLine{00002\ \textcolor{comment}{}}
+\DoxyCodeLine{00003\ \textcolor{comment}{Licensed\ under\ the\ Apache\ License,\ Version\ 2.0\ (the\ "{}License"{});}}
+\DoxyCodeLine{00004\ \textcolor{comment}{you\ may\ not\ use\ this\ file\ except\ in\ compliance\ with\ the\ License.}}
+\DoxyCodeLine{00005\ \textcolor{comment}{You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{00006\ \textcolor{comment}{}}
+\DoxyCodeLine{00007\ \textcolor{comment}{\ \ \ \ http://www.apache.org/licenses/LICENSE-\/2.0}}
+\DoxyCodeLine{00008\ \textcolor{comment}{}}
+\DoxyCodeLine{00009\ \textcolor{comment}{Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ software}}
+\DoxyCodeLine{00010\ \textcolor{comment}{distributed\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,}}
+\DoxyCodeLine{00011\ \textcolor{comment}{WITHOUT\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,\ either\ express\ or\ implied.}}
+\DoxyCodeLine{00012\ \textcolor{comment}{See\ the\ License\ for\ the\ specific\ language\ governing\ permissions\ and}}
+\DoxyCodeLine{00013\ \textcolor{comment}{limitations\ under\ the\ License.}}
+\DoxyCodeLine{00014\ \textcolor{comment}{==============================================================================*/}}
+\DoxyCodeLine{00015\ }
+\DoxyCodeLine{00016\ \textcolor{preprocessor}{\#ifndef\ CODEGEN\_RUNTIME\_MICRO\_CODEGEN\_CONTEXT\_H\_}}
+\DoxyCodeLine{00017\ \textcolor{preprocessor}{\#define\ CODEGEN\_RUNTIME\_MICRO\_CODEGEN\_CONTEXT\_H\_}}
+\DoxyCodeLine{00018\ }
+\DoxyCodeLine{00019\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/c/common.h"{}}}
+\DoxyCodeLine{00020\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/micro/micro\_context.h"{}}}
+\DoxyCodeLine{00021\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/micro/micro\_graph.h"{}}}
+\DoxyCodeLine{00022\ }
+\DoxyCodeLine{00023\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacetflite}{tflite}}\ \{}
+\DoxyCodeLine{00024\ }
+\DoxyCodeLine{00025\ \textcolor{comment}{//\ A\ poor\ man's\ std::span,\ we\ should\ consider\ using\ the\ Pigweed\ span\ instead.}}
+\DoxyCodeLine{00026\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{00027\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classtflite_1_1_span}{Span}}\ \{}
+\DoxyCodeLine{00028\ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00029\ \ \ \textcolor{keyword}{constexpr}\ \mbox{\hyperlink{classtflite_1_1_span_a9955c5b1c0527172d0aa178b265636ae}{Span}}(T*\ \mbox{\hyperlink{classtflite_1_1_span_a4e7c028092b65f13e8732e1ce4f49c39}{data}},\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{classtflite_1_1_span_a781c869d16cdaa528e08386641ec0280}{size}})\ noexcept\ :\ \mbox{\hyperlink{classtflite_1_1_span_aa180df8abd8635db0f902c46c39c478d}{data\_}}(\mbox{\hyperlink{classtflite_1_1_span_a4e7c028092b65f13e8732e1ce4f49c39}{data}}),\ \mbox{\hyperlink{classtflite_1_1_span_ae53fbd8b3375eb9e2c22878f5832c30c}{size\_}}(\mbox{\hyperlink{classtflite_1_1_span_a781c869d16cdaa528e08386641ec0280}{size}})\ \{\}}
+\DoxyCodeLine{00030\ }
+\DoxyCodeLine{00031\ \ \ \textcolor{keyword}{constexpr}\ T\&\ \mbox{\hyperlink{classtflite_1_1_span_a695afaeb4ee935fcfa3eed1b08c58565}{operator[]}}(\textcolor{keywordtype}{size\_t}\ idx)\ \textcolor{keyword}{const}\ \textcolor{keyword}{noexcept}\ \{\ \textcolor{keywordflow}{return}\ *(\mbox{\hyperlink{classtflite_1_1_span_aa180df8abd8635db0f902c46c39c478d}{data\_}}\ +\ idx);\ \}}
+\DoxyCodeLine{00032\ }
+\DoxyCodeLine{00033\ \ \ \textcolor{keyword}{constexpr}\ T*\ \mbox{\hyperlink{classtflite_1_1_span_a4e7c028092b65f13e8732e1ce4f49c39}{data}}()\ const\ noexcept\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1_span_aa180df8abd8635db0f902c46c39c478d}{data\_}};\ \}}
+\DoxyCodeLine{00034\ \ \ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{classtflite_1_1_span_a781c869d16cdaa528e08386641ec0280}{size}}()\ const\ noexcept\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1_span_ae53fbd8b3375eb9e2c22878f5832c30c}{size\_}};\ \}}
+\DoxyCodeLine{00035\ }
+\DoxyCodeLine{00036\ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{00037\ \ \ T*\ \mbox{\hyperlink{classtflite_1_1_span_aa180df8abd8635db0f902c46c39c478d}{data\_}};}
+\DoxyCodeLine{00038\ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{classtflite_1_1_span_ae53fbd8b3375eb9e2c22878f5832c30c}{size\_}};}
+\DoxyCodeLine{00039\ \};}
+\DoxyCodeLine{00040\ }
+\DoxyCodeLine{00041\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structtflite_1_1_subgraph}{Subgraph}}\ \{}
+\DoxyCodeLine{00042\ \ \ \mbox{\hyperlink{classtflite_1_1_span}{Span<const\ size\_t>}}\ \mbox{\hyperlink{structtflite_1_1_subgraph_a190d7208265716beecbb731c1d1b42b4}{inputs}};}
+\DoxyCodeLine{00043\ \ \ \mbox{\hyperlink{classtflite_1_1_span}{Span<const\ size\_t>}}\ \mbox{\hyperlink{structtflite_1_1_subgraph_a529e326f3b2eb5cd0f4f453934202223}{outputs}};}
+\DoxyCodeLine{00044\ \ \ \mbox{\hyperlink{classtflite_1_1_span}{Span<TfLiteNode>}}\ \mbox{\hyperlink{structtflite_1_1_subgraph_ab66a9a1529381c0bcf3128cbc574a086}{nodes}};}
+\DoxyCodeLine{00045\ \ \ \mbox{\hyperlink{classtflite_1_1_span}{Span<TfLiteEvalTensor>}}\ \mbox{\hyperlink{structtflite_1_1_subgraph_a59a4d1c39133c5f9de4decac0d21253b}{tensors}};}
+\DoxyCodeLine{00046\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ (*\mbox{\hyperlink{structtflite_1_1_subgraph_af0b51e5f3fddc0e8af40102ec015ad8d}{invoke}})(\mbox{\hyperlink{struct_tf_lite_context}{TfLiteContext}}*,\ \mbox{\hyperlink{classtflite_1_1_span}{Span<TfLiteNode>}});}
+\DoxyCodeLine{00047\ \};}
+\DoxyCodeLine{00048\ }
+\DoxyCodeLine{00049\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classtflite_1_1_micro_codegen_context}{MicroCodegenContext}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{classtflite_1_1_micro_context}{MicroContext}},\ \mbox{\hyperlink{classtflite_1_1_micro_graph}{MicroGraph}}\ \{}
+\DoxyCodeLine{00050\ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00051\ \ \ \mbox{\hyperlink{classtflite_1_1_micro_codegen_context_aa27aeca5a9565ee7f87e0df6a15f70ec}{MicroCodegenContext}}(\mbox{\hyperlink{struct_tf_lite_context}{TfLiteContext}}*\ context,\ \mbox{\hyperlink{classtflite_1_1_span}{Span<Subgraph>}}\ subgraphs);}
+\DoxyCodeLine{00052\ }
+\DoxyCodeLine{00053\ \ \ \mbox{\hyperlink{classtflite_1_1_micro_codegen_context_a66aadfa00075aaf6d19816c952335727}{\string~MicroCodegenContext}}()\ =\ \textcolor{keywordflow}{default};}
+\DoxyCodeLine{00054\ }
+\DoxyCodeLine{00055\ \ \ \textcolor{comment}{//\ MicroContext\ API}}
+\DoxyCodeLine{00056\ \ \ \textcolor{keywordtype}{void}*\ \mbox{\hyperlink{classtflite_1_1_micro_codegen_context_a02bb45c53dc65f9b2277b437e6e69d4c}{AllocatePersistentBuffer}}(\textcolor{keywordtype}{size\_t}\ bytes)\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00057\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_codegen_context_a7321c975e61b921a08b672f1f2c8b805}{RequestScratchBufferInArena}}(\textcolor{keywordtype}{size\_t}\ bytes,}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}*\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src7bb90234a942007b3f55b52484ee7c3e_a82de2679c069b1bce97a7d4aeb83cf60}{buffer\_idx}})\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00059\ \ \ \textcolor{keywordtype}{void}*\ \mbox{\hyperlink{classtflite_1_1_micro_codegen_context_a21397c4516b95ef7f36c5042dcfa96e6}{GetScratchBuffer}}(\textcolor{keywordtype}{int}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src7bb90234a942007b3f55b52484ee7c3e_a82de2679c069b1bce97a7d4aeb83cf60}{buffer\_idx}})\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00060\ \ \ \mbox{\hyperlink{struct_tf_lite_tensor}{TfLiteTensor}}*\ \mbox{\hyperlink{classtflite_1_1_micro_codegen_context_a58d18b04ab7dd66ef0151bbceef9e96e}{AllocateTempTfLiteTensor}}(\textcolor{keywordtype}{int}\ tensor\_idx)\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00061\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classtflite_1_1_micro_codegen_context_a3c648dbf320eb6d0252a0d5fd96cc40c}{DeallocateTempTfLiteTensor}}(\mbox{\hyperlink{struct_tf_lite_tensor}{TfLiteTensor}}*\ \mbox{\hyperlink{namespacetensor}{tensor}})\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00062\ \ \ uint8\_t*\ \mbox{\hyperlink{classtflite_1_1_micro_codegen_context_ae4d2d653011eb761f67911c8041ebad1}{AllocateTempBuffer}}(\textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{hello__world__model_8cc_a439227feff9d7f55384e8780cfc2eb82}{size}},\ \textcolor{keywordtype}{size\_t}\ alignment)\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00063\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classtflite_1_1_micro_codegen_context_a7944de8ff8d6e4cdb0043ff95acae6bd}{DeallocateTempBuffer}}(uint8\_t*\ \mbox{\hyperlink{nano__ble33__sense__accelerometer__continuous_8ino_a221f01f29c6cba77d9479aba615283f5}{buffer}})\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00064\ \ \ \mbox{\hyperlink{struct_tf_lite_eval_tensor}{TfLiteEvalTensor}}*\ \mbox{\hyperlink{classtflite_1_1_micro_codegen_context_af9b8afcd798112a32ae94a7ee954cf8e}{GetEvalTensor}}(\textcolor{keywordtype}{int}\ tensor\_idx)\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00065\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_codegen_context_aea17a295df881cb7e1679215b90c97c1}{set\_external\_context}}(\textcolor{keywordtype}{void}*\ external\_context\_payload)\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00066\ \ \ \textcolor{keywordtype}{void}*\ \mbox{\hyperlink{classtflite_1_1_micro_codegen_context_a414f685cd17230b065e156dd98c56822}{external\_context}}()\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00067\ \ \ \mbox{\hyperlink{classtflite_1_1_micro_graph}{MicroGraph}}\&\ \mbox{\hyperlink{classtflite_1_1_micro_codegen_context_a40b86ddd3f09c2fae920b6d3294e6edb}{graph}}()\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00068\ }
+\DoxyCodeLine{00069\ \ \ \textcolor{comment}{//\ MicroGraph\ API}}
+\DoxyCodeLine{00070\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_codegen_context_af90a89f4dd7c1db0c72a634dc80aeb0f}{InvokeSubgraph}}(\textcolor{keywordtype}{int}\ subgraph\_idx)\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00071\ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{classtflite_1_1_micro_codegen_context_af952f4328aca9f1168f5f0516e7bfab0}{NumSubgraphInputs}}(\textcolor{keywordtype}{int}\ subgraph\_idx)\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00072\ \ \ \mbox{\hyperlink{struct_tf_lite_eval_tensor}{TfLiteEvalTensor}}*\ \mbox{\hyperlink{classtflite_1_1_micro_codegen_context_a14e332b644e746e8438f4ebdf4bba5b2}{GetSubgraphInput}}(\textcolor{keywordtype}{int}\ subgraph\_idx,\ \textcolor{keywordtype}{int}\ input\_idx)\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00073\ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{classtflite_1_1_micro_codegen_context_a5e057e8d03f50fa5425f0ced4e024e1a}{NumSubgraphOutputs}}(\textcolor{keywordtype}{int}\ subgraph\_idx)\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00074\ \ \ \mbox{\hyperlink{struct_tf_lite_eval_tensor}{TfLiteEvalTensor}}*\ \mbox{\hyperlink{classtflite_1_1_micro_codegen_context_ae935be4d75e2a2285a1dadc976c7b500}{GetSubgraphOutput}}(\textcolor{keywordtype}{int}\ subgraph\_idx,}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ output\_idx)\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00076\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{classtflite_1_1_micro_codegen_context_a961ed74b7446a8eb3ba000481a873127}{NumSubgraphs}}()\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00077\ \ \ \mbox{\hyperlink{classtflite_1_1_micro_resource_variables}{MicroResourceVariables}}*\ \mbox{\hyperlink{classtflite_1_1_micro_codegen_context_ae6df1ef427c3d0b54201d2e1429a2669}{GetResourceVariables}}()\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00078\ }
+\DoxyCodeLine{00079\ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{00080\ \ \ \mbox{\hyperlink{struct_tf_lite_context}{TfLiteContext}}*\ \mbox{\hyperlink{classtflite_1_1_micro_codegen_context_a4bf001ff0fce8b3fec5728e9c1cd346b}{context\_}};}
+\DoxyCodeLine{00081\ \ \ \mbox{\hyperlink{classtflite_1_1_span}{Span<Subgraph>}}\ \mbox{\hyperlink{classtflite_1_1_micro_codegen_context_a22b56b1bf9983ddc3586afa04204e60e}{subgraphs\_}};}
+\DoxyCodeLine{00082\ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{classtflite_1_1_micro_codegen_context_a9a4b38a5a394a97b76214356751d5f93}{current\_subgraph\_idx\_}}\ =\ 0;}
+\DoxyCodeLine{00083\ \ \ \textcolor{keywordtype}{void}*\ \mbox{\hyperlink{classtflite_1_1_micro_codegen_context_afca390a296086bbd8cbbafc0227f7e36}{external\_context\_payload\_}}\ =\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{00084\ }
+\DoxyCodeLine{00085\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src336b24cffab807348972c47c46f8de00_a92a34c72cfcc4f6c5bd49086ba082af4}{TF\_LITE\_REMOVE\_VIRTUAL\_DELETE}}}
+\DoxyCodeLine{00086\ \};}
+\DoxyCodeLine{00087\ }
+\DoxyCodeLine{00088\ \}\ \ \textcolor{comment}{//\ namespace\ tflite}}
+\DoxyCodeLine{00089\ }
+\DoxyCodeLine{00090\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ CODEGEN\_RUNTIME\_MICRO\_CODEGEN\_CONTEXT\_H\_}}
+
+\end{DoxyCode}

@@ -1,0 +1,249 @@
+\chapter{porting\+\_\+reference\+\_\+ops}
+\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_e2cc8d602e76088df71202fcf3d8bf60}{}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_e2cc8d602e76088df71202fcf3d8bf60}\index{porting\_reference\_ops@{porting\_reference\_ops}}
+\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_e2cc8d602e76088df71202fcf3d8bf60_autotoc_md195}{}\doxysection{\texorpdfstring{Porting Reference Ops from Lite to Micro}{Porting Reference Ops from Lite to Micro}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_e2cc8d602e76088df71202fcf3d8bf60_autotoc_md195}
+This is a guide to porting reference ops from Lite to Micro. It explains, step-\/by-\/step, the recommended code changes and the process for submitting them for review and acceptance. The process results in multiple pull requests, or PRs. Multiple, \href{https://google.github.io/eng-practices/review/developer/small-cls.html}{\texttt{ small PRs}} are easier for the project to review and merge.
+
+The \href{https://github.com/tensorflow/tflite-micro/blob/main/CONTRIBUTING.md}{\texttt{ Micro Contributing Guidelines}} are prerequisite reading. They cover general code health, maintainability, style, and submission, as well as how to setup a development environment. This guide contains step-\/by-\/step instructions for the specific task of porting reference ops from Lite to Micro.
+
+
+\begin{DoxyItemize}
+\item Porting Reference Ops from Lite to Micro
+\begin{DoxyItemize}
+\item 1. Look for a port already in progress
+\item 2. Open a Git\+Hub issue to track the port
+\item 3. Extract Lite\textquotesingle{}s code for parsing op parameters to a function (PR1)
+\item 4. Extract the reference for the op to a standalone header (PR2)
+\item 5. Port the op from Lite to Micro (PR3)
+\end{DoxyItemize}
+\item General Guidelines
+\begin{DoxyItemize}
+\item Check each commit for formatting, lint, and unit-\/test passage
+\item Maintain a 1\+:1 correspondence between Micro and Lite versions of unit tests
+\end{DoxyItemize}
+\item Notes
+\item Frequently Asked Questions
+\begin{DoxyItemize}
+\item Can I use malloc/free or new/delete in my operator code?
+\item Can I use static variable allocation in my operator code?
+\item How do I allocate persistent memory?
+\item When am I allowed to allocate persistent memory?
+\item How do I allocate/use temporary memory?
+\item When can I allocate/use temporary memory?
+\item Can I resize my input/output tensors?
+\item Can I change the shape of tensors in my operator code?
+\item When can I change the shape of tensors in my operator code?
+\item Can I modify a Tf\+Lite\+Tensor or Tf\+Lite\+Eval\+Tensor?
+\end{DoxyItemize}
+\end{DoxyItemize}\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_e2cc8d602e76088df71202fcf3d8bf60_autotoc_md196}{}\doxysubsection{\texorpdfstring{1. Look for a port already in progress}{1. Look for a port already in progress}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_e2cc8d602e76088df71202fcf3d8bf60_autotoc_md196}
+Begin by searching the tflite-\/micro Git\+Hub repository for issues containing the name of the op under consideration to ensure someone isn\textquotesingle{}t already working on a port.\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_e2cc8d602e76088df71202fcf3d8bf60_autotoc_md197}{}\doxysubsection{\texorpdfstring{2. Open a Git\+Hub issue to track the port}{2. Open a Git\+Hub issue to track the port}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_e2cc8d602e76088df71202fcf3d8bf60_autotoc_md197}
+Open a Git\+Hub issue to announce your intent to port the op, and to begin a record of your work. Document the entire process of porting the op in this issue. Link constituent PRs to this issue. See the article \mbox{[}Providing Context\mbox{]}\mbox{[}\mbox{]} for background on documenting your work via bug reports.\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_e2cc8d602e76088df71202fcf3d8bf60_autotoc_md198}{}\doxysubsection{\texorpdfstring{3. Extract Lite\textquotesingle{}s code for parsing op parameters to a function (PR1)}{3. Extract Lite\textquotesingle{}s code for parsing op parameters to a function (PR1)}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_e2cc8d602e76088df71202fcf3d8bf60_autotoc_md198}
+Now we begin changing, testing, and submitting code. This step will result in the first pull request, PR1.
+
+
+\begin{DoxyEnumerate}
+\item Extract the code for parsing op parameters out of the switch statement in \href{https://github.com/tensorflow/tensorflow/blob/d8394a6d774f5e3c02d97f1fc18ff445199db598/tensorflow/lite/core/api/flatbuffer_conversions.cc\#L135}{\texttt{ {\ttfamily Parse\+Op\+Data\+Tf\+Lite()}}} in {\ttfamily \doxylink{flatbuffer__conversions_8cc}{lite/core/api/flatbuffer\+\_\+conversions.\+cc}} into a standalone function, and call that function from the switch statement. This standalone function is now available to be called by the Micro op resolver, which also needs to parse the op parameters, in a future change. A simple example is \href{https://github.com/tensorflow/tensorflow/pull/45307}{\texttt{ PR \#45307}}, and a more complicated example is \mbox{[}PR \#46021\mbox{]}\mbox{[}\mbox{]}.
+\end{DoxyEnumerate}
+\begin{DoxyEnumerate}
+\item Use {\ttfamily clang-\/format} to make sure the code is properly formatted.
+
+{\ttfamily shell clang-\/format -\/-\/style=google -\/i \$(git ls-\/files -\/m \texorpdfstring{$\vert$}{|} grep -\/E \textquotesingle{}\textbackslash{}.cc\texorpdfstring{$\vert$}{|}\textbackslash{}.h\textquotesingle{}) }
+\end{DoxyEnumerate}
+\begin{DoxyEnumerate}
+\item Make sure your code is lint-\/free.
+
+{\ttfamily shell cpplint.\+py \$(git ls-\/files -\/m) }
+\end{DoxyEnumerate}
+\begin{DoxyEnumerate}
+\item Create a single commit containing the change. Observe the guidelines for good commit log messages found in the article \href{https://testing.googleblog.com/2017/09/code-health-providing-context-with.html}{\texttt{ Providing Context}}. A good example is commit \href{https://github.com/tensorflow/tensorflow/pull/45307/commits/0664214792ad2357f6224e7002661894775cb512}{\texttt{ 0664214}}.
+\end{DoxyEnumerate}
+\begin{DoxyEnumerate}
+\item Since this change modifies the op\textquotesingle{}s implementation in Lite, test the change with the relevant Lite unit tests.
+
+{\ttfamily shell bazel test tensorflow/lite/kernels\+:all }
+\end{DoxyEnumerate}
+\begin{DoxyEnumerate}
+\item Create and submit the PR. Write a \href{https://google.github.io/eng-practices/review/developer/cl-descriptions.html}{\texttt{ good PR description}}, and be sure to link to the Git\+Hub issue created to document the port. A good example is \href{https://github.com/tensorflow/tensorflow/pull/45307}{\texttt{ PR \#45307}}.
+\end{DoxyEnumerate}\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_e2cc8d602e76088df71202fcf3d8bf60_autotoc_md199}{}\doxysubsection{\texorpdfstring{4. Extract the reference for the op to a standalone header (PR2)}{4. Extract the reference for the op to a standalone header (PR2)}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_e2cc8d602e76088df71202fcf3d8bf60_autotoc_md199}
+Move the reference implementation of the op in \href{https://github.com/tensorflow/tensorflow/blob/92f459e6b917fa5099ef5317d14c5100d33a86f0/tensorflow/lite/kernels/internal/reference/reference_ops.h}{\texttt{ reference\+\_\+ops.\+h}} to a standalone header so that Micro can include it without including unrelated dependencies via reference\+\_\+ops.\+h.
+
+A good example is \href{https://github.com/tensorflow/tensorflow/pull/45311}{\texttt{ PR \#45311}}.
+
+
+\begin{DoxyEnumerate}
+\item Copy an existing header from {\ttfamily tensorflow/lite/kernels/internal/reference/} to {\ttfamily tensorflow/lite/kernels/internal/reference/\+NEW\+\_\+\+OP.\+H} to create the boilerplate. Replace {\ttfamily NEW\+\_\+\+OP.\+H} with the name of the new operator.
+\end{DoxyEnumerate}
+\begin{DoxyEnumerate}
+\item Move the implementation from {\ttfamily tensorflow/lite/kernels/internal/reference/reference\+\_\+ops.\+h} to {\ttfamily tensorflow/lite/kernels/internal/reference/\+NEW\+\_\+\+OP.\+H}.
+\end{DoxyEnumerate}
+\begin{DoxyEnumerate}
+\item Add the new header to the build by adding to the library definitions {\ttfamily reference\+\_\+base} and {\ttfamily legacy\+\_\+reference\+\_\+base} in the file {\ttfamily tensorflow/lite/kernels/internal/\+BUILD}. See, for example, \href{https://github.com/tensorflow/tensorflow/pull/45311/commits/92f459e6b917fa5099ef5317d14c5100d33a86f0\#diff-0b0fc9e1affece3c5a141ee9326f882876b6b958bc8b12a7c01d7540dc04983e}{\texttt{ this change for operator FILL}}.
+\end{DoxyEnumerate}
+\begin{DoxyEnumerate}
+\item Use the program {\ttfamily clang-\/format} to make sure the code is properly formatted.
+
+{\ttfamily shell clang-\/format -\/-\/style=google -\/i \$(git ls-\/files -\/m \texorpdfstring{$\vert$}{|} grep -\/E \textquotesingle{}\textbackslash{}.cc\texorpdfstring{$\vert$}{|}\textbackslash{}.h\textquotesingle{}) }
+
+Do not clang-\/format existing code in {\ttfamily \doxylink{namespace_b_u_i_l_d}{BUILD}} or {\ttfamily reference\+\_\+ops.\+h}.
+\end{DoxyEnumerate}
+\begin{DoxyEnumerate}
+\item Make sure your code is lint-\/free.
+
+{\ttfamily shell cpplint.\+py \$(git ls-\/files -\/m) }
+
+Do not modify code in {\ttfamily \doxylink{namespace_b_u_i_l_d}{BUILD}} or {\ttfamily reference\+\_\+ops.\+h} to satisfy {\ttfamily cpplint.\+py}.
+\end{DoxyEnumerate}
+\begin{DoxyEnumerate}
+\item Create a single commit containing the change. Observe the guidelines for good commit log messages found in the article \href{https://testing.googleblog.com/2017/09/code-health-providing-context-with.html}{\texttt{ Providing Context}}. A good example is commit \href{https://github.com/tensorflow/tensorflow/commit/92f459e6b917fa5099ef5317d14c5100d33a86f0}{\texttt{ 92f459e}}.
+\end{DoxyEnumerate}
+\begin{DoxyEnumerate}
+\item Since this change modifies the op\textquotesingle{}s implementation in Lite, test the change with the relevant Lite unit tests.
+
+{\ttfamily shell bazel test tensorflow/lite/kernels\+:all }
+\end{DoxyEnumerate}
+\begin{DoxyEnumerate}
+\item Create and submit the PR. Write a \href{https://google.github.io/eng-practices/review/developer/cl-descriptions.html}{\texttt{ good PR description}}, and be sure to link to the Git\+Hub issue created to document the port. A good example is \href{https://github.com/tensorflow/tensorflow/pull/45311}{\texttt{ PR \#45311}}.
+\end{DoxyEnumerate}\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_e2cc8d602e76088df71202fcf3d8bf60_autotoc_md200}{}\doxysubsection{\texorpdfstring{5. Port the op from Lite to Micro (PR3)}{5. Port the op from Lite to Micro (PR3)}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_e2cc8d602e76088df71202fcf3d8bf60_autotoc_md200}
+
+\begin{DoxyEnumerate}
+\item Copy the kernel and test from Lite to Micro.
+
+In the first commit of this PR, copy the kernel and test from Lite to Micro without making any modifications and without adding them to the build.
+
+A good example is commit \href{https://github.com/tensorflow/tensorflow/commit/a2ca1fd7a174438f736c0435dd3e4e618612fdee}{\texttt{ a2ca1fd}}.
+
+This copy action is in its own commit in order to create readable, reviewable diffs when modifications are made in later commits. If the files were copied and modified in one step, the modifications would not appear as a diff of the Lite version. Instead, the files would simply appear at the destination path in their final form.
+\end{DoxyEnumerate}
+\begin{DoxyEnumerate}
+\item Remove Lite-\/specific code from copies
+
+In the second commit of this PR, remove the bulk of Lite-\/specific code from the files copied to micro in the previous step.
+
+A good example is commit \href{https://github.com/tensorflow/tensorflow/commit/a5a87b420b87a1f832e241db3a5b724207ea700a}{\texttt{ a5a87b4}}.
+
+This bulk-\/delete action is in its own commit for reasons similar to those given in the step above\+: to produce a more readable, reviewable diff in this step and in the next. Because the files are not yet added to the build, they need not (and obviously won\textquotesingle{}t) compiler or function. What to delete now as opposed to deleting in the next commit is somewhat subjective, but make deletes in order to\+:
+\begin{DoxyItemize}
+\item Flatten the namespace down to {\ttfamily tflite}.
+\item Stop resizing output tensors.
+\item Remove input and output types other than {\ttfamily int8}, {\ttfamily int16}, and {\ttfamily float32}.
+\item Stop using gmock and gtest.
+\item etc.
+\end{DoxyItemize}
+\end{DoxyEnumerate}
+\begin{DoxyEnumerate}
+\item Port the op and the test
+
+Make the necessary changes to the micro kernel, header, and test to make the op implementation suitable for micro. Include these in the build.
+
+This step requires the most creativity, and may receive the most feedback during review. Maintain good atomicity in your commits. Considering its scope, this step will consist of more than one commit. A good example is the changes made in \href{https://github.com/tensorflow/tensorflow/pull/45647}{\texttt{ PR \#45647}}.
+\end{DoxyEnumerate}
+\begin{DoxyEnumerate}
+\item Use {\ttfamily clang-\/format} to make sure the code is properly formatted.
+
+{\ttfamily shell \$ clang-\/format -\/-\/style=google -\/i \$(git ls-\/files -\/m \texorpdfstring{$\vert$}{|} grep -\/E \textquotesingle{}\textbackslash{}.cc\texorpdfstring{$\vert$}{|}\textbackslash{}.h\textquotesingle{}) }
+
+Do not clang-\/format existing code in {\ttfamily \doxylink{namespace_b_u_i_l_d}{BUILD}} or {\ttfamily reference\+\_\+ops.\+h}.
+\end{DoxyEnumerate}
+\begin{DoxyEnumerate}
+\item Make sure the code is lint-\/free.
+
+{\ttfamily shell \$ cpplint.\+py \$(git ls-\/files -\/m) }
+
+Do not modify code in {\ttfamily \doxylink{namespace_b_u_i_l_d}{BUILD}} or {\ttfamily reference\+\_\+ops.\+h} to satisfy {\ttfamily cpplint.\+py}.
+\end{DoxyEnumerate}
+\begin{DoxyEnumerate}
+\item Make sure the port passes all applicable tests.
+
+{\ttfamily shell \$ bazel test tensorflow/lite/micro/kernels\+:\$\{op\}\+\_\+test \$ bazel test tensorflow/lite/micro/kernels\+:all \$ make -\/f tensorflow/lite/micro/tools/make/\+Makefile test\+\_\+kernel\+\_\+\$\{op\}\+\_\+test \$ make -\/f tensorflow/lite/micro/tools/make/\+Makefile test }
+
+See the general \href{https://github.com/tensorflow/tflite-micro/blob/main/CONTRIBUTING.md}{\texttt{ Micro Contributing Guidelines}} for other testing ideas, including the use of address sanitizers.
+\end{DoxyEnumerate}
+\begin{DoxyEnumerate}
+\item Create and submit the PR. Write a \href{https://google.github.io/eng-practices/review/developer/cl-descriptions.html}{\texttt{ good PR description}}, and be sure to link to the Git\+Hub issue created to document the port. A good example is \href{https://github.com/tensorflow/tensorflow/pull/45647}{\texttt{ PR \#45647}}.
+\end{DoxyEnumerate}\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_e2cc8d602e76088df71202fcf3d8bf60_autotoc_md201}{}\doxysection{\texorpdfstring{General Guidelines}{General Guidelines}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_e2cc8d602e76088df71202fcf3d8bf60_autotoc_md201}
+\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_e2cc8d602e76088df71202fcf3d8bf60_autotoc_md202}{}\doxysubsection{\texorpdfstring{Check each commit for formatting, lint, and unit-\/test passage}{Check each commit for formatting, lint, and unit-\/test passage}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_e2cc8d602e76088df71202fcf3d8bf60_autotoc_md202}
+Check each commit against the \href{https://github.com/tensorflow/tflite-micro/blob/main/CONTRIBUTING.md\#before-submitting-your-pr}{\texttt{ pre-\/submit checklist}} in the micro Contributing Guidelines. Specifically, make sure your code\+:
+
+
+\begin{DoxyEnumerate}
+\item Is formatted with clang-\/format.
+\end{DoxyEnumerate}
+\begin{DoxyEnumerate}
+\item Passes a lint check.
+\end{DoxyEnumerate}
+\begin{DoxyEnumerate}
+\item Passes all unit tests.
+
+{\ttfamily shell \$ make -\/s -\/j8 -\/f tensorflow/lite/micro/tools/make/\+Makefile test }
+\end{DoxyEnumerate}
+
+CI runs these checks on all PRs, and will hold up your PR if any of these checks fail.\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_e2cc8d602e76088df71202fcf3d8bf60_autotoc_md203}{}\doxysubsection{\texorpdfstring{Maintain a 1\+:1 correspondence between Micro and Lite versions of unit tests}{Maintain a 1\+:1 correspondence between Micro and Lite versions of unit tests}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_e2cc8d602e76088df71202fcf3d8bf60_autotoc_md203}
+To the extent possible, maintain a 1\+:1 correspondence between Micro and Lite versions of unit tests. Avoid cleanup of merely stylistic issues, e.\+g., by replacing the hardcoded literal {\ttfamily 3.\+40282e+038} with {\ttfamily std\+::numeric\+\_\+limits\texorpdfstring{$<$}{<}float\texorpdfstring{$>$}{>}::\doxylink{common__functions_8h_affe776513b24d84b39af8ab0930fef7f}{max()}}. Any changes between the Micro and Lite versions of a test put a burden on future maintainers to figure out whether the differences are actually significant or just stylistic.\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_e2cc8d602e76088df71202fcf3d8bf60_autotoc_md204}{}\doxysection{\texorpdfstring{Notes}{Notes}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_e2cc8d602e76088df71202fcf3d8bf60_autotoc_md204}
+
+\begin{DoxyItemize}
+\item There was discussion of commits vs. PRs in \href{https://github.com/tensorflow/tensorflow/issues/45387}{\texttt{ \#45387}}.
+\item \href{https://www.tensorflow.org/lite/performance/quantization_spec}{\texttt{ Tensor\+Flow Lite 8-\/bit quantization specification}}
+\end{DoxyItemize}\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_e2cc8d602e76088df71202fcf3d8bf60_autotoc_md205}{}\doxysection{\texorpdfstring{Frequently Asked Questions}{Frequently Asked Questions}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_e2cc8d602e76088df71202fcf3d8bf60_autotoc_md205}
+\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_e2cc8d602e76088df71202fcf3d8bf60_autotoc_md206}{}\doxysubsection{\texorpdfstring{Can I use malloc/free or new/delete in my operator code?}{Can I use malloc/free or new/delete in my operator code?}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_e2cc8d602e76088df71202fcf3d8bf60_autotoc_md206}
+No. All memory allocation in Tensor\+Flow Lite Micro (TFLM) is done using C++ stack based automatic allocation, or through specialized TFLM persistent and temporary allocation methods.\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_e2cc8d602e76088df71202fcf3d8bf60_autotoc_md207}{}\doxysubsection{\texorpdfstring{Can I use static variable allocation in my operator code?}{Can I use static variable allocation in my operator code?}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_e2cc8d602e76088df71202fcf3d8bf60_autotoc_md207}
+No. This is due to the call ordering of C++ static constructors being platform/compiler dependent.\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_e2cc8d602e76088df71202fcf3d8bf60_autotoc_md208}{}\doxysubsection{\texorpdfstring{How do I allocate persistent memory?}{How do I allocate persistent memory?}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_e2cc8d602e76088df71202fcf3d8bf60_autotoc_md208}
+Use {\ttfamily \doxylink{struct_tf_lite_context_abad57406eef93e58a3c20bedc8458834}{Tf\+Lite\+Context\+::\+Allocate\+Persistent\+Buffer}} to allocate persistent memory. Memory allocated by this method will remain valid throughout the lifetime of the {\ttfamily \doxylink{classtflite_1_1_micro_interpreter}{tflite\+::\+Micro\+Interpreter}} instance.
+
+An example code snippet looks like (\href{../kernels/leaky_relu.cc}{\texttt{ leaky\+\_\+relu.\+cc}})\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ ++}
+\DoxyCodeLine{\textcolor{keywordtype}{void}*\ \mbox{\hyperlink{namespacetflite_a3d065f44cf8041140c1fc435dca59aa1}{LeakyReluInit}}(\mbox{\hyperlink{struct_tf_lite_context}{TfLiteContext}}*\ context,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \mbox{\hyperlink{nano__ble33__sense__accelerometer__continuous_8ino_a221f01f29c6cba77d9479aba615283f5}{buffer}},\ \textcolor{keywordtype}{size\_t}\ length)\ \{}
+\DoxyCodeLine{\ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src82599f02174ce2f1c2fd003f3eee8b73_aae1ef2f661f926fac4c1555e46d4c704}{TFLITE\_DCHECK}}(context-\/>\mbox{\hyperlink{struct_tf_lite_context_abad57406eef93e58a3c20bedc8458834}{AllocatePersistentBuffer}}\ !=\ \textcolor{keyword}{nullptr});}
+\DoxyCodeLine{\ \ \textcolor{keywordflow}{return}\ context-\/>\mbox{\hyperlink{struct_tf_lite_context_abad57406eef93e58a3c20bedc8458834}{AllocatePersistentBuffer}}(context,\ \textcolor{keyword}{sizeof}(LeakyReluOpData));}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_e2cc8d602e76088df71202fcf3d8bf60_autotoc_md209}{}\doxysubsection{\texorpdfstring{When am I allowed to allocate persistent memory?}{When am I allowed to allocate persistent memory?}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_e2cc8d602e76088df71202fcf3d8bf60_autotoc_md209}
+The {\ttfamily \doxylink{struct_tf_lite_context_abad57406eef93e58a3c20bedc8458834}{Tf\+Lite\+Context\+::\+Allocate\+Persistent\+Buffer}} method may only be called within the scope of your operator\textquotesingle{}s {\ttfamily Init} and {\ttfamily Prepare} methods.\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_e2cc8d602e76088df71202fcf3d8bf60_autotoc_md210}{}\doxysubsection{\texorpdfstring{How do I allocate/use temporary memory?}{How do I allocate/use temporary memory?}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_e2cc8d602e76088df71202fcf3d8bf60_autotoc_md210}
+Use the {\ttfamily \doxylink{struct_tf_lite_context_a7a3778903dc181d98fe1f10a4f6e15c9}{Tf\+Lite\+Context\+::\+Request\+Scratch\+Buffer\+In\+Arena}} and {\ttfamily \doxylink{struct_tf_lite_context_a79a5ae043ca55b703fe6f4cf8c571217}{Tf\+Lite\+Context\+::\+Get\+Scratch\+Buffer}} methods. The temporary memory is shared between all operators, and is only valid for your operator within the scope of your operator\textquotesingle{}s {\ttfamily Invoke} method. Do not attempt to use temporary memory to share data between operator invocations. Temporary memory is to be used only as pre-\/allocated storage during the execution scope of your operator\textquotesingle{}s {\ttfamily Invoke} method.
+
+An example code snippet looks like (\href{../kernels/add_n.cc}{\texttt{ add\+\_\+n.\+cc}})\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ ++}
+\DoxyCodeLine{\textcolor{keywordflow}{if}\ (\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbcd3bbe90c4644d53fde1ce4e312f437_a7a2a916a8059078c2d7a05f46c7126fd}{output}}-\/>\mbox{\hyperlink{struct_tf_lite_eval_tensor_a180bc742f14353dd12e73a872f0e0cb5}{type}}\ ==\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_a8a47ba81bdef28b5c479ee7928a7d123a0abdf1d6cf1c5907891defe4ce746455}{kTfLiteFloat32}})\ \{}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{//\ Allocate\ scratch\ buffer\ space\ for\ pointer\ to\ each\ tensor's\ data}}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{//\ and\ store\ the\ scratch\ buffer\ index\ in\ the\ node's\ user\_data}}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src07231aa9a2b381aa3c97687e9f0d823d_ac05d8dbadcf0a6890de3aa3dea280352}{scratch\_index}};}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordtype}{size\_t}\ scratch\_size\ =\ \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{float}*)\ *\ num\_inputs;}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src0ad488291f7fc2ff7a022d8a6e141a3e_a42da7e8a147c70f352f54ed0959365d7}{TF\_LITE\_ENSURE\_OK}}(context,\ context-\/>\mbox{\hyperlink{struct_tf_lite_context_a7a3778903dc181d98fe1f10a4f6e15c9}{RequestScratchBufferInArena}}(}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ context,\ scratch\_size,\ \&\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src07231aa9a2b381aa3c97687e9f0d823d_ac05d8dbadcf0a6890de3aa3dea280352}{scratch\_index}}));}
+\DoxyCodeLine{\ \ \ \ node-\/>user\_data\ =}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keyword}{reinterpret\_cast<}decltype(node-\/\textcolor{keyword}{>}user\_data)>(\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src07231aa9a2b381aa3c97687e9f0d823d_ac05d8dbadcf0a6890de3aa3dea280352}{scratch\_index}});}
+\DoxyCodeLine{\ \ \}}
+
+\end{DoxyCode}
+ And to use the buffer\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ ++}
+\DoxyCodeLine{\textcolor{keywordtype}{int}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src07231aa9a2b381aa3c97687e9f0d823d_ac05d8dbadcf0a6890de3aa3dea280352}{scratch\_index}}\ =}
+\DoxyCodeLine{\ \ \ \ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{int}\textcolor{keyword}{>}(\textcolor{keyword}{reinterpret\_cast<}intptr\_t\textcolor{keyword}{>}(node-\/>user\_data));}
+\DoxyCodeLine{\textcolor{keywordtype}{void}*\ scratch\_buffer\ =\ context-\/>\mbox{\hyperlink{struct_tf_lite_context_a79a5ae043ca55b703fe6f4cf8c571217}{GetScratchBuffer}}(context,\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src07231aa9a2b381aa3c97687e9f0d823d_ac05d8dbadcf0a6890de3aa3dea280352}{scratch\_index}});}
+
+\end{DoxyCode}
+\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_e2cc8d602e76088df71202fcf3d8bf60_autotoc_md211}{}\doxysubsection{\texorpdfstring{When can I allocate/use temporary memory?}{When can I allocate/use temporary memory?}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_e2cc8d602e76088df71202fcf3d8bf60_autotoc_md211}
+The {\ttfamily \doxylink{struct_tf_lite_context_a7a3778903dc181d98fe1f10a4f6e15c9}{Tf\+Lite\+Context\+::\+Request\+Scratch\+Buffer\+In\+Arena}} method is available only within the scope of your operator\textquotesingle{}s {\ttfamily Prepare} method. The {\ttfamily \doxylink{struct_tf_lite_context_a79a5ae043ca55b703fe6f4cf8c571217}{Tf\+Lite\+Context\+::\+Get\+Scratch\+Buffer}} method is available only within the scope of your operator\textquotesingle{}s {\ttfamily Invoke} method.\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_e2cc8d602e76088df71202fcf3d8bf60_autotoc_md212}{}\doxysubsection{\texorpdfstring{Can I resize my input/output tensors?}{Can I resize my input/output tensors?}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_e2cc8d602e76088df71202fcf3d8bf60_autotoc_md212}
+No. The storage space for each input/output tensor is a fixed, calculated value determined at the time the Tensor\+Flow Lite (Tf\+Lite) model converter is executed. During the {\ttfamily Init} phase of the {\ttfamily \doxylink{classtflite_1_1_micro_interpreter}{tflite\+::\+Micro\+Interpreter}} all tensor storage is allocated by the {\ttfamily \doxylink{classtflite_1_1_micro_interpreter}{tflite\+::\+Micro\+Interpreter}} instance, using the calculated values of the model converter. For more information see\+: \doxysectlink{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_2f970c8a04c7ccf34db0746d108b813f}{Memory Allocation Overview}{0}\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_e2cc8d602e76088df71202fcf3d8bf60_autotoc_md213}{}\doxysubsection{\texorpdfstring{Can I change the shape of tensors in my operator code?}{Can I change the shape of tensors in my operator code?}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_e2cc8d602e76088df71202fcf3d8bf60_autotoc_md213}
+Yes. The new shape must not exceed the storage space indicated by the old shape. Because tensor shape values may live in memory that is not directly writable (ex. Flash, EEPROM, ROM), a special method must be called before modification is attempted. The {\ttfamily \doxylink{namespacetflite_1_1micro_a7189e8045e8205d6f29ec78a2cd9111a}{tflite\+::micro\+::\+Create\+Writable\+Tensor\+Dims\+With\+Copy}} method will move the tensor shape values to guaranteed persistent writable memory.
+
+An example code snippet looks like (\href{../kernels/l2_pool_2d.cc}{\texttt{ l2\+\_\+pool\+\_\+2d.\+cc}})\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ ++}
+\DoxyCodeLine{\textcolor{comment}{//\ the\ output\ variable\ is\ a\ TfLiteTensor*}}
+\DoxyCodeLine{\mbox{\hyperlink{struct_tf_lite_eval_tensor}{TfLiteEvalTensor}}*\ output\_eval\ =}
+\DoxyCodeLine{\ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_1_1micro_aa482f3e94317cf4ae04468449ff7ee14}{tflite::micro::GetEvalOutput}}(context,\ node,\ kOutputTensor);}
+\DoxyCodeLine{\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src0ad488291f7fc2ff7a022d8a6e141a3e_a42da7e8a147c70f352f54ed0959365d7}{TF\_LITE\_ENSURE\_OK}}(context,\ \mbox{\hyperlink{namespacetflite_1_1micro_a7189e8045e8205d6f29ec78a2cd9111a}{tflite::micro::CreateWritableTensorDimsWithCopy}}(}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ context,\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbcd3bbe90c4644d53fde1ce4e312f437_a7a2a916a8059078c2d7a05f46c7126fd}{output}},\ output\_eval));}
+\DoxyCodeLine{\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbcd3bbe90c4644d53fde1ce4e312f437_a7a2a916a8059078c2d7a05f46c7126fd}{output}}-\/>\mbox{\hyperlink{struct_tf_lite_eval_tensor_aeaf6a5ebeb5026105c51f1f905a0091e}{dims}}-\/>\mbox{\hyperlink{struct_tf_lite_int_array_ab262dcb3609e96a3d8a5e64fccd092d6}{data}}[kBatchRank]\ =\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcb6422ba4b09c37fea36f264b4bcbc5a2_a33ca4260b69888f0d67521391a871b5e}{batches}};}
+\DoxyCodeLine{\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbcd3bbe90c4644d53fde1ce4e312f437_a7a2a916a8059078c2d7a05f46c7126fd}{output}}-\/>\mbox{\hyperlink{struct_tf_lite_eval_tensor_aeaf6a5ebeb5026105c51f1f905a0091e}{dims}}-\/>\mbox{\hyperlink{struct_tf_lite_int_array_ab262dcb3609e96a3d8a5e64fccd092d6}{data}}[kHeightRank]\ =\ \mbox{\hyperlink{ei__fill__result__struct_8h_a1ef0471f3f0466a7152ee88ba4fce7d3}{out\_height}};}
+\DoxyCodeLine{\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbcd3bbe90c4644d53fde1ce4e312f437_a7a2a916a8059078c2d7a05f46c7126fd}{output}}-\/>\mbox{\hyperlink{struct_tf_lite_eval_tensor_aeaf6a5ebeb5026105c51f1f905a0091e}{dims}}-\/>\mbox{\hyperlink{struct_tf_lite_int_array_ab262dcb3609e96a3d8a5e64fccd092d6}{data}}[kWidthRank]\ =\ \mbox{\hyperlink{ei__fill__result__struct_8h_ad304736c157d6f1061c74fe1ce38c8b8}{out\_width}};}
+\DoxyCodeLine{\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbcd3bbe90c4644d53fde1ce4e312f437_a7a2a916a8059078c2d7a05f46c7126fd}{output}}-\/>\mbox{\hyperlink{struct_tf_lite_eval_tensor_aeaf6a5ebeb5026105c51f1f905a0091e}{dims}}-\/>\mbox{\hyperlink{struct_tf_lite_int_array_ab262dcb3609e96a3d8a5e64fccd092d6}{data}}[kChannelRank]\ =\ channels\_out;}
+
+\end{DoxyCode}
+\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_e2cc8d602e76088df71202fcf3d8bf60_autotoc_md214}{}\doxysubsection{\texorpdfstring{When can I change the shape of tensors in my operator code?}{When can I change the shape of tensors in my operator code?}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_e2cc8d602e76088df71202fcf3d8bf60_autotoc_md214}
+Tensor shape values can be modified any time after the {\ttfamily \doxylink{namespacetflite_1_1micro_a7189e8045e8205d6f29ec78a2cd9111a}{tflite\+::micro\+::\+Create\+Writable\+Tensor\+Dims\+With\+Copy}} method has been called. This means that tensor shape values can be modified within the scope of your operator\textquotesingle{}s {\ttfamily Prepare} or {\ttfamily Invoke} methods. The {\ttfamily \doxylink{namespacetflite_1_1micro_a7189e8045e8205d6f29ec78a2cd9111a}{tflite\+::micro\+::\+Create\+Writable\+Tensor\+Dims\+With\+Copy}} method may only be called within the scope of your operator\textquotesingle{}s {\ttfamily Prepare} method.\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_e2cc8d602e76088df71202fcf3d8bf60_autotoc_md215}{}\doxysubsection{\texorpdfstring{Can I modify a {\ttfamily Tf\+Lite\+Tensor} or {\ttfamily Tf\+Lite\+Eval\+Tensor}?}{Can I modify a {\ttfamily Tf\+Lite\+Tensor} or {\ttfamily Tf\+Lite\+Eval\+Tensor}?}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_e2cc8d602e76088df71202fcf3d8bf60_autotoc_md215}
+No. The {\ttfamily \doxylink{classtflite_1_1_micro_interpreter}{tflite\+::\+Micro\+Interpreter}} is the owner and manipulator of these data structures. Your code should not modify these data structures. The only directly allowed modification of tensors is to change their data values, or their shape values.\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_e2cc8d602e76088df71202fcf3d8bf60_autotoc_md216}{}\doxysubsection{\texorpdfstring{How do I fix optimized kernel unit test failures?}{How do I fix optimized kernel unit test failures?}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_e2cc8d602e76088df71202fcf3d8bf60_autotoc_md216}
+Kernel unit tests for all optimizated kernels should pass. By default kernel unit tests for the newly added op may fail for optimized kernels as they may not have the correct references. In this case, we should let the optimized kernels fall back to the newly added reference kernels. For example, refer to this \href{https://github.com/tensorflow/tflite-micro/pull/1274/commits/d36c9dd598dcbf352f2c60463fd0d4153703a1cd}{\texttt{ this commit}}. 

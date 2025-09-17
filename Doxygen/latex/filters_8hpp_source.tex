@@ -1,0 +1,148 @@
+\doxysection{filters.\+hpp}
+\hypertarget{filters_8hpp_source}{}\label{filters_8hpp_source}\index{Face\_Access\_inferencing/src/edge-\/impulse-\/sdk/dsp/spectral/filters.hpp@{Face\_Access\_inferencing/src/edge-\/impulse-\/sdk/dsp/spectral/filters.hpp}}
+\mbox{\hyperlink{filters_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{00002\ \textcolor{comment}{\ *\ Copyright\ (c)\ 2024\ EdgeImpulse\ Inc.}}
+\DoxyCodeLine{00003\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00004\ \textcolor{comment}{\ *\ Generated\ by\ Edge\ Impulse\ and\ licensed\ under\ the\ applicable\ Edge\ Impulse}}
+\DoxyCodeLine{00005\ \textcolor{comment}{\ *\ Terms\ of\ Service.\ Community\ and\ Professional\ Terms\ of\ Service}}
+\DoxyCodeLine{00006\ \textcolor{comment}{\ *\ (https://docs.edgeimpulse.com/page/terms-\/of-\/service)\ or\ Enterprise\ Terms\ of}}
+\DoxyCodeLine{00007\ \textcolor{comment}{\ *\ Service\ (https://docs.edgeimpulse.com/page/enterprise-\/terms-\/of-\/service),}}
+\DoxyCodeLine{00008\ \textcolor{comment}{\ *\ according\ to\ your\ product\ plan\ subscription\ (the\ “License”).}}
+\DoxyCodeLine{00009\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00010\ \textcolor{comment}{\ *\ This\ software,\ documentation\ and\ other\ associated\ files\ (collectively\ referred}}
+\DoxyCodeLine{00011\ \textcolor{comment}{\ *\ to\ as\ the\ “Software”)\ is\ a\ single\ SDK\ variation\ generated\ by\ the\ Edge\ Impulse}}
+\DoxyCodeLine{00012\ \textcolor{comment}{\ *\ platform\ and\ requires\ an\ active\ paid\ Edge\ Impulse\ subscription\ to\ use\ this}}
+\DoxyCodeLine{00013\ \textcolor{comment}{\ *\ Software\ for\ any\ purpose.}}
+\DoxyCodeLine{00014\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00015\ \textcolor{comment}{\ *\ You\ may\ NOT\ use\ this\ Software\ unless\ you\ have\ an\ active\ Edge\ Impulse\ subscription}}
+\DoxyCodeLine{00016\ \textcolor{comment}{\ *\ that\ meets\ the\ eligibility\ requirements\ for\ the\ applicable\ License,\ subject\ to}}
+\DoxyCodeLine{00017\ \textcolor{comment}{\ *\ your\ full\ and\ continued\ compliance\ with\ the\ terms\ and\ conditions\ of\ the\ License,}}
+\DoxyCodeLine{00018\ \textcolor{comment}{\ *\ including\ without\ limitation\ any\ usage\ restrictions\ under\ the\ applicable\ License.}}
+\DoxyCodeLine{00019\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00020\ \textcolor{comment}{\ *\ If\ you\ do\ not\ have\ an\ active\ Edge\ Impulse\ product\ plan\ subscription,\ or\ if\ use}}
+\DoxyCodeLine{00021\ \textcolor{comment}{\ *\ of\ this\ Software\ exceeds\ the\ usage\ limitations\ of\ your\ Edge\ Impulse\ product\ plan}}
+\DoxyCodeLine{00022\ \textcolor{comment}{\ *\ subscription,\ you\ are\ not\ permitted\ to\ use\ this\ Software\ and\ must\ immediately}}
+\DoxyCodeLine{00023\ \textcolor{comment}{\ *\ delete\ and\ erase\ all\ copies\ of\ this\ Software\ within\ your\ control\ or\ possession.}}
+\DoxyCodeLine{00024\ \textcolor{comment}{\ *\ Edge\ Impulse\ reserves\ all\ rights\ and\ remedies\ available\ to\ enforce\ its\ rights.}}
+\DoxyCodeLine{00025\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00026\ \textcolor{comment}{\ *\ Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ the\ Software\ is}}
+\DoxyCodeLine{00027\ \textcolor{comment}{\ *\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,\ WITHOUT\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,}}
+\DoxyCodeLine{00028\ \textcolor{comment}{\ *\ either\ express\ or\ implied.\ See\ the\ License\ for\ the\ specific\ language\ governing}}
+\DoxyCodeLine{00029\ \textcolor{comment}{\ *\ permissions,\ disclaimers\ and\ limitations\ under\ the\ License.}}
+\DoxyCodeLine{00030\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{00031\ \textcolor{preprocessor}{\#ifndef\ \_EIDSP\_SPECTRAL\_FILTERS\_H\_}}
+\DoxyCodeLine{00032\ \textcolor{preprocessor}{\#define\ \_EIDSP\_SPECTRAL\_FILTERS\_H\_}}
+\DoxyCodeLine{00033\ }
+\DoxyCodeLine{00034\ \textcolor{preprocessor}{\#include\ <math.h>}}
+\DoxyCodeLine{00035\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{numpy_8hpp}{../numpy.hpp}}"{}}}
+\DoxyCodeLine{00036\ }
+\DoxyCodeLine{00037\ \textcolor{preprocessor}{\#ifndef\ M\_PI}}
+\DoxyCodeLine{00038\ \textcolor{preprocessor}{\#define\ M\_PI\ 3.14159265358979323846264338327950288}}
+\DoxyCodeLine{00039\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ M\_PI}}
+\DoxyCodeLine{00040\ }
+\DoxyCodeLine{00041\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespaceei}{ei}}\ \{}
+\DoxyCodeLine{00042\ \textcolor{keyword}{namespace\ }spectral\ \{}
+\DoxyCodeLine{00043\ \textcolor{keyword}{namespace\ }filters\ \{}
+\DoxyCodeLine{00053\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespaceei_1_1spectral_1_1filters_a3a582d4d7c6f4981b5adcf44543a1612}{butterworth\_lowpass}}(}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ filter\_order,}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}\ sampling\_freq,}
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}\ cutoff\_freq,}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{float}\ *src,}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}\ *dest,}
+\DoxyCodeLine{00059\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{namespaceei_a000f348b45d99db3a9dd6a9991ef667a}{size}})}
+\DoxyCodeLine{00060\ \ \ \ \ \{}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ n\_steps\ =\ filter\_order\ /\ 2;}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}\ a\ =\ tan(\mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2experimental_2microfrontend_2lib_2window__util_8c_ae71449b1cc6e6250b91f539153a7a0d3}{M\_PI}}\ *\ cutoff\_freq\ /\ sampling\_freq);}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}\ a2\ =\ pow(a,\ 2);}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}\ *A\ =\ (\textcolor{keywordtype}{float}*)\mbox{\hyperlink{memory_8hpp_acb99ad7939b0a5a3ef1f623ffc8f96a2}{ei\_dsp\_calloc}}(n\_steps,\ \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{float}));}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}\ *d1\ =\ (\textcolor{keywordtype}{float}*)\mbox{\hyperlink{memory_8hpp_acb99ad7939b0a5a3ef1f623ffc8f96a2}{ei\_dsp\_calloc}}(n\_steps,\ \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{float}));}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}\ *d2\ =\ (\textcolor{keywordtype}{float}*)\mbox{\hyperlink{memory_8hpp_acb99ad7939b0a5a3ef1f623ffc8f96a2}{ei\_dsp\_calloc}}(n\_steps,\ \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{float}));}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}\ *w0\ =\ (\textcolor{keywordtype}{float}*)\mbox{\hyperlink{memory_8hpp_acb99ad7939b0a5a3ef1f623ffc8f96a2}{ei\_dsp\_calloc}}(n\_steps,\ \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{float}));}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}\ *w1\ =\ (\textcolor{keywordtype}{float}*)\mbox{\hyperlink{memory_8hpp_acb99ad7939b0a5a3ef1f623ffc8f96a2}{ei\_dsp\_calloc}}(n\_steps,\ \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{float}));}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}\ *w2\ =\ (\textcolor{keywordtype}{float}*)\mbox{\hyperlink{memory_8hpp_acb99ad7939b0a5a3ef1f623ffc8f96a2}{ei\_dsp\_calloc}}(n\_steps,\ \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{float}));}
+\DoxyCodeLine{00070\ }
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Calculate\ the\ filter\ parameters}}
+\DoxyCodeLine{00072\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int}\ ix\ =\ 0;\ ix\ <\ n\_steps;\ ix++)\ \{}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_acab531abaa74a7e664e3986f2522b33a}{r}}\ =\ sin(\mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2experimental_2microfrontend_2lib_2window__util_8c_ae71449b1cc6e6250b91f539153a7a0d3}{M\_PI}}\ *\ ((2.0\ *\ ix)\ +\ 1.0)\ /\ (2.0\ *\ filter\_order));}
+\DoxyCodeLine{00074\ \ \ \ \ \ \ \ \ \ \ \ \ sampling\_freq\ =\ a2\ +\ (2.0\ *\ a\ *\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_acab531abaa74a7e664e3986f2522b33a}{r}})\ +\ 1.0;}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \ \ \ \ \ \ A[ix]\ =\ a2\ /\ sampling\_freq;}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ \ \ \ \ d1[ix]\ =\ 2.0\ *\ (1\ -\/\ a2)\ /\ sampling\_freq;}
+\DoxyCodeLine{00077\ \ \ \ \ \ \ \ \ \ \ \ \ d2[ix]\ =\ -\/(a2\ -\/\ (2.0\ *\ a\ *\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_acab531abaa74a7e664e3986f2522b33a}{r}})\ +\ 1.0)\ /\ sampling\_freq;}
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00079\ }
+\DoxyCodeLine{00080\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Apply\ the\ filter}}
+\DoxyCodeLine{00081\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ sx\ =\ 0;\ sx\ <\ \mbox{\hyperlink{namespaceei_a000f348b45d99db3a9dd6a9991ef667a}{size}};\ sx++)\ \{}
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \ \ \ \ \ \ dest[sx]\ =\ src[sx];}
+\DoxyCodeLine{00083\ }
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ n\_steps;\ i++)\ \{}
+\DoxyCodeLine{00085\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ w0[i]\ =\ d1[i]\ *\ w1[i]\ +\ d2[i]\ *\ w2[i]\ +\ dest[sx];}
+\DoxyCodeLine{00086\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ dest[sx]\ =\ A[i]\ *\ (w0[i]\ +\ (2.0\ *\ w1[i])\ +\ w2[i]);}
+\DoxyCodeLine{00087\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ w2[i]\ =\ w1[i];}
+\DoxyCodeLine{00088\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ w1[i]\ =\ w0[i];}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00090\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00091\ }
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{memory_8hpp_a728a1c89209caadbb6cd4229f375adb3}{ei\_dsp\_free}}(A,\ n\_steps*\textcolor{keyword}{sizeof}(\textcolor{keywordtype}{float}));}
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{memory_8hpp_a728a1c89209caadbb6cd4229f375adb3}{ei\_dsp\_free}}(d1,\ n\_steps*\textcolor{keyword}{sizeof}(\textcolor{keywordtype}{float}));}
+\DoxyCodeLine{00094\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{memory_8hpp_a728a1c89209caadbb6cd4229f375adb3}{ei\_dsp\_free}}(d2,\ n\_steps*\textcolor{keyword}{sizeof}(\textcolor{keywordtype}{float}));}
+\DoxyCodeLine{00095\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{memory_8hpp_a728a1c89209caadbb6cd4229f375adb3}{ei\_dsp\_free}}(w0,\ n\_steps*\textcolor{keyword}{sizeof}(\textcolor{keywordtype}{float}));}
+\DoxyCodeLine{00096\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{memory_8hpp_a728a1c89209caadbb6cd4229f375adb3}{ei\_dsp\_free}}(w1,\ n\_steps*\textcolor{keyword}{sizeof}(\textcolor{keywordtype}{float}));}
+\DoxyCodeLine{00097\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{memory_8hpp_a728a1c89209caadbb6cd4229f375adb3}{ei\_dsp\_free}}(w2,\ n\_steps*\textcolor{keyword}{sizeof}(\textcolor{keywordtype}{float}));}
+\DoxyCodeLine{00098\ \ \ \ \ \}}
+\DoxyCodeLine{00099\ }
+\DoxyCodeLine{00109\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespaceei_1_1spectral_1_1filters_ab859007a0b3e9eea4b901da30eb4801b}{butterworth\_highpass}}(}
+\DoxyCodeLine{00110\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ filter\_order,}
+\DoxyCodeLine{00111\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}\ sampling\_freq,}
+\DoxyCodeLine{00112\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}\ cutoff\_freq,}
+\DoxyCodeLine{00113\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{float}\ *src,}
+\DoxyCodeLine{00114\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}\ *dest,}
+\DoxyCodeLine{00115\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{namespaceei_a000f348b45d99db3a9dd6a9991ef667a}{size}})}
+\DoxyCodeLine{00116\ \ \ \ \ \{}
+\DoxyCodeLine{00117\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ n\_steps\ =\ filter\_order\ /\ 2;}
+\DoxyCodeLine{00118\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}\ a\ =\ tan(\mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2experimental_2microfrontend_2lib_2window__util_8c_ae71449b1cc6e6250b91f539153a7a0d3}{M\_PI}}\ *\ cutoff\_freq\ /\ sampling\_freq);}
+\DoxyCodeLine{00119\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}\ a2\ =\ pow(a,\ 2);}
+\DoxyCodeLine{00120\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}\ *A\ =\ (\textcolor{keywordtype}{float}*)\mbox{\hyperlink{memory_8hpp_acb99ad7939b0a5a3ef1f623ffc8f96a2}{ei\_dsp\_calloc}}(n\_steps,\ \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{float}));}
+\DoxyCodeLine{00121\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}\ *d1\ =\ (\textcolor{keywordtype}{float}*)\mbox{\hyperlink{memory_8hpp_acb99ad7939b0a5a3ef1f623ffc8f96a2}{ei\_dsp\_calloc}}(n\_steps,\ \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{float}));}
+\DoxyCodeLine{00122\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}\ *d2\ =\ (\textcolor{keywordtype}{float}*)\mbox{\hyperlink{memory_8hpp_acb99ad7939b0a5a3ef1f623ffc8f96a2}{ei\_dsp\_calloc}}(n\_steps,\ \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{float}));}
+\DoxyCodeLine{00123\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}\ *w0\ =\ (\textcolor{keywordtype}{float}*)\mbox{\hyperlink{memory_8hpp_acb99ad7939b0a5a3ef1f623ffc8f96a2}{ei\_dsp\_calloc}}(n\_steps,\ \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{float}));}
+\DoxyCodeLine{00124\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}\ *w1\ =\ (\textcolor{keywordtype}{float}*)\mbox{\hyperlink{memory_8hpp_acb99ad7939b0a5a3ef1f623ffc8f96a2}{ei\_dsp\_calloc}}(n\_steps,\ \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{float}));}
+\DoxyCodeLine{00125\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}\ *w2\ =\ (\textcolor{keywordtype}{float}*)\mbox{\hyperlink{memory_8hpp_acb99ad7939b0a5a3ef1f623ffc8f96a2}{ei\_dsp\_calloc}}(n\_steps,\ \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{float}));}
+\DoxyCodeLine{00126\ }
+\DoxyCodeLine{00127\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Calculate\ the\ filter\ parameters}}
+\DoxyCodeLine{00128\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ ix\ =\ 0;\ ix\ <\ n\_steps;\ ix++)\ \{}
+\DoxyCodeLine{00129\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_acab531abaa74a7e664e3986f2522b33a}{r}}\ =\ sin(\mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2experimental_2microfrontend_2lib_2window__util_8c_ae71449b1cc6e6250b91f539153a7a0d3}{M\_PI}}\ *\ ((2.0\ *\ ix)\ +\ 1.0)\ /\ (2.0\ *\ filter\_order));}
+\DoxyCodeLine{00130\ \ \ \ \ \ \ \ \ \ \ \ \ sampling\_freq\ =\ a2\ +\ (2.0\ *\ a\ *\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_acab531abaa74a7e664e3986f2522b33a}{r}})\ +\ 1.0;}
+\DoxyCodeLine{00131\ \ \ \ \ \ \ \ \ \ \ \ \ A[ix]\ =\ 1.0f\ /\ sampling\_freq;}
+\DoxyCodeLine{00132\ \ \ \ \ \ \ \ \ \ \ \ \ d1[ix]\ =\ 2.0\ *\ (1\ -\/\ a2)\ /\ sampling\_freq;}
+\DoxyCodeLine{00133\ \ \ \ \ \ \ \ \ \ \ \ \ d2[ix]\ =\ -\/(a2\ -\/\ (2.0\ *\ a\ *\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_acab531abaa74a7e664e3986f2522b33a}{r}})\ +\ 1.0)\ /\ sampling\_freq;}
+\DoxyCodeLine{00134\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00135\ }
+\DoxyCodeLine{00136\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Apply\ the\ filter}}
+\DoxyCodeLine{00137\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ sx\ =\ 0;\ sx\ <\ \mbox{\hyperlink{namespaceei_a000f348b45d99db3a9dd6a9991ef667a}{size}};\ sx++)\ \{}
+\DoxyCodeLine{00138\ \ \ \ \ \ \ \ \ \ \ \ \ dest[sx]\ =\ src[sx];}
+\DoxyCodeLine{00139\ }
+\DoxyCodeLine{00140\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ n\_steps;\ i++)\ \{}
+\DoxyCodeLine{00141\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ w0[i]\ =\ d1[i]\ *\ w1[i]\ +\ d2[i]\ *\ w2[i]\ +\ dest[sx];}
+\DoxyCodeLine{00142\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ dest[sx]\ =\ A[i]\ *\ (w0[i]\ -\/\ (2.0\ *\ w1[i])\ +\ w2[i]);}
+\DoxyCodeLine{00143\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ w2[i]\ =\ w1[i];}
+\DoxyCodeLine{00144\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ w1[i]\ =\ w0[i];}
+\DoxyCodeLine{00145\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00146\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00147\ }
+\DoxyCodeLine{00148\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{memory_8hpp_a728a1c89209caadbb6cd4229f375adb3}{ei\_dsp\_free}}(A,\ n\_steps*\textcolor{keyword}{sizeof}(\textcolor{keywordtype}{float}));}
+\DoxyCodeLine{00149\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{memory_8hpp_a728a1c89209caadbb6cd4229f375adb3}{ei\_dsp\_free}}(d1,\ n\_steps*\textcolor{keyword}{sizeof}(\textcolor{keywordtype}{float}));}
+\DoxyCodeLine{00150\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{memory_8hpp_a728a1c89209caadbb6cd4229f375adb3}{ei\_dsp\_free}}(d2,\ n\_steps*\textcolor{keyword}{sizeof}(\textcolor{keywordtype}{float}));}
+\DoxyCodeLine{00151\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{memory_8hpp_a728a1c89209caadbb6cd4229f375adb3}{ei\_dsp\_free}}(w0,\ n\_steps*\textcolor{keyword}{sizeof}(\textcolor{keywordtype}{float}));}
+\DoxyCodeLine{00152\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{memory_8hpp_a728a1c89209caadbb6cd4229f375adb3}{ei\_dsp\_free}}(w1,\ n\_steps*\textcolor{keyword}{sizeof}(\textcolor{keywordtype}{float}));}
+\DoxyCodeLine{00153\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{memory_8hpp_a728a1c89209caadbb6cd4229f375adb3}{ei\_dsp\_free}}(w2,\ n\_steps*\textcolor{keyword}{sizeof}(\textcolor{keywordtype}{float}));}
+\DoxyCodeLine{00154\ \ \ \ \ \}}
+\DoxyCodeLine{00155\ }
+\DoxyCodeLine{00156\ \}\ \textcolor{comment}{//\ namespace\ filters}}
+\DoxyCodeLine{00157\ \}\ \textcolor{comment}{//\ namespace\ spectral}}
+\DoxyCodeLine{00158\ \}\ \textcolor{comment}{//\ namespace\ ei}}
+\DoxyCodeLine{00159\ }
+\DoxyCodeLine{00160\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ \_EIDSP\_SPECTRAL\_FILTERS\_H\_}}
+
+\end{DoxyCode}

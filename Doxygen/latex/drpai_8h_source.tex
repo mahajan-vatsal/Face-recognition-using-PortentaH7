@@ -1,0 +1,744 @@
+\doxysection{drpai.\+h}
+\hypertarget{drpai_8h_source}{}\label{drpai_8h_source}\index{Face\_Access\_inferencing/src/edge-\/impulse-\/sdk/classifier/inferencing\_engines/drpai.h@{Face\_Access\_inferencing/src/edge-\/impulse-\/sdk/classifier/inferencing\_engines/drpai.h}}
+\mbox{\hyperlink{drpai_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{00002\ \textcolor{comment}{\ *\ Copyright\ (c)\ 2022\ EdgeImpulse\ Inc.}}
+\DoxyCodeLine{00003\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00004\ \textcolor{comment}{\ *\ Licensed\ under\ the\ Apache\ License,\ Version\ 2.0\ (the\ "{}License"{});}}
+\DoxyCodeLine{00005\ \textcolor{comment}{\ *\ you\ may\ not\ use\ this\ file\ except\ in\ compliance\ with\ the\ License.}}
+\DoxyCodeLine{00006\ \textcolor{comment}{\ *\ You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{00007\ \textcolor{comment}{\ *\ http://www.apache.org/licenses/LICENSE-\/2.0}}
+\DoxyCodeLine{00008\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00009\ \textcolor{comment}{\ *\ Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,}}
+\DoxyCodeLine{00010\ \textcolor{comment}{\ *\ software\ distributed\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS}}
+\DoxyCodeLine{00011\ \textcolor{comment}{\ *\ IS"{}\ BASIS,\ WITHOUT\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,\ either}}
+\DoxyCodeLine{00012\ \textcolor{comment}{\ *\ express\ or\ implied.\ See\ the\ License\ for\ the\ specific\ language}}
+\DoxyCodeLine{00013\ \textcolor{comment}{\ *\ governing\ permissions\ and\ limitations\ under\ the\ License.}}
+\DoxyCodeLine{00014\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00015\ \textcolor{comment}{\ *\ SPDX-\/License-\/Identifier:\ Apache-\/2.0}}
+\DoxyCodeLine{00016\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{00017\ }
+\DoxyCodeLine{00018\ \textcolor{preprocessor}{\#ifndef\ \_EI\_CLASSIFIER\_INFERENCING\_ENGINE\_DRPAI\_H\_}}
+\DoxyCodeLine{00019\ \textcolor{preprocessor}{\#define\ \_EI\_CLASSIFIER\_INFERENCING\_ENGINE\_DRPAI\_H\_}}
+\DoxyCodeLine{00020\ }
+\DoxyCodeLine{00021\ \textcolor{preprocessor}{\#if\ (EI\_CLASSIFIER\_INFERENCING\_ENGINE\ ==\ EI\_CLASSIFIER\_DRPAI)}}
+\DoxyCodeLine{00022\ }
+\DoxyCodeLine{00023\ \textcolor{comment}{/*****************************************}}
+\DoxyCodeLine{00024\ \textcolor{comment}{\ *\ includes}}
+\DoxyCodeLine{00025\ \textcolor{comment}{\ ******************************************/}}
+\DoxyCodeLine{00026\ \textcolor{preprocessor}{\#include\ <cstring>}}
+\DoxyCodeLine{00027\ \textcolor{preprocessor}{\#include\ <errno.h>}}
+\DoxyCodeLine{00028\ \textcolor{preprocessor}{\#include\ <fcntl.h>}}
+\DoxyCodeLine{00029\ \textcolor{preprocessor}{\#include\ <float.h>}}
+\DoxyCodeLine{00030\ \textcolor{preprocessor}{\#include\ <fstream>}}
+\DoxyCodeLine{00031\ \textcolor{preprocessor}{\#include\ <iomanip>}}
+\DoxyCodeLine{00032\ \textcolor{preprocessor}{\#include\ <map>}}
+\DoxyCodeLine{00033\ \textcolor{preprocessor}{\#include\ <math.h>}}
+\DoxyCodeLine{00034\ \textcolor{preprocessor}{\#include\ <stdio.h>}}
+\DoxyCodeLine{00035\ \textcolor{preprocessor}{\#include\ <stdlib.h>}}
+\DoxyCodeLine{00036\ \textcolor{preprocessor}{\#include\ <sys/ioctl.h>}}
+\DoxyCodeLine{00037\ \textcolor{preprocessor}{\#include\ <sys/mman.h>}}
+\DoxyCodeLine{00038\ \textcolor{preprocessor}{\#include\ <sys/stat.h>}}
+\DoxyCodeLine{00039\ \textcolor{preprocessor}{\#include\ <unistd.h>}}
+\DoxyCodeLine{00040\ \textcolor{preprocessor}{\#include\ <vector>}}
+\DoxyCodeLine{00041\ }
+\DoxyCodeLine{00042\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{model__metadata_8h}{model-\/parameters/model\_metadata.h}}>}}
+\DoxyCodeLine{00043\ }
+\DoxyCodeLine{00044\ \textcolor{preprocessor}{\#if\ ((EI\_CLASSIFIER\_OBJECT\_DETECTION\ ==\ 1)\ \&\&\ (EI\_CLASSIFIER\_OBJECT\_DETECTION\_LAST\_LAYER\ ==\ EI\_CLASSIFIER\_LAST\_LAYER\_YOLOV5\_V5\_DRPAI))}}
+\DoxyCodeLine{00045\ \textcolor{comment}{//\ For\ a\ YOLOV5\_V5\_DRPAI\ model\ we\ ran\ the\ unsupported\ layers\ with\ TF}}
+\DoxyCodeLine{00046\ \textcolor{preprocessor}{\#include\ <thread>}}
+\DoxyCodeLine{00047\ \textcolor{preprocessor}{\#include\ "{}tensorflow-\/lite/tensorflow/lite/c/common.h"{}}}
+\DoxyCodeLine{00048\ \textcolor{preprocessor}{\#include\ "{}tensorflow-\/lite/tensorflow/lite/interpreter.h"{}}}
+\DoxyCodeLine{00049\ \textcolor{preprocessor}{\#include\ "{}tensorflow-\/lite/tensorflow/lite/kernels/register.h"{}}}
+\DoxyCodeLine{00050\ \textcolor{preprocessor}{\#include\ "{}tensorflow-\/lite/tensorflow/lite/model.h"{}}}
+\DoxyCodeLine{00051\ \textcolor{preprocessor}{\#include\ "{}tensorflow-\/lite/tensorflow/lite/optional\_debug\_tools.h"{}}}
+\DoxyCodeLine{00052\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00053\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{kernels_2custom_2tree__ensemble__classifier_8h}{edge-\/impulse-\/sdk/tensorflow/lite/kernels/custom/tree\_ensemble\_classifier.h}}"{}}}
+\DoxyCodeLine{00054\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{ei__fill__result__struct_8h}{edge-\/impulse-\/sdk/classifier/ei\_fill\_result\_struct.h}}"{}}}
+\DoxyCodeLine{00055\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{ei__model__types_8h}{edge-\/impulse-\/sdk/classifier/ei\_model\_types.h}}"{}}}
+\DoxyCodeLine{00056\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{ei__run__dsp_8h}{edge-\/impulse-\/sdk/classifier/ei\_run\_dsp.h}}"{}}}
+\DoxyCodeLine{00057\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{ei__logging_8h}{edge-\/impulse-\/sdk/porting/ei\_logging.h}}"{}}}
+\DoxyCodeLine{00058\ }
+\DoxyCodeLine{00059\ \textcolor{preprocessor}{\#include\ <linux/drpai.h>}}
+\DoxyCodeLine{00060\ \textcolor{preprocessor}{\#include\ <tflite-\/model/drpai\_model.h>}}
+\DoxyCodeLine{00061\ }
+\DoxyCodeLine{00062\ }
+\DoxyCodeLine{00063\ }
+\DoxyCodeLine{00064\ \textcolor{comment}{/*****************************************}}
+\DoxyCodeLine{00065\ \textcolor{comment}{\ *\ Macro}}
+\DoxyCodeLine{00066\ \textcolor{comment}{\ ******************************************/}}
+\DoxyCodeLine{00067\ \textcolor{comment}{/*Maximum\ DRP-\/AI\ Timeout\ threshold*/}}
+\DoxyCodeLine{00068\ \textcolor{preprocessor}{\#define\ DRPAI\_TIMEOUT\ (5)}}
+\DoxyCodeLine{00069\ }
+\DoxyCodeLine{00070\ \textcolor{comment}{/*Buffer\ size\ for\ writing\ data\ to\ memory\ via\ DRP-\/AI\ Driver.*/}}
+\DoxyCodeLine{00071\ \textcolor{preprocessor}{\#define\ BUF\_SIZE\ (1024)}}
+\DoxyCodeLine{00072\ }
+\DoxyCodeLine{00073\ \textcolor{comment}{/*Index\ to\ access\ drpai\_file\_path[]*/}}
+\DoxyCodeLine{00074\ \textcolor{preprocessor}{\#define\ INDEX\_D\ (0)}}
+\DoxyCodeLine{00075\ \textcolor{preprocessor}{\#define\ INDEX\_C\ (1)}}
+\DoxyCodeLine{00076\ \textcolor{preprocessor}{\#define\ INDEX\_P\ (2)}}
+\DoxyCodeLine{00077\ \textcolor{preprocessor}{\#define\ INDEX\_A\ (3)}}
+\DoxyCodeLine{00078\ \textcolor{preprocessor}{\#define\ INDEX\_W\ (4)}}
+\DoxyCodeLine{00079\ }
+\DoxyCodeLine{00080\ \textcolor{comment}{/*****************************************}}
+\DoxyCodeLine{00081\ \textcolor{comment}{\ *\ Public\ global\ vars}}
+\DoxyCodeLine{00082\ \textcolor{comment}{\ ******************************************/}}
+\DoxyCodeLine{00083\ \textcolor{comment}{//\ input\ and\ output\ buffer\ pointers\ for\ memory\ mapped\ regions\ used\ by\ DRP-\/AI}}
+\DoxyCodeLine{00084\ uint8\_t\ *\mbox{\hyperlink{drpai_8h_a267f34e4307ebcca8cc6069ced88489c}{drpai\_input\_buf}}\ =\ (uint8\_t\ *)NULL;}
+\DoxyCodeLine{00085\ \textcolor{keywordtype}{float}\ *\mbox{\hyperlink{drpai_8h_a0219b963b7bfdddad7677bbd78f754b6}{drpai\_output\_buf}}\ =\ (\textcolor{keywordtype}{float}\ *)NULL;}
+\DoxyCodeLine{00086\ }
+\DoxyCodeLine{00087\ \textcolor{comment}{/*****************************************}}
+\DoxyCodeLine{00088\ \textcolor{comment}{\ *\ Typedef}}
+\DoxyCodeLine{00089\ \textcolor{comment}{\ ******************************************/}}
+\DoxyCodeLine{00090\ \textcolor{comment}{/*\ For\ DRP-\/AI\ Address\ List\ */}}
+\DoxyCodeLine{00091\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\{}
+\DoxyCodeLine{00092\ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{long}\ \mbox{\hyperlink{structst__addr__t_ae97d7c2d20dc1eefc08ce0fd234ed69c}{desc\_aimac\_addr}};}
+\DoxyCodeLine{00093\ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{long}\ \mbox{\hyperlink{structst__addr__t_afb623d9111023842c4c799595908d33e}{desc\_aimac\_size}};}
+\DoxyCodeLine{00094\ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{long}\ \mbox{\hyperlink{structst__addr__t_a635aaea6b1e6b8489c902f3d6bd480a3}{desc\_drp\_addr}};}
+\DoxyCodeLine{00095\ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{long}\ \mbox{\hyperlink{structst__addr__t_a42edf4b0471b5b5424e8945d3224a828}{desc\_drp\_size}};}
+\DoxyCodeLine{00096\ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{long}\ \mbox{\hyperlink{structst__addr__t_a25a6347303eb140ec9da804c03f97730}{drp\_param\_addr}};}
+\DoxyCodeLine{00097\ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{long}\ \mbox{\hyperlink{structst__addr__t_ab6d76e93588adc5fb02fe6b922b9fc40}{drp\_param\_size}};}
+\DoxyCodeLine{00098\ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{long}\ \mbox{\hyperlink{structst__addr__t_a99dd9697552674b5067290a97f1ad6cc}{data\_in\_addr}};}
+\DoxyCodeLine{00099\ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{long}\ \mbox{\hyperlink{structst__addr__t_aa255220ec6e78598495f57799280f4d6}{data\_in\_size}};}
+\DoxyCodeLine{00100\ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{long}\ \mbox{\hyperlink{structst__addr__t_a27d0537864bfc908834692a59f6c877d}{data\_addr}};}
+\DoxyCodeLine{00101\ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{long}\ \mbox{\hyperlink{structst__addr__t_a5baafc9a5706cd35fd7bce3c038514b9}{data\_size}};}
+\DoxyCodeLine{00102\ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{long}\ \mbox{\hyperlink{structst__addr__t_a99703386f1c56236cfaf88ddf1fa62a4}{work\_addr}};}
+\DoxyCodeLine{00103\ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{long}\ \mbox{\hyperlink{structst__addr__t_affa38ca1372859771ee72c9e142a01e6}{work\_size}};}
+\DoxyCodeLine{00104\ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{long}\ \mbox{\hyperlink{structst__addr__t_a8fc26b2701c2e2b98ed96e609cb3a833}{data\_out\_addr}};}
+\DoxyCodeLine{00105\ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{long}\ \mbox{\hyperlink{structst__addr__t_a0c36fd59b6ad2ee7c79835ec111a7384}{data\_out\_size}};}
+\DoxyCodeLine{00106\ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{long}\ \mbox{\hyperlink{structst__addr__t_a051bc2a4db53950bd8f1aa6290155ece}{drp\_config\_addr}};}
+\DoxyCodeLine{00107\ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{long}\ \mbox{\hyperlink{structst__addr__t_a7e9e942839409d66926b77025d391265}{drp\_config\_size}};}
+\DoxyCodeLine{00108\ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{long}\ \mbox{\hyperlink{structst__addr__t_ac1b6d87d7af068f407b56f3cb7c48990}{weight\_addr}};}
+\DoxyCodeLine{00109\ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{long}\ \mbox{\hyperlink{structst__addr__t_aa214c4593457c4c8ebb27520a197e8cf}{weight\_size}};}
+\DoxyCodeLine{00110\ \}\ \mbox{\hyperlink{structst__addr__t}{st\_addr\_t}};}
+\DoxyCodeLine{00111\ }
+\DoxyCodeLine{00112\ \textcolor{comment}{/*****************************************}}
+\DoxyCodeLine{00113\ \textcolor{comment}{\ *\ static\ vars}}
+\DoxyCodeLine{00114\ \textcolor{comment}{\ ******************************************/}}
+\DoxyCodeLine{00115\ \textcolor{keyword}{static}\ \mbox{\hyperlink{structst__addr__t}{st\_addr\_t}}\ \mbox{\hyperlink{drpai_8h_ac77e3e50f3865affc33e32b4f965fa9d}{drpai\_address}};}
+\DoxyCodeLine{00116\ \textcolor{keyword}{static}\ uint64\_t\ \mbox{\hyperlink{drpai_8h_af93884ff03bb810390ab0e2321b94730}{udmabuf\_address}}\ =\ 0;}
+\DoxyCodeLine{00117\ }
+\DoxyCodeLine{00118\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{drpai_8h_a624b3ed259be0a9d9b9f60aa7eb173b6}{drpai\_fd}}\ =\ -\/1;}
+\DoxyCodeLine{00119\ }
+\DoxyCodeLine{00120\ drpai\_data\_t\ \mbox{\hyperlink{drpai_8h_a03e1c4614b2c72e8f36b82895bc4e419}{proc}}[DRPAI\_INDEX\_NUM];}
+\DoxyCodeLine{00121\ }
+\DoxyCodeLine{00122\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{drpai_8h_adf5b9610b65e88c732a14d93a1a606f7}{get\_udmabuf\_memory\_start\_addr}}()}
+\DoxyCodeLine{00123\ \{\ \ \ \textcolor{comment}{/*\ Obtain\ udmabuf\ memory\ area\ starting\ address\ */}}
+\DoxyCodeLine{00124\ }
+\DoxyCodeLine{00125\ \ \ \ \ int8\_t\ fd\ =\ 0;}
+\DoxyCodeLine{00126\ \ \ \ \ \textcolor{keywordtype}{char}\ addr[1024];}
+\DoxyCodeLine{00127\ \ \ \ \ int32\_t\ read\_ret\ =\ 0;}
+\DoxyCodeLine{00128\ \ \ \ \ errno\ =\ 0;}
+\DoxyCodeLine{00129\ }
+\DoxyCodeLine{00130\ \ \ \ \ fd\ =\ open(\textcolor{stringliteral}{"{}/sys/class/u-\/dma-\/buf/udmabuf0/phys\_addr"{}},\ O\_RDONLY);}
+\DoxyCodeLine{00131\ \ \ \ \ \textcolor{keywordflow}{if}\ (0\ >\ fd)}
+\DoxyCodeLine{00132\ \ \ \ \ \{}
+\DoxyCodeLine{00133\ \ \ \ \ \ \ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}[ERROR]\ Failed\ to\ open\ udmabuf0/phys\_addr\ :\ errno=\%d\(\backslash\)n"{}},\ errno);}
+\DoxyCodeLine{00134\ \ \ \ \ \}}
+\DoxyCodeLine{00135\ }
+\DoxyCodeLine{00136\ \ \ \ \ read\_ret\ =\ read(fd,\ addr,\ 1024);}
+\DoxyCodeLine{00137\ \ \ \ \ \textcolor{keywordflow}{if}\ (0\ >\ read\_ret)}
+\DoxyCodeLine{00138\ \ \ \ \ \{}
+\DoxyCodeLine{00139\ \ \ \ \ \ \ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}[ERROR]\ Failed\ to\ read\ udmabuf0/phys\_addr\ :\ errno=\%d\(\backslash\)n"{}},\ errno);}
+\DoxyCodeLine{00140\ \ \ \ \ \ \ \ \ close(fd);}
+\DoxyCodeLine{00141\ \ \ \ \ \}}
+\DoxyCodeLine{00142\ }
+\DoxyCodeLine{00143\ \ \ \ \ sscanf(addr,\ \textcolor{stringliteral}{"{}\%lx"{}},\ \&\mbox{\hyperlink{drpai_8h_af93884ff03bb810390ab0e2321b94730}{udmabuf\_address}});}
+\DoxyCodeLine{00144\ \ \ \ \ close(fd);}
+\DoxyCodeLine{00145\ }
+\DoxyCodeLine{00146\ \ \ \ \ \textcolor{comment}{/*\ Filter\ the\ bit\ higher\ than\ 32\ bit\ */}}
+\DoxyCodeLine{00147\ \ \ \ \ \mbox{\hyperlink{drpai_8h_af93884ff03bb810390ab0e2321b94730}{udmabuf\_address}}\ \&=0xFFFFFFFF;}
+\DoxyCodeLine{00148\ \}}
+\DoxyCodeLine{00149\ }
+\DoxyCodeLine{00150\ uint8\_t\ \mbox{\hyperlink{drpai_8h_a8e07ed238a9d97c2fd9a3f9bc0b04246}{drpai\_init\_mem}}(uint32\_t\ input\_frame\_size)\ \{}
+\DoxyCodeLine{00151\ \ \ int32\_t\ i\ =\ 0;}
+\DoxyCodeLine{00152\ }
+\DoxyCodeLine{00153\ \ \ \textcolor{keywordtype}{int}\ udmabuf\_fd0\ =\ open(\textcolor{stringliteral}{"{}/dev/udmabuf0"{}},\ O\_RDWR);}
+\DoxyCodeLine{00154\ \ \ \textcolor{keywordflow}{if}\ (udmabuf\_fd0\ <\ 0)\ \{}
+\DoxyCodeLine{00155\ \ \ \ \ \textcolor{keywordflow}{return}\ -\/1;}
+\DoxyCodeLine{00156\ \ \ \}}
+\DoxyCodeLine{00157\ }
+\DoxyCodeLine{00158\ \ \ \textcolor{comment}{//\ input\_frame\_size\ ===\ data\_in\_size}}
+\DoxyCodeLine{00159\ \ \ uint8\_t\ *addr\ =}
+\DoxyCodeLine{00160\ \ \ \ \ \ \ (uint8\_t\ *)mmap(NULL,\ input\_frame\_size,}
+\DoxyCodeLine{00161\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ PROT\_READ\ |\ PROT\_WRITE,\ MAP\_SHARED,\ udmabuf\_fd0,\ 0);}
+\DoxyCodeLine{00162\ }
+\DoxyCodeLine{00163\ \ \ \mbox{\hyperlink{drpai_8h_a267f34e4307ebcca8cc6069ced88489c}{drpai\_input\_buf}}\ =\ addr;}
+\DoxyCodeLine{00164\ }
+\DoxyCodeLine{00165\ \ \ \textcolor{comment}{/*\ Write\ once\ to\ allocate\ physical\ memory\ to\ u-\/dma-\/buf\ virtual\ space.}}
+\DoxyCodeLine{00166\ \textcolor{comment}{\ \ \ *\ Note:\ Do\ not\ use\ memset()\ for\ this.}}
+\DoxyCodeLine{00167\ \textcolor{comment}{\ \ \ *\ \ \ \ \ \ \ Because\ it\ does\ not\ work\ as\ expected.\ */}}
+\DoxyCodeLine{00168\ \ \ \textcolor{keywordflow}{for}\ (i\ =\ 0;\ i\ <\ input\_frame\_size;\ i++)\ \{}
+\DoxyCodeLine{00169\ \ \ \ \ \mbox{\hyperlink{drpai_8h_a267f34e4307ebcca8cc6069ced88489c}{drpai\_input\_buf}}[i]\ =\ 0;}
+\DoxyCodeLine{00170\ \ \ \}}
+\DoxyCodeLine{00171\ }
+\DoxyCodeLine{00172\ }
+\DoxyCodeLine{00173\ \ \ \mbox{\hyperlink{drpai_8h_adf5b9610b65e88c732a14d93a1a606f7}{get\_udmabuf\_memory\_start\_addr}}();}
+\DoxyCodeLine{00174\ \ \ \textcolor{keywordflow}{if}\ (0\ ==\ \mbox{\hyperlink{drpai_8h_af93884ff03bb810390ab0e2321b94730}{udmabuf\_address}})\ \{}
+\DoxyCodeLine{00175\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{group__ei__returntypes_ggad9580b47a6cd5e74cfc31a03bdfecebea900fb696dc939054a8921a350d7a1e1a}{EI\_IMPULSE\_DRPAI\_INIT\_FAILED}};}
+\DoxyCodeLine{00176\ \ \ \}}
+\DoxyCodeLine{00177\ }
+\DoxyCodeLine{00178\ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00179\ \}}
+\DoxyCodeLine{00180\ }
+\DoxyCodeLine{00181\ \textcolor{comment}{/*****************************************}}
+\DoxyCodeLine{00182\ \textcolor{comment}{\ *\ Function\ Name\ :\ read\_addrmap\_txt}}
+\DoxyCodeLine{00183\ \textcolor{comment}{\ *\ Description\ \ :\ Loads\ address\ and\ size\ of\ DRP-\/AI\ Object\ files\ into\ struct}}
+\DoxyCodeLine{00184\ \textcolor{comment}{\ *addr.\ Arguments\ \ \ \ \ \ \ :\ addr\_file\ =\ filename\ of\ addressmap\ file\ (from}}
+\DoxyCodeLine{00185\ \textcolor{comment}{\ *DRP-\/AI\ Object\ files)\ Return\ value\ :\ 0\ if\ succeeded\ not\ 0\ otherwise}}
+\DoxyCodeLine{00186\ \textcolor{comment}{\ ******************************************/}}
+\DoxyCodeLine{00187\ \textcolor{keyword}{static}\ int8\_t\ \mbox{\hyperlink{drpai_8h_a413c90e9df01f788fed7bce56eb7dd0a}{read\_addrmap\_txt}}()\ \{}
+\DoxyCodeLine{00188\ \ \ \textcolor{comment}{//\ create\ a\ stream\ from\ the\ DRP-\/AI\ model\ data\ without\ copying}}
+\DoxyCodeLine{00189\ \ \ std::istringstream\ ifs;}
+\DoxyCodeLine{00190\ \ \ ifs.rdbuf()-\/>pubsetbuf((\textcolor{keywordtype}{char}\ *)ei\_ei\_addrmap\_intm\_txt,\ ei\_ei\_addrmap\_intm\_txt\_len);}
+\DoxyCodeLine{00191\ }
+\DoxyCodeLine{00192\ \ \ std::string\ \mbox{\hyperlink{ethosu__interface_8h_af6cf19e40e97afb5a7c29f7b439d091d}{str}};}
+\DoxyCodeLine{00193\ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{long}\ l\_addr;}
+\DoxyCodeLine{00194\ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{long}\ l\_size;}
+\DoxyCodeLine{00195\ \ \ std::string\ element,\ a,\ s;}
+\DoxyCodeLine{00196\ }
+\DoxyCodeLine{00197\ \ \ \textcolor{keywordflow}{if}\ (ifs.fail())\ \{}
+\DoxyCodeLine{00198\ \ \ \ \ \textcolor{keywordflow}{return}\ -\/1;}
+\DoxyCodeLine{00199\ \ \ \}}
+\DoxyCodeLine{00200\ }
+\DoxyCodeLine{00201\ \ \ \textcolor{keywordflow}{while}\ (getline(ifs,\ str))\ \{}
+\DoxyCodeLine{00202\ \ \ \ \ std::istringstream\ iss(str);}
+\DoxyCodeLine{00203\ \ \ \ \ iss\ >>\ element\ >>\ a\ >>\ s;}
+\DoxyCodeLine{00204\ \ \ \ \ l\_addr\ =\ strtol(a.c\_str(),\ NULL,\ 16);}
+\DoxyCodeLine{00205\ \ \ \ \ l\_size\ =\ strtol(s.c\_str(),\ NULL,\ 16);}
+\DoxyCodeLine{00206\ }
+\DoxyCodeLine{00207\ \ \ \ \ \textcolor{keywordflow}{if}\ (element\ ==\ \textcolor{stringliteral}{"{}drp\_config"{}})\ \{}
+\DoxyCodeLine{00208\ \ \ \ \ \ \ \mbox{\hyperlink{drpai_8h_ac77e3e50f3865affc33e32b4f965fa9d}{drpai\_address}}.\mbox{\hyperlink{structst__addr__t_a051bc2a4db53950bd8f1aa6290155ece}{drp\_config\_addr}}\ =\ l\_addr;}
+\DoxyCodeLine{00209\ \ \ \ \ \ \ \mbox{\hyperlink{drpai_8h_ac77e3e50f3865affc33e32b4f965fa9d}{drpai\_address}}.\mbox{\hyperlink{structst__addr__t_a7e9e942839409d66926b77025d391265}{drp\_config\_size}}\ =\ l\_size;}
+\DoxyCodeLine{00210\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (element\ ==\ \textcolor{stringliteral}{"{}desc\_aimac"{}})\ \{}
+\DoxyCodeLine{00211\ \ \ \ \ \ \ \mbox{\hyperlink{drpai_8h_ac77e3e50f3865affc33e32b4f965fa9d}{drpai\_address}}.\mbox{\hyperlink{structst__addr__t_ae97d7c2d20dc1eefc08ce0fd234ed69c}{desc\_aimac\_addr}}\ =\ l\_addr;}
+\DoxyCodeLine{00212\ \ \ \ \ \ \ \mbox{\hyperlink{drpai_8h_ac77e3e50f3865affc33e32b4f965fa9d}{drpai\_address}}.\mbox{\hyperlink{structst__addr__t_afb623d9111023842c4c799595908d33e}{desc\_aimac\_size}}\ =\ l\_size;}
+\DoxyCodeLine{00213\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (element\ ==\ \textcolor{stringliteral}{"{}desc\_drp"{}})\ \{}
+\DoxyCodeLine{00214\ \ \ \ \ \ \ \mbox{\hyperlink{drpai_8h_ac77e3e50f3865affc33e32b4f965fa9d}{drpai\_address}}.\mbox{\hyperlink{structst__addr__t_a635aaea6b1e6b8489c902f3d6bd480a3}{desc\_drp\_addr}}\ =\ l\_addr;}
+\DoxyCodeLine{00215\ \ \ \ \ \ \ \mbox{\hyperlink{drpai_8h_ac77e3e50f3865affc33e32b4f965fa9d}{drpai\_address}}.\mbox{\hyperlink{structst__addr__t_a42edf4b0471b5b5424e8945d3224a828}{desc\_drp\_size}}\ =\ l\_size;}
+\DoxyCodeLine{00216\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (element\ ==\ \textcolor{stringliteral}{"{}drp\_param"{}})\ \{}
+\DoxyCodeLine{00217\ \ \ \ \ \ \ \mbox{\hyperlink{drpai_8h_ac77e3e50f3865affc33e32b4f965fa9d}{drpai\_address}}.\mbox{\hyperlink{structst__addr__t_a25a6347303eb140ec9da804c03f97730}{drp\_param\_addr}}\ =\ l\_addr;}
+\DoxyCodeLine{00218\ \ \ \ \ \ \ \mbox{\hyperlink{drpai_8h_ac77e3e50f3865affc33e32b4f965fa9d}{drpai\_address}}.\mbox{\hyperlink{structst__addr__t_ab6d76e93588adc5fb02fe6b922b9fc40}{drp\_param\_size}}\ =\ l\_size;}
+\DoxyCodeLine{00219\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (element\ ==\ \textcolor{stringliteral}{"{}weight"{}})\ \{}
+\DoxyCodeLine{00220\ \ \ \ \ \ \ \mbox{\hyperlink{drpai_8h_ac77e3e50f3865affc33e32b4f965fa9d}{drpai\_address}}.\mbox{\hyperlink{structst__addr__t_ac1b6d87d7af068f407b56f3cb7c48990}{weight\_addr}}\ =\ l\_addr;}
+\DoxyCodeLine{00221\ \ \ \ \ \ \ \mbox{\hyperlink{drpai_8h_ac77e3e50f3865affc33e32b4f965fa9d}{drpai\_address}}.\mbox{\hyperlink{structst__addr__t_aa214c4593457c4c8ebb27520a197e8cf}{weight\_size}}\ =\ l\_size;}
+\DoxyCodeLine{00222\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (element\ ==\ \textcolor{stringliteral}{"{}data\_in"{}})\ \{}
+\DoxyCodeLine{00223\ \ \ \ \ \ \ \mbox{\hyperlink{drpai_8h_ac77e3e50f3865affc33e32b4f965fa9d}{drpai\_address}}.\mbox{\hyperlink{structst__addr__t_a99dd9697552674b5067290a97f1ad6cc}{data\_in\_addr}}\ =\ l\_addr;}
+\DoxyCodeLine{00224\ \ \ \ \ \ \ \mbox{\hyperlink{drpai_8h_ac77e3e50f3865affc33e32b4f965fa9d}{drpai\_address}}.\mbox{\hyperlink{structst__addr__t_aa255220ec6e78598495f57799280f4d6}{data\_in\_size}}\ =\ l\_size;}
+\DoxyCodeLine{00225\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (element\ ==\ \textcolor{stringliteral}{"{}data"{}})\ \{}
+\DoxyCodeLine{00226\ \ \ \ \ \ \ \mbox{\hyperlink{drpai_8h_ac77e3e50f3865affc33e32b4f965fa9d}{drpai\_address}}.\mbox{\hyperlink{structst__addr__t_a27d0537864bfc908834692a59f6c877d}{data\_addr}}\ =\ l\_addr;}
+\DoxyCodeLine{00227\ \ \ \ \ \ \ \mbox{\hyperlink{drpai_8h_ac77e3e50f3865affc33e32b4f965fa9d}{drpai\_address}}.\mbox{\hyperlink{structst__addr__t_a5baafc9a5706cd35fd7bce3c038514b9}{data\_size}}\ =\ l\_size;}
+\DoxyCodeLine{00228\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (element\ ==\ \textcolor{stringliteral}{"{}data\_out"{}})\ \{}
+\DoxyCodeLine{00229\ \ \ \ \ \ \ \mbox{\hyperlink{drpai_8h_ac77e3e50f3865affc33e32b4f965fa9d}{drpai\_address}}.\mbox{\hyperlink{structst__addr__t_a8fc26b2701c2e2b98ed96e609cb3a833}{data\_out\_addr}}\ =\ l\_addr;}
+\DoxyCodeLine{00230\ \ \ \ \ \ \ \mbox{\hyperlink{drpai_8h_ac77e3e50f3865affc33e32b4f965fa9d}{drpai\_address}}.\mbox{\hyperlink{structst__addr__t_a0c36fd59b6ad2ee7c79835ec111a7384}{data\_out\_size}}\ =\ l\_size;}
+\DoxyCodeLine{00231\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (element\ ==\ \textcolor{stringliteral}{"{}work"{}})\ \{}
+\DoxyCodeLine{00232\ \ \ \ \ \ \ \mbox{\hyperlink{drpai_8h_ac77e3e50f3865affc33e32b4f965fa9d}{drpai\_address}}.\mbox{\hyperlink{structst__addr__t_a99703386f1c56236cfaf88ddf1fa62a4}{work\_addr}}\ =\ l\_addr;}
+\DoxyCodeLine{00233\ \ \ \ \ \ \ \mbox{\hyperlink{drpai_8h_ac77e3e50f3865affc33e32b4f965fa9d}{drpai\_address}}.\mbox{\hyperlink{structst__addr__t_affa38ca1372859771ee72c9e142a01e6}{work\_size}}\ =\ l\_size;}
+\DoxyCodeLine{00234\ \ \ \ \ \}}
+\DoxyCodeLine{00235\ \ \ \}}
+\DoxyCodeLine{00236\ }
+\DoxyCodeLine{00237\ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00238\ \}}
+\DoxyCodeLine{00239\ }
+\DoxyCodeLine{00240\ \textcolor{comment}{/*****************************************}}
+\DoxyCodeLine{00241\ \textcolor{comment}{\ *\ Function\ Name\ :\ load\_data\_to\_mem}}
+\DoxyCodeLine{00242\ \textcolor{comment}{\ *\ Description\ \ :\ Loads\ a\ binary\ blob\ DRP-\/AI\ Driver\ Memory}}
+\DoxyCodeLine{00243\ \textcolor{comment}{\ *\ Arguments\ \ \ \ \ \ \ \ :\ data\_ptr\ =\ pointer\ to\ the\ bytes\ to\ write}}
+\DoxyCodeLine{00244\ \textcolor{comment}{\ *\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ drpai\_fd\ =\ file\ descriptor\ of\ DRP-\/AI\ Driver}}
+\DoxyCodeLine{00245\ \textcolor{comment}{\ *\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ from\ =\ memory\ start\ address\ where\ the\ data\ is}}
+\DoxyCodeLine{00246\ \textcolor{comment}{\ *written\ size\ =\ data\ size\ to\ be\ written\ Return\ value\ \ \ :\ 0\ if\ succeeded\ not\ 0}}
+\DoxyCodeLine{00247\ \textcolor{comment}{\ *otherwise}}
+\DoxyCodeLine{00248\ \textcolor{comment}{\ ******************************************/}}
+\DoxyCodeLine{00249\ \textcolor{keyword}{static}\ int8\_t\ \mbox{\hyperlink{drpai_8h_a81d963fa6adab789d7fb45022927881c}{load\_data\_to\_mem}}(\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *data\_ptr,\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{drpai_8h_a624b3ed259be0a9d9b9f60aa7eb173b6}{drpai\_fd}},}
+\DoxyCodeLine{00250\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{long}\ from,\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{long}\ \mbox{\hyperlink{namespaceei_a000f348b45d99db3a9dd6a9991ef667a}{size}})\ \{}
+\DoxyCodeLine{00251\ \ \ drpai\_data\_t\ drpai\_data;}
+\DoxyCodeLine{00252\ }
+\DoxyCodeLine{00253\ \ \ drpai\_data.address\ =\ from;}
+\DoxyCodeLine{00254\ \ \ drpai\_data.size\ =\ \mbox{\hyperlink{namespaceei_a000f348b45d99db3a9dd6a9991ef667a}{size}};}
+\DoxyCodeLine{00255\ }
+\DoxyCodeLine{00256\ \ \ errno\ =\ 0;}
+\DoxyCodeLine{00257\ \ \ \textcolor{keywordflow}{if}\ (-\/1\ ==\ ioctl(\mbox{\hyperlink{drpai_8h_a624b3ed259be0a9d9b9f60aa7eb173b6}{drpai\_fd}},\ DRPAI\_ASSIGN,\ \&drpai\_data))\ \{}
+\DoxyCodeLine{00258\ \ \ \ \ \textcolor{keywordflow}{return}\ -\/1;}
+\DoxyCodeLine{00259\ \ \ \}}
+\DoxyCodeLine{00260\ }
+\DoxyCodeLine{00261\ \ \ errno\ =\ 0;}
+\DoxyCodeLine{00262\ \ \ \textcolor{keywordflow}{if}\ (-\/1\ ==\ write(\mbox{\hyperlink{drpai_8h_a624b3ed259be0a9d9b9f60aa7eb173b6}{drpai\_fd}},\ data\_ptr,\ \mbox{\hyperlink{namespaceei_a000f348b45d99db3a9dd6a9991ef667a}{size}}))\ \{}
+\DoxyCodeLine{00263\ \ \ \ \ \textcolor{keywordflow}{return}\ -\/1;}
+\DoxyCodeLine{00264\ \ \ \}}
+\DoxyCodeLine{00265\ }
+\DoxyCodeLine{00266\ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00267\ \}}
+\DoxyCodeLine{00268\ }
+\DoxyCodeLine{00269\ \textcolor{comment}{/*****************************************}}
+\DoxyCodeLine{00270\ \textcolor{comment}{\ *\ Function\ Name\ :\ \ load\_drpai\_data}}
+\DoxyCodeLine{00271\ \textcolor{comment}{\ *\ Description\ \ :\ Loads\ DRP-\/AI\ Object\ files\ to\ memory\ via\ DRP-\/AI\ Driver.}}
+\DoxyCodeLine{00272\ \textcolor{comment}{\ *\ Arguments\ \ \ \ \ \ \ \ :\ drpai\_fd\ =\ file\ descriptor\ of\ DRP-\/AI\ Driver}}
+\DoxyCodeLine{00273\ \textcolor{comment}{\ *\ Return\ value\ :\ 0\ if\ succeeded}}
+\DoxyCodeLine{00274\ \textcolor{comment}{\ *\ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ not\ 0\ otherwise}}
+\DoxyCodeLine{00275\ \textcolor{comment}{\ ******************************************/}}
+\DoxyCodeLine{00276\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{drpai_8h_a4f9c64725a3f867475dcb96f14710226}{load\_drpai\_data}}(\textcolor{keywordtype}{int}\ \mbox{\hyperlink{drpai_8h_a624b3ed259be0a9d9b9f60aa7eb173b6}{drpai\_fd}})\ \{}
+\DoxyCodeLine{00277\ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{long}\ addr,\ \mbox{\hyperlink{namespaceei_a000f348b45d99db3a9dd6a9991ef667a}{size}};}
+\DoxyCodeLine{00278\ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *data\_ptr;}
+\DoxyCodeLine{00279\ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ 5;\ i++)\ \{}
+\DoxyCodeLine{00280\ \ \ \ \ \textcolor{keywordflow}{switch}\ (i)\ \{}
+\DoxyCodeLine{00281\ \ \ \ \ \textcolor{keywordflow}{case}\ (\mbox{\hyperlink{drpai_8h_a86d19367463eef2cc7791bfd593f324d}{INDEX\_W}}):}
+\DoxyCodeLine{00282\ \ \ \ \ \ \ addr\ =\ \mbox{\hyperlink{drpai_8h_ac77e3e50f3865affc33e32b4f965fa9d}{drpai\_address}}.\mbox{\hyperlink{structst__addr__t_ac1b6d87d7af068f407b56f3cb7c48990}{weight\_addr}};}
+\DoxyCodeLine{00283\ \ \ \ \ \ \ \mbox{\hyperlink{namespaceei_a000f348b45d99db3a9dd6a9991ef667a}{size}}\ =\ \mbox{\hyperlink{drpai_8h_ac77e3e50f3865affc33e32b4f965fa9d}{drpai\_address}}.\mbox{\hyperlink{structst__addr__t_aa214c4593457c4c8ebb27520a197e8cf}{weight\_size}};}
+\DoxyCodeLine{00284\ \ \ \ \ \ \ data\_ptr\ =\ ei\_ei\_weight\_dat;}
+\DoxyCodeLine{00285\ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00286\ \ \ \ \ \textcolor{keywordflow}{case}\ (\mbox{\hyperlink{drpai_8h_ab98a7b834870173986a4a0e006ed4ef5}{INDEX\_C}}):}
+\DoxyCodeLine{00287\ \ \ \ \ \ \ addr\ =\ \mbox{\hyperlink{drpai_8h_ac77e3e50f3865affc33e32b4f965fa9d}{drpai\_address}}.\mbox{\hyperlink{structst__addr__t_a051bc2a4db53950bd8f1aa6290155ece}{drp\_config\_addr}};}
+\DoxyCodeLine{00288\ \ \ \ \ \ \ \mbox{\hyperlink{namespaceei_a000f348b45d99db3a9dd6a9991ef667a}{size}}\ =\ \mbox{\hyperlink{drpai_8h_ac77e3e50f3865affc33e32b4f965fa9d}{drpai\_address}}.\mbox{\hyperlink{structst__addr__t_a7e9e942839409d66926b77025d391265}{drp\_config\_size}};}
+\DoxyCodeLine{00289\ \ \ \ \ \ \ data\_ptr\ =\ ei\_ei\_drpcfg\_mem;}
+\DoxyCodeLine{00290\ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00291\ \ \ \ \ \textcolor{keywordflow}{case}\ (\mbox{\hyperlink{drpai_8h_a072183bc564777f0440f90ca2fef7a90}{INDEX\_P}}):}
+\DoxyCodeLine{00292\ \ \ \ \ \ \ addr\ =\ \mbox{\hyperlink{drpai_8h_ac77e3e50f3865affc33e32b4f965fa9d}{drpai\_address}}.\mbox{\hyperlink{structst__addr__t_a25a6347303eb140ec9da804c03f97730}{drp\_param\_addr}};}
+\DoxyCodeLine{00293\ \ \ \ \ \ \ \mbox{\hyperlink{namespaceei_a000f348b45d99db3a9dd6a9991ef667a}{size}}\ =\ \mbox{\hyperlink{drpai_8h_ac77e3e50f3865affc33e32b4f965fa9d}{drpai\_address}}.\mbox{\hyperlink{structst__addr__t_ab6d76e93588adc5fb02fe6b922b9fc40}{drp\_param\_size}};}
+\DoxyCodeLine{00294\ \ \ \ \ \ \ data\_ptr\ =\ ei\_drp\_param\_bin;}
+\DoxyCodeLine{00295\ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00296\ \ \ \ \ \textcolor{keywordflow}{case}\ (\mbox{\hyperlink{drpai_8h_acd60e136b4675a11bd2cec4003df7f8a}{INDEX\_A}}):}
+\DoxyCodeLine{00297\ \ \ \ \ \ \ addr\ =\ \mbox{\hyperlink{drpai_8h_ac77e3e50f3865affc33e32b4f965fa9d}{drpai\_address}}.\mbox{\hyperlink{structst__addr__t_ae97d7c2d20dc1eefc08ce0fd234ed69c}{desc\_aimac\_addr}};}
+\DoxyCodeLine{00298\ \ \ \ \ \ \ \mbox{\hyperlink{namespaceei_a000f348b45d99db3a9dd6a9991ef667a}{size}}\ =\ \mbox{\hyperlink{drpai_8h_ac77e3e50f3865affc33e32b4f965fa9d}{drpai\_address}}.\mbox{\hyperlink{structst__addr__t_afb623d9111023842c4c799595908d33e}{desc\_aimac\_size}};}
+\DoxyCodeLine{00299\ \ \ \ \ \ \ data\_ptr\ =\ ei\_aimac\_desc\_bin;}
+\DoxyCodeLine{00300\ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00301\ \ \ \ \ \textcolor{keywordflow}{case}\ (\mbox{\hyperlink{drpai_8h_a52471c6aadb1fb8c7bd7bf924ea34519}{INDEX\_D}}):}
+\DoxyCodeLine{00302\ \ \ \ \ \ \ addr\ =\ \mbox{\hyperlink{drpai_8h_ac77e3e50f3865affc33e32b4f965fa9d}{drpai\_address}}.\mbox{\hyperlink{structst__addr__t_a635aaea6b1e6b8489c902f3d6bd480a3}{desc\_drp\_addr}};}
+\DoxyCodeLine{00303\ \ \ \ \ \ \ \mbox{\hyperlink{namespaceei_a000f348b45d99db3a9dd6a9991ef667a}{size}}\ =\ \mbox{\hyperlink{drpai_8h_ac77e3e50f3865affc33e32b4f965fa9d}{drpai\_address}}.\mbox{\hyperlink{structst__addr__t_a42edf4b0471b5b5424e8945d3224a828}{desc\_drp\_size}};}
+\DoxyCodeLine{00304\ \ \ \ \ \ \ data\_ptr\ =\ ei\_drp\_desc\_bin;}
+\DoxyCodeLine{00305\ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00306\ \ \ \ \ \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{00307\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ -\/1;}
+\DoxyCodeLine{00308\ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00309\ \ \ \ \ \}}
+\DoxyCodeLine{00310\ \ \ \ \ \textcolor{keywordflow}{if}\ (0\ !=\ \mbox{\hyperlink{drpai_8h_a81d963fa6adab789d7fb45022927881c}{load\_data\_to\_mem}}(data\_ptr,\ \mbox{\hyperlink{drpai_8h_a624b3ed259be0a9d9b9f60aa7eb173b6}{drpai\_fd}},\ addr,\ \mbox{\hyperlink{namespaceei_a000f348b45d99db3a9dd6a9991ef667a}{size}}))\ \{}
+\DoxyCodeLine{00311\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ -\/1;}
+\DoxyCodeLine{00312\ \ \ \ \ \}}
+\DoxyCodeLine{00313\ \ \ \}}
+\DoxyCodeLine{00314\ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00315\ \}}
+\DoxyCodeLine{00316\ }
+\DoxyCodeLine{00317\ \mbox{\hyperlink{group__ei__returntypes_gad9580b47a6cd5e74cfc31a03bdfecebe}{EI\_IMPULSE\_ERROR}}\ \mbox{\hyperlink{drpai_8h_a49b84eac46f6746d1f95d7426ae9e9af}{drpai\_init\_classifier}}()\ \{}
+\DoxyCodeLine{00318\ \ \ \textcolor{comment}{//\ retval\ for\ drpai\ status}}
+\DoxyCodeLine{00319\ \ \ \textcolor{keywordtype}{int}\ ret\_drpai;}
+\DoxyCodeLine{00320\ }
+\DoxyCodeLine{00321\ \ \ \textcolor{comment}{//\ Read\ DRP-\/AI\ Object\ files\ address\ and\ size}}
+\DoxyCodeLine{00322\ \ \ \textcolor{keywordflow}{if}\ (0\ !=\ \mbox{\hyperlink{drpai_8h_a413c90e9df01f788fed7bce56eb7dd0a}{read\_addrmap\_txt}}())\ \{}
+\DoxyCodeLine{00323\ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}ERR:\ read\_addrmap\_txt\ failed\ :\ \%d\(\backslash\)n"{}},\ errno);}
+\DoxyCodeLine{00324\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{group__ei__returntypes_ggad9580b47a6cd5e74cfc31a03bdfecebea900fb696dc939054a8921a350d7a1e1a}{EI\_IMPULSE\_DRPAI\_INIT\_FAILED}};}
+\DoxyCodeLine{00325\ \ \ \}}
+\DoxyCodeLine{00326\ }
+\DoxyCodeLine{00327\ \ \ \textcolor{comment}{//\ DRP-\/AI\ Driver\ Open}}
+\DoxyCodeLine{00328\ \ \ \mbox{\hyperlink{drpai_8h_a624b3ed259be0a9d9b9f60aa7eb173b6}{drpai\_fd}}\ =\ open(\textcolor{stringliteral}{"{}/dev/drpai0"{}},\ O\_RDWR);}
+\DoxyCodeLine{00329\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{drpai_8h_a624b3ed259be0a9d9b9f60aa7eb173b6}{drpai\_fd}}\ <\ 0)\ \{}
+\DoxyCodeLine{00330\ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}ERR:\ Failed\ to\ Open\ DRP-\/AI\ Driver:\ errno=\%d\(\backslash\)n"{}},\ errno);}
+\DoxyCodeLine{00331\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{group__ei__returntypes_ggad9580b47a6cd5e74cfc31a03bdfecebea900fb696dc939054a8921a350d7a1e1a}{EI\_IMPULSE\_DRPAI\_INIT\_FAILED}};}
+\DoxyCodeLine{00332\ \ \ \}}
+\DoxyCodeLine{00333\ }
+\DoxyCodeLine{00334\ \ \ \textcolor{comment}{//\ Load\ DRP-\/AI\ Data\ from\ Filesystem\ to\ Memory\ via\ DRP-\/AI\ Driver}}
+\DoxyCodeLine{00335\ \ \ ret\_drpai\ =\ \mbox{\hyperlink{drpai_8h_a4f9c64725a3f867475dcb96f14710226}{load\_drpai\_data}}(\mbox{\hyperlink{drpai_8h_a624b3ed259be0a9d9b9f60aa7eb173b6}{drpai\_fd}});}
+\DoxyCodeLine{00336\ \ \ \textcolor{keywordflow}{if}\ (ret\_drpai\ !=\ 0)\ \{}
+\DoxyCodeLine{00337\ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}ERR:\ Failed\ to\ load\ DRPAI\ Data\(\backslash\)n"{}});}
+\DoxyCodeLine{00338\ \ \ \ \ \textcolor{keywordflow}{if}\ (0\ !=\ close(\mbox{\hyperlink{drpai_8h_a624b3ed259be0a9d9b9f60aa7eb173b6}{drpai\_fd}}))\ \{}
+\DoxyCodeLine{00339\ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}ERR:\ Failed\ to\ Close\ DRPAI\ Driver:\ errno=\%d\(\backslash\)n"{}},\ errno);}
+\DoxyCodeLine{00340\ \ \ \ \ \}}
+\DoxyCodeLine{00341\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{group__ei__returntypes_ggad9580b47a6cd5e74cfc31a03bdfecebea900fb696dc939054a8921a350d7a1e1a}{EI\_IMPULSE\_DRPAI\_INIT\_FAILED}};}
+\DoxyCodeLine{00342\ \ \ \}}
+\DoxyCodeLine{00343\ }
+\DoxyCodeLine{00344\ \ \ \textcolor{comment}{//\ statically\ store\ DRP\ object\ file\ addresses\ and\ sizes}}
+\DoxyCodeLine{00345\ \ \ \mbox{\hyperlink{drpai_8h_a03e1c4614b2c72e8f36b82895bc4e419}{proc}}[DRPAI\_INDEX\_INPUT].address\ =\ (uint32\_t)\mbox{\hyperlink{drpai_8h_af93884ff03bb810390ab0e2321b94730}{udmabuf\_address}};}
+\DoxyCodeLine{00346\ \ \ \mbox{\hyperlink{drpai_8h_a03e1c4614b2c72e8f36b82895bc4e419}{proc}}[DRPAI\_INDEX\_INPUT].size\ =\ \mbox{\hyperlink{drpai_8h_ac77e3e50f3865affc33e32b4f965fa9d}{drpai\_address}}.\mbox{\hyperlink{structst__addr__t_aa255220ec6e78598495f57799280f4d6}{data\_in\_size}};}
+\DoxyCodeLine{00347\ \ \ \mbox{\hyperlink{drpai_8h_a03e1c4614b2c72e8f36b82895bc4e419}{proc}}[DRPAI\_INDEX\_DRP\_CFG].address\ =\ \mbox{\hyperlink{drpai_8h_ac77e3e50f3865affc33e32b4f965fa9d}{drpai\_address}}.\mbox{\hyperlink{structst__addr__t_a051bc2a4db53950bd8f1aa6290155ece}{drp\_config\_addr}};}
+\DoxyCodeLine{00348\ \ \ \mbox{\hyperlink{drpai_8h_a03e1c4614b2c72e8f36b82895bc4e419}{proc}}[DRPAI\_INDEX\_DRP\_CFG].size\ =\ \mbox{\hyperlink{drpai_8h_ac77e3e50f3865affc33e32b4f965fa9d}{drpai\_address}}.\mbox{\hyperlink{structst__addr__t_a7e9e942839409d66926b77025d391265}{drp\_config\_size}};}
+\DoxyCodeLine{00349\ \ \ \mbox{\hyperlink{drpai_8h_a03e1c4614b2c72e8f36b82895bc4e419}{proc}}[DRPAI\_INDEX\_DRP\_PARAM].address\ =\ \mbox{\hyperlink{drpai_8h_ac77e3e50f3865affc33e32b4f965fa9d}{drpai\_address}}.\mbox{\hyperlink{structst__addr__t_a25a6347303eb140ec9da804c03f97730}{drp\_param\_addr}};}
+\DoxyCodeLine{00350\ \ \ \mbox{\hyperlink{drpai_8h_a03e1c4614b2c72e8f36b82895bc4e419}{proc}}[DRPAI\_INDEX\_DRP\_PARAM].size\ =\ \mbox{\hyperlink{drpai_8h_ac77e3e50f3865affc33e32b4f965fa9d}{drpai\_address}}.\mbox{\hyperlink{structst__addr__t_ab6d76e93588adc5fb02fe6b922b9fc40}{drp\_param\_size}};}
+\DoxyCodeLine{00351\ \ \ \mbox{\hyperlink{drpai_8h_a03e1c4614b2c72e8f36b82895bc4e419}{proc}}[DRPAI\_INDEX\_AIMAC\_DESC].address\ =\ \mbox{\hyperlink{drpai_8h_ac77e3e50f3865affc33e32b4f965fa9d}{drpai\_address}}.\mbox{\hyperlink{structst__addr__t_ae97d7c2d20dc1eefc08ce0fd234ed69c}{desc\_aimac\_addr}};}
+\DoxyCodeLine{00352\ \ \ \mbox{\hyperlink{drpai_8h_a03e1c4614b2c72e8f36b82895bc4e419}{proc}}[DRPAI\_INDEX\_AIMAC\_DESC].size\ =\ \mbox{\hyperlink{drpai_8h_ac77e3e50f3865affc33e32b4f965fa9d}{drpai\_address}}.\mbox{\hyperlink{structst__addr__t_afb623d9111023842c4c799595908d33e}{desc\_aimac\_size}};}
+\DoxyCodeLine{00353\ \ \ \mbox{\hyperlink{drpai_8h_a03e1c4614b2c72e8f36b82895bc4e419}{proc}}[DRPAI\_INDEX\_DRP\_DESC].address\ =\ \mbox{\hyperlink{drpai_8h_ac77e3e50f3865affc33e32b4f965fa9d}{drpai\_address}}.\mbox{\hyperlink{structst__addr__t_a635aaea6b1e6b8489c902f3d6bd480a3}{desc\_drp\_addr}};}
+\DoxyCodeLine{00354\ \ \ \mbox{\hyperlink{drpai_8h_a03e1c4614b2c72e8f36b82895bc4e419}{proc}}[DRPAI\_INDEX\_DRP\_DESC].size\ =\ \mbox{\hyperlink{drpai_8h_ac77e3e50f3865affc33e32b4f965fa9d}{drpai\_address}}.\mbox{\hyperlink{structst__addr__t_a42edf4b0471b5b5424e8945d3224a828}{desc\_drp\_size}};}
+\DoxyCodeLine{00355\ \ \ \mbox{\hyperlink{drpai_8h_a03e1c4614b2c72e8f36b82895bc4e419}{proc}}[DRPAI\_INDEX\_WEIGHT].address\ =\ \mbox{\hyperlink{drpai_8h_ac77e3e50f3865affc33e32b4f965fa9d}{drpai\_address}}.\mbox{\hyperlink{structst__addr__t_ac1b6d87d7af068f407b56f3cb7c48990}{weight\_addr}};}
+\DoxyCodeLine{00356\ \ \ \mbox{\hyperlink{drpai_8h_a03e1c4614b2c72e8f36b82895bc4e419}{proc}}[DRPAI\_INDEX\_WEIGHT].size\ =\ \mbox{\hyperlink{drpai_8h_ac77e3e50f3865affc33e32b4f965fa9d}{drpai\_address}}.\mbox{\hyperlink{structst__addr__t_aa214c4593457c4c8ebb27520a197e8cf}{weight\_size}};}
+\DoxyCodeLine{00357\ \ \ \mbox{\hyperlink{drpai_8h_a03e1c4614b2c72e8f36b82895bc4e419}{proc}}[DRPAI\_INDEX\_OUTPUT].address\ =\ \mbox{\hyperlink{drpai_8h_ac77e3e50f3865affc33e32b4f965fa9d}{drpai\_address}}.\mbox{\hyperlink{structst__addr__t_a8fc26b2701c2e2b98ed96e609cb3a833}{data\_out\_addr}};}
+\DoxyCodeLine{00358\ \ \ \mbox{\hyperlink{drpai_8h_a03e1c4614b2c72e8f36b82895bc4e419}{proc}}[DRPAI\_INDEX\_OUTPUT].size\ =\ \mbox{\hyperlink{drpai_8h_ac77e3e50f3865affc33e32b4f965fa9d}{drpai\_address}}.\mbox{\hyperlink{structst__addr__t_a0c36fd59b6ad2ee7c79835ec111a7384}{data\_out\_size}};}
+\DoxyCodeLine{00359\ }
+\DoxyCodeLine{00360\ \ \ \mbox{\hyperlink{ei__logging_8h_a807a3beed2af012bea0e48165d5161c2}{EI\_LOGD}}(\textcolor{stringliteral}{"{}proc[DRPAI\_INDEX\_INPUT]\ addr:\ \%p,\ size:\ \%p\(\backslash\)r\(\backslash\)n"{}},\ \mbox{\hyperlink{drpai_8h_a03e1c4614b2c72e8f36b82895bc4e419}{proc}}[DRPAI\_INDEX\_INPUT].address,\ \mbox{\hyperlink{drpai_8h_a03e1c4614b2c72e8f36b82895bc4e419}{proc}}[DRPAI\_INDEX\_INPUT].\mbox{\hyperlink{namespaceei_a000f348b45d99db3a9dd6a9991ef667a}{size}});}
+\DoxyCodeLine{00361\ \ \ \mbox{\hyperlink{ei__logging_8h_a807a3beed2af012bea0e48165d5161c2}{EI\_LOGD}}(\textcolor{stringliteral}{"{}proc[DRPAI\_INDEX\_DRP\_CFG]\ addr:\ \%p,\ size:\ \%p\(\backslash\)r\(\backslash\)n"{}},\ \mbox{\hyperlink{drpai_8h_a03e1c4614b2c72e8f36b82895bc4e419}{proc}}[DRPAI\_INDEX\_DRP\_CFG].address,\ \mbox{\hyperlink{drpai_8h_a03e1c4614b2c72e8f36b82895bc4e419}{proc}}[DRPAI\_INDEX\_DRP\_CFG].\mbox{\hyperlink{namespaceei_a000f348b45d99db3a9dd6a9991ef667a}{size}});}
+\DoxyCodeLine{00362\ \ \ \mbox{\hyperlink{ei__logging_8h_a807a3beed2af012bea0e48165d5161c2}{EI\_LOGD}}(\textcolor{stringliteral}{"{}proc[DRPAI\_INDEX\_DRP\_PARAM]\ addr:\ \%p,\ size:\ \%p\(\backslash\)r\(\backslash\)n"{}},\ \mbox{\hyperlink{drpai_8h_a03e1c4614b2c72e8f36b82895bc4e419}{proc}}[DRPAI\_INDEX\_DRP\_PARAM].address,\ \mbox{\hyperlink{drpai_8h_a03e1c4614b2c72e8f36b82895bc4e419}{proc}}[DRPAI\_INDEX\_DRP\_PARAM].\mbox{\hyperlink{namespaceei_a000f348b45d99db3a9dd6a9991ef667a}{size}});}
+\DoxyCodeLine{00363\ \ \ \mbox{\hyperlink{ei__logging_8h_a807a3beed2af012bea0e48165d5161c2}{EI\_LOGD}}(\textcolor{stringliteral}{"{}proc[DRPAI\_INDEX\_AIMAC\_DESC]\ addr:\ \%p,\ size:\ \%p\(\backslash\)r\(\backslash\)n"{}},\ \mbox{\hyperlink{drpai_8h_a03e1c4614b2c72e8f36b82895bc4e419}{proc}}[DRPAI\_INDEX\_AIMAC\_DESC].address,\ \mbox{\hyperlink{drpai_8h_a03e1c4614b2c72e8f36b82895bc4e419}{proc}}[DRPAI\_INDEX\_AIMAC\_DESC].\mbox{\hyperlink{namespaceei_a000f348b45d99db3a9dd6a9991ef667a}{size}});}
+\DoxyCodeLine{00364\ \ \ \mbox{\hyperlink{ei__logging_8h_a807a3beed2af012bea0e48165d5161c2}{EI\_LOGD}}(\textcolor{stringliteral}{"{}proc[DRPAI\_INDEX\_DRP\_DESC]\ addr:\ \%p,\ size:\ \%p\(\backslash\)r\(\backslash\)n"{}},\ \mbox{\hyperlink{drpai_8h_a03e1c4614b2c72e8f36b82895bc4e419}{proc}}[DRPAI\_INDEX\_DRP\_DESC].address,\ \mbox{\hyperlink{drpai_8h_a03e1c4614b2c72e8f36b82895bc4e419}{proc}}[DRPAI\_INDEX\_DRP\_DESC].\mbox{\hyperlink{namespaceei_a000f348b45d99db3a9dd6a9991ef667a}{size}});}
+\DoxyCodeLine{00365\ \ \ \mbox{\hyperlink{ei__logging_8h_a807a3beed2af012bea0e48165d5161c2}{EI\_LOGD}}(\textcolor{stringliteral}{"{}proc[DRPAI\_INDEX\_WEIGHT]\ addr:\ \%p,\ size:\ \%p\(\backslash\)r\(\backslash\)n"{}},\ \mbox{\hyperlink{drpai_8h_a03e1c4614b2c72e8f36b82895bc4e419}{proc}}[DRPAI\_INDEX\_WEIGHT].address,\ \mbox{\hyperlink{drpai_8h_a03e1c4614b2c72e8f36b82895bc4e419}{proc}}[DRPAI\_INDEX\_WEIGHT].\mbox{\hyperlink{namespaceei_a000f348b45d99db3a9dd6a9991ef667a}{size}});}
+\DoxyCodeLine{00366\ \ \ \mbox{\hyperlink{ei__logging_8h_a807a3beed2af012bea0e48165d5161c2}{EI\_LOGD}}(\textcolor{stringliteral}{"{}proc[DRPAI\_INDEX\_OUTPUT]\ addr:\ \%p,\ size:\ \%p\(\backslash\)r\(\backslash\)n"{}},\ \mbox{\hyperlink{drpai_8h_a03e1c4614b2c72e8f36b82895bc4e419}{proc}}[DRPAI\_INDEX\_OUTPUT].address,\ \mbox{\hyperlink{drpai_8h_a03e1c4614b2c72e8f36b82895bc4e419}{proc}}[DRPAI\_INDEX\_OUTPUT].\mbox{\hyperlink{namespaceei_a000f348b45d99db3a9dd6a9991ef667a}{size}});}
+\DoxyCodeLine{00367\ }
+\DoxyCodeLine{00368\ \ \ \mbox{\hyperlink{drpai_8h_a0219b963b7bfdddad7677bbd78f754b6}{drpai\_output\_buf}}\ =\ (\textcolor{keywordtype}{float}\ *)\mbox{\hyperlink{group__ei__user__functions_ga71ecca5661ac4434a709c88e4c39b4aa}{ei\_malloc}}(\mbox{\hyperlink{drpai_8h_ac77e3e50f3865affc33e32b4f965fa9d}{drpai\_address}}.\mbox{\hyperlink{structst__addr__t_a0c36fd59b6ad2ee7c79835ec111a7384}{data\_out\_size}});}
+\DoxyCodeLine{00369\ }
+\DoxyCodeLine{00370\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{ei__fill__result__struct_8h_a2fb43be102b153d659b668ad295aff40}{EI\_IMPULSE\_OK}};}
+\DoxyCodeLine{00371\ \}}
+\DoxyCodeLine{00372\ }
+\DoxyCodeLine{00373\ \mbox{\hyperlink{group__ei__returntypes_gad9580b47a6cd5e74cfc31a03bdfecebe}{EI\_IMPULSE\_ERROR}}\ \mbox{\hyperlink{drpai_8h_aaeb472e063238fd5bb5ade9b90535853}{drpai\_run\_classifier\_image\_quantized}}()\ \{}
+\DoxyCodeLine{00374\ \textcolor{preprocessor}{\#if\ EI\_CLASSIFIER\_COMPILED\ ==\ 1}}
+\DoxyCodeLine{00375\ \textcolor{preprocessor}{\#error\ "{}DRP-\/AI\ is\ not\ compatible\ with\ EON\ Compiler"{}}}
+\DoxyCodeLine{00376\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00377\ \ \ \textcolor{comment}{//\ output\ data\ from\ DRPAI\ model}}
+\DoxyCodeLine{00378\ \ \ drpai\_data\_t\ drpai\_data;}
+\DoxyCodeLine{00379\ \ \ \textcolor{comment}{//\ status\ used\ to\ query\ if\ any\ internal\ errors\ occured\ during\ inferencing}}
+\DoxyCodeLine{00380\ \ \ drpai\_status\_t\ drpai\_status;}
+\DoxyCodeLine{00381\ \ \ \textcolor{comment}{//\ descriptor\ used\ for\ checking\ if\ DRPAI\ is\ done\ inferencing}}
+\DoxyCodeLine{00382\ \ \ fd\_set\ rfds;}
+\DoxyCodeLine{00383\ \ \ \textcolor{comment}{//\ struct\ used\ to\ define\ DRPAI\ timeout}}
+\DoxyCodeLine{00384\ \ \ \textcolor{keyword}{struct\ }timespec\ tv;}
+\DoxyCodeLine{00385\ \ \ \textcolor{comment}{//\ retval\ for\ drpai\ status}}
+\DoxyCodeLine{00386\ \ \ \textcolor{keywordtype}{int}\ ret\_drpai;}
+\DoxyCodeLine{00387\ \ \ \textcolor{comment}{//\ retval\ when\ querying\ drpai\ status}}
+\DoxyCodeLine{00388\ \ \ \textcolor{keywordtype}{int}\ inf\_status\ =\ 0;}
+\DoxyCodeLine{00389\ }
+\DoxyCodeLine{00390\ \ \ \textcolor{comment}{//\ DRP-\/AI\ Output\ Memory\ Preparation}}
+\DoxyCodeLine{00391\ \ \ drpai\_data.address\ =\ \mbox{\hyperlink{drpai_8h_ac77e3e50f3865affc33e32b4f965fa9d}{drpai\_address}}.\mbox{\hyperlink{structst__addr__t_a8fc26b2701c2e2b98ed96e609cb3a833}{data\_out\_addr}};}
+\DoxyCodeLine{00392\ \ \ drpai\_data.size\ =\ \mbox{\hyperlink{drpai_8h_ac77e3e50f3865affc33e32b4f965fa9d}{drpai\_address}}.\mbox{\hyperlink{structst__addr__t_a0c36fd59b6ad2ee7c79835ec111a7384}{data\_out\_size}};}
+\DoxyCodeLine{00393\ }
+\DoxyCodeLine{00394\ \ \ \textcolor{comment}{//\ Start\ DRP-\/AI\ driver}}
+\DoxyCodeLine{00395\ \ \ \mbox{\hyperlink{ei__logging_8h_a807a3beed2af012bea0e48165d5161c2}{EI\_LOGD}}(\textcolor{stringliteral}{"{}Start\ DRPAI\ inference\(\backslash\)r\(\backslash\)n"{}});}
+\DoxyCodeLine{00396\ \ \ \textcolor{keywordtype}{int}\ ioret\ =\ ioctl(\mbox{\hyperlink{drpai_8h_a624b3ed259be0a9d9b9f60aa7eb173b6}{drpai\_fd}},\ DRPAI\_START,\ \&\mbox{\hyperlink{drpai_8h_a03e1c4614b2c72e8f36b82895bc4e419}{proc}}[0]);}
+\DoxyCodeLine{00397\ \ \ \textcolor{keywordflow}{if}\ (0\ !=\ ioret)\ \{}
+\DoxyCodeLine{00398\ \ \ \ \ \mbox{\hyperlink{ei__logging_8h_a754a1a854d8d67297d5e8e5113a15d35}{EI\_LOGE}}(\textcolor{stringliteral}{"{}Failed\ to\ Start\ DRPAI\ Inference:\ \%d\(\backslash\)n"{}},\ errno);}
+\DoxyCodeLine{00399\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{group__ei__returntypes_ggad9580b47a6cd5e74cfc31a03bdfecebea28104f4b6ee14fd88688fc0ea76538ac}{EI\_IMPULSE\_DRPAI\_RUNTIME\_FAILED}};}
+\DoxyCodeLine{00400\ \ \ \}}
+\DoxyCodeLine{00401\ }
+\DoxyCodeLine{00402\ \ \ \textcolor{comment}{//\ Settings\ For\ pselect\ -\/\ this\ is\ how\ DRPAI\ signals\ inferencing\ complete}}
+\DoxyCodeLine{00403\ \ \ FD\_ZERO(\&rfds);}
+\DoxyCodeLine{00404\ \ \ FD\_SET(\mbox{\hyperlink{drpai_8h_a624b3ed259be0a9d9b9f60aa7eb173b6}{drpai\_fd}},\ \&rfds);}
+\DoxyCodeLine{00405\ \ \ \textcolor{comment}{//\ Define\ a\ timeout\ for\ DRP-\/AI\ to\ complete}}
+\DoxyCodeLine{00406\ \ \ tv.tv\_sec\ =\ \mbox{\hyperlink{drpai_8h_ad8001c76eaea7dd77475217632feb0a5}{DRPAI\_TIMEOUT}};}
+\DoxyCodeLine{00407\ \ \ tv.tv\_nsec\ =\ 0;}
+\DoxyCodeLine{00408\ }
+\DoxyCodeLine{00409\ \ \ \textcolor{comment}{//\ Wait\ until\ DRP-\/AI\ ends}}
+\DoxyCodeLine{00410\ \ \ \mbox{\hyperlink{ei__logging_8h_a807a3beed2af012bea0e48165d5161c2}{EI\_LOGD}}(\textcolor{stringliteral}{"{}Waiting\ on\ DRPAI\ inference\ results\(\backslash\)r\(\backslash\)n"{}});}
+\DoxyCodeLine{00411\ \ \ ret\_drpai\ =\ pselect(\mbox{\hyperlink{drpai_8h_a624b3ed259be0a9d9b9f60aa7eb173b6}{drpai\_fd}}\ +\ 1,\ \&rfds,\ NULL,\ NULL,\ \&tv,\ NULL);}
+\DoxyCodeLine{00412\ \ \ \textcolor{keywordflow}{if}\ (ret\_drpai\ ==\ 0)\ \{}
+\DoxyCodeLine{00413\ \ \ \ \ \ \ \mbox{\hyperlink{ei__logging_8h_a754a1a854d8d67297d5e8e5113a15d35}{EI\_LOGE}}(\textcolor{stringliteral}{"{}DRPAI\ Inference\ pselect()\ Timeout:\ \%d\(\backslash\)n"{}},\ errno);}
+\DoxyCodeLine{00414\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{group__ei__returntypes_ggad9580b47a6cd5e74cfc31a03bdfecebea28104f4b6ee14fd88688fc0ea76538ac}{EI\_IMPULSE\_DRPAI\_RUNTIME\_FAILED}};}
+\DoxyCodeLine{00415\ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (ret\_drpai\ <\ 0)\ \{}
+\DoxyCodeLine{00416\ \ \ \ \ \ \ \mbox{\hyperlink{ei__logging_8h_a754a1a854d8d67297d5e8e5113a15d35}{EI\_LOGE}}(\textcolor{stringliteral}{"{}DRPAI\ Inference\ pselect()\ Error:\ \%d\(\backslash\)n"{}},\ errno);}
+\DoxyCodeLine{00417\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{group__ei__returntypes_ggad9580b47a6cd5e74cfc31a03bdfecebea28104f4b6ee14fd88688fc0ea76538ac}{EI\_IMPULSE\_DRPAI\_RUNTIME\_FAILED}};}
+\DoxyCodeLine{00418\ \ \ \}}
+\DoxyCodeLine{00419\ }
+\DoxyCodeLine{00420\ \ \ \textcolor{comment}{//\ Checks\ for\ DRPAI\ inference\ status\ errors}}
+\DoxyCodeLine{00421\ \ \ \mbox{\hyperlink{ei__logging_8h_a807a3beed2af012bea0e48165d5161c2}{EI\_LOGD}}(\textcolor{stringliteral}{"{}Getting\ DRPAI\ Status\(\backslash\)r\(\backslash\)n"{}});}
+\DoxyCodeLine{00422\ \ \ inf\_status\ =\ ioctl(\mbox{\hyperlink{drpai_8h_a624b3ed259be0a9d9b9f60aa7eb173b6}{drpai\_fd}},\ DRPAI\_GET\_STATUS,\ \&drpai\_status);}
+\DoxyCodeLine{00423\ \ \ \textcolor{keywordflow}{if}\ (inf\_status\ !=\ 0)\ \{}
+\DoxyCodeLine{00424\ \ \ \ \ \ \ \mbox{\hyperlink{ei__logging_8h_a754a1a854d8d67297d5e8e5113a15d35}{EI\_LOGE}}(\textcolor{stringliteral}{"{}DRPAI\ Internal\ Error:\ \%d\(\backslash\)n"{}},\ errno);}
+\DoxyCodeLine{00425\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{group__ei__returntypes_ggad9580b47a6cd5e74cfc31a03bdfecebea28104f4b6ee14fd88688fc0ea76538ac}{EI\_IMPULSE\_DRPAI\_RUNTIME\_FAILED}};}
+\DoxyCodeLine{00426\ \ \ \}}
+\DoxyCodeLine{00427\ }
+\DoxyCodeLine{00428\ \ \ \mbox{\hyperlink{ei__logging_8h_a807a3beed2af012bea0e48165d5161c2}{EI\_LOGD}}(\textcolor{stringliteral}{"{}Getting\ inference\ results\(\backslash\)r\(\backslash\)n"{}});}
+\DoxyCodeLine{00429\ \ \ \textcolor{keywordflow}{if}\ (ioctl(\mbox{\hyperlink{drpai_8h_a624b3ed259be0a9d9b9f60aa7eb173b6}{drpai\_fd}},\ DRPAI\_ASSIGN,\ \&drpai\_data)\ !=\ 0)\ \{}
+\DoxyCodeLine{00430\ \ \ \ \ \ \ \mbox{\hyperlink{ei__logging_8h_a754a1a854d8d67297d5e8e5113a15d35}{EI\_LOGE}}(\textcolor{stringliteral}{"{}Failed\ to\ Assign\ DRPAI\ data:\ \%d\(\backslash\)n"{}},\ errno);}
+\DoxyCodeLine{00431\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{group__ei__returntypes_ggad9580b47a6cd5e74cfc31a03bdfecebea28104f4b6ee14fd88688fc0ea76538ac}{EI\_IMPULSE\_DRPAI\_RUNTIME\_FAILED}};}
+\DoxyCodeLine{00432\ \ \ \}}
+\DoxyCodeLine{00433\ }
+\DoxyCodeLine{00434\ \ \ \textcolor{keywordflow}{if}\ (read(\mbox{\hyperlink{drpai_8h_a624b3ed259be0a9d9b9f60aa7eb173b6}{drpai\_fd}},\ \mbox{\hyperlink{drpai_8h_a0219b963b7bfdddad7677bbd78f754b6}{drpai\_output\_buf}},\ drpai\_data.size)\ <\ 0)\ \{}
+\DoxyCodeLine{00435\ \ \ \ \ \ \ \mbox{\hyperlink{ei__logging_8h_a754a1a854d8d67297d5e8e5113a15d35}{EI\_LOGE}}(\textcolor{stringliteral}{"{}Failed\ to\ read\ DRPAI\ output\ data:\ \%d\(\backslash\)n"{}},\ errno);}
+\DoxyCodeLine{00436\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{group__ei__returntypes_ggad9580b47a6cd5e74cfc31a03bdfecebea28104f4b6ee14fd88688fc0ea76538ac}{EI\_IMPULSE\_DRPAI\_RUNTIME\_FAILED}};}
+\DoxyCodeLine{00437\ \ \ \}}
+\DoxyCodeLine{00438\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{ei__fill__result__struct_8h_a2fb43be102b153d659b668ad295aff40}{EI\_IMPULSE\_OK}};}
+\DoxyCodeLine{00439\ \}}
+\DoxyCodeLine{00440\ }
+\DoxyCodeLine{00441\ \textcolor{comment}{//\ close\ the\ driver\ (reset\ file\ handles)}}
+\DoxyCodeLine{00442\ \mbox{\hyperlink{group__ei__returntypes_gad9580b47a6cd5e74cfc31a03bdfecebe}{EI\_IMPULSE\_ERROR}}\ \mbox{\hyperlink{drpai_8h_a7562bd2fd848d402288f55093dc3d77a}{drpai\_close}}(uint32\_t\ input\_frame\_size)\ \{}
+\DoxyCodeLine{00443\ \ \ munmap(\mbox{\hyperlink{drpai_8h_a267f34e4307ebcca8cc6069ced88489c}{drpai\_input\_buf}},\ input\_frame\_size);}
+\DoxyCodeLine{00444\ \ \ free(\mbox{\hyperlink{drpai_8h_a0219b963b7bfdddad7677bbd78f754b6}{drpai\_output\_buf}});}
+\DoxyCodeLine{00445\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{drpai_8h_a624b3ed259be0a9d9b9f60aa7eb173b6}{drpai\_fd}}\ >\ 0)\ \{}
+\DoxyCodeLine{00446\ \ \ \ \ \textcolor{keywordflow}{if}\ (0\ !=\ close(\mbox{\hyperlink{drpai_8h_a624b3ed259be0a9d9b9f60aa7eb173b6}{drpai\_fd}}))\ \{}
+\DoxyCodeLine{00447\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__logging_8h_a754a1a854d8d67297d5e8e5113a15d35}{EI\_LOGE}}(\textcolor{stringliteral}{"{}Failed\ to\ Close\ DRP-\/AI\ Driver:\ errno=\%d\(\backslash\)n"{}},\ errno);}
+\DoxyCodeLine{00448\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{group__ei__returntypes_ggad9580b47a6cd5e74cfc31a03bdfecebea28104f4b6ee14fd88688fc0ea76538ac}{EI\_IMPULSE\_DRPAI\_RUNTIME\_FAILED}};}
+\DoxyCodeLine{00449\ \ \ \ \ \}}
+\DoxyCodeLine{00450\ \ \ \ \ \mbox{\hyperlink{drpai_8h_a624b3ed259be0a9d9b9f60aa7eb173b6}{drpai\_fd}}\ =\ -\/1;}
+\DoxyCodeLine{00451\ \ \ \}}
+\DoxyCodeLine{00452\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{ei__fill__result__struct_8h_a2fb43be102b153d659b668ad295aff40}{EI\_IMPULSE\_OK}};}
+\DoxyCodeLine{00453\ \}}
+\DoxyCodeLine{00454\ }
+\DoxyCodeLine{00455\ \textcolor{preprocessor}{\#if\ ((EI\_CLASSIFIER\_OBJECT\_DETECTION\ ==\ 1)\ \&\&\ (EI\_CLASSIFIER\_OBJECT\_DETECTION\_LAST\_LAYER\ ==\ EI\_CLASSIFIER\_LAST\_LAYER\_YOLOV5\_V5\_DRPAI))}}
+\DoxyCodeLine{00456\ \mbox{\hyperlink{group__ei__returntypes_gad9580b47a6cd5e74cfc31a03bdfecebe}{EI\_IMPULSE\_ERROR}}\ drpai\_run\_yolov5\_postprocessing(}
+\DoxyCodeLine{00457\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structei__impulse}{ei\_impulse\_t}}\ *impulse,}
+\DoxyCodeLine{00458\ \ \ \ \ \mbox{\hyperlink{structei__learning__block__config__tflite__graph__t}{ei\_learning\_block\_config\_tflite\_graph\_t}}\ *\mbox{\hyperlink{ei__fill__result__struct_8h_aafcd7d36638d6a564b6edbceef06ea8b}{block\_config}},}
+\DoxyCodeLine{00459\ \ \ \ \ \mbox{\hyperlink{structei__signal__t}{signal\_t}}\ *\mbox{\hyperlink{classei_1_1signal}{signal}},}
+\DoxyCodeLine{00460\ \ \ \ \ \mbox{\hyperlink{structei__impulse__result__t}{ei\_impulse\_result\_t}}\ *\mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}},}
+\DoxyCodeLine{00461\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{ei__fill__result__struct_8h_a881f62341b5a41a3c5707268bd537be1}{debug}}\ =\ \textcolor{keyword}{false})}
+\DoxyCodeLine{00462\ \{}
+\DoxyCodeLine{00463\ }
+\DoxyCodeLine{00464\ \ \ \ \ \textcolor{keyword}{static}\ std::unique\_ptr<tflite::FlatBufferModel>\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2model_8h_ae142afd8c2e2c711c1c62440deebe03c}{model}}\ =\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{00465\ \ \ \ \ \textcolor{keyword}{static}\ std::unique\_ptr<tflite::Interpreter>\ \mbox{\hyperlink{_inference_allocate_tensor_8cpp_a0d8f3bb5211083760f7c593d57adb17d}{interpreter}}\ =\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{00466\ }
+\DoxyCodeLine{00467\ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2model_8h_ae142afd8c2e2c711c1c62440deebe03c}{model}})\ \{}
+\DoxyCodeLine{00468\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2model_8h_ae142afd8c2e2c711c1c62440deebe03c}{model}}\ =\ tflite::FlatBufferModel::BuildFromBuffer((\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*)yolov5\_part2,\ yolov5\_part2\_len);}
+\DoxyCodeLine{00469\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2model_8h_ae142afd8c2e2c711c1c62440deebe03c}{model}})\ \{}
+\DoxyCodeLine{00470\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}Failed\ to\ build\ TFLite\ model\ from\ buffer\(\backslash\)n"{}});}
+\DoxyCodeLine{00471\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{group__ei__returntypes_ggad9580b47a6cd5e74cfc31a03bdfecebeadcc41afc4542dc94f9dcf36d88c1ea31}{EI\_IMPULSE\_TFLITE\_ERROR}};}
+\DoxyCodeLine{00472\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00473\ }
+\DoxyCodeLine{00474\ \ \ \ \ \ \ \ \ tflite::ops::builtin::BuiltinOpResolver\ resolver;}
+\DoxyCodeLine{00475\ \ \ \ \ \ \ \ \ tflite::InterpreterBuilder\ builder(*\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2model_8h_ae142afd8c2e2c711c1c62440deebe03c}{model}},\ resolver);}
+\DoxyCodeLine{00476\ \ \ \ \ \ \ \ \ builder(\&\mbox{\hyperlink{_inference_allocate_tensor_8cpp_a0d8f3bb5211083760f7c593d57adb17d}{interpreter}});}
+\DoxyCodeLine{00477\ }
+\DoxyCodeLine{00478\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{_inference_allocate_tensor_8cpp_a0d8f3bb5211083760f7c593d57adb17d}{interpreter}})\ \{}
+\DoxyCodeLine{00479\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}Failed\ to\ construct\ interpreter\(\backslash\)n"{}});}
+\DoxyCodeLine{00480\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{group__ei__returntypes_ggad9580b47a6cd5e74cfc31a03bdfecebeadcc41afc4542dc94f9dcf36d88c1ea31}{EI\_IMPULSE\_TFLITE\_ERROR}};}
+\DoxyCodeLine{00481\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00482\ }
+\DoxyCodeLine{00483\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{_inference_allocate_tensor_8cpp_a0d8f3bb5211083760f7c593d57adb17d}{interpreter}}-\/>\mbox{\hyperlink{classtflite_1_1_micro_interpreter_a4b27c1aa8a87107b98515b4da0fc0bfd}{AllocateTensors}}()\ !=\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361ab25fe210808197f1b6601df8ccdcd699}{kTfLiteOk}})\ \{}
+\DoxyCodeLine{00484\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}AllocateTensors\ failed\(\backslash\)n"{}});}
+\DoxyCodeLine{00485\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{group__ei__returntypes_ggad9580b47a6cd5e74cfc31a03bdfecebeadcc41afc4542dc94f9dcf36d88c1ea31}{EI\_IMPULSE\_TFLITE\_ERROR}};}
+\DoxyCodeLine{00486\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00487\ }
+\DoxyCodeLine{00488\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ hw\_thread\_count\ =\ (\mbox{\hyperlink{namespacefoto_a1005e20fd9ccefeed966f9fee79837cb}{int}})std::thread::hardware\_concurrency();}
+\DoxyCodeLine{00489\ \ \ \ \ \ \ \ \ hw\_thread\_count\ -\/=\ 1;\ \textcolor{comment}{//\ leave\ one\ thread\ free\ for\ the\ other\ application}}
+\DoxyCodeLine{00490\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (hw\_thread\_count\ <\ 1)\ \{}
+\DoxyCodeLine{00491\ \ \ \ \ \ \ \ \ \ \ \ \ hw\_thread\_count\ =\ 1;}
+\DoxyCodeLine{00492\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00493\ }
+\DoxyCodeLine{00494\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{_inference_allocate_tensor_8cpp_a0d8f3bb5211083760f7c593d57adb17d}{interpreter}}-\/>SetNumThreads(hw\_thread\_count)\ !=\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361ab25fe210808197f1b6601df8ccdcd699}{kTfLiteOk}})\ \{}
+\DoxyCodeLine{00495\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}SetNumThreads\ failed\(\backslash\)n"{}});}
+\DoxyCodeLine{00496\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{group__ei__returntypes_ggad9580b47a6cd5e74cfc31a03bdfecebeadcc41afc4542dc94f9dcf36d88c1ea31}{EI\_IMPULSE\_TFLITE\_ERROR}};}
+\DoxyCodeLine{00497\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00498\ \ \ \ \ \}}
+\DoxyCodeLine{00499\ }
+\DoxyCodeLine{00500\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ drpai\_buff\_size\ =\ \mbox{\hyperlink{drpai_8h_ac77e3e50f3865affc33e32b4f965fa9d}{drpai\_address}}.\mbox{\hyperlink{structst__addr__t_a0c36fd59b6ad2ee7c79835ec111a7384}{data\_out\_size}}\ /\ \textcolor{keyword}{sizeof}(float);}
+\DoxyCodeLine{00501\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ drpai\_features\ =\ drpai\_buff\_size;}
+\DoxyCodeLine{00502\ }
+\DoxyCodeLine{00503\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ els\_per\_grid\ =\ drpai\_features\ /\ ((NUM\_GRID\_1\ *\ NUM\_GRID\_1)\ +\ (NUM\_GRID\_2\ *\ NUM\_GRID\_2)\ +\ (NUM\_GRID\_3\ *\ NUM\_GRID\_3));}
+\DoxyCodeLine{00504\ }
+\DoxyCodeLine{00505\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ grid\_1\_offset\ =\ 0;}
+\DoxyCodeLine{00506\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ grid\_1\_size\ =\ (NUM\_GRID\_1\ *\ NUM\_GRID\_1)\ *\ els\_per\_grid;}
+\DoxyCodeLine{00507\ }
+\DoxyCodeLine{00508\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ grid\_2\_offset\ =\ grid\_1\_offset\ +\ grid\_1\_size;}
+\DoxyCodeLine{00509\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ grid\_2\_size\ =\ (NUM\_GRID\_2\ *\ NUM\_GRID\_2)\ *\ els\_per\_grid;}
+\DoxyCodeLine{00510\ }
+\DoxyCodeLine{00511\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ grid\_3\_offset\ =\ grid\_2\_offset\ +\ grid\_2\_size;}
+\DoxyCodeLine{00512\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ grid\_3\_size\ =\ (NUM\_GRID\_3\ *\ NUM\_GRID\_3)\ *\ els\_per\_grid;}
+\DoxyCodeLine{00513\ }
+\DoxyCodeLine{00514\ \ \ \ \ \textcolor{comment}{//\ Now\ we\ don't\ know\ the\ exact\ tensor\ order\ for\ some\ reason}}
+\DoxyCodeLine{00515\ \ \ \ \ \textcolor{comment}{//\ so\ let's\ do\ that\ dynamically}}
+\DoxyCodeLine{00516\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ ix\ =\ 0;\ ix\ <\ 3;\ ix++)\ \{}
+\DoxyCodeLine{00517\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_tf_lite_tensor}{TfLiteTensor}}\ *\ \mbox{\hyperlink{namespacetensor}{tensor}}\ =\ \mbox{\hyperlink{_inference_allocate_tensor_8cpp_a0d8f3bb5211083760f7c593d57adb17d}{interpreter}}-\/>\mbox{\hyperlink{classtflite_1_1_micro_interpreter_ac9046fdf3b601b6cbbcdcd4e28ad165d}{input\_tensor}}(ix);}
+\DoxyCodeLine{00518\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ tensor\_size\ =\ 1;}
+\DoxyCodeLine{00519\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ ix\ =\ 0;\ ix\ <\ \mbox{\hyperlink{namespacetensor}{tensor}}-\/>dims-\/>size;\ ix++)\ \{}
+\DoxyCodeLine{00520\ \ \ \ \ \ \ \ \ \ \ \ \ tensor\_size\ *=\ \mbox{\hyperlink{namespacetensor}{tensor}}-\/>dims-\/>data[ix];}
+\DoxyCodeLine{00521\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00522\ }
+\DoxyCodeLine{00523\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__logging_8h_a807a3beed2af012bea0e48165d5161c2}{EI\_LOGD}}(\textcolor{stringliteral}{"{}input\ tensor\ \%d,\ tensor\_size=\%d\(\backslash\)n"{}},\ (\textcolor{keywordtype}{int})ix,\ (\textcolor{keywordtype}{int})tensor\_size);}
+\DoxyCodeLine{00524\ }
+\DoxyCodeLine{00525\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}\ *\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src5afb18c45f6346167aa977a363205143_a9cebfb3d6ddd692fbdd268cf4b9ad024}{input}}\ =\ \mbox{\hyperlink{_inference_allocate_tensor_8cpp_a0d8f3bb5211083760f7c593d57adb17d}{interpreter}}-\/>\mbox{\hyperlink{classtflite_1_1_micro_interpreter_aca5b048a9c2652931f7f53b4dc47c3a2}{typed\_input\_tensor}}<\textcolor{keywordtype}{float}>(ix);}
+\DoxyCodeLine{00526\ }
+\DoxyCodeLine{00527\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (tensor\_size\ ==\ grid\_1\_size)\ \{}
+\DoxyCodeLine{00528\ \ \ \ \ \ \ \ \ \ \ \ \ memcpy(\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src5afb18c45f6346167aa977a363205143_a9cebfb3d6ddd692fbdd268cf4b9ad024}{input}},\ \mbox{\hyperlink{drpai_8h_a0219b963b7bfdddad7677bbd78f754b6}{drpai\_output\_buf}}\ +\ grid\_1\_offset,\ grid\_1\_size\ *\ \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{float}));}
+\DoxyCodeLine{00529\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00530\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (tensor\_size\ ==\ grid\_2\_size)\ \{}
+\DoxyCodeLine{00531\ \ \ \ \ \ \ \ \ \ \ \ \ memcpy(\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src5afb18c45f6346167aa977a363205143_a9cebfb3d6ddd692fbdd268cf4b9ad024}{input}},\ \mbox{\hyperlink{drpai_8h_a0219b963b7bfdddad7677bbd78f754b6}{drpai\_output\_buf}}\ +\ grid\_2\_offset,\ grid\_2\_size\ *\ \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{float}));}
+\DoxyCodeLine{00532\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00533\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (tensor\_size\ ==\ grid\_3\_size)\ \{}
+\DoxyCodeLine{00534\ \ \ \ \ \ \ \ \ \ \ \ \ memcpy(\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src5afb18c45f6346167aa977a363205143_a9cebfb3d6ddd692fbdd268cf4b9ad024}{input}},\ \mbox{\hyperlink{drpai_8h_a0219b963b7bfdddad7677bbd78f754b6}{drpai\_output\_buf}}\ +\ grid\_3\_offset,\ grid\_3\_size\ *\ \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{float}));}
+\DoxyCodeLine{00535\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00536\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00537\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}ERR:\ Cannot\ determine\ which\ grid\ to\ use\ for\ input\ tensor\ \%d\ with\ \%d\ tensor\ size\(\backslash\)n"{}},}
+\DoxyCodeLine{00538\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{keywordtype}{int})ix,\ (\textcolor{keywordtype}{int})tensor\_size);}
+\DoxyCodeLine{00539\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{group__ei__returntypes_ggad9580b47a6cd5e74cfc31a03bdfecebeadcc41afc4542dc94f9dcf36d88c1ea31}{EI\_IMPULSE\_TFLITE\_ERROR}};}
+\DoxyCodeLine{00540\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00541\ \ \ \ \ \}}
+\DoxyCodeLine{00542\ }
+\DoxyCodeLine{00543\ \ \ \ \ uint64\_t\ ctx\_start\_us\ =\ \mbox{\hyperlink{group__ei__user__functions_gac9aae7befaa896e21417df1f00518416}{ei\_read\_timer\_us}}();}
+\DoxyCodeLine{00544\ }
+\DoxyCodeLine{00545\ \ \ \ \ \mbox{\hyperlink{_inference_allocate_tensor_8cpp_a0d8f3bb5211083760f7c593d57adb17d}{interpreter}}-\/>\mbox{\hyperlink{classtflite_1_1_micro_interpreter_a2d76c06ba8d41944e185c3d330e3d554}{Invoke}}();}
+\DoxyCodeLine{00546\ }
+\DoxyCodeLine{00547\ \ \ \ \ uint64\_t\ ctx\_end\_us\ =\ \mbox{\hyperlink{group__ei__user__functions_gac9aae7befaa896e21417df1f00518416}{ei\_read\_timer\_us}}();}
+\DoxyCodeLine{00548\ }
+\DoxyCodeLine{00549\ \ \ \ \ \mbox{\hyperlink{ei__logging_8h_a807a3beed2af012bea0e48165d5161c2}{EI\_LOGD}}(\textcolor{stringliteral}{"{}Invoke\ took\ \%d\ ms.\(\backslash\)n"{}},\ (\textcolor{keywordtype}{int})((ctx\_end\_us\ -\/\ ctx\_start\_us)\ /\ 1000));}
+\DoxyCodeLine{00550\ }
+\DoxyCodeLine{00551\ \ \ \ \ \textcolor{keywordtype}{float}*\ out\_data\ =\ \mbox{\hyperlink{_inference_allocate_tensor_8cpp_a0d8f3bb5211083760f7c593d57adb17d}{interpreter}}-\/>\mbox{\hyperlink{classtflite_1_1_micro_interpreter_affde2f0e5e345412b8104d8b5c2c2bdf}{typed\_output\_tensor}}<\textcolor{keywordtype}{float}>(0);}
+\DoxyCodeLine{00552\ }
+\DoxyCodeLine{00553\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ out\_size\ =\ impulse-\/>\mbox{\hyperlink{structei__impulse_a4dd1368c2ed2a4e899274669e81417e4}{tflite\_output\_features\_count}};}
+\DoxyCodeLine{00554\ }
+\DoxyCodeLine{00555\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{ei__fill__result__struct_8h_a881f62341b5a41a3c5707268bd537be1}{debug}})\ \{}
+\DoxyCodeLine{00556\ \ \ \ \ \ \ printf(\textcolor{stringliteral}{"{}First\ 20\ bytes:\ "{}});}
+\DoxyCodeLine{00557\ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ ix\ =\ 0;\ ix\ <\ 20;\ ix++)\ \{}
+\DoxyCodeLine{00558\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}\%f\ "{}},\ out\_data[ix]);}
+\DoxyCodeLine{00559\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00560\ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}\(\backslash\)n"{}});}
+\DoxyCodeLine{00561\ \ \ \ \ \}}
+\DoxyCodeLine{00562\ }
+\DoxyCodeLine{00563\ \ \ \ \ \textcolor{comment}{//\ printf("{}Last\ 5\ bytes:\ "{});}}
+\DoxyCodeLine{00564\ \ \ \ \ \textcolor{comment}{//\ for\ (size\_t\ ix\ =\ out\_size\ -\/\ 5;\ ix\ <\ out\_size;\ ix++)\ \{}}
+\DoxyCodeLine{00565\ \ \ \ \ \textcolor{comment}{//\ \ \ \ \ printf("{}\%f\ "{},\ out\_data[ix]);}}
+\DoxyCodeLine{00566\ \ \ \ \ \textcolor{comment}{//\ \}}}
+\DoxyCodeLine{00567\ \ \ \ \ \textcolor{comment}{//\ printf("{}\(\backslash\)n"{});}}
+\DoxyCodeLine{00568\ }
+\DoxyCodeLine{00569\ \ \ \ \ \textcolor{keywordflow}{return}\ fill\_result\_struct\_f32\_yolov5(impulse,\ \mbox{\hyperlink{ei__fill__result__struct_8h_aafcd7d36638d6a564b6edbceef06ea8b}{block\_config}},\ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}},\ 5,\ out\_data,\ out\_size);}
+\DoxyCodeLine{00570\ \}}
+\DoxyCodeLine{00571\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00572\ }
+\DoxyCodeLine{00582\ \mbox{\hyperlink{group__ei__returntypes_gad9580b47a6cd5e74cfc31a03bdfecebe}{EI\_IMPULSE\_ERROR}}\ \mbox{\hyperlink{drpai_8h_ae95031a834aea77650106530f566fdb5}{run\_nn\_inference}}(}
+\DoxyCodeLine{00583\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structei__impulse}{ei\_impulse\_t}}\ *impulse,}
+\DoxyCodeLine{00584\ \ \ \ \ \mbox{\hyperlink{structei__feature__t}{ei\_feature\_t}}\ *fmatrix,}
+\DoxyCodeLine{00585\ \ \ \ \ uint32\_t\ learn\_block\_index,}
+\DoxyCodeLine{00586\ \ \ \ \ uint32\_t*\ input\_block\_ids,}
+\DoxyCodeLine{00587\ \ \ \ \ uint32\_t\ input\_block\_ids\_size,}
+\DoxyCodeLine{00588\ \ \ \ \ \mbox{\hyperlink{structei__impulse__result__t}{ei\_impulse\_result\_t}}\ *\mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}},}
+\DoxyCodeLine{00589\ \ \ \ \ \textcolor{keywordtype}{void}\ *\mbox{\hyperlink{ei__run__dsp_8h_a0819d397f9fba7b345b75fef1c1f782a}{config\_ptr}},}
+\DoxyCodeLine{00590\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{ei__fill__result__struct_8h_a881f62341b5a41a3c5707268bd537be1}{debug}})}
+\DoxyCodeLine{00591\ \{}
+\DoxyCodeLine{00592\ \ \ \ \ \textcolor{comment}{//\ dummy,\ not\ used\ for\ DRPAI}}
+\DoxyCodeLine{00593\ \}}
+\DoxyCodeLine{00594\ }
+\DoxyCodeLine{00600\ \mbox{\hyperlink{group__ei__returntypes_gad9580b47a6cd5e74cfc31a03bdfecebe}{EI\_IMPULSE\_ERROR}}\ \mbox{\hyperlink{drpai_8h_a5086db080c7196118d01d4a4c4a1bd3c}{run\_nn\_inference\_image\_quantized}}(}
+\DoxyCodeLine{00601\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structei__impulse}{ei\_impulse\_t}}\ *impulse,}
+\DoxyCodeLine{00602\ \ \ \ \ \mbox{\hyperlink{structei__signal__t}{signal\_t}}\ *\mbox{\hyperlink{classei_1_1signal}{signal}},}
+\DoxyCodeLine{00603\ \ \ \ \ \mbox{\hyperlink{structei__impulse__result__t}{ei\_impulse\_result\_t}}\ *\mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}},}
+\DoxyCodeLine{00604\ \ \ \ \ \textcolor{keywordtype}{void}\ *\mbox{\hyperlink{ei__run__dsp_8h_a0819d397f9fba7b345b75fef1c1f782a}{config\_ptr}},}
+\DoxyCodeLine{00605\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{ei__fill__result__struct_8h_a881f62341b5a41a3c5707268bd537be1}{debug}}\ =\ \textcolor{keyword}{false})}
+\DoxyCodeLine{00606\ \{}
+\DoxyCodeLine{00607\ \ \ \ \ \mbox{\hyperlink{structei__learning__block__config__tflite__graph__t}{ei\_learning\_block\_config\_tflite\_graph\_t}}\ *\mbox{\hyperlink{ei__fill__result__struct_8h_aafcd7d36638d6a564b6edbceef06ea8b}{block\_config}}\ =\ (\mbox{\hyperlink{structei__learning__block__config__tflite__graph__t}{ei\_learning\_block\_config\_tflite\_graph\_t}}*)\mbox{\hyperlink{ei__run__dsp_8h_a0819d397f9fba7b345b75fef1c1f782a}{config\_ptr}};}
+\DoxyCodeLine{00608\ }
+\DoxyCodeLine{00609\ \ \ \ \ \textcolor{comment}{//\ this\ needs\ to\ be\ changed\ for\ multi-\/model,\ multi-\/impulse}}
+\DoxyCodeLine{00610\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{ei__run__dsp_8h_a14631929beccdd8e64dcd89f7325a851}{first\_run}}\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00611\ \ \ \ \ uint64\_t\ ctx\_start\_us;}
+\DoxyCodeLine{00612\ \ \ \ \ uint64\_t\ dsp\_start\_us\ =\ \mbox{\hyperlink{group__ei__user__functions_gac9aae7befaa896e21417df1f00518416}{ei\_read\_timer\_us}}();}
+\DoxyCodeLine{00613\ }
+\DoxyCodeLine{00614\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{ei__run__dsp_8h_a14631929beccdd8e64dcd89f7325a851}{first\_run}})\ \{}
+\DoxyCodeLine{00615\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ map\ memory\ regions\ to\ the\ DRP-\/AI\ UDMA.\ This\ is\ required\ for\ passing\ data}}
+\DoxyCodeLine{00616\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ to\ and\ from\ DRP-\/AI}}
+\DoxyCodeLine{00617\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ t\ =\ \mbox{\hyperlink{drpai_8h_a8e07ed238a9d97c2fd9a3f9bc0b04246}{drpai\_init\_mem}}(impulse-\/>\mbox{\hyperlink{structei__impulse_a3b948bf79bdff1640fcae9a63476726a}{nn\_input\_frame\_size}});}
+\DoxyCodeLine{00618\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (t\ !=\ 0)\ \{}
+\DoxyCodeLine{00619\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{group__ei__returntypes_ggad9580b47a6cd5e74cfc31a03bdfecebea900fb696dc939054a8921a350d7a1e1a}{EI\_IMPULSE\_DRPAI\_INIT\_FAILED}};}
+\DoxyCodeLine{00620\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00621\ }
+\DoxyCodeLine{00622\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group__ei__returntypes_gad9580b47a6cd5e74cfc31a03bdfecebe}{EI\_IMPULSE\_ERROR}}\ \mbox{\hyperlink{ei__run__dsp_8h_a6baa346e44f4c2158d2be4f9b77b8203}{ret}}\ =\ \mbox{\hyperlink{drpai_8h_a49b84eac46f6746d1f95d7426ae9e9af}{drpai\_init\_classifier}}();}
+\DoxyCodeLine{00623\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{ei__run__dsp_8h_a6baa346e44f4c2158d2be4f9b77b8203}{ret}}\ !=\ \mbox{\hyperlink{ei__fill__result__struct_8h_a2fb43be102b153d659b668ad295aff40}{EI\_IMPULSE\_OK}})\ \{}
+\DoxyCodeLine{00624\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{drpai_8h_a7562bd2fd848d402288f55093dc3d77a}{drpai\_close}}(impulse-\/>\mbox{\hyperlink{structei__impulse_a3b948bf79bdff1640fcae9a63476726a}{nn\_input\_frame\_size}});}
+\DoxyCodeLine{00625\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{group__ei__returntypes_ggad9580b47a6cd5e74cfc31a03bdfecebea900fb696dc939054a8921a350d7a1e1a}{EI\_IMPULSE\_DRPAI\_INIT\_FAILED}};}
+\DoxyCodeLine{00626\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00627\ }
+\DoxyCodeLine{00628\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__logging_8h_a4a3699d72a6fecbead656e6b596bbb67}{EI\_LOGI}}(\textcolor{stringliteral}{"{}Initialized\ input\ and\ output\ buffers:\(\backslash\)r\(\backslash\)n"{}});}
+\DoxyCodeLine{00629\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__logging_8h_a4a3699d72a6fecbead656e6b596bbb67}{EI\_LOGI}}(\textcolor{stringliteral}{"{}input\ buf\ (addr:\ \%p,\ size:\ 0x\%x)\(\backslash\)r\(\backslash\)n"{}},\ \mbox{\hyperlink{drpai_8h_a267f34e4307ebcca8cc6069ced88489c}{drpai\_input\_buf}},\ \mbox{\hyperlink{drpai_8h_ac77e3e50f3865affc33e32b4f965fa9d}{drpai\_address}}.\mbox{\hyperlink{structst__addr__t_aa255220ec6e78598495f57799280f4d6}{data\_in\_size}});}
+\DoxyCodeLine{00630\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__logging_8h_a4a3699d72a6fecbead656e6b596bbb67}{EI\_LOGI}}(\textcolor{stringliteral}{"{}output\ buf\ (addr:\ \%p,\ size:\ 0x\%x)\(\backslash\)r\(\backslash\)n"{}},\ \mbox{\hyperlink{drpai_8h_a0219b963b7bfdddad7677bbd78f754b6}{drpai\_output\_buf}},\ \mbox{\hyperlink{drpai_8h_ac77e3e50f3865affc33e32b4f965fa9d}{drpai\_address}}.\mbox{\hyperlink{structst__addr__t_a0c36fd59b6ad2ee7c79835ec111a7384}{data\_out\_size}});}
+\DoxyCodeLine{00631\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__logging_8h_a4a3699d72a6fecbead656e6b596bbb67}{EI\_LOGI}}(\textcolor{stringliteral}{"{}udmabuf\_addr:\ \%p\(\backslash\)n"{}},\ \mbox{\hyperlink{drpai_8h_af93884ff03bb810390ab0e2321b94730}{udmabuf\_address}});}
+\DoxyCodeLine{00632\ \ \ \ \ \}}
+\DoxyCodeLine{00633\ }
+\DoxyCodeLine{00634\ \ \ \ \ \mbox{\hyperlink{ei__logging_8h_a807a3beed2af012bea0e48165d5161c2}{EI\_LOGD}}(\textcolor{stringliteral}{"{}Starting\ DSP...\(\backslash\)n"{}});}
+\DoxyCodeLine{00635\ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{ei__run__dsp_8h_a6baa346e44f4c2158d2be4f9b77b8203}{ret}};}
+\DoxyCodeLine{00636\ }
+\DoxyCodeLine{00637\ \ \ \ \ \mbox{\hyperlink{ei__logging_8h_a807a3beed2af012bea0e48165d5161c2}{EI\_LOGD}}(\textcolor{stringliteral}{"{}fmatrix\ size\ ==\ Bpp\ *\ signal.total\_length\ (\ \%p\ ==\ \%p\ *\ \%p\ =\ \%p\ )\(\backslash\)r\(\backslash\)n"{}},\ \mbox{\hyperlink{drpai_8h_a03e1c4614b2c72e8f36b82895bc4e419}{proc}}[DRPAI\_INDEX\_INPUT].\mbox{\hyperlink{namespaceei_a000f348b45d99db3a9dd6a9991ef667a}{size}},\ 3,\ \mbox{\hyperlink{classei_1_1signal}{signal}}-\/>total\_length,\ 3\ *\ \mbox{\hyperlink{classei_1_1signal}{signal}}-\/>total\_length);}
+\DoxyCodeLine{00638\ \ \ \ \ \textcolor{comment}{//\ Creates\ a\ features\ matrix\ mapped\ to\ the\ DRP-\/AI\ UDMA\ input\ region}}
+\DoxyCodeLine{00639\ \ \ \ \ ei::matrix\_u8\_t\ features\_matrix(1,\ \mbox{\hyperlink{drpai_8h_a03e1c4614b2c72e8f36b82895bc4e419}{proc}}[DRPAI\_INDEX\_INPUT].\mbox{\hyperlink{namespaceei_a000f348b45d99db3a9dd6a9991ef667a}{size}},\ \mbox{\hyperlink{drpai_8h_a267f34e4307ebcca8cc6069ced88489c}{drpai\_input\_buf}});}
+\DoxyCodeLine{00640\ }
+\DoxyCodeLine{00641\ \ \ \ \ \textcolor{comment}{//\ Grabs\ the\ raw\ image\ buffer\ from\ the\ signal,\ DRP-\/AI\ will\ automatically}}
+\DoxyCodeLine{00642\ \ \ \ \ \textcolor{comment}{//\ extract\ features}}
+\DoxyCodeLine{00643\ \ \ \ \ \mbox{\hyperlink{ei__run__dsp_8h_a6baa346e44f4c2158d2be4f9b77b8203}{ret}}\ =\ extract\_drpai\_features\_quantized(}
+\DoxyCodeLine{00644\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classei_1_1signal}{signal}},}
+\DoxyCodeLine{00645\ \ \ \ \ \ \ \ \ \&features\_matrix,}
+\DoxyCodeLine{00646\ \ \ \ \ \ \ \ \ impulse-\/>\mbox{\hyperlink{structei__impulse_a489e5b084b43bc5fba557f540a1d28cf}{dsp\_blocks}}[0].\mbox{\hyperlink{structei__model__dsp__t_a47f0ccb8e2258720b6e1e944dea17415}{config}},}
+\DoxyCodeLine{00647\ \ \ \ \ \ \ \ \ impulse-\/>\mbox{\hyperlink{structei__impulse_a093f0d48cbfbe485c9c6b0e49dfa2d37}{frequency}});}
+\DoxyCodeLine{00648\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{ei__run__dsp_8h_a6baa346e44f4c2158d2be4f9b77b8203}{ret}}\ !=\ \mbox{\hyperlink{namespaceei_a35329cd4e57031263ba0a94c8d3959baa58f9da92fe1aff29466bdd4aa2a7b361}{EIDSP\_OK}})\ \{}
+\DoxyCodeLine{00649\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}ERR:\ Failed\ to\ run\ DSP\ process\ (\%d)\(\backslash\)n"{}},\ \mbox{\hyperlink{ei__run__dsp_8h_a6baa346e44f4c2158d2be4f9b77b8203}{ret}});}
+\DoxyCodeLine{00650\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{group__ei__returntypes_ggad9580b47a6cd5e74cfc31a03bdfecebea8aa7b64c67d3575b5ccc5b8cf7c8ee4d}{EI\_IMPULSE\_DSP\_ERROR}};}
+\DoxyCodeLine{00651\ \ \ \ \ \}}
+\DoxyCodeLine{00652\ }
+\DoxyCodeLine{00653\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{ei__classifier__porting_8h_a650fcb83b9cce450c15d64133f69e324}{ei\_run\_impulse\_check\_canceled}}()\ ==\ \mbox{\hyperlink{group__ei__returntypes_ggad9580b47a6cd5e74cfc31a03bdfecebea89ce76cdbf5f921f740fea3ed38aecb0}{EI\_IMPULSE\_CANCELED}})\ \{}
+\DoxyCodeLine{00654\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{group__ei__returntypes_ggad9580b47a6cd5e74cfc31a03bdfecebea89ce76cdbf5f921f740fea3ed38aecb0}{EI\_IMPULSE\_CANCELED}};}
+\DoxyCodeLine{00655\ \ \ \ \ \}}
+\DoxyCodeLine{00656\ }
+\DoxyCodeLine{00657\ \ \ \ \ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}}-\/>timing.dsp\_us\ =\ \mbox{\hyperlink{group__ei__user__functions_gac9aae7befaa896e21417df1f00518416}{ei\_read\_timer\_us}}()\ -\/\ dsp\_start\_us;}
+\DoxyCodeLine{00658\ \ \ \ \ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}}-\/>timing.dsp\ =\ (int)(\mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}}-\/>timing.dsp\_us\ /\ 1000);}
+\DoxyCodeLine{00659\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{ei__fill__result__struct_8h_a881f62341b5a41a3c5707268bd537be1}{debug}})\ \{}
+\DoxyCodeLine{00660\ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}Features\ (\%d\ ms.):\ "{}},\ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}}-\/>timing.dsp);}
+\DoxyCodeLine{00661\ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ ix\ =\ 0;\ ix\ <\ \mbox{\hyperlink{model__metadata_8h_a20248f6cc7bd7943da6de1c1a38f1894}{EI\_CLASSIFIER\_NN\_INPUT\_FRAME\_SIZE}};\ ix++)\ \{}
+\DoxyCodeLine{00662\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}0x\%hhx,\ "{}},\ \mbox{\hyperlink{drpai_8h_a267f34e4307ebcca8cc6069ced88489c}{drpai\_input\_buf}}[ix]);}
+\DoxyCodeLine{00663\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00664\ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}\(\backslash\)n"{}});}
+\DoxyCodeLine{00665\ \ \ \ \ \}}
+\DoxyCodeLine{00666\ }
+\DoxyCodeLine{00667\ \ \ \ \ ctx\_start\_us\ =\ \mbox{\hyperlink{group__ei__user__functions_gac9aae7befaa896e21417df1f00518416}{ei\_read\_timer\_us}}();}
+\DoxyCodeLine{00668\ }
+\DoxyCodeLine{00669\ \ \ \ \ \textcolor{comment}{//\ Run\ DRP-\/AI\ inference,\ a\ static\ buffer\ is\ used\ to\ store\ the\ raw\ output}}
+\DoxyCodeLine{00670\ \ \ \ \ \textcolor{comment}{//\ results}}
+\DoxyCodeLine{00671\ \ \ \ \ \mbox{\hyperlink{ei__run__dsp_8h_a6baa346e44f4c2158d2be4f9b77b8203}{ret}}\ =\ \mbox{\hyperlink{drpai_8h_aaeb472e063238fd5bb5ade9b90535853}{drpai\_run\_classifier\_image\_quantized}}();}
+\DoxyCodeLine{00672\ }
+\DoxyCodeLine{00673\ \ \ \ \ \textcolor{comment}{//\ close\ driver\ to\ reset\ memory,\ file\ pointer}}
+\DoxyCodeLine{00674\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{ei__run__dsp_8h_a6baa346e44f4c2158d2be4f9b77b8203}{ret}}\ !=\ \mbox{\hyperlink{ei__fill__result__struct_8h_a2fb43be102b153d659b668ad295aff40}{EI\_IMPULSE\_OK}})\ \{}
+\DoxyCodeLine{00675\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{drpai_8h_a7562bd2fd848d402288f55093dc3d77a}{drpai\_close}}(impulse-\/>\mbox{\hyperlink{structei__impulse_a3b948bf79bdff1640fcae9a63476726a}{nn\_input\_frame\_size}});}
+\DoxyCodeLine{00676\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__dsp_8h_a14631929beccdd8e64dcd89f7325a851}{first\_run}}\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00677\ \ \ \ \ \}}
+\DoxyCodeLine{00678\ \ \ \ \ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00679\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ drpai\_reset();}}
+\DoxyCodeLine{00680\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__dsp_8h_a14631929beccdd8e64dcd89f7325a851}{first\_run}}\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00681\ \ \ \ \ \}}
+\DoxyCodeLine{00682\ }
+\DoxyCodeLine{00683\ \ \ \ \ \mbox{\hyperlink{group__ei__returntypes_gad9580b47a6cd5e74cfc31a03bdfecebe}{EI\_IMPULSE\_ERROR}}\ fill\_res\ =\ \mbox{\hyperlink{ei__fill__result__struct_8h_a2fb43be102b153d659b668ad295aff40}{EI\_IMPULSE\_OK}};}
+\DoxyCodeLine{00684\ }
+\DoxyCodeLine{00685\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{ei__fill__result__struct_8h_aafcd7d36638d6a564b6edbceef06ea8b}{block\_config}}-\/>\mbox{\hyperlink{structei__learning__block__config__tflite__graph__t_af1a9b7c47a826887609d831078ccbdbc}{object\_detection}})\ \{}
+\DoxyCodeLine{00686\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}\ (\mbox{\hyperlink{ei__fill__result__struct_8h_aafcd7d36638d6a564b6edbceef06ea8b}{block\_config}}-\/>\mbox{\hyperlink{structei__learning__block__config__tflite__graph__t_a9f1d65f69c49cecaddb6b6abb65644ef}{object\_detection\_last\_layer}})\ \{}
+\DoxyCodeLine{00687\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{ei__model__types_8h_ae9f473b0f3438b846c2c12ab84338858}{EI\_CLASSIFIER\_LAST\_LAYER\_FOMO}}:\ \{}
+\DoxyCodeLine{00688\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{ei__fill__result__struct_8h_a881f62341b5a41a3c5707268bd537be1}{debug}})\ \{}
+\DoxyCodeLine{00689\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}DEBUG:\ raw\ drpai\ output"{}});}
+\DoxyCodeLine{00690\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}\(\backslash\)n["{}});}
+\DoxyCodeLine{00691\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (uint32\_t\ i\ =\ 0;\ i\ <\ impulse-\/>\mbox{\hyperlink{structei__impulse_a4dd1368c2ed2a4e899274669e81417e4}{tflite\_output\_features\_count}};\ i++)\ \{}
+\DoxyCodeLine{00692\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group__ei__user__functions_gadcb0babc6f41a7d0aa4c0801c96ae7e4}{ei\_printf\_float}}(\mbox{\hyperlink{drpai_8h_a0219b963b7bfdddad7677bbd78f754b6}{drpai\_output\_buf}}[i]);}
+\DoxyCodeLine{00693\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}\ "{}});}
+\DoxyCodeLine{00694\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00695\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}]\(\backslash\)n"{}});}
+\DoxyCodeLine{00696\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00697\ }
+\DoxyCodeLine{00698\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ fill\_res\ =\ fill\_result\_struct\_f32\_fomo(}
+\DoxyCodeLine{00699\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ impulse,}
+\DoxyCodeLine{00700\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__fill__result__struct_8h_aafcd7d36638d6a564b6edbceef06ea8b}{block\_config}},}
+\DoxyCodeLine{00701\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}},}
+\DoxyCodeLine{00702\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{drpai_8h_a0219b963b7bfdddad7677bbd78f754b6}{drpai\_output\_buf}},}
+\DoxyCodeLine{00703\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ impulse-\/>\mbox{\hyperlink{structei__impulse_a51d2390841b11688a861c16753380c15}{fomo\_output\_size}},}
+\DoxyCodeLine{00704\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ impulse-\/>\mbox{\hyperlink{structei__impulse_a51d2390841b11688a861c16753380c15}{fomo\_output\_size}});}
+\DoxyCodeLine{00705\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00706\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00707\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{ei__model__types_8h_a92c64af4832fb183ad9e80b1e9231d41}{EI\_CLASSIFIER\_LAST\_LAYER\_SSD}}:\ \{}
+\DoxyCodeLine{00708\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}ERR:\ MobileNet\ SSD\ models\ are\ not\ implemented\ for\ DRP-\/AI\ (\%d)\(\backslash\)n"{}},}
+\DoxyCodeLine{00709\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__fill__result__struct_8h_aafcd7d36638d6a564b6edbceef06ea8b}{block\_config}}-\/>\mbox{\hyperlink{structei__learning__block__config__tflite__graph__t_a9f1d65f69c49cecaddb6b6abb65644ef}{object\_detection\_last\_layer}});}
+\DoxyCodeLine{00710\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{group__ei__returntypes_ggad9580b47a6cd5e74cfc31a03bdfecebea399c371041be7c468a3b05a4d8352d14}{EI\_IMPULSE\_UNSUPPORTED\_INFERENCING\_ENGINE}};}
+\DoxyCodeLine{00711\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00712\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{ei__model__types_8h_a99770a4e5276510d3289b20a8866ae3b}{EI\_CLASSIFIER\_LAST\_LAYER\_YOLOV5\_V5\_DRPAI}}:\ \{}
+\DoxyCodeLine{00713\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{ei__fill__result__struct_8h_a881f62341b5a41a3c5707268bd537be1}{debug}})\ \{}
+\DoxyCodeLine{00714\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}DEBUG:\ raw\ drpai\ output"{}});}
+\DoxyCodeLine{00715\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}\(\backslash\)n["{}});}
+\DoxyCodeLine{00716\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ impulse-\/>tflite\_output\_features\_count\ can't\ be\ used\ here\ as\ this\ is\ not\ the\ final\ output}}
+\DoxyCodeLine{00717\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ so\ print\ only\ the\ first\ 10\ values.}}
+\DoxyCodeLine{00718\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (uint32\_t\ i\ =\ 0;\ i\ <\ 10;\ i++)\ \{}
+\DoxyCodeLine{00719\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group__ei__user__functions_gadcb0babc6f41a7d0aa4c0801c96ae7e4}{ei\_printf\_float}}(\mbox{\hyperlink{drpai_8h_a0219b963b7bfdddad7677bbd78f754b6}{drpai\_output\_buf}}[i]);}
+\DoxyCodeLine{00720\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}\ "{}});}
+\DoxyCodeLine{00721\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00722\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}]\(\backslash\)n"{}});}
+\DoxyCodeLine{00723\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00724\ }
+\DoxyCodeLine{00725\ \textcolor{preprocessor}{\#if\ ((EI\_CLASSIFIER\_OBJECT\_DETECTION\ ==\ 1)\ \&\&\ (EI\_CLASSIFIER\_OBJECT\_DETECTION\_LAST\_LAYER\ ==\ EI\_CLASSIFIER\_LAST\_LAYER\_YOLOV5\_V5\_DRPAI))}}
+\DoxyCodeLine{00726\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ do\ post\ processing}}
+\DoxyCodeLine{00727\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ fill\_res\ =\ drpai\_run\_yolov5\_postprocessing(impulse,\ \mbox{\hyperlink{ei__fill__result__struct_8h_aafcd7d36638d6a564b6edbceef06ea8b}{block\_config}},\ \mbox{\hyperlink{classei_1_1signal}{signal}},\ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}},\ \mbox{\hyperlink{ei__fill__result__struct_8h_a881f62341b5a41a3c5707268bd537be1}{debug}});}
+\DoxyCodeLine{00728\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00729\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00730\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00731\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}:\ \{}
+\DoxyCodeLine{00732\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}ERR:\ Unsupported\ object\ detection\ last\ layer\ (\%d)\(\backslash\)n"{}},}
+\DoxyCodeLine{00733\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__fill__result__struct_8h_aafcd7d36638d6a564b6edbceef06ea8b}{block\_config}}-\/>\mbox{\hyperlink{structei__learning__block__config__tflite__graph__t_a9f1d65f69c49cecaddb6b6abb65644ef}{object\_detection\_last\_layer}});}
+\DoxyCodeLine{00734\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{group__ei__returntypes_ggad9580b47a6cd5e74cfc31a03bdfecebea399c371041be7c468a3b05a4d8352d14}{EI\_IMPULSE\_UNSUPPORTED\_INFERENCING\_ENGINE}};}
+\DoxyCodeLine{00735\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00736\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00737\ \ \ \ \ \}}
+\DoxyCodeLine{00738\ \ \ \ \ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00739\ \ \ \ \ \ \ \ \ fill\_res\ =\ fill\_result\_struct\_f32(impulse,\ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}},\ \mbox{\hyperlink{drpai_8h_a0219b963b7bfdddad7677bbd78f754b6}{drpai\_output\_buf}},\ \mbox{\hyperlink{ei__fill__result__struct_8h_a881f62341b5a41a3c5707268bd537be1}{debug}});}
+\DoxyCodeLine{00740\ \ \ \ \ \}}
+\DoxyCodeLine{00741\ }
+\DoxyCodeLine{00742\ \ \ \ \ \textcolor{keywordflow}{if}\ (fill\_res\ !=\ \mbox{\hyperlink{ei__fill__result__struct_8h_a2fb43be102b153d659b668ad295aff40}{EI\_IMPULSE\_OK}})\ \{}
+\DoxyCodeLine{00743\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ fill\_res;}
+\DoxyCodeLine{00744\ \ \ \ \ \}}
+\DoxyCodeLine{00745\ }
+\DoxyCodeLine{00746\ \ \ \ \ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}}-\/>timing.classification\_us\ =\ \mbox{\hyperlink{group__ei__user__functions_gac9aae7befaa896e21417df1f00518416}{ei\_read\_timer\_us}}()\ -\/\ ctx\_start\_us;}
+\DoxyCodeLine{00747\ \ \ \ \ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}}-\/>timing.classification\ =\ (int)(\mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}}-\/>timing.classification\_us\ /\ 1000);}
+\DoxyCodeLine{00748\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{ei__fill__result__struct_8h_a2fb43be102b153d659b668ad295aff40}{EI\_IMPULSE\_OK}};}
+\DoxyCodeLine{00749\ \}}
+\DoxyCodeLine{00750\ }
+\DoxyCodeLine{00751\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ \#if\ (EI\_CLASSIFIER\_INFERENCING\_ENGINE\ ==\ EI\_CLASSIFIER\_DRPAI)}}
+\DoxyCodeLine{00752\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ \_EI\_CLASSIFIER\_INFERENCING\_ENGINE\_DRPAI\_H\_}}
+
+\end{DoxyCode}

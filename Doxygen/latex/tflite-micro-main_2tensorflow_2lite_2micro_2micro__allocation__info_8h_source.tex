@@ -1,0 +1,144 @@
+\doxysection{micro\+\_\+allocation\+\_\+info.\+h}
+\hypertarget{tflite-micro-main_2tensorflow_2lite_2micro_2micro__allocation__info_8h_source}{}\label{tflite-micro-main_2tensorflow_2lite_2micro_2micro__allocation__info_8h_source}\index{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/main/tensorflow/lite/micro/micro\_allocation\_info.h@{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/main/tensorflow/lite/micro/micro\_allocation\_info.h}}
+\mbox{\hyperlink{tflite-micro-main_2tensorflow_2lite_2micro_2micro__allocation__info_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{/*\ Copyright\ 2022\ The\ TensorFlow\ Authors.\ All\ Rights\ Reserved.}}
+\DoxyCodeLine{00002\ \textcolor{comment}{}}
+\DoxyCodeLine{00003\ \textcolor{comment}{Licensed\ under\ the\ Apache\ License,\ Version\ 2.0\ (the\ "{}License"{});}}
+\DoxyCodeLine{00004\ \textcolor{comment}{you\ may\ not\ use\ this\ file\ except\ in\ compliance\ with\ the\ License.}}
+\DoxyCodeLine{00005\ \textcolor{comment}{You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{00006\ \textcolor{comment}{}}
+\DoxyCodeLine{00007\ \textcolor{comment}{\ \ \ \ http://www.apache.org/licenses/LICENSE-\/2.0}}
+\DoxyCodeLine{00008\ \textcolor{comment}{}}
+\DoxyCodeLine{00009\ \textcolor{comment}{Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ software}}
+\DoxyCodeLine{00010\ \textcolor{comment}{distributed\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,}}
+\DoxyCodeLine{00011\ \textcolor{comment}{WITHOUT\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,\ either\ express\ or\ implied.}}
+\DoxyCodeLine{00012\ \textcolor{comment}{See\ the\ License\ for\ the\ specific\ language\ governing\ permissions\ and}}
+\DoxyCodeLine{00013\ \textcolor{comment}{limitations\ under\ the\ License.}}
+\DoxyCodeLine{00014\ \textcolor{comment}{==============================================================================*/}}
+\DoxyCodeLine{00015\ \textcolor{preprocessor}{\#ifndef\ TENSORFLOW\_LITE\_MICRO\_MICRO\_ALLOCATION\_INFO\_H\_}}
+\DoxyCodeLine{00016\ \textcolor{preprocessor}{\#define\ TENSORFLOW\_LITE\_MICRO\_MICRO\_ALLOCATION\_INFO\_H\_}}
+\DoxyCodeLine{00017\ }
+\DoxyCodeLine{00018\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/c/common.h"{}}}
+\DoxyCodeLine{00019\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/micro/compatibility.h"{}}}
+\DoxyCodeLine{00020\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/micro/flatbuffer\_utils.h"{}}}
+\DoxyCodeLine{00021\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/micro/micro\_allocator.h"{}}}
+\DoxyCodeLine{00022\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/schema/schema\_generated.h"{}}}
+\DoxyCodeLine{00023\ }
+\DoxyCodeLine{00024\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacetflite}{tflite}}\ \{}
+\DoxyCodeLine{00025\ }
+\DoxyCodeLine{00026\ \textcolor{comment}{//\ Used\ to\ hold\ information\ used\ during\ allocation\ calculations.}}
+\DoxyCodeLine{00027\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structtflite_1_1_allocation_info}{AllocationInfo}}\ \{}
+\DoxyCodeLine{00028\ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{structtflite_1_1_allocation_info_aaa426c2e3d373ba3e1a55b865da6b99e}{bytes}};}
+\DoxyCodeLine{00029\ \ \ \textcolor{keywordtype}{void}**\ \mbox{\hyperlink{structtflite_1_1_allocation_info_a8376f6c682502e19c20a2b584a6d7a30}{output\_ptr}};}
+\DoxyCodeLine{00030\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{structtflite_1_1_allocation_info_ad8099e1bf7a1b4a854a700b8d6e09f49}{first\_created}};}
+\DoxyCodeLine{00031\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{structtflite_1_1_allocation_info_a0306753499176be9d21f6b7c57cb3ae0}{last\_used}};}
+\DoxyCodeLine{00032\ \ \ int32\_t\ \mbox{\hyperlink{structtflite_1_1_allocation_info_ae96fc4bf2b5edfc7dbe6d1d84fe98bf2}{offline\_offset}};}
+\DoxyCodeLine{00033\ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{structtflite_1_1_allocation_info_adb285251755232ec2660d072c5617fba}{needs\_allocating}};}
+\DoxyCodeLine{00034\ \};}
+\DoxyCodeLine{00035\ }
+\DoxyCodeLine{00036\ \textcolor{comment}{//\ Used\ to\ hold\ the\ allocation\ info\ list\ and\ related\ metadata\ for\ the\ entire}}
+\DoxyCodeLine{00037\ \textcolor{comment}{//\ graph\ (including\ subgraphs).\ Since\ all\ subgraphs\ are\ planned\ together,\ the}}
+\DoxyCodeLine{00038\ \textcolor{comment}{//\ allocation\ info\ list\ contains\ allocations\ for\ all\ subgraphs.\ Track\ the\ offset}}
+\DoxyCodeLine{00039\ \textcolor{comment}{//\ into\ this\ list\ for\ each\ subgraph\ then\ reserve\ space\ to\ track\ all\ allocations.}}
+\DoxyCodeLine{00040\ \textcolor{comment}{//}}
+\DoxyCodeLine{00041\ \textcolor{comment}{//\ The\ AllocationInfo\ list\ is\ a\ contiguous\ list\ of\ allocations\ across\ all}}
+\DoxyCodeLine{00042\ \textcolor{comment}{//\ subgraphs\ and\ scratch\ buffers.\ Each\ element\ here\ is\ marked\ as}}
+\DoxyCodeLine{00043\ \textcolor{comment}{//\ s<subgraph\ index>t<tensor\ index>.\ The\ following\ is\ a\ possible}}
+\DoxyCodeLine{00044\ \textcolor{comment}{//\ AllocationInfo\ list:}}
+\DoxyCodeLine{00045\ \textcolor{comment}{//\ [s0t0,\ s0t1,\ s1t0,\ s2t1,\ s1t2,\ s3t0,\ s3t1,\ scratch0,\ scratch1,\ scratch2]}}
+\DoxyCodeLine{00046\ \textcolor{comment}{//}}
+\DoxyCodeLine{00047\ \textcolor{comment}{//\ For\ this\ example,\ the\ subgraph\ offsets\ would\ be\ [0,\ 2,\ 5]\ and\ the\ scratch}}
+\DoxyCodeLine{00048\ \textcolor{comment}{//\ offset\ would\ be\ 7.}}
+\DoxyCodeLine{00049\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structtflite_1_1_graph_allocation_info}{GraphAllocationInfo}}\ \{}
+\DoxyCodeLine{00050\ \ \ \mbox{\hyperlink{structtflite_1_1_allocation_info}{AllocationInfo}}*\ \mbox{\hyperlink{structtflite_1_1_graph_allocation_info_a3cf9ecda14ced5d3480f52cb81cf33a1}{allocation\_info}};}
+\DoxyCodeLine{00051\ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{structtflite_1_1_graph_allocation_info_a3e361eea59347d8e3bad8e6e5dba4c20}{allocation\_info\_count}};}
+\DoxyCodeLine{00052\ \ \ \textcolor{keywordtype}{size\_t}*\ \mbox{\hyperlink{structtflite_1_1_graph_allocation_info_a3906711487b1e1ae61f3b23015c60e27}{subgraph\_offsets}};}
+\DoxyCodeLine{00053\ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{structtflite_1_1_graph_allocation_info_a534b27a92b1da1fe3aaa7eebf4b2ef11}{scratch\_offset}};}
+\DoxyCodeLine{00054\ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{structtflite_1_1_graph_allocation_info_af00ac1b17d65a3aed3142c3fd26cab00}{tensor\_count}};}
+\DoxyCodeLine{00055\ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{structtflite_1_1_graph_allocation_info_a82a4b8ec6ffaedeb83a3ed968454dd7f}{scratch\_buffer\_count}};}
+\DoxyCodeLine{00056\ \};}
+\DoxyCodeLine{00057\ }
+\DoxyCodeLine{00058\ \textcolor{comment}{//\ A\ helper\ class\ to\ construct\ AllocationInfo\ array.\ This\ array\ contains\ the}}
+\DoxyCodeLine{00059\ \textcolor{comment}{//\ lifetime\ of\ tensors\ /\ scratch\_buffer\ and\ will\ be\ used\ to\ calculate\ the\ memory}}
+\DoxyCodeLine{00060\ \textcolor{comment}{//\ plan.\ Methods\ need\ to\ be\ called\ in\ order\ from\ \`{}Create`,\ Init`,\ \`{}Add*`,\ to}}
+\DoxyCodeLine{00061\ \textcolor{comment}{//\ \`{}Finish`.}}
+\DoxyCodeLine{00062\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classtflite_1_1_allocation_info_builder}{AllocationInfoBuilder}}\ \{}
+\DoxyCodeLine{00063\ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00064\ \ \ \mbox{\hyperlink{classtflite_1_1_allocation_info_builder_aca9440d4aaaca2b18875c508e67accb7}{AllocationInfoBuilder}}(\textcolor{keyword}{const}\ Model*\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2model_8h_ae142afd8c2e2c711c1c62440deebe03c}{model}},}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classtflite_1_1_i_non_persistent_buffer_allocator}{INonPersistentBufferAllocator}}*\ non\_persistent\_allocator)}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ :\ \mbox{\hyperlink{classtflite_1_1_allocation_info_builder_a23abfbcc16333de338ea8b5f530f9507}{model\_}}(\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2model_8h_ae142afd8c2e2c711c1c62440deebe03c}{model}}),\ \mbox{\hyperlink{classtflite_1_1_allocation_info_builder_ac515bf60f23ccf88e6e66dfb043d0935}{non\_persistent\_allocator\_}}(non\_persistent\_allocator)\ \{\}}
+\DoxyCodeLine{00067\ }
+\DoxyCodeLine{00068\ \ \ \textcolor{comment}{//\ Check\ if\ model\ contains\ offline\ planned\ buffer\ offsets.}}
+\DoxyCodeLine{00069\ \ \ \textcolor{comment}{//\ \ -\/\ If\ there's\ no\ metadata\ available,\ offline\_planner\_offsets\ is\ not\ set}}
+\DoxyCodeLine{00070\ \ \ \textcolor{comment}{//\ \ -\/\ If\ there's\ metadata\ available,\ offline\_planner\_offsets\ will\ point\ to\ the}}
+\DoxyCodeLine{00071\ \ \ \textcolor{comment}{//\ \ \ \ first\ offset\ in\ the\ metadata\ buffer\ list.}}
+\DoxyCodeLine{00072\ \ \ \mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2core_2c_2c__api__types_8h_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_allocation_info_builder_ac0595de4276171bfae1fa926b15be26a}{GetOfflinePlannedOffsets}}(}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \textcolor{keyword}{const}\ int32\_t**\ offline\_planner\_offsets);}
+\DoxyCodeLine{00074\ }
+\DoxyCodeLine{00075\ \ \ \textcolor{comment}{//\ Allocate\ memory\ for\ the\ allocation\ info\ array\ as\ well\ as\ offsets\ into\ that}}
+\DoxyCodeLine{00076\ \ \ \textcolor{comment}{//\ array\ for\ each\ subgraph.}}
+\DoxyCodeLine{00077\ \ \ \mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2core_2c_2c__api__types_8h_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_allocation_info_builder_ace39eadc7e6b318702dc8cf7672db945}{CreateAllocationInfo}}(\textcolor{keywordtype}{int}\ scratch\_buffer\_request\_count);}
+\DoxyCodeLine{00078\ }
+\DoxyCodeLine{00079\ \ \ \textcolor{comment}{//\ Release\ memory\ used\ for\ the\ allocation\ info\ array.}}
+\DoxyCodeLine{00080\ \ \ \mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2core_2c_2c__api__types_8h_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_allocation_info_builder_acd8ced6b69cfa6df2f23630838e446b1}{FreeAllocationInfo}}();}
+\DoxyCodeLine{00081\ }
+\DoxyCodeLine{00082\ \ \ \textcolor{comment}{//\ Initialize\ AllocationInfo\ for\ all\ tensors\ and\ scratch\ buffers\ in\ the\ graph.}}
+\DoxyCodeLine{00083\ \ \ \mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2core_2c_2c__api__types_8h_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_allocation_info_builder_a1f9b44879dc982d9d6eefc2b734583d7}{InitializeAllocationInfo}}(\textcolor{keyword}{const}\ int32\_t*\ offline\_offsets,}
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structtflite_1_1_subgraph_allocations}{SubgraphAllocations}}*\ allocations);}
+\DoxyCodeLine{00085\ }
+\DoxyCodeLine{00086\ \ \ \textcolor{comment}{//\ Mark\ the\ scope\ of\ each\ tensor\ and\ scratch\ buffer\ across\ the\ graph.\ Enter}}
+\DoxyCodeLine{00087\ \ \ \textcolor{comment}{//\ all\ possible\ subgraphs\ invoked\ by\ each\ control\ flow\ operator.\ This\ method}}
+\DoxyCodeLine{00088\ \ \ \textcolor{comment}{//\ marks\ the\ maximum\ lifetime\ of\ each\ buffer\ so\ that\ tensors\ are\ correctly}}
+\DoxyCodeLine{00089\ \ \ \textcolor{comment}{//\ planned\ for\ all\ valid\ invocation\ flows.}}
+\DoxyCodeLine{00090\ \ \ \mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2core_2c_2c__api__types_8h_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_allocation_info_builder_a99e3a26e80c74c22c2f0e22e13cd8db4}{MarkAllocationLifetimes}}(}
+\DoxyCodeLine{00091\ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ subgraph\_idx,\ \mbox{\hyperlink{structtflite_1_1internal_1_1_scratch_buffer_request}{internal::ScratchBufferRequest}}*\ scratch\_buffer\_request,}
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \mbox{\hyperlink{structtflite_1_1_scratch_buffer_handle}{ScratchBufferHandle}}*\ scratch\_buffer\_handles,}
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \mbox{\hyperlink{structtflite_1_1_subgraph_allocations}{SubgraphAllocations}}*\ allocations);}
+\DoxyCodeLine{00094\ }
+\DoxyCodeLine{00095\ \ \ \textcolor{comment}{//\ Identify\ control\ flow\ operators\ and\ recursively\ mark\ all\ subgraphs\ which}}
+\DoxyCodeLine{00096\ \ \ \textcolor{comment}{//\ that\ operator\ can\ invoke.\ The\ lifetime\ of\ all\ tensors\ within\ a\ subgraph}}
+\DoxyCodeLine{00097\ \ \ \textcolor{comment}{//\ can\ only\ be\ extended.\ The\ order\ of\ subgraph\ invocation\ does\ not\ matter}}
+\DoxyCodeLine{00098\ \ \ \textcolor{comment}{//\ since\ subgraphs\ within\ the\ same\ control\ flow\ operator\ are\ executed}}
+\DoxyCodeLine{00099\ \ \ \textcolor{comment}{//\ within\ their\ own\ allocation\ scope\ (planned\ buffers\ in\ a\ subgraph\ cannot}}
+\DoxyCodeLine{00100\ \ \ \textcolor{comment}{//\ persist\ beyond\ the\ end\ of\ that\ subgraph's\ invocation).}}
+\DoxyCodeLine{00101\ \ \ \mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2core_2c_2c__api__types_8h_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_allocation_info_builder_a1fb302d95f5a0ace62efbeafd7d23811}{MarkSubgraphLifetimesIfNecessary}}(}
+\DoxyCodeLine{00102\ \ \ \ \ \ \ \textcolor{keyword}{const}\ Operator*\ op,}
+\DoxyCodeLine{00103\ \ \ \ \ \ \ \mbox{\hyperlink{structtflite_1_1internal_1_1_scratch_buffer_request}{internal::ScratchBufferRequest}}*\ scratch\_buffer\_requests,}
+\DoxyCodeLine{00104\ \ \ \ \ \ \ \mbox{\hyperlink{structtflite_1_1_scratch_buffer_handle}{ScratchBufferHandle}}*\ scratch\_buffer\_handles,}
+\DoxyCodeLine{00105\ \ \ \ \ \ \ \mbox{\hyperlink{structtflite_1_1_subgraph_allocations}{SubgraphAllocations}}*\ allocations);}
+\DoxyCodeLine{00106\ }
+\DoxyCodeLine{00107\ \ \ \textcolor{comment}{//\ Returns\ the\ number\ of\ allocations.}}
+\DoxyCodeLine{00108\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{classtflite_1_1_allocation_info_builder_a54830c19e89c11a8dc98b364bde88397}{AllocationCount}}()\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1_allocation_info_builder_a04df52de48e4cb4fc803c3e83d926be6}{info\_}}.\mbox{\hyperlink{structtflite_1_1_graph_allocation_info_a3e361eea59347d8e3bad8e6e5dba4c20}{allocation\_info\_count}};\ \}}
+\DoxyCodeLine{00109\ }
+\DoxyCodeLine{00110\ \ \ \textcolor{comment}{//\ Returns\ a\ pointer\ to\ the\ built\ AllocationInfo\ array.}}
+\DoxyCodeLine{00111\ \ \ \mbox{\hyperlink{structtflite_1_1_allocation_info}{AllocationInfo}}*\ \mbox{\hyperlink{classtflite_1_1_allocation_info_builder_ab8ce9c3cee04aec34ad53b69494e9678}{Finish}}()\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1_allocation_info_builder_a04df52de48e4cb4fc803c3e83d926be6}{info\_}}.\mbox{\hyperlink{structtflite_1_1_graph_allocation_info_a3cf9ecda14ced5d3480f52cb81cf33a1}{allocation\_info}};\ \}}
+\DoxyCodeLine{00112\ }
+\DoxyCodeLine{00113\ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{00114\ \ \ \textcolor{comment}{//\ Mark\ the\ given\ Allocation\ info\ as\ first\ created\ at\ the\ specified\ allocation}}
+\DoxyCodeLine{00115\ \ \ \textcolor{comment}{//\ scope\ count.\ Only\ the\ first\ creation\ must\ be\ recorded\ since\ the\ allocation}}
+\DoxyCodeLine{00116\ \ \ \textcolor{comment}{//\ scope\ count\ monotonically\ increases\ throughout\ the\ lifetime\ marking}}
+\DoxyCodeLine{00117\ \ \ \textcolor{comment}{//\ process.}}
+\DoxyCodeLine{00118\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classtflite_1_1_allocation_info_builder_adfd2b8d72bff663fb1dd581796885178}{UpdateFirstCreated}}(\mbox{\hyperlink{structtflite_1_1_allocation_info}{AllocationInfo}}*\ current,\ \textcolor{keywordtype}{int}\ allocation\_scope\_count);}
+\DoxyCodeLine{00119\ }
+\DoxyCodeLine{00120\ \ \ \textcolor{comment}{//\ Mark\ the\ given\ AllocationInfo\ as\ last\ used\ at\ the\ specified\ allocation}}
+\DoxyCodeLine{00121\ \ \ \textcolor{comment}{//\ scope}}
+\DoxyCodeLine{00122\ \ \ \textcolor{comment}{//\ count.\ Update\ the\ last\ used\ marker\ every\ time,\ since\ the\ allocation\ scope}}
+\DoxyCodeLine{00123\ \ \ \textcolor{comment}{//\ count\ monotonically\ increases\ through\ the\ lifetime\ marking\ process.}}
+\DoxyCodeLine{00124\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classtflite_1_1_allocation_info_builder_adb97161f3d304aab13162c34c29298ce}{UpdateLastUsed}}(\mbox{\hyperlink{structtflite_1_1_allocation_info}{AllocationInfo}}*\ current,\ \textcolor{keywordtype}{int}\ allocation\_scope\_count);}
+\DoxyCodeLine{00125\ }
+\DoxyCodeLine{00126\ \ \ \textcolor{comment}{//\ Validate\ if\ a\ subgraph\ satisfies\ assumptions.}}
+\DoxyCodeLine{00127\ \ \ \mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2core_2c_2c__api__types_8h_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_allocation_info_builder_a76aeff21b3d63905d6548c039c419f34}{ValidateSubgraph}}(\textcolor{keyword}{const}\ SubGraph*\ subgraph,}
+\DoxyCodeLine{00128\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_tf_lite_eval_tensor}{TfLiteEvalTensor}}*\ eval\_tensors);}
+\DoxyCodeLine{00129\ }
+\DoxyCodeLine{00130\ \ \ \textcolor{keyword}{const}\ tflite::Model*\ \mbox{\hyperlink{classtflite_1_1_allocation_info_builder_a23abfbcc16333de338ea8b5f530f9507}{model\_}}\ =\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{00131\ \ \ \mbox{\hyperlink{classtflite_1_1_i_non_persistent_buffer_allocator}{INonPersistentBufferAllocator}}*\ \mbox{\hyperlink{classtflite_1_1_allocation_info_builder_ac515bf60f23ccf88e6e66dfb043d0935}{non\_persistent\_allocator\_}}\ =\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{00132\ \ \ \mbox{\hyperlink{structtflite_1_1_graph_allocation_info}{GraphAllocationInfo}}\ \mbox{\hyperlink{classtflite_1_1_allocation_info_builder_a04df52de48e4cb4fc803c3e83d926be6}{info\_}};}
+\DoxyCodeLine{00133\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{classtflite_1_1_allocation_info_builder_a50a3ce5a34875df71e2cb059a4d9912d}{allocation\_scope\_count\_}}\ =\ 0;}
+\DoxyCodeLine{00134\ \};}
+\DoxyCodeLine{00135\ }
+\DoxyCodeLine{00136\ \}\ \ \textcolor{comment}{//\ namespace\ tflite}}
+\DoxyCodeLine{00137\ }
+\DoxyCodeLine{00138\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ TENSORFLOW\_LITE\_MICRO\_MICRO\_ALLOCATION\_INFO\_H\_}}
+
+\end{DoxyCode}

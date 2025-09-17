@@ -1,0 +1,97 @@
+\doxysection{binary\+\_\+function.\+h}
+\hypertarget{tflite-micro-main_2tensorflow_2lite_2kernels_2internal_2reference_2binary__function_8h_source}{}\label{tflite-micro-main_2tensorflow_2lite_2kernels_2internal_2reference_2binary__function_8h_source}\index{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/main/tensorflow/lite/kernels/internal/reference/binary\_function.h@{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/main/tensorflow/lite/kernels/internal/reference/binary\_function.h}}
+\mbox{\hyperlink{tflite-micro-main_2tensorflow_2lite_2kernels_2internal_2reference_2binary__function_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{/*\ Copyright\ 2019\ The\ TensorFlow\ Authors.\ All\ Rights\ Reserved.}}
+\DoxyCodeLine{00002\ \textcolor{comment}{}}
+\DoxyCodeLine{00003\ \textcolor{comment}{Licensed\ under\ the\ Apache\ License,\ Version\ 2.0\ (the\ "{}License"{});}}
+\DoxyCodeLine{00004\ \textcolor{comment}{you\ may\ not\ use\ this\ file\ except\ in\ compliance\ with\ the\ License.}}
+\DoxyCodeLine{00005\ \textcolor{comment}{You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{00006\ \textcolor{comment}{}}
+\DoxyCodeLine{00007\ \textcolor{comment}{\ \ \ \ http://www.apache.org/licenses/LICENSE-\/2.0}}
+\DoxyCodeLine{00008\ \textcolor{comment}{}}
+\DoxyCodeLine{00009\ \textcolor{comment}{Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ software}}
+\DoxyCodeLine{00010\ \textcolor{comment}{distributed\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,}}
+\DoxyCodeLine{00011\ \textcolor{comment}{WITHOUT\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,\ either\ express\ or\ implied.}}
+\DoxyCodeLine{00012\ \textcolor{comment}{See\ the\ License\ for\ the\ specific\ language\ governing\ permissions\ and}}
+\DoxyCodeLine{00013\ \textcolor{comment}{limitations\ under\ the\ License.}}
+\DoxyCodeLine{00014\ \textcolor{comment}{==============================================================================*/}}
+\DoxyCodeLine{00015\ \textcolor{preprocessor}{\#ifndef\ TENSORFLOW\_LITE\_KERNELS\_INTERNAL\_REFERENCE\_BINARY\_FUNCTION\_H\_}}
+\DoxyCodeLine{00016\ \textcolor{preprocessor}{\#define\ TENSORFLOW\_LITE\_KERNELS\_INTERNAL\_REFERENCE\_BINARY\_FUNCTION\_H\_}}
+\DoxyCodeLine{00017\ }
+\DoxyCodeLine{00018\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/kernels/internal/common.h"{}}}
+\DoxyCodeLine{00019\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/kernels/internal/compatibility.h"{}}}
+\DoxyCodeLine{00020\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/kernels/internal/types.h"{}}}
+\DoxyCodeLine{00021\ }
+\DoxyCodeLine{00022\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacetflite}{tflite}}\ \{}
+\DoxyCodeLine{00023\ }
+\DoxyCodeLine{00024\ \textcolor{keyword}{namespace\ }reference\_ops\ \{}
+\DoxyCodeLine{00025\ }
+\DoxyCodeLine{00026\ \textcolor{comment}{//\ Also\ appears\ to\ duplicate\ MinimumMaximum.}}
+\DoxyCodeLine{00027\ \textcolor{comment}{//}}
+\DoxyCodeLine{00028\ \textcolor{comment}{//\ R:\ Result\ type.\ T1:\ Input\ 1\ type.\ T2:\ Input\ 2\ type.}}
+\DoxyCodeLine{00029\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ R,\ \textcolor{keyword}{typename}\ T1,\ \textcolor{keyword}{typename}\ T2>}
+\DoxyCodeLine{00030\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1reference__ops_a7f450c3977a516c94cc65067293c5d64}{BroadcastBinaryFunction4DSlow}}(}
+\DoxyCodeLine{00031\ \ \ \ \ \textcolor{keyword}{const}\ RuntimeShape\&\ unextended\_input1\_shape,\ \textcolor{keyword}{const}\ T1*\ \mbox{\hyperlink{div__test_8cc_aaa3dc5d0e541e598f33e079b201185f9}{input1\_data}},}
+\DoxyCodeLine{00032\ \ \ \ \ \textcolor{keyword}{const}\ RuntimeShape\&\ unextended\_input2\_shape,\ \textcolor{keyword}{const}\ T2*\ \mbox{\hyperlink{div__test_8cc_a70b003e7ad90ac4daa3f400c2a022d50}{input2\_data}},}
+\DoxyCodeLine{00033\ \ \ \ \ \textcolor{keyword}{const}\ RuntimeShape\&\ unextended\_output\_shape,\ R*\ \mbox{\hyperlink{add__n__test_8cc_a3305b43869c4b837b0a33c12cff5069b}{output\_data}},}
+\DoxyCodeLine{00034\ \ \ \ \ R\ (*func)(T1,\ T2))\ \{}
+\DoxyCodeLine{00035\ \ \ \mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2kernels_2internal_2compatibility_8h_a153a4c7bc866139ad88ebf7cb7f4c400}{TFLITE\_DCHECK\_LE}}(unextended\_input1\_shape.DimensionsCount(),\ 4);}
+\DoxyCodeLine{00036\ \ \ \mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2kernels_2internal_2compatibility_8h_a153a4c7bc866139ad88ebf7cb7f4c400}{TFLITE\_DCHECK\_LE}}(unextended\_input2\_shape.DimensionsCount(),\ 4);}
+\DoxyCodeLine{00037\ \ \ \mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2kernels_2internal_2compatibility_8h_a153a4c7bc866139ad88ebf7cb7f4c400}{TFLITE\_DCHECK\_LE}}(unextended\_output\_shape.DimensionsCount(),\ 4);}
+\DoxyCodeLine{00038\ \ \ \textcolor{keyword}{const}\ RuntimeShape\ output\_shape\ =}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \mbox{\hyperlink{classtflite_1_1_runtime_shape_a647264349b0f266c94102a8b3dda22cf}{RuntimeShape::ExtendedShape}}(4,\ unextended\_output\_shape);}
+\DoxyCodeLine{00040\ }
+\DoxyCodeLine{00041\ \ \ NdArrayDesc<4>\ desc1;}
+\DoxyCodeLine{00042\ \ \ NdArrayDesc<4>\ desc2;}
+\DoxyCodeLine{00043\ \ \ \mbox{\hyperlink{namespacetflite_a760e75250ae8653f7ce34572b7ec80e6}{NdArrayDescsForElementwiseBroadcast}}(unextended\_input1\_shape,}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ unextended\_input2\_shape,\ \&desc1,\ \&desc2);}
+\DoxyCodeLine{00045\ }
+\DoxyCodeLine{00046\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}*\ dims\_data\ =}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\textcolor{keywordtype}{int}*\textcolor{keyword}{>}(output\_shape.DimsDataUpTo5D());}
+\DoxyCodeLine{00048\ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}}\ =\ 0;\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}}\ <\ output\_shape.Dims(0);\ ++\mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}})\ \{}
+\DoxyCodeLine{00049\ \ \ \ \ \textcolor{keywordtype}{int}\ out\_idx\_b\ =\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}}\ *\ dims\_data[1];}
+\DoxyCodeLine{00050\ \ \ \ \ \textcolor{keywordtype}{int}\ in\_idx1\_b\ =\ desc1.strides[0]\ *\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}};}
+\DoxyCodeLine{00051\ \ \ \ \ \textcolor{keywordtype}{int}\ in\_idx2\_b\ =\ desc2.strides[0]\ *\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}};}
+\DoxyCodeLine{00052\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ \mbox{\hyperlink{detection__postprocess_8cpp_aa4f0d3eebc3c443f9be81bf48561a217}{y}}\ =\ 0;\ \mbox{\hyperlink{detection__postprocess_8cpp_aa4f0d3eebc3c443f9be81bf48561a217}{y}}\ <\ output\_shape.Dims(1);\ ++\mbox{\hyperlink{detection__postprocess_8cpp_aa4f0d3eebc3c443f9be81bf48561a217}{y}})\ \{}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ out\_idx\_y\ =\ (out\_idx\_b\ +\ \mbox{\hyperlink{detection__postprocess_8cpp_aa4f0d3eebc3c443f9be81bf48561a217}{y}})\ *\ dims\_data[2];}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ in\_idx1\_y\ =\ in\_idx1\_b\ +\ desc1.strides[1]\ *\ \mbox{\hyperlink{detection__postprocess_8cpp_aa4f0d3eebc3c443f9be81bf48561a217}{y}};}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ in\_idx2\_y\ =\ in\_idx2\_b\ +\ desc2.strides[1]\ *\ \mbox{\hyperlink{detection__postprocess_8cpp_aa4f0d3eebc3c443f9be81bf48561a217}{y}};}
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ \mbox{\hyperlink{detection__postprocess_8cpp_ad0da36b2558901e21e7a30f6c227a45e}{x}}\ =\ 0;\ \mbox{\hyperlink{detection__postprocess_8cpp_ad0da36b2558901e21e7a30f6c227a45e}{x}}\ <\ output\_shape.Dims(2);\ ++\mbox{\hyperlink{detection__postprocess_8cpp_ad0da36b2558901e21e7a30f6c227a45e}{x}})\ \{}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ out\_idx\_x\ =\ (out\_idx\_y\ +\ \mbox{\hyperlink{detection__postprocess_8cpp_ad0da36b2558901e21e7a30f6c227a45e}{x}})\ *\ dims\_data[3];}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ in1\_idx\ =\ in\_idx1\_y\ +\ desc1.strides[2]\ *\ \mbox{\hyperlink{detection__postprocess_8cpp_ad0da36b2558901e21e7a30f6c227a45e}{x}};}
+\DoxyCodeLine{00059\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ in2\_idx\ =\ in\_idx2\_y\ +\ desc2.strides[2]\ *\ \mbox{\hyperlink{detection__postprocess_8cpp_ad0da36b2558901e21e7a30f6c227a45e}{x}};}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ c\ =\ 0;\ \mbox{\hyperlink{namespace_face_tracking_ae1d05f5db945b43ec1f03e442d9ea864}{c}}\ <\ output\_shape.Dims(3);\ ++\mbox{\hyperlink{namespace_face_tracking_ae1d05f5db945b43ec1f03e442d9ea864}{c}})\ \{}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ out\_idx\ =\ out\_idx\_x\ +\ \mbox{\hyperlink{namespace_face_tracking_ae1d05f5db945b43ec1f03e442d9ea864}{c}};}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ in1\_val\ =\ \mbox{\hyperlink{div__test_8cc_aaa3dc5d0e541e598f33e079b201185f9}{input1\_data}}[in1\_idx];}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ in2\_val\ =\ \mbox{\hyperlink{div__test_8cc_a70b003e7ad90ac4daa3f400c2a022d50}{input2\_data}}[in2\_idx];}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{add__n__test_8cc_a3305b43869c4b837b0a33c12cff5069b}{output\_data}}[out\_idx]\ =\ func(in1\_val,\ in2\_val);}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \ \ \ \ in1\_idx\ +=\ desc1.strides[3];}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ \ \ in2\_idx\ +=\ desc2.strides[3];}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00069\ \ \ \ \ \}}
+\DoxyCodeLine{00070\ \ \ \}}
+\DoxyCodeLine{00071\ \}}
+\DoxyCodeLine{00072\ }
+\DoxyCodeLine{00073\ \textcolor{comment}{//\ R:\ Result\ type.\ T1:\ Input\ 1\ type.\ T2:\ Input\ 2\ type.}}
+\DoxyCodeLine{00074\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ R,\ \textcolor{keyword}{typename}\ T1,\ \textcolor{keyword}{typename}\ T2>}
+\DoxyCodeLine{00075\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1reference__ops_a9e1202b0eb38355629a53c5d7ade6da3}{BinaryFunction}}(\textcolor{keyword}{const}\ RuntimeShape\&\ input1\_shape,}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ T1*\ \mbox{\hyperlink{div__test_8cc_aaa3dc5d0e541e598f33e079b201185f9}{input1\_data}},}
+\DoxyCodeLine{00077\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ RuntimeShape\&\ input2\_shape,}
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ T2*\ \mbox{\hyperlink{div__test_8cc_a70b003e7ad90ac4daa3f400c2a022d50}{input2\_data}},}
+\DoxyCodeLine{00079\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ RuntimeShape\&\ output\_shape,\ R*\ \mbox{\hyperlink{add__n__test_8cc_a3305b43869c4b837b0a33c12cff5069b}{output\_data}},}
+\DoxyCodeLine{00080\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ R\ (*func)(T1,\ T2))\ \{}
+\DoxyCodeLine{00081\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ flat\_size\ =}
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_a8d6998b7eb7b2f0d21f8352da6f6271f}{MatchingFlatSize}}(input1\_shape,\ input2\_shape,\ output\_shape);}
+\DoxyCodeLine{00083\ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ flat\_size;\ ++i)\ \{}
+\DoxyCodeLine{00084\ \ \ \ \ \mbox{\hyperlink{add__n__test_8cc_a3305b43869c4b837b0a33c12cff5069b}{output\_data}}[i]\ =\ func(\mbox{\hyperlink{div__test_8cc_aaa3dc5d0e541e598f33e079b201185f9}{input1\_data}}[i],\ \mbox{\hyperlink{div__test_8cc_a70b003e7ad90ac4daa3f400c2a022d50}{input2\_data}}[i]);}
+\DoxyCodeLine{00085\ \ \ \}}
+\DoxyCodeLine{00086\ \}}
+\DoxyCodeLine{00087\ }
+\DoxyCodeLine{00088\ \}\ \ \textcolor{comment}{//\ namespace\ reference\_ops}}
+\DoxyCodeLine{00089\ \}\ \ \textcolor{comment}{//\ namespace\ tflite}}
+\DoxyCodeLine{00090\ }
+\DoxyCodeLine{00091\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ TENSORFLOW\_LITE\_KERNELS\_INTERNAL\_REFERENCE\_BINARY\_FUNCTION\_H\_}}
+
+\end{DoxyCode}

@@ -1,0 +1,110 @@
+\doxysection{micro\+\_\+graph.\+h}
+\hypertarget{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2micro_2micro__graph_8h_source}{}\label{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2micro_2micro__graph_8h_source}\index{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/arduino-\/examples-\/main/src/tensorflow/lite/micro/micro\_graph.h@{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/arduino-\/examples-\/main/src/tensorflow/lite/micro/micro\_graph.h}}
+\mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2micro_2micro__graph_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{/*\ Copyright\ 2021\ The\ TensorFlow\ Authors.\ All\ Rights\ Reserved.}}
+\DoxyCodeLine{00002\ \textcolor{comment}{}}
+\DoxyCodeLine{00003\ \textcolor{comment}{Licensed\ under\ the\ Apache\ License,\ Version\ 2.0\ (the\ "{}License"{});}}
+\DoxyCodeLine{00004\ \textcolor{comment}{you\ may\ not\ use\ this\ file\ except\ in\ compliance\ with\ the\ License.}}
+\DoxyCodeLine{00005\ \textcolor{comment}{You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{00006\ \textcolor{comment}{}}
+\DoxyCodeLine{00007\ \textcolor{comment}{\ \ \ \ http://www.apache.org/licenses/LICENSE-\/2.0}}
+\DoxyCodeLine{00008\ \textcolor{comment}{}}
+\DoxyCodeLine{00009\ \textcolor{comment}{Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ software}}
+\DoxyCodeLine{00010\ \textcolor{comment}{distributed\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,}}
+\DoxyCodeLine{00011\ \textcolor{comment}{WITHOUT\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,\ either\ express\ or\ implied.}}
+\DoxyCodeLine{00012\ \textcolor{comment}{See\ the\ License\ for\ the\ specific\ language\ governing\ permissions\ and}}
+\DoxyCodeLine{00013\ \textcolor{comment}{limitations\ under\ the\ License.}}
+\DoxyCodeLine{00014\ \textcolor{comment}{==============================================================================*/}}
+\DoxyCodeLine{00015\ }
+\DoxyCodeLine{00016\ \textcolor{preprocessor}{\#ifndef\ TENSORFLOW\_LITE\_MICRO\_MICRO\_GRAPH\_H\_}}
+\DoxyCodeLine{00017\ \textcolor{preprocessor}{\#define\ TENSORFLOW\_LITE\_MICRO\_MICRO\_GRAPH\_H\_}}
+\DoxyCodeLine{00018\ }
+\DoxyCodeLine{00019\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/c/common.h"{}}}
+\DoxyCodeLine{00020\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/micro/micro\_allocator.h"{}}}
+\DoxyCodeLine{00021\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/micro/micro\_resource\_variable.h"{}}}
+\DoxyCodeLine{00022\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/schema/schema\_generated.h"{}}}
+\DoxyCodeLine{00023\ }
+\DoxyCodeLine{00024\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacetflite}{tflite}}\ \{}
+\DoxyCodeLine{00025\ }
+\DoxyCodeLine{00026\ \textcolor{comment}{//\ Abstracts\ the\ details\ of\ interacting\ with\ the\ tflite::Model.}}
+\DoxyCodeLine{00027\ \textcolor{comment}{//}}
+\DoxyCodeLine{00028\ \textcolor{comment}{//\ Provides\ methods\ to\ access,\ initialize,\ prepare,\ invoke\ and\ free\ any}}
+\DoxyCodeLine{00029\ \textcolor{comment}{//\ subgraph\ in\ the\ tflite::Graph.}}
+\DoxyCodeLine{00030\ \textcolor{keyword}{class\ }MicroGraph\ \{}
+\DoxyCodeLine{00031\ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00032\ \ \ \textcolor{comment}{//\ The\ lifetime\ of\ the\ context,\ model,\ allocator\ and\ resource\_variables\ must}}
+\DoxyCodeLine{00033\ \ \ \textcolor{comment}{//\ be\ at\ least\ as\ long\ as\ that\ of\ the\ graph\ object,\ since\ the\ this\ class\ may}}
+\DoxyCodeLine{00034\ \ \ \textcolor{comment}{//\ need\ to\ access\ them\ at\ any\ time.\ If\ resource\_variables\ is\ a\ nullptr,}}
+\DoxyCodeLine{00035\ \ \ \textcolor{comment}{//\ GetResourceVariables\ will\ return\ a\ nullptr.}}
+\DoxyCodeLine{00036\ \ \ \mbox{\hyperlink{classtflite_1_1_micro_graph_afaf3fdb30062ff4261dcea48931dbe4a}{MicroGraph}}(\mbox{\hyperlink{struct_tf_lite_context}{TfLiteContext}}*\ context,\ \textcolor{keyword}{const}\ Model*\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2model_8h_ae142afd8c2e2c711c1c62440deebe03c}{model}},}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \ \ \ \ \ \ \ MicroAllocator*\ allocator,}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \ \ \ \ \ \ \ MicroResourceVariables*\ resource\_variables);}
+\DoxyCodeLine{00039\ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{classtflite_1_1_micro_graph_aa1d96421d4c6257c39f0b3f6c6fd995f}{\string~MicroGraph}}();}
+\DoxyCodeLine{00040\ }
+\DoxyCodeLine{00041\ \ \ \textcolor{comment}{//\ Sets\ up\ builtin\ data\ and\ calls\ TfLiteRegistration-\/>Init\ for\ every\ operator}}
+\DoxyCodeLine{00042\ \ \ \textcolor{comment}{//\ in\ every\ subgraph\ in\ the\ model.}}
+\DoxyCodeLine{00043\ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2core_2c_2c__api__types_8h_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_graph_afe7f1a69357f477f4176b9ce50221b95}{InitSubgraphs}}();}
+\DoxyCodeLine{00044\ }
+\DoxyCodeLine{00045\ \ \ \textcolor{comment}{//\ Calls\ TfLiteRegistration-\/>Prepare\ for\ every\ operator\ in\ every\ subgraph\ in}}
+\DoxyCodeLine{00046\ \ \ \textcolor{comment}{//\ the\ model.}}
+\DoxyCodeLine{00047\ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2core_2c_2c__api__types_8h_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_graph_a79568a2ebb69642afa711d5b680663d9}{PrepareSubgraphs}}();}
+\DoxyCodeLine{00048\ }
+\DoxyCodeLine{00049\ \ \ \textcolor{comment}{//\ Calls\ TfLiteRegistration-\/>Free\ for\ every\ operator\ in\ every\ subgraph\ in\ the}}
+\DoxyCodeLine{00050\ \ \ \textcolor{comment}{//\ model.}}
+\DoxyCodeLine{00051\ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2core_2c_2c__api__types_8h_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_graph_a32efbcc3f93de17f34ae4a79584721a9}{FreeSubgraphs}}();}
+\DoxyCodeLine{00052\ }
+\DoxyCodeLine{00053\ \ \ \textcolor{comment}{//\ Calls\ TfLiteRegistration-\/>Invoke\ for\ every\ operator\ in\ a\ single\ subgraph\ in}}
+\DoxyCodeLine{00054\ \ \ \textcolor{comment}{//\ the\ model.}}
+\DoxyCodeLine{00055\ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2core_2c_2c__api__types_8h_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_graph_ac0153ffa2c0512f4c0fcae27de3de971}{InvokeSubgraph}}(\textcolor{keywordtype}{int}\ subgraph\_idx);}
+\DoxyCodeLine{00056\ }
+\DoxyCodeLine{00057\ \ \ \textcolor{comment}{//\ Zeros\ out\ all\ variable\ tensors\ in\ all\ subgraphs\ in\ the\ model.}}
+\DoxyCodeLine{00058\ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2core_2c_2c__api__types_8h_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_graph_a57c2e5324eda3553f7730e5fc6228d37}{ResetVariableTensors}}();}
+\DoxyCodeLine{00059\ }
+\DoxyCodeLine{00060\ \ \ \textcolor{comment}{//\ Number\ of\ tensor\ inputs\ to\ a\ specified\ subgraph\ in\ the\ model.}}
+\DoxyCodeLine{00061\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{classtflite_1_1_micro_graph_aac1ef70a66a142df87de1ea0de2fd86b}{NumSubgraphInputs}}(\textcolor{keywordtype}{int}\ subgraph\_idx);}
+\DoxyCodeLine{00062\ }
+\DoxyCodeLine{00063\ \ \ \textcolor{comment}{//\ Get\ the\ specified\ input\ tensor\ of\ a\ specified\ subgraph\ in\ the\ model.}}
+\DoxyCodeLine{00064\ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{struct_tf_lite_eval_tensor}{TfLiteEvalTensor}}*\ \mbox{\hyperlink{classtflite_1_1_micro_graph_abe2f95b76bf037bbbd974ca40e79ad6e}{GetSubgraphInput}}(\textcolor{keywordtype}{int}\ subgraph\_idx,\ \textcolor{keywordtype}{int}\ input\_idx);}
+\DoxyCodeLine{00065\ }
+\DoxyCodeLine{00066\ \ \ \textcolor{comment}{//\ Number\ of\ tensor\ outputs\ from\ a\ specified\ subgraph\ in\ the\ model.}}
+\DoxyCodeLine{00067\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{classtflite_1_1_micro_graph_a0bd3598e90033454b3f572e38ba73e15}{NumSubgraphOutputs}}(\textcolor{keywordtype}{int}\ subgraph\_idx);}
+\DoxyCodeLine{00068\ }
+\DoxyCodeLine{00069\ \ \ \textcolor{comment}{//\ Get\ the\ specified\ output\ tensor\ of\ a\ specified\ subgraph\ in\ the\ model.}}
+\DoxyCodeLine{00070\ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{struct_tf_lite_eval_tensor}{TfLiteEvalTensor}}*\ \mbox{\hyperlink{classtflite_1_1_micro_graph_a340f1ebef3b2ed63e49958dbcfee59ce}{GetSubgraphOutput}}(\textcolor{keywordtype}{int}\ subgraph\_idx,\ \textcolor{keywordtype}{int}\ output\_idx);}
+\DoxyCodeLine{00071\ }
+\DoxyCodeLine{00072\ \ \ \textcolor{comment}{//\ Number\ of\ subgraphs\ in\ the\ model.}}
+\DoxyCodeLine{00073\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{classtflite_1_1_micro_graph_aca4f73e02246f015529967aa887b7607}{NumSubgraphs}}();}
+\DoxyCodeLine{00074\ }
+\DoxyCodeLine{00075\ \ \ \textcolor{comment}{//\ Hook\ to\ pass\ in\ subgraph\ allocations\ tracked\ within\ the\ interpreter,}}
+\DoxyCodeLine{00076\ \ \ \textcolor{comment}{//\ allowing\ MicroGraph\ to\ init\ /\ prepare\ /\ invoke\ subgraphs\ in\ the\ model.}}
+\DoxyCodeLine{00077\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classtflite_1_1_micro_graph_ace08e8cc387ebcec80693eb58553db6b}{SetSubgraphAllocations}}(SubgraphAllocations*\ subgraph\_allocations);}
+\DoxyCodeLine{00078\ }
+\DoxyCodeLine{00079\ \ \ \textcolor{comment}{//\ Get\ the\ current\ subgraph\ index.\ Within\ an\ on\ operator,\ this\ is\ guaranteed}}
+\DoxyCodeLine{00080\ \ \ \textcolor{comment}{//\ to\ be\ the\ subgraph\ of\ that\ operator.}}
+\DoxyCodeLine{00081\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{classtflite_1_1_micro_graph_abe7194d3ce27fefcb29f16a64fb68ac1}{GetCurrentSubgraphIndex}}()\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1_micro_graph_a6872d5fac69730db4b9b4039b42f38e5}{current\_subgraph\_index\_}};\ \}}
+\DoxyCodeLine{00082\ }
+\DoxyCodeLine{00083\ \ \ \textcolor{comment}{//\ Gets\ the\ list\ of\ alloctions\ for\ each\ subgraph.\ This\ is\ the\ source\ of\ truth}}
+\DoxyCodeLine{00084\ \ \ \textcolor{comment}{//\ for\ all\ per-\/subgraph\ allocation\ data.}}
+\DoxyCodeLine{00085\ \ \ \mbox{\hyperlink{structtflite_1_1_subgraph_allocations}{SubgraphAllocations}}*\ \mbox{\hyperlink{classtflite_1_1_micro_graph_a1c1fff40f1d23c03327755c2bc8ea047}{GetAllocations}}()\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1_micro_graph_a947f6a18f25111718586992d64c34670}{subgraph\_allocations\_}};\ \}}
+\DoxyCodeLine{00086\ }
+\DoxyCodeLine{00087\ \ \ \textcolor{comment}{//\ Get\ the\ resource\ variables\ for\ this\ TFLM\ graph.}}
+\DoxyCodeLine{00088\ \ \ \mbox{\hyperlink{classtflite_1_1_micro_resource_variables}{MicroResourceVariables}}*\ \mbox{\hyperlink{classtflite_1_1_micro_graph_abeea813728f069f2912f174544831717}{GetResourceVariables}}()\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1_micro_graph_a8f0b109d2ebee098565b404372cca6eb}{resource\_variables\_}};\ \}}
+\DoxyCodeLine{00089\ }
+\DoxyCodeLine{00090\ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{00091\ \ \ \mbox{\hyperlink{struct_tf_lite_context}{TfLiteContext}}*\ \mbox{\hyperlink{classtflite_1_1_micro_graph_afaf31db3ad585639f0fe3a5428cbfed3}{context\_}};}
+\DoxyCodeLine{00092\ \ \ \textcolor{keyword}{const}\ Model*\ \mbox{\hyperlink{classtflite_1_1_micro_graph_a2469446b2431e505f267558232db80ed}{model\_}};}
+\DoxyCodeLine{00093\ \ \ \mbox{\hyperlink{classtflite_1_1_micro_allocator}{MicroAllocator}}*\ \mbox{\hyperlink{classtflite_1_1_micro_graph_a7e00069985cadb41daa2f8511085b20a}{allocator\_}};}
+\DoxyCodeLine{00094\ \ \ \mbox{\hyperlink{structtflite_1_1_subgraph_allocations}{SubgraphAllocations}}*\ \mbox{\hyperlink{classtflite_1_1_micro_graph_a947f6a18f25111718586992d64c34670}{subgraph\_allocations\_}}\ =\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{00095\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{classtflite_1_1_micro_graph_a6872d5fac69730db4b9b4039b42f38e5}{current\_subgraph\_index\_}};}
+\DoxyCodeLine{00096\ \ \ \mbox{\hyperlink{classtflite_1_1_micro_resource_variables}{MicroResourceVariables}}*\ \mbox{\hyperlink{classtflite_1_1_micro_graph_a8f0b109d2ebee098565b404372cca6eb}{resource\_variables\_}};}
+\DoxyCodeLine{00097\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classflatbuffers_1_1_vector}{flatbuffers::Vector<flatbuffers::Offset<SubGraph>}}>*\ \mbox{\hyperlink{classtflite_1_1_micro_graph_a4ef45a06b7d73cfc1350a7c22d15e99f}{subgraphs\_}};}
+\DoxyCodeLine{00098\ }
+\DoxyCodeLine{00099\ \ \ \mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2micro_2compatibility_8h_a92a34c72cfcc4f6c5bd49086ba082af4}{TF\_LITE\_REMOVE\_VIRTUAL\_DELETE}}}
+\DoxyCodeLine{00100\ \};}
+\DoxyCodeLine{00101\ }
+\DoxyCodeLine{00102\ \}\ \ \textcolor{comment}{//\ namespace\ tflite}}
+\DoxyCodeLine{00103\ }
+\DoxyCodeLine{00104\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ TENSORFLOW\_LITE\_MICRO\_MICRO\_GRAPH\_H\_}}
+
+\end{DoxyCode}
