@@ -1,0 +1,199 @@
+\documentclass[10pt, a4paper]{beamer}
+%\documentclass{article}
+
+%Metadaten
+\title{Machine Vision with Arduino Portenta H7}
+
+\subtitle{Face recognition using Edge Impulse and Arduino PortentaH7 connected to Vision Shield.}
+%\institution{University of Applied Science Hochschule Emden/Leer}
+\author{Vatsal Mahajan, Manoj Selvaraju, Vijay Singh}
+
+%\date{\today}
+\date{\today}
+
+% siehe hesader.tex Zeile 10-16 zum Aktivieren der Notes
+% Kommentare stehen in \notes{} und können im 2-screen-mode genutzt werden
+\include{Slides/header}
+
+%\addbibresource{Documents/MyLiterature.bib} %Import the bibliography file
+
+\usepackage{listings}
+\usepackage{xcolor}
+
+\lstset{
+	basicstyle=\ttfamily\small,
+	keywordstyle=\color{blue},
+	commentstyle=\color{gray},
+	stringstyle=\color{red},
+	numberstyle=\tiny\color{gray},
+	stepnumber=1,
+	numbersep=10pt,
+	backgroundcolor=\color{white},
+	showspaces=false,
+	showstringspaces=false,
+	breaklines=true,
+	frame=single,
+	tabsize=2,
+	captionpos=b
+}
+
+\begin{document}
+	
+	\include{Slides/start}
+	
+	\section{Introduction}
+
+\begin{frame}
+	\frametitle{Introduction}
+	
+	\begin{block}{}
+		Edge Impulse offers a cloud-based system for data collection, neural network design, model training, testing and deployment.
+	\end{block}
+	
+   \begin{block}{The key steps are:}
+	\begin{columns}
+		
+		% Left column (Written content)
+		\column{0.4\textwidth}
+		\begin{itemize}
+			\item Dataset Preparation and Upload.
+			\item Choose the best model for the task.
+			\item Model Training.
+			\item Model Testing and Export.
+		\end{itemize}
+		
+		% Right column (Image)
+		\column{0.5\textwidth}
+		\centering
+		\includegraphics[width=1\textwidth]{images/EdgeImpulse.png}
+		\textbf{Figure 1: Edge Impulse}
+		
+	\end{columns}
+\end{block}
+\end{frame}
+		
+
+	
+	\section{Dataset Preparation and Upload}
+	\begin{frame}
+		
+	
+		\frametitle{Dataset Preparation and Upload}
+		
+		\begin{block}{Creating our Own Dataset}
+			In the Project we are using our own dataset for the model training and testing.
+			\begin{itemize}
+				\item We have face images for the three distinct people, organize them in separate folders named Vatsal, Manoj, and Vijay.
+				\item To train the model we need the enough images (at least 50-70 per person) under different conditions (lighting, angle) for better performance.
+			\end{itemize}
+		\end{block}
+		
+		\begin{block}{Uploading the dataset to Edge Impulse}
+			\begin{itemize}
+				\item Go to Edge Impulse and log in or create an account.
+				\item Create a new project, name it (e.g.,"Face Recognition"), and select Image as the type of data for your project.
+				\item Go to the "Data Acquisition" tab: This is where you'll upload your dataset.
+				
+			\end{itemize}
+			
+		\end{block}
+	\end{frame}
+	
+	\section{Uploading Images}	
+\begin{frame}{Uploading Images}
+		\begin{block}{}
+			\begin{itemize}
+				\item Click on Upload Data. Then drag and drop the images of each person into the platform.
+				\item Making sure to label each image accordingly, like Vatsal, Manoj, and Vijay.
+		\end{itemize}
+			
+			\centering
+			\includegraphics[width=0.9\textwidth]{images/DataSet.png}
+			\textbf{Figure 2: Dataset}
+			
+		\end{block}
+\end{frame}
+
+	\section{Impulse Design}
+\begin{frame}{Impulse Design}
+	Once our dataset is uploaded, we'll design an Impulse (model pipeline) in Edge Impulse.
+	
+	\begin{block}{Choosing the Model Architecture}
+		Model Choice: Convolutional Neural Network (CNN). \\
+		For image-related tasks like face recognition, CNNs are typically the best choice. CNNs can detect patterns (like facial features) and differentiate between individuals.
+			\begin{itemize}
+				\item Click on the Impulse Design tab in Edge Impulse.
+				\item Choose the Image block. This will preprocess the images (resize, convert to grayscale if needed, etc.) and prepare them for model input.
+				\item Select Image Classification as the task.
+				\item Choose a CNN architecture for the project.
+				\item We may need to resize our input images to a 320 x 320 pixels resolution to make the model efficient.
+			\end{itemize}
+
+\end{block}	
+\end{frame}		
+
+\begin{frame}{Impulse Design}
+		
+		\centering
+		\includegraphics[width=0.9\textwidth]{images/ImpulseDesign.png}
+		\textbf{Figure 3: Impulse Design}
+	
+\end{frame}
+
+	\section{Model Training}
+\begin{frame}{Model Training}
+	\begin{block}{Configuring Training Parameters}
+		\begin{itemize}
+			\item \textbf{Training/Validation Split:} Usually 80\% training, 20\% validation. But in our case, it's \textbf{76\%} training, \textbf{24\%} validation.
+			\item \textbf{Number of training cycles (Epochs):} 25
+			\item \textbf{Learning rate:} 0.0005
+		\end{itemize}
+	\end{block}
+	
+	\begin{block}{Model Training}
+		\begin{itemize}
+			\item \textbf{Accuracy:} 83.3\%
+			\item \textbf{Loss:} 0.22
+		\end{itemize}
+	\end{block}
+\end{frame}
+
+\begin{frame}{Model Training}
+	
+		\centering
+	\includegraphics[width=1.0\textwidth]{images/Accuracy.png} % Replace with your image file
+	\textbf{Figure 4: Model Training Progress}
+	
+\end{frame}
+
+
+	\section{Model Testing}
+\begin{frame}{Model Testing}
+	\begin{block}{Evaluating the Model}
+		\begin{itemize}
+			\item  \textbf{To Test the model:} Go to "Live Classification" tab. we uploaded some new images and the model recognizes faces.
+			\item  \textbf{Confidence Score:} The system will show confidence scores for each class (Vatsal, Manoj, Vijay).
+		\end{itemize}
+\end{block}
+
+\centering
+\includegraphics[width=0.8\textwidth]{images/Test.png} 
+
+\end{frame}
+
+
+	\section{Model Deployment}
+\begin{frame}{Model Deployment}
+	\begin{block}{Evaluating the Model}
+		\begin{itemize}
+		 \item Go to the Deployment tab.
+		 \item Select \textbf{TensorFlow Lite (.tflite)} as the export format.
+		 \item \textbf{Quantization:} Choose \textbf{int8 Quantization} if you plan to run the model on embedded systems like Portenta H7. Quantization reduces the model size and speeds up inference.
+			
+		\end{itemize}
+\end{block}
+\end{frame}
+
+\include{Slides/end}
+	
+\end{document}
