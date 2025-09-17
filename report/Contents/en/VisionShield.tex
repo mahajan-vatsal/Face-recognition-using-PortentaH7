@@ -1,0 +1,179 @@
+%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% $Autor: Wings $
+% $Datum: 2020-07-24 09:05:07Z $
+% $Pfad: GDV/Vortraege/latex - Ausarbeitung/Kapitel/Einleitung.tex $
+% $Version: 4732 $
+%
+%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{Portenta Vision Shield hardware}
+\label{Sec:VisionShieldHardware}
+
+The Arduino Portenta Vision Shield is an add-on board providing machine vision capabilities and additional
+connectivity to the Portenta family of Arduino boards, designed to meet the needs of industrial automation. The
+Portenta Vision Shield connects via a high-density connector to the Portenta boards with minimal hardware and
+software setup. ~\ref{VisionShield} \cite{arduinoVisionShield:2024}
+
+\begin{figure}
+	\begin{center}
+		\includegraphics[width=0.7\linewidth]{Images/VisionShield/VisionShield.png}
+		\caption{Portenta Vision Shield}
+		\label{VisionShield}
+	\end{center}
+\end{figure}
+
+\section{Features}
+	
+	\textbf{Himax HM-01B0 Camera Module}
+	
+	\begin{itemize}
+		\item Ultra-Low-Power Image Sensor designed for always-on vision devices and applications
+		\item Window, vertical flip, and horizontal mirror readout
+		\item Programmable black level calibration target, frame size, frame rate, exposure, analog gain (up to 8x), and digital gain (up to 4x)
+		\item Automatic exposure and gain control loop with support for 50 Hz / 60 Hz flicker avoidance
+		\item Motion Detection circuit with programmable ROI and detection threshold with digital output to serve as an interrupt
+	\end{itemize}
+	
+	\textbf{Supported Resolutions:}
+	\begin{itemize}
+		\item QQVGA (160x120) at 15, 30, 60, and 120 FPS 
+		\item QVGA (320x240) at 15, 30, and 60 FPS
+	\end{itemize}
+	
+	\textbf{Power:}
+	\begin{itemize}
+		\item $<$ 1.1 mW QQVGA resolution at 30 FPS
+		\item $<$ 2 mW QVGA resolution at 30 FPS 
+	\end{itemize}
+	
+	\textbf{2x MP34DT06JTR MEMS PDM Digital Microphone:}
+	\begin{itemize}
+		\item AOP = 122.5 dB SPL 
+		\item dB signal-to-noise ratio 
+		\item Omnidirectional sensitivity 
+		\item $-$26 dBFS $\pm$ 1 dB sensitivity 
+		\item MIPI 20-pin compatible JTAG Connector 
+	\end{itemize}
+	
+	\textbf{Memory:}
+	\begin{itemize}
+		\item Micro SD Card Slot
+	\end{itemize}
+
+\section{Functional Overview}
+
+
+
+\begin{figure}
+	\begin{center}
+		\includegraphics[width=0.7\linewidth]{Images/VisionShield/BoardTopology.png}
+		\caption{Board Topology}
+		\label{BoardTopology}
+	\end{center}
+\end{figure}
+
+\begin{figure}
+	\begin{center}
+		\includegraphics[width=0.7\linewidth]{Images/VisionShield/Discription.png}
+		\caption{Board Topology}
+		\label{BoardTopology}
+	\end{center}
+\end{figure}
+
+	
+	\section{Power}
+	
+	The Portenta H7/C33 supplies 3.3 V power to the LoRa\textsuperscript{\textregistered} module (ASX00026 only), Ethernet communication (ASX00021 only), Micro SD slot, and dual microphones via the 3.3 V output of the high-density connectors. An onboard LDO regulator supplies a 2.8 V output (300 mA) for the camera module.
+	
+	\section{Camera Module}
+	
+	The Himax HM-01B0 Module is a very low-power camera with 324x324 resolution and a maximum of 60 FPS depending on the operating mode. Video data is transferred over a configurable 8-bit interconnect with support for frame and line synchronization. The module delivered with the Portenta Vision Shield is the monochrome version. Configuration is achieved via an I2C connection with the compatible Portenta boards microcontrollers.
+	
+	HM-01B0 offers very low-power image acquisition and provides the possibility to perform motion detection without main processor interaction. The “Always-on” operation provides the ability to turn on the main processor when movement is detected with minimal power consumption.
+	
+	\textbf{Note:} The Portenta C33 is not compatible with the camera of the Portenta Vision Shield.
+	
+	\section{Digital Microphones}
+	
+	The dual MP34DT05 digital MEMS microphones are omnidirectional and operate via a capacitive sensing element with a high (64 dB) signal-to-noise ratio. The microphones have been configured to provide separate left and right audio over a single PDM stream.
+	
+	The sensing element, capable of detecting acoustic waves, is manufactured using a specialized silicon micromachining process dedicated to produce audio sensors.
+	
+	\section{Micro SD Card Slot}
+	
+	A Micro SD card slot is available under the Portenta Vision Shield board. Available libraries allow reading and writing to FAT16/32 formatted cards.
+	
+	\section{Ethernet (ASX00021 Only)}
+	
+	Ethernet connector allows connecting to 10/100 Base TX networks using the Ethernet PHY available on the Portenta board.
+	
+\section{First Step with Portenta Vision Shield:}
+
+\subsection{Getting Started With the Portenta Vision Shield Camera}
+This tutorial shows you how to capture frames from the Arduino Portenta Vision Shield Camera module and visualize the video output through a Processing sketch. ~\ref{VisionShield} \cite{portentaVisionShieldCamera:2024}
+	\begin{figure}
+		\begin{center}
+			\includegraphics[width=0.7\linewidth]{Images/VisionShield/VisionShield.png}
+			\caption{VisionShield}
+			\label{VisionShield}
+		\end{center}
+	\end{figure}
+
+\subsection{Goals:}
+\begin{itemize}
+	\item Capturing the frames from the camera
+	\item Sending the frames as a byte stream through a Serial connection
+	\item Visualising the frames in Processing
+\end{itemize}
+
+\subsection{Required Hardware and Software:}
+\begin{itemize}
+	\item Portenta H7
+	\item Portenta Vision Shield (LoRa or Ethernet)
+	\item USB-C cable
+	\item Arduino IDE 2.3.2
+	\item Processing software
+\end{itemize}
+\subsection{Instructions:}
+	Accessing the Portenta Vision Shield's camera data is done with the help of both Arduino and the Processing IDE. The Arduino sketch handles the capture of image data by the on-board camera, while the java applet created with Processing helps to visualize this data with the help of a serial connection. The following steps will run you through how to capture, package the data through the serial port and visualize the output in Processing.
+\begin{itemize}
+	\item \textbf{The Basic Setup:} Connect the Portenta Vision Shield to your Portenta H7 as shown in the figure. The top and bottom high density connecters are connected to the corresponding ones on the underside of the H7 board. Plug in the H7 to your computer using the USB-C® cable. ~\ref{Connection VS}
+	\begin{figure}
+		\begin{center}
+			\includegraphics[width=0.7\linewidth]{Images/VisionShield/Connection VS.png}
+			\caption{Connection VS}
+			\label{Connection VS}
+		\end{center}
+	\end{figure}
+	\item \textbf{Adding the Portenta to the List of Available Boards:} In your Arduino IDE, open the board manager and search for "portenta". Find the Arduino mbed-enabled Boards library and click on "Install" to install the latest version of the mbed core (1.2.3 at the time of writing this tutorial). ~\ref{Portentaport}
+	\begin{figure}
+		\begin{center}
+			\includegraphics[width=0.7\linewidth]{Images/PortentaH7/Portentaport.png}
+			\caption{Portentaport}
+			\label{Portentaport}
+		\end{center}
+	\end{figure}
+	
+	\item \textbf{Uploading the Classic Blink Sketch:} Let's program the Portenta with the classic blink example to check if the connection to the board works. 
+	
+	\begin{lstlisting}
+		// the setup function runs once when you press reset or power the board
+		void setup() {
+			// initialize digital pin LED_BUILTIN as an output.
+			pinMode(LED_BUILTIN, OUTPUT);
+			digitalWrite(LED_BUILTIN, HIGH); // turn the LED off after being turned on by pinMode()
+		}
+		
+		// the loop function runs over and over again forever
+		void loop() {
+			digitalWrite(LED_BUILTIN, LOW); // turn the LED on (LOW is the voltage level)
+			delay(1000); // wait for a second
+			digitalWrite(LED_BUILTIN, HIGH); // turn the LED off by making the voltage HIGH
+			delay(1000); // wait for a second
+		}   
+		
+	\end{lstlisting}
+	
+\end{itemize}
+
