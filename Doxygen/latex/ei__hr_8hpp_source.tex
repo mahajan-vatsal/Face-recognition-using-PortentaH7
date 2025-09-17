@@ -1,0 +1,183 @@
+\doxysection{ei\+\_\+hr.\+hpp}
+\hypertarget{ei__hr_8hpp_source}{}\label{ei__hr_8hpp_source}\index{Face\_Access\_inferencing/src/edge-\/impulse-\/sdk/dsp/ei\_hr.hpp@{Face\_Access\_inferencing/src/edge-\/impulse-\/sdk/dsp/ei\_hr.hpp}}
+\mbox{\hyperlink{ei__hr_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{00002\ \textcolor{comment}{\ *\ Copyright\ (c)\ 2024\ EdgeImpulse\ Inc.}}
+\DoxyCodeLine{00003\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00004\ \textcolor{comment}{\ *\ Generated\ by\ Edge\ Impulse\ and\ licensed\ under\ the\ applicable\ Edge\ Impulse}}
+\DoxyCodeLine{00005\ \textcolor{comment}{\ *\ Terms\ of\ Service.\ Community\ and\ Professional\ Terms\ of\ Service}}
+\DoxyCodeLine{00006\ \textcolor{comment}{\ *\ (https://docs.edgeimpulse.com/page/terms-\/of-\/service)\ or\ Enterprise\ Terms\ of}}
+\DoxyCodeLine{00007\ \textcolor{comment}{\ *\ Service\ (https://docs.edgeimpulse.com/page/enterprise-\/terms-\/of-\/service),}}
+\DoxyCodeLine{00008\ \textcolor{comment}{\ *\ according\ to\ your\ product\ plan\ subscription\ (the\ “License”).}}
+\DoxyCodeLine{00009\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00010\ \textcolor{comment}{\ *\ This\ software,\ documentation\ and\ other\ associated\ files\ (collectively\ referred}}
+\DoxyCodeLine{00011\ \textcolor{comment}{\ *\ to\ as\ the\ “Software”)\ is\ a\ single\ SDK\ variation\ generated\ by\ the\ Edge\ Impulse}}
+\DoxyCodeLine{00012\ \textcolor{comment}{\ *\ platform\ and\ requires\ an\ active\ paid\ Edge\ Impulse\ subscription\ to\ use\ this}}
+\DoxyCodeLine{00013\ \textcolor{comment}{\ *\ Software\ for\ any\ purpose.}}
+\DoxyCodeLine{00014\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00015\ \textcolor{comment}{\ *\ You\ may\ NOT\ use\ this\ Software\ unless\ you\ have\ an\ active\ Edge\ Impulse\ subscription}}
+\DoxyCodeLine{00016\ \textcolor{comment}{\ *\ that\ meets\ the\ eligibility\ requirements\ for\ the\ applicable\ License,\ subject\ to}}
+\DoxyCodeLine{00017\ \textcolor{comment}{\ *\ your\ full\ and\ continued\ compliance\ with\ the\ terms\ and\ conditions\ of\ the\ License,}}
+\DoxyCodeLine{00018\ \textcolor{comment}{\ *\ including\ without\ limitation\ any\ usage\ restrictions\ under\ the\ applicable\ License.}}
+\DoxyCodeLine{00019\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00020\ \textcolor{comment}{\ *\ If\ you\ do\ not\ have\ an\ active\ Edge\ Impulse\ product\ plan\ subscription,\ or\ if\ use}}
+\DoxyCodeLine{00021\ \textcolor{comment}{\ *\ of\ this\ Software\ exceeds\ the\ usage\ limitations\ of\ your\ Edge\ Impulse\ product\ plan}}
+\DoxyCodeLine{00022\ \textcolor{comment}{\ *\ subscription,\ you\ are\ not\ permitted\ to\ use\ this\ Software\ and\ must\ immediately}}
+\DoxyCodeLine{00023\ \textcolor{comment}{\ *\ delete\ and\ erase\ all\ copies\ of\ this\ Software\ within\ your\ control\ or\ possession.}}
+\DoxyCodeLine{00024\ \textcolor{comment}{\ *\ Edge\ Impulse\ reserves\ all\ rights\ and\ remedies\ available\ to\ enforce\ its\ rights.}}
+\DoxyCodeLine{00025\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00026\ \textcolor{comment}{\ *\ Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ the\ Software\ is}}
+\DoxyCodeLine{00027\ \textcolor{comment}{\ *\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,\ WITHOUT\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,}}
+\DoxyCodeLine{00028\ \textcolor{comment}{\ *\ either\ express\ or\ implied.\ See\ the\ License\ for\ the\ specific\ language\ governing}}
+\DoxyCodeLine{00029\ \textcolor{comment}{\ *\ permissions,\ disclaimers\ and\ limitations\ under\ the\ License.}}
+\DoxyCodeLine{00030\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{00031\ \textcolor{preprocessor}{\#ifndef\ HR\_PPG\_HPP}}
+\DoxyCodeLine{00032\ \textcolor{preprocessor}{\#define\ HR\_PPG\_HPP}}
+\DoxyCodeLine{00033\ }
+\DoxyCodeLine{00034\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{numpy_8hpp}{edge-\/impulse-\/sdk/dsp/numpy.hpp}}"{}}}
+\DoxyCodeLine{00035\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{ei__dsp__handle_8h}{edge-\/impulse-\/sdk/dsp/ei\_dsp\_handle.h}}"{}}}
+\DoxyCodeLine{00036\ \textcolor{preprocessor}{\#include\ "{}edge-\/impulse-\/enterprise/hr/hr\_ppg.hpp"{}}}
+\DoxyCodeLine{00037\ \textcolor{preprocessor}{\#include\ "{}edge-\/impulse-\/enterprise/hr/hrv.hpp"{}}}
+\DoxyCodeLine{00038\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{memory_8hpp}{edge-\/impulse-\/sdk/dsp/memory.hpp}}"{}}}
+\DoxyCodeLine{00039\ }
+\DoxyCodeLine{00040\ \textcolor{comment}{//\ Need\ a\ wrapper\ to\ get\ ei\_malloc\ used}}
+\DoxyCodeLine{00041\ \textcolor{comment}{//\ cppyy\ didn't\ like\ this\ override\ for\ some\ reason}}
+\DoxyCodeLine{00042\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classhrv__wrap}{hrv\_wrap}}\ :\ \textcolor{keyword}{public}\ ei::hrv::beats\_to\_hrv\ \{}
+\DoxyCodeLine{00043\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00044\ \ \ \ \ \textcolor{comment}{//\ Boilerplate\ below\ here}}
+\DoxyCodeLine{00045\ \ \ \ \ \textcolor{keywordtype}{void}*\ \textcolor{keyword}{operator}\ \textcolor{keyword}{new}(\textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{hello__world__model_8cc_a439227feff9d7f55384e8780cfc2eb82}{size}})\ \{}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Custom\ memory\ allocation\ logic\ here}}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{group__ei__user__functions_ga71ecca5661ac4434a709c88e4c39b4aa}{ei\_malloc}}(\mbox{\hyperlink{hello__world__model_8cc_a439227feff9d7f55384e8780cfc2eb82}{size}});}
+\DoxyCodeLine{00048\ \ \ \ \ \}}
+\DoxyCodeLine{00049\ }
+\DoxyCodeLine{00050\ \ \ \ \ \textcolor{keywordtype}{void}\ \textcolor{keyword}{operator}\ \textcolor{keyword}{delete}(\textcolor{keywordtype}{void}*\ \mbox{\hyperlink{ei__aligned__malloc_8h_a0619a76ea2d4e6cce18b93ddf5082a36}{ptr}})\ \{}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Custom\ memory\ deallocation\ logic\ here}}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group__ei__user__functions_ga7a6a70833407ff1870c12396ce2c4aa3}{ei\_free}}(\mbox{\hyperlink{ei__aligned__malloc_8h_a0619a76ea2d4e6cce18b93ddf5082a36}{ptr}});}
+\DoxyCodeLine{00053\ \ \ \ \ \}}
+\DoxyCodeLine{00054\ \ \ \ \ \textcolor{comment}{//\ end\ boilerplate}}
+\DoxyCodeLine{00055\ }
+\DoxyCodeLine{00056\ \ \ \ \ \textcolor{comment}{//\ Use\ the\ same\ constructor\ as\ the\ parent}}
+\DoxyCodeLine{00057\ \ \ \ \ \textcolor{keyword}{using\ }ei::hrv::beats\_to\_hrv::beats\_to\_hrv;}
+\DoxyCodeLine{00058\ \};}
+\DoxyCodeLine{00059\ }
+\DoxyCodeLine{00060\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classhr__class}{hr\_class}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{class_dsp_handle}{DspHandle}}\ \{}
+\DoxyCodeLine{00061\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00062\ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{classhr__class_a8bb107a4c7b132f542db37ea7c12577d}{print}}()\textcolor{keyword}{\ override\ }\{}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}Last\ HR:\ \%f\(\backslash\)n"{}},\ \mbox{\hyperlink{classhr__class_ada6ee5ca9b172e4d4e951b781deb6d82}{ppg}}.\_res.hr);}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespaceei_a35329cd4e57031263ba0a94c8d3959baa58f9da92fe1aff29466bdd4aa2a7b361}{ei::EIDSP\_OK}};}
+\DoxyCodeLine{00065\ \ \ \ \ \}}
+\DoxyCodeLine{00066\ }
+\DoxyCodeLine{00067\ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{classhr__class_a6087b5e9dced96a4266327d02d805951}{extract}}(}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ ei::signal\_t\ *\mbox{\hyperlink{group__ei__functions_ga46d130150ef0ce589284705bdc4c8b69}{signal}},}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ ei::matrix\_t\ *\mbox{\hyperlink{ei__run__dsp_8h_a3ba015549c47e712909a20cde87dfe4f}{output\_matrix}},}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ *\mbox{\hyperlink{ei__run__dsp_8h_a0819d397f9fba7b345b75fef1c1f782a}{config\_ptr}},}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{float}\ \mbox{\hyperlink{ei__run__dsp_8h_a25c6eab61238d97eb4aaef9fc6d1fa4e}{frequency}},}
+\DoxyCodeLine{00072\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structei__impulse__result__t}{ei\_impulse\_result\_t}}\ *\mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}})\textcolor{keyword}{\ override}}
+\DoxyCodeLine{00073\ \textcolor{keyword}{\ \ \ \ }\{}
+\DoxyCodeLine{00074\ \ \ \ \ \ \ \ \ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespaceei}{ei}};}
+\DoxyCodeLine{00075\ }
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Using\ reference\ avoids\ a\ copy}}
+\DoxyCodeLine{00077\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structei__dsp__config__hr__t}{ei\_dsp\_config\_hr\_t}}\&\ \mbox{\hyperlink{micro_2kernels_2filter__bank_8cc_ac0f32fd234a078ace764ae2fc15c41a0}{config}}\ =\ *((\mbox{\hyperlink{structei__dsp__config__hr__t}{ei\_dsp\_config\_hr\_t}}*)\mbox{\hyperlink{ei__run__dsp_8h_a0819d397f9fba7b345b75fef1c1f782a}{config\_ptr}});}
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ floats\_per\_inc\ =\ \mbox{\hyperlink{classhr__class_ada6ee5ca9b172e4d4e951b781deb6d82}{ppg}}.win\_inc\_samples\ *\ \mbox{\hyperlink{classhr__class_ada6ee5ca9b172e4d4e951b781deb6d82}{ppg}}.\mbox{\hyperlink{structei__dsp__config__hr__t_aa87c0c01b22f23b8b2393235c7168b26}{axes}};}
+\DoxyCodeLine{00079\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ hrv\_inc\_samples\ =\ \mbox{\hyperlink{micro_2kernels_2filter__bank_8cc_ac0f32fd234a078ace764ae2fc15c41a0}{config}}.hrv\_update\_interval\_s\ *\ \mbox{\hyperlink{ei__run__dsp_8h_a25c6eab61238d97eb4aaef9fc6d1fa4e}{frequency}}\ *\ \mbox{\hyperlink{classhr__class_ada6ee5ca9b172e4d4e951b781deb6d82}{ppg}}.axes;}
+\DoxyCodeLine{00080\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Greater\ than\ b/c\ can\ have\ multiple\ increments\ (HRs)\ per\ window}}
+\DoxyCodeLine{00081\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__aligned__malloc_8h_a95cd4fa643ce672b347744b35c5b7056}{assert}}(\mbox{\hyperlink{classei_1_1signal}{signal}}-\/>total\_length\ >=\ floats\_per\_inc);}
+\DoxyCodeLine{00082\ }
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ out\_idx\ =\ 0;}
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ hrv\_count\ =\ 0;}
+\DoxyCodeLine{00085\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <=\ \mbox{\hyperlink{classei_1_1signal}{signal}}-\/>total\_length\ -\/\ floats\_per\_inc;\ i\ +=\ floats\_per\_inc)\ \{}
+\DoxyCodeLine{00086\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ TODO\ ask\ for\ smaller\ increments\ and\ bp\ them\ into\ place}}
+\DoxyCodeLine{00087\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Copy\ into\ the\ end\ of\ the\ buffer}}
+\DoxyCodeLine{00088\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structei__matrix}{matrix\_t}}\ \mbox{\hyperlink{nicla__sense__fusion_8ino_ae6219c1117781a1dbbb7839946bca32c}{temp}}(\mbox{\hyperlink{classhr__class_ada6ee5ca9b172e4d4e951b781deb6d82}{ppg}}.win\_inc\_samples,\ \mbox{\hyperlink{classhr__class_ada6ee5ca9b172e4d4e951b781deb6d82}{ppg}}.axes);}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classei_1_1signal}{signal}}-\/>get\_data(i,\ floats\_per\_inc,\ \mbox{\hyperlink{nicla__sense__fusion_8ino_ae6219c1117781a1dbbb7839946bca32c}{temp}}.buffer);}
+\DoxyCodeLine{00090\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ hr\ =\ \mbox{\hyperlink{classhr__class_ada6ee5ca9b172e4d4e951b781deb6d82}{ppg}}.stream(\&\mbox{\hyperlink{nicla__sense__fusion_8ino_ae6219c1117781a1dbbb7839946bca32c}{temp}});}
+\DoxyCodeLine{00091\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}})\ \{}
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}}-\/>hr\_calcs.heart\_rate\ =\ hr;}
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00094\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(!\mbox{\hyperlink{classhr__class_a1931ef1581d934d26d36e3be785d51dd}{hrv}}\ ||\ (\mbox{\hyperlink{classhr__class_a1931ef1581d934d26d36e3be785d51dd}{hrv}}\ \&\&\ \mbox{\hyperlink{micro_2kernels_2filter__bank_8cc_ac0f32fd234a078ace764ae2fc15c41a0}{config}}.include\_hr))\ \{}
+\DoxyCodeLine{00095\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__dsp_8h_a3ba015549c47e712909a20cde87dfe4f}{output\_matrix}}-\/>\mbox{\hyperlink{structei__matrix_a5412b64a3551881269b8c1493f0da17a}{buffer}}[out\_idx++]\ =\ hr;}
+\DoxyCodeLine{00096\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00097\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\mbox{\hyperlink{classhr__class_a1931ef1581d934d26d36e3be785d51dd}{hrv}})\ \{}
+\DoxyCodeLine{00098\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ peaks\ =\ \mbox{\hyperlink{classhr__class_ada6ee5ca9b172e4d4e951b781deb6d82}{ppg}}.get\_peaks();}
+\DoxyCodeLine{00099\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classhr__class_a1931ef1581d934d26d36e3be785d51dd}{hrv}}-\/>add\_streaming\_beats(peaks);}
+\DoxyCodeLine{00100\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ hrv\_count\ +=\ floats\_per\_inc;}
+\DoxyCodeLine{00101\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(hrv\_count\ >=\ hrv\_inc\_samples)\ \{}
+\DoxyCodeLine{00102\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespaceei_a95dce84c9a88cb7ad8f36a81dc0bc3a8}{fvec}}\ \mbox{\hyperlink{static__buffer_8ino_a02165b70108b2e24fce73bc3d2e3c860}{features}}\ =\ \mbox{\hyperlink{classhr__class_a1931ef1581d934d26d36e3be785d51dd}{hrv}}-\/>get\_hrv\_features(0);}
+\DoxyCodeLine{00103\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keywordtype}{size\_t}\ j\ =\ 0;\ j\ <\ \mbox{\hyperlink{static__buffer_8ino_a02165b70108b2e24fce73bc3d2e3c860}{features}}.size();\ j++)\ \{}
+\DoxyCodeLine{00104\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__dsp_8h_a3ba015549c47e712909a20cde87dfe4f}{output\_matrix}}-\/>\mbox{\hyperlink{structei__matrix_a5412b64a3551881269b8c1493f0da17a}{buffer}}[out\_idx++]\ =\ \mbox{\hyperlink{static__buffer_8ino_a02165b70108b2e24fce73bc3d2e3c860}{features}}[j];}
+\DoxyCodeLine{00105\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00106\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ hrv\_count\ =\ 0;}
+\DoxyCodeLine{00107\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00108\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00109\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00110\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{ei__run__dsp_8h_a54eac5b77b39bd93efe5b92bbf779cd8}{EIDSP\_OK}};}
+\DoxyCodeLine{00111\ \ \ \ \ \}}
+\DoxyCodeLine{00112\ }
+\DoxyCodeLine{00113\ \ \ \ \ \mbox{\hyperlink{classhr__class_a93de3961e61d92ec23ca34560da33801}{hr\_class}}(\mbox{\hyperlink{structei__dsp__config__hr__t}{ei\_dsp\_config\_hr\_t}}*\ \mbox{\hyperlink{micro_2kernels_2filter__bank_8cc_ac0f32fd234a078ace764ae2fc15c41a0}{config}},\ \textcolor{keywordtype}{float}\ \mbox{\hyperlink{ei__run__dsp_8h_a25c6eab61238d97eb4aaef9fc6d1fa4e}{frequency}})}
+\DoxyCodeLine{00114\ \ \ \ \ \ \ \ \ :\ \mbox{\hyperlink{classhr__class_ada6ee5ca9b172e4d4e951b781deb6d82}{ppg}}(\mbox{\hyperlink{ei__run__dsp_8h_a25c6eab61238d97eb4aaef9fc6d1fa4e}{frequency}},}
+\DoxyCodeLine{00115\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{micro_2kernels_2filter__bank_8cc_ac0f32fd234a078ace764ae2fc15c41a0}{config}}-\/>axes,}
+\DoxyCodeLine{00116\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ int(\mbox{\hyperlink{ei__run__dsp_8h_a25c6eab61238d97eb4aaef9fc6d1fa4e}{frequency}}\ *\ \mbox{\hyperlink{micro_2kernels_2filter__bank_8cc_ac0f32fd234a078ace764ae2fc15c41a0}{config}}-\/>hr\_win\_size\_s),}
+\DoxyCodeLine{00117\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ int(\mbox{\hyperlink{ei__run__dsp_8h_a25c6eab61238d97eb4aaef9fc6d1fa4e}{frequency}}\ *\ 2),\ \textcolor{comment}{//\ TODO\ variable\ overlap}}
+\DoxyCodeLine{00118\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{micro_2kernels_2filter__bank_8cc_ac0f32fd234a078ace764ae2fc15c41a0}{config}}-\/>filter\_preset,}
+\DoxyCodeLine{00119\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{micro_2kernels_2filter__bank_8cc_ac0f32fd234a078ace764ae2fc15c41a0}{config}}-\/>acc\_resting\_std,}
+\DoxyCodeLine{00120\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{micro_2kernels_2filter__bank_8cc_ac0f32fd234a078ace764ae2fc15c41a0}{config}}-\/>\mbox{\hyperlink{_test_microphone_8ino_af715d185b7ab82db4a55088c69dd6c47}{sensitivity}},}
+\DoxyCodeLine{00121\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__fill__result__struct_8h_a930920b2bc42824a5c03be681830f4b2}{true}}),\ \mbox{\hyperlink{classhr__class_a1931ef1581d934d26d36e3be785d51dd}{hrv}}(nullptr)}
+\DoxyCodeLine{00122\ \ \ \ \ \{}
+\DoxyCodeLine{00123\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcaa715bcbccfd2c1131fb15ef75f0ddfd_a89ead81608095f24b8cc943c9265bccc}{table}}\ =\ \mbox{\hyperlink{micro_2kernels_2filter__bank_8cc_ac0f32fd234a078ace764ae2fc15c41a0}{config}}-\/>named\_axes;}
+\DoxyCodeLine{00124\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ \mbox{\hyperlink{micro_2kernels_2filter__bank_8cc_ac0f32fd234a078ace764ae2fc15c41a0}{config}}-\/>named\_axes\_size;\ i++\ )\ \{}
+\DoxyCodeLine{00125\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classhr__class_ada6ee5ca9b172e4d4e951b781deb6d82}{ppg}}.set\_offset\_table(i,\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcaa715bcbccfd2c1131fb15ef75f0ddfd_a89ead81608095f24b8cc943c9265bccc}{table}}[i].\mbox{\hyperlink{cumsum__test_8cc_a195d3f5576f1c8b039cff255b07a3aee}{axis}});}
+\DoxyCodeLine{00126\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00127\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ if\ not\ "{}none"{}}}
+\DoxyCodeLine{00128\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(strcmp(\mbox{\hyperlink{micro_2kernels_2filter__bank_8cc_ac0f32fd234a078ace764ae2fc15c41a0}{config}}-\/>hrv\_features,\textcolor{stringliteral}{"{}none"{}})\ !=\ 0)\ \{}
+\DoxyCodeLine{00129\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ new\ is\ overloaded\ to\ use\ ei\_malloc}}
+\DoxyCodeLine{00130\ \ \ \ \ \ \ \ \ \ \ \ \ hrv\ =\ new\ hrv\_wrap(}
+\DoxyCodeLine{00131\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ frequency,}
+\DoxyCodeLine{00132\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ config-\/>hrv\_features,}
+\DoxyCodeLine{00133\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ config-\/>hrv\_update\_interval\_s,}
+\DoxyCodeLine{00134\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ config-\/>hrv\_win\_size\_s,}
+\DoxyCodeLine{00135\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 2);\ \textcolor{comment}{//\ TODO\ variable\ window?}}
+\DoxyCodeLine{00136\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00137\ \ \ \ \ \}}
+\DoxyCodeLine{00138\ }
+\DoxyCodeLine{00139\ \ \ \ \ \mbox{\hyperlink{classhr__class_a751b960fc88a9951e46c9c64a302bc0b}{\string~hr\_class}}()\ \{}
+\DoxyCodeLine{00140\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\mbox{\hyperlink{classhr__class_a1931ef1581d934d26d36e3be785d51dd}{hrv}})\ \{}
+\DoxyCodeLine{00141\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ delete\ is\ overloaded\ to\ use\ ei\_free}}
+\DoxyCodeLine{00142\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{delete}\ \mbox{\hyperlink{classhr__class_a1931ef1581d934d26d36e3be785d51dd}{hrv}};}
+\DoxyCodeLine{00143\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00144\ \ \ \ \ \}}
+\DoxyCodeLine{00145\ }
+\DoxyCodeLine{00146\ \ \ \ \ \textcolor{keywordtype}{float}\ \mbox{\hyperlink{classhr__class_a57c45be55a9a1ce0f3e26d5b61edf252}{get\_last\_hr}}()\ \{}
+\DoxyCodeLine{00147\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classhr__class_ada6ee5ca9b172e4d4e951b781deb6d82}{ppg}}.\_res.hr;}
+\DoxyCodeLine{00148\ \ \ \ \ \}}
+\DoxyCodeLine{00149\ }
+\DoxyCodeLine{00150\ \ \ \ \ \textcolor{comment}{//\ Boilerplate\ below\ here}}
+\DoxyCodeLine{00151\ \ \ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{class_dsp_handle}{DspHandle}}*\ \mbox{\hyperlink{classhr__class_a59e50ec282178a526ae8e2c713456b05}{create}}(\textcolor{keywordtype}{void}*\ \mbox{\hyperlink{micro_2kernels_2filter__bank_8cc_ac0f32fd234a078ace764ae2fc15c41a0}{config}},\ \textcolor{keywordtype}{float}\ \mbox{\hyperlink{ei__run__dsp_8h_a25c6eab61238d97eb4aaef9fc6d1fa4e}{frequency}});}
+\DoxyCodeLine{00152\ }
+\DoxyCodeLine{00153\ \ \ \ \ \textcolor{keywordtype}{void}*\ \textcolor{keyword}{operator}\ \textcolor{keyword}{new}(\textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{hello__world__model_8cc_a439227feff9d7f55384e8780cfc2eb82}{size}})\ \{}
+\DoxyCodeLine{00154\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Custom\ memory\ allocation\ logic\ here}}
+\DoxyCodeLine{00155\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{group__ei__user__functions_ga71ecca5661ac4434a709c88e4c39b4aa}{ei\_malloc}}(\mbox{\hyperlink{hello__world__model_8cc_a439227feff9d7f55384e8780cfc2eb82}{size}});}
+\DoxyCodeLine{00156\ \ \ \ \ \}}
+\DoxyCodeLine{00157\ }
+\DoxyCodeLine{00158\ \ \ \ \ \textcolor{keywordtype}{void}\ \textcolor{keyword}{operator}\ \textcolor{keyword}{delete}(\textcolor{keywordtype}{void}*\ \mbox{\hyperlink{ei__aligned__malloc_8h_a0619a76ea2d4e6cce18b93ddf5082a36}{ptr}})\ \{}
+\DoxyCodeLine{00159\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Custom\ memory\ deallocation\ logic\ here}}
+\DoxyCodeLine{00160\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group__ei__user__functions_ga7a6a70833407ff1870c12396ce2c4aa3}{ei\_free}}(\mbox{\hyperlink{ei__aligned__malloc_8h_a0619a76ea2d4e6cce18b93ddf5082a36}{ptr}});}
+\DoxyCodeLine{00161\ \ \ \ \ \}}
+\DoxyCodeLine{00162\ \ \ \ \ \textcolor{comment}{//\ end\ boilerplate}}
+\DoxyCodeLine{00163\ \textcolor{keyword}{private}:}
+\DoxyCodeLine{00164\ \ \ \ \ ei::hr\_ppg\ \mbox{\hyperlink{classhr__class_ada6ee5ca9b172e4d4e951b781deb6d82}{ppg}};}
+\DoxyCodeLine{00165\ \ \ \ \ \mbox{\hyperlink{classhrv__wrap}{hrv\_wrap}}*\ \mbox{\hyperlink{classhr__class_a1931ef1581d934d26d36e3be785d51dd}{hrv}};\ \textcolor{comment}{//\ pointer\ b/c\ we\ don't\ always\ need\ it}}
+\DoxyCodeLine{00166\ \};}
+\DoxyCodeLine{00167\ }
+\DoxyCodeLine{00168\ \mbox{\hyperlink{class_dsp_handle}{DspHandle}}*\ \mbox{\hyperlink{classhr__class_a59e50ec282178a526ae8e2c713456b05}{hr\_class::create}}(\textcolor{keywordtype}{void}*\ config\_in,\ \textcolor{keywordtype}{float}\ \mbox{\hyperlink{ei__run__dsp_8h_a25c6eab61238d97eb4aaef9fc6d1fa4e}{frequency}})\ \{\ \textcolor{comment}{//\ NOLINT\ def\ in\ header\ is\ OK\ at\ EI}}
+\DoxyCodeLine{00169\ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{micro_2kernels_2filter__bank_8cc_ac0f32fd234a078ace764ae2fc15c41a0}{config}}\ =\ \textcolor{keyword}{reinterpret\_cast<}\mbox{\hyperlink{structei__dsp__config__hr__t}{ei\_dsp\_config\_hr\_t}}*\textcolor{keyword}{>}(config\_in);}
+\DoxyCodeLine{00170\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{classhr__class_a93de3961e61d92ec23ca34560da33801}{hr\_class}}(\mbox{\hyperlink{micro_2kernels_2filter__bank_8cc_ac0f32fd234a078ace764ae2fc15c41a0}{config}},\ \mbox{\hyperlink{ei__run__dsp_8h_a25c6eab61238d97eb4aaef9fc6d1fa4e}{frequency}});}
+\DoxyCodeLine{00171\ \};}
+\DoxyCodeLine{00172\ }
+\DoxyCodeLine{00173\ \textcolor{comment}{/*}}
+\DoxyCodeLine{00174\ \textcolor{comment}{NOTE,\ contact\ EI\ sales\ for\ license\ and\ source\ to\ use\ EI\ heart\ rate\ and\ heart\ rate\ variance\ functions\ in\ deployment}}
+\DoxyCodeLine{00175\ \textcolor{comment}{*/}}
+\DoxyCodeLine{00176\ }
+\DoxyCodeLine{00177\ \textcolor{preprocessor}{\#endif}}
+
+\end{DoxyCode}

@@ -1,0 +1,193 @@
+\chapter{memory\+\_\+management}
+\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_1037f320971b1b747e6f4fbf09903628}{}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_1037f320971b1b747e6f4fbf09903628}\index{memory\_management@{memory\_management}}
+
+\begin{DoxyItemize}
+\item Memory Management in Tensor\+Flow Lite Micro
+\begin{DoxyItemize}
+\item Tensor Arena
+\begin{DoxyItemize}
+\item Head Section
+\begin{DoxyItemize}
+\item Offline planned tensor allocations
+\end{DoxyItemize}
+\item Temporary Section
+\item Tail Section
+\end{DoxyItemize}
+\item Recording Memory APIs
+\begin{DoxyItemize}
+\item Allocation Section Details
+\end{DoxyItemize}
+\end{DoxyItemize}
+\end{DoxyItemize}\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_1037f320971b1b747e6f4fbf09903628_autotoc_md162}{}\doxysection{\texorpdfstring{Memory Management in Tensor\+Flow Lite Micro}{Memory Management in Tensor\+Flow Lite Micro}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_1037f320971b1b747e6f4fbf09903628_autotoc_md162}
+This document outlines how memory is managed internally by Tensor\+Flow Lite Micro (TFLM) today. It outlines the "{}online"{} allocation strategy used by the default TFLM APIs for loading a model into a shared tensor arena.\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_1037f320971b1b747e6f4fbf09903628_autotoc_md163}{}\doxysubsection{\texorpdfstring{Tensor Arena}{Tensor Arena}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_1037f320971b1b747e6f4fbf09903628_autotoc_md163}
+The main "{}working"{} space for TFLM allocations is inside a single {\ttfamily char} or {\ttfamily int8\+\_\+t} buffer. This buffer can be managed by passing it directly into a {\ttfamily \doxylink{classtflite_1_1_micro_interpreter}{tflite\+::\+Micro\+Interpreter}} constructor or through a {\ttfamily \doxylink{classtflite_1_1_micro_allocator}{tflite\+::\+Micro\+Allocator}} instance that can be passed into a {\ttfamily \doxylink{classtflite_1_1_micro_interpreter}{tflite\+::\+Micro\+Interpreter}} constructor. Internally, the {\ttfamily \doxylink{classtflite_1_1_micro_allocator}{tflite\+::\+Micro\+Allocator}} classifies allocations into 3 different sections\+:
+
+
+\begin{DoxyItemize}
+\item {\bfseries{Head}} -\/ non-\/persistent allocations.
+\item {\bfseries{Temporary}} -\/ short term "{}scoped"{} allocations.
+\item {\bfseries{Tail}} -\/ persistent allocations.
+\end{DoxyItemize}
+
+The illustration below represents typical allocations in TFLM\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}
+\DoxyCodeLine{|\ \ \ \ \ \ \ \ |\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ |\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ |}
+\DoxyCodeLine{|\ \ HEAD\ \ |<-\/-\/\ \ TEMPORARY\ \ \ \ -\/-\/>|\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ TAIL\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ |}
+\DoxyCodeLine{|\ \ \ \ \ \ \ \ |\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ |\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ |}
+\DoxyCodeLine{-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}
+\DoxyCodeLine{*\ Lowest\ Address\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Highest\ Address\ *}
+
+\end{DoxyCode}
+\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_1037f320971b1b747e6f4fbf09903628_autotoc_md164}{}\doxysubsubsection{\texorpdfstring{Head Section}{Head Section}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_1037f320971b1b747e6f4fbf09903628_autotoc_md164}
+This non-\/persistent section typically holds shared Tensor buffers. This section does not allocate small iterative chunks, it can only be set by a specific length for the entire section.
+
+This allocation length of this section is managed by the {\ttfamily \doxylink{classtflite_1_1_greedy_memory_planner}{tflite\+::\+Greedy\+Memory\+Planner}}. That memory planner looks at the entire graph of a model and tries to reuse as many buffers as possible to create the smallest length for the head. The Tensor buffers for this section can be accessed via a {\ttfamily \doxylink{struct_tf_lite_eval_tensor}{Tf\+Lite\+Eval\+Tensor}} or {\ttfamily \doxylink{struct_tf_lite_tensor}{Tf\+Lite\+Tensor}} instance on the {\ttfamily \doxylink{classtflite_1_1_micro_interpreter}{tflite\+::\+Micro\+Interpreter}}.\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_1037f320971b1b747e6f4fbf09903628_autotoc_md165}{}\doxysubsubsubsection{\texorpdfstring{Offline planned tensor allocations}{Offline planned tensor allocations}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_1037f320971b1b747e6f4fbf09903628_autotoc_md165}
+All, or a subset of, tensors can be allocated using an offline planner. An offline planner performs tensor allocation on e.\+g. a host PC. The offline tensor allocation plan is added to model metadata. See format below.
+
+For each non-\/constant tensor in the {\ttfamily tensors\+:\mbox{[}Tensor\mbox{]}} list of the subgraph, a byte offset to the start of the head section of the memory arena is given. -\/1 indicates that the tensor will be allocated at runtime by the {\ttfamily \doxylink{classtflite_1_1_greedy_memory_planner}{tflite\+::\+Greedy\+Memory\+Planner}}. The offline plan is permitted to overlap buffers if it knows that the data will not be used at the same time.
+
+The offline tensor allocation plan will be encoded in the {\ttfamily metadata\+:\mbox{[}Metadata\mbox{]}} field of the model, using the following encoding\+:
+
+\tabulinesep=1mm
+\begin{longtabu}spread 0pt [c]{*{2}{|X[-1]}|}
+\hline
+\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ Metadata component   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ Value    }\\\cline{1-2}
+\endfirsthead
+\hline
+\endfoot
+\hline
+\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ Metadata component   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ Value    }\\\cline{1-2}
+\endhead
+name\+:string   &“\+Offline\+Memory\+Allocation”    \\\cline{1-2}
+buffer\+:unit   &Index of buffer containing offline tensor allocation data   \\\cline{1-2}
+\end{longtabu}
+
+
+The buffer contents for the offline tensor allocation is a list of 32-\/bit integers of the following format\+:
+
+\tabulinesep=1mm
+\begin{longtabu}spread 0pt [c]{*{2}{|X[-1]}|}
+\hline
+\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ Offset   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ Value    }\\\cline{1-2}
+\endfirsthead
+\hline
+\endfoot
+\hline
+\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ Offset   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ Value    }\\\cline{1-2}
+\endhead
+0   &Offline allocation format version    \\\cline{1-2}
+1   &Number of subgraphs    \\\cline{1-2}
+2   &Number offsets following\+: n    \\\cline{1-2}
+3   &Byte offset of tensor \#0 or -\/1 to allocate at runtime    \\\cline{1-2}
+4   &Byte offset of tensor \#1 or -\/1 to allocate at runtime    \\\cline{1-2}
+...   &...    \\\cline{1-2}
+3+(n-\/1)   &Byte offset of tensor \#(n-\/1) or -\/1 to allocate at runtime   \\\cline{1-2}
+\end{longtabu}
+
+
+Note that offsets 0 (the version) and 1 (the number of subgraphs) are currently ignored by the micro memory allocator. In case of multiple subgraphs, it assumes all tensors for all subgraphs are concatenated\+: all tensors for the first subgraph are first, followed by those of the second subgraph, etc.
+
+The {\ttfamily \doxylink{classtflite_1_1_greedy_memory_planner}{tflite\+::\+Greedy\+Memory\+Planner}} treats the provided offline tensor allocation plan as constant fixed offset to the start of the head section and will attempt to fit any other tensors (such as scratch tensors added a runtime using the {\ttfamily Request\+Scratch\+Buffer\+In\+Arena} API of {\ttfamily \doxylink{struct_tf_lite_context}{Tf\+Lite\+Context}}) around those fixed offsets.\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_1037f320971b1b747e6f4fbf09903628_autotoc_md166}{}\doxysubsubsection{\texorpdfstring{Temporary Section}{Temporary Section}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_1037f320971b1b747e6f4fbf09903628_autotoc_md166}
+This section is used to allocate "{}scoped"{} or short-\/term, non-\/guaranteed buffers. Allocations from this section start from the current end address of the head section and grow towards the tail section. An allocation chain can be reset (and must be reset before adjusting the head) and moves the current allocation start address back to the end of the head section.
+
+TFLM currently uses these allocations for a scope allocation of large C structs or scratch memory that is expected to be valid for at least the lifetime of a method call. This section.\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_1037f320971b1b747e6f4fbf09903628_autotoc_md167}{}\doxysubsubsection{\texorpdfstring{Tail Section}{Tail Section}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_1037f320971b1b747e6f4fbf09903628_autotoc_md167}
+This section holds all persistent allocations used by TFLM. This section contains many random sized allocations and grows towards the end of the head section. Allocations in this section come from a variety of areas inside of TFLM. TFLM provides a recording API to assist with auditing the contents of this section.\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_1037f320971b1b747e6f4fbf09903628_autotoc_md168}{}\doxysubsection{\texorpdfstring{Recording Memory APIs}{Recording Memory APIs}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_1037f320971b1b747e6f4fbf09903628_autotoc_md168}
+TFLM provides simple APIs for auditing memory usage in the shared tensor arena. These APIs are opt-\/in and require some additional memory overhead and a working debug logging implementation \href{https://github.com/tensorflow/tflite-micro/blob/main/tensorflow/lite/micro/debug_log.cc}{\texttt{ (reference implementation)}}.
+
+A typical bare-\/bones TFLM interpreter setup looks as such\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ ++}
+\DoxyCodeLine{\textcolor{comment}{//\ Buffer\ for\ the\ tensor\ arena:}}
+\DoxyCodeLine{\textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{person__detection__test_8cc_a5af3a65557f88ed72dd512ad65b55096}{tensor\_arena\_size}}\ =\ 2048;}
+\DoxyCodeLine{uint8\_t\ \mbox{\hyperlink{network__tester__test_8cc_abf99e32bec994276b2bcf77385c93365}{tensor\_arena}}[\mbox{\hyperlink{person__detection__test_8cc_a5af3a65557f88ed72dd512ad65b55096}{tensor\_arena\_size}}];}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//\ Interpreter\ using\ the\ shared\ tensor\ arena\ above:}}
+\DoxyCodeLine{\mbox{\hyperlink{classtflite_1_1_micro_interpreter}{tflite::MicroInterpreter}}\ \mbox{\hyperlink{_inference_allocate_tensor_8cpp_a0d8f3bb5211083760f7c593d57adb17d}{interpreter}}(}
+\DoxyCodeLine{\ \ \mbox{\hyperlink{namespacetflite_a3707d04839963c9df1f3449f5196e3a4}{tflite::GetModel}}(my\_model\_data),\ ops\_resolver,}
+\DoxyCodeLine{\ \ \mbox{\hyperlink{network__tester__test_8cc_abf99e32bec994276b2bcf77385c93365}{tensor\_arena}},\ \mbox{\hyperlink{person__detection__test_8cc_a5af3a65557f88ed72dd512ad65b55096}{tensor\_arena\_size}});}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//\ Invoke\ one\ time\ which\ will\ allocate\ internals:}}
+\DoxyCodeLine{\textcolor{keywordflow}{if}\ (\mbox{\hyperlink{_inference_allocate_tensor_8cpp_a0d8f3bb5211083760f7c593d57adb17d}{interpreter}}.\mbox{\hyperlink{classtflite_1_1_micro_interpreter_a2d76c06ba8d41944e185c3d330e3d554}{Invoke}}()\ !=\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361ab25fe210808197f1b6601df8ccdcd699}{kTfLiteOk}})\ \{}
+\DoxyCodeLine{\ \ \mbox{\hyperlink{_face___access__inferencing_2src_2edge-impulse-sdk_2tensorflow_2lite_2micro_2micro__log_8h_ab9bf491b4a37b06ba732fd7de6b04cb2}{MicroPrintf}}(\textcolor{stringliteral}{"{}Exception\ during\ invoke()!"{}});}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+
+
+Recording API can simply be used by including the {\ttfamily Recording\+Micro\+Interpreter} class ({\ttfamily recording\+\_\+micro\+\_\+interpreter.\+h}) and replace {\ttfamily \doxylink{classtflite_1_1_micro_interpreter}{tflite\+::\+Micro\+Interpreter}} with {\ttfamily \doxylink{classtflite_1_1_recording_micro_interpreter}{tflite\+::\+Recording\+Micro\+Interpreter}}. The same call to {\ttfamily invoke()} is performed, but another call is made to {\ttfamily Print\+Allocations()} which will output detailed allocation logging\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ ++}
+\DoxyCodeLine{\textcolor{comment}{//\ Add\ an\ include\ to\ the\ recording\ API:}}
+\DoxyCodeLine{\textcolor{preprocessor}{\#include\ "{}recording\_micro\_interpreter.h"{}}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//\ Simply\ change\ the\ class\ name\ from\ 'MicroInterpreter'\ to\ 'RecordingMicroInterpreter':}}
+\DoxyCodeLine{\mbox{\hyperlink{classtflite_1_1_recording_micro_interpreter}{tflite::RecordingMicroInterpreter}}\ \mbox{\hyperlink{_inference_allocate_tensor_8cpp_a0d8f3bb5211083760f7c593d57adb17d}{interpreter}}(}
+\DoxyCodeLine{\ \ \mbox{\hyperlink{namespacetflite_a3707d04839963c9df1f3449f5196e3a4}{tflite::GetModel}}(my\_model\_data),\ ops\_resolver,}
+\DoxyCodeLine{\ \ \mbox{\hyperlink{network__tester__test_8cc_abf99e32bec994276b2bcf77385c93365}{tensor\_arena}},\ \mbox{\hyperlink{person__detection__test_8cc_a5af3a65557f88ed72dd512ad65b55096}{tensor\_arena\_size}});}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//\ Invoke\ one\ time\ which\ will\ allocate\ internals:}}
+\DoxyCodeLine{\textcolor{keywordflow}{if}\ (\mbox{\hyperlink{_inference_allocate_tensor_8cpp_a0d8f3bb5211083760f7c593d57adb17d}{interpreter}}.\mbox{\hyperlink{classtflite_1_1_micro_interpreter_a2d76c06ba8d41944e185c3d330e3d554}{Invoke}}()\ !=\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361ab25fe210808197f1b6601df8ccdcd699}{kTfLiteOk}})\ \{}
+\DoxyCodeLine{\ \ \mbox{\hyperlink{_face___access__inferencing_2src_2edge-impulse-sdk_2tensorflow_2lite_2micro_2micro__log_8h_ab9bf491b4a37b06ba732fd7de6b04cb2}{MicroPrintf}}(\textcolor{stringliteral}{"{}Exception\ during\ invoke()!"{}});}
+\DoxyCodeLine{\}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//\ Print\ out\ detailed\ allocation\ information:}}
+\DoxyCodeLine{\mbox{\hyperlink{_inference_allocate_tensor_8cpp_a0d8f3bb5211083760f7c593d57adb17d}{interpreter}}.GetMicroAllocator().PrintAllocations();}
+
+\end{DoxyCode}
+
+
+The output of this call will look something similar to this (output from the \href{https://github.com/tensorflow/tflite-micro/blob/main/tensorflow/lite/micro/memory_arena_threshold_test.cc\#L205}{\texttt{ memory\+\_\+arena\+\_\+threshold\+\_\+test}})\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{[RecordingMicroAllocator]\ Arena\ allocation\ total\ 9568\ bytes}
+\DoxyCodeLine{[RecordingMicroAllocator]\ Arena\ allocation\ head\ 7744\ bytes}
+\DoxyCodeLine{[RecordingMicroAllocator]\ Arena\ allocation\ tail\ 1824\ bytes}
+\DoxyCodeLine{[RecordingMicroAllocator]\ 'TfLiteEvalTensor\ data'\ used\ 360\ bytes\ with\ alignment\ overhead\ (requested\ 360\ bytes\ for\ 15\ allocations)}
+\DoxyCodeLine{[RecordingMicroAllocator]\ 'Persistent\ TfLiteTensor\ data'\ used\ 0\ bytes\ with\ alignment\ overhead\ (requested\ 0\ bytes\ for\ 0\ tensors)}
+\DoxyCodeLine{[RecordingMicroAllocator]\ 'Persistent\ TfLiteTensor\ quantization\ data'\ used\ 0\ bytes\ with\ alignment\ overhead\ (requested\ 0\ bytes\ for\ 0\ allocations)}
+\DoxyCodeLine{[RecordingMicroAllocator]\ 'TfLiteTensor\ variable\ buffer\ data'\ used\ 0\ bytes\ with\ alignment\ overhead\ (requested\ 0\ bytes\ for\ 0\ allocations)}
+\DoxyCodeLine{[RecordingMicroAllocator]\ 'NodeAndRegistration\ struct'\ used\ 392\ bytes\ with\ alignment\ overhead\ (requested\ 392\ bytes\ for\ 7\ NodeAndRegistration\ structs)}
+\DoxyCodeLine{[RecordingMicroAllocator]\ 'Operator\ runtime\ data'\ used\ 136\ bytes\ with\ alignment\ overhead\ (requested\ 136\ bytes\ for\ 5\ OpData\ structs)}
+
+\end{DoxyCode}
+\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_1037f320971b1b747e6f4fbf09903628_autotoc_md169}{}\doxysubsubsection{\texorpdfstring{Allocation Section Details}{Allocation Section Details}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_1037f320971b1b747e6f4fbf09903628_autotoc_md169}
+More information about each recorded allocation section\+:
+
+
+\begin{DoxyItemize}
+\item \textquotesingle{}\doxylink{struct_tf_lite_eval_tensor}{Tf\+Lite\+Eval\+Tensor} data\textquotesingle{}
+\begin{DoxyItemize}
+\item C struct that holds the data type, dimension, and a pointer to the buffer representing the Tensor.
+\end{DoxyItemize}
+\item \textquotesingle{}Persistent \doxylink{struct_tf_lite_tensor}{Tf\+Lite\+Tensor} data\textquotesingle{}
+\begin{DoxyItemize}
+\item C struct that holds more information than a {\ttfamily \doxylink{struct_tf_lite_eval_tensor}{Tf\+Lite\+Eval\+Tensor}} struct in the graph.
+\item Allocations in this bucket will only show up when accessing tensors from the accessors on {\ttfamily \doxylink{classtflite_1_1_micro_interpreter}{tflite\+::\+Micro\+Interpreter}}.
+\end{DoxyItemize}
+\item \textquotesingle{}Persistent \doxylink{struct_tf_lite_tensor}{Tf\+Lite\+Tensor} quantization data\textquotesingle{}
+\begin{DoxyItemize}
+\item Length of persistent quantization data assigned to persistent {\ttfamily \doxylink{struct_tf_lite_tensor}{Tf\+Lite\+Tensor}} structs.
+\item Allocations in this bucket will only show up when accessing tensors from the accessors on {\ttfamily \doxylink{classtflite_1_1_micro_interpreter}{tflite\+::\+Micro\+Interpreter}}.
+\end{DoxyItemize}
+\item \textquotesingle{}\doxylink{struct_tf_lite_tensor}{Tf\+Lite\+Tensor} variable buffer data\textquotesingle{}
+\begin{DoxyItemize}
+\item Length of buffer data from a variable tensor (retains data throughout calls to {\ttfamily invoke()}).
+\end{DoxyItemize}
+\item \textquotesingle{}Node\+And\+Registration struct\textquotesingle{}
+\begin{DoxyItemize}
+\item C struct that holds a {\ttfamily \doxylink{struct_tf_lite_registration}{Tf\+Lite\+Registration}} and {\ttfamily \doxylink{struct_tf_lite_node}{Tf\+Lite\+Node}} struct instance.
+\item Each operator in a model will contain one {\ttfamily Node\+And\+Registration} struct.
+\end{DoxyItemize}
+\item \textquotesingle{}Operator runtime data\textquotesingle{}
+\begin{DoxyItemize}
+\item Persistent allocations of data cached by TFLM kernels (e.\+g. quantization params, multipliers, etc). 
+\end{DoxyItemize}
+\end{DoxyItemize}

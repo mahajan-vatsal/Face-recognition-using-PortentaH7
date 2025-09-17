@@ -1,0 +1,70 @@
+\doxysection{audio\+\_\+common.\+h}
+\hypertarget{audio__common_8h_source}{}\label{audio__common_8h_source}\index{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/arduino-\/examples-\/main/src/peripherals/audio\_common.h@{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/arduino-\/examples-\/main/src/peripherals/audio\_common.h}}
+\mbox{\hyperlink{audio__common_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{/*\ Copyright\ 2022\ The\ TensorFlow\ Authors.\ All\ Rights\ Reserved.}}
+\DoxyCodeLine{00002\ \textcolor{comment}{}}
+\DoxyCodeLine{00003\ \textcolor{comment}{Licensed\ under\ the\ Apache\ License,\ Version\ 2.0\ (the\ "{}License"{});}}
+\DoxyCodeLine{00004\ \textcolor{comment}{you\ may\ not\ use\ this\ file\ except\ in\ compliance\ with\ the\ License.}}
+\DoxyCodeLine{00005\ \textcolor{comment}{You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{00006\ \textcolor{comment}{}}
+\DoxyCodeLine{00007\ \textcolor{comment}{\ \ \ \ http://www.apache.org/licenses/LICENSE-\/2.0}}
+\DoxyCodeLine{00008\ \textcolor{comment}{}}
+\DoxyCodeLine{00009\ \textcolor{comment}{Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ software}}
+\DoxyCodeLine{00010\ \textcolor{comment}{distributed\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,}}
+\DoxyCodeLine{00011\ \textcolor{comment}{WITHOUT\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,\ either\ express\ or\ implied.}}
+\DoxyCodeLine{00012\ \textcolor{comment}{See\ the\ License\ for\ the\ specific\ language\ governing\ permissions\ and}}
+\DoxyCodeLine{00013\ \textcolor{comment}{limitations\ under\ the\ License.}}
+\DoxyCodeLine{00014\ \textcolor{comment}{==============================================================================*/}}
+\DoxyCodeLine{00015\ }
+\DoxyCodeLine{00016\ \textcolor{preprocessor}{\#ifndef\ PERIPHERALS\_AUDIO\_COMMON\_H\_}}
+\DoxyCodeLine{00017\ \textcolor{preprocessor}{\#define\ PERIPHERALS\_AUDIO\_COMMON\_H\_}}
+\DoxyCodeLine{00018\ }
+\DoxyCodeLine{00019\ \textcolor{preprocessor}{\#include\ <functional>}}
+\DoxyCodeLine{00020\ }
+\DoxyCodeLine{00021\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespaceperipherals}{peripherals}}\ \{}
+\DoxyCodeLine{00022\ }
+\DoxyCodeLine{00023\ \textcolor{keyword}{enum}\ \mbox{\hyperlink{namespaceperipherals_a95958b21186e7002e23d2837b9b1990f}{AudioFunction}}\ \{\ \mbox{\hyperlink{namespaceperipherals_a95958b21186e7002e23d2837b9b1990fa6c7afde930fd6029a08a367c02ec4fd4}{kPlay}},\ \mbox{\hyperlink{namespaceperipherals_a95958b21186e7002e23d2837b9b1990faec0820801bb5eab0035cfed810e9eb33}{kRecord}}\ \};}
+\DoxyCodeLine{00024\ }
+\DoxyCodeLine{00025\ \textcolor{keyword}{enum}\ \mbox{\hyperlink{namespaceperipherals_ab7c14f3b41de10657b7efa0ea4690e86}{AudioChannelConfig}}\ \{}
+\DoxyCodeLine{00026\ \ \ \mbox{\hyperlink{namespaceperipherals_ab7c14f3b41de10657b7efa0ea4690e86ace23b73e320cf262b6429bd1552c7f4b}{kStereo}},\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ stereo\ input\ to\ output\ onto\ left\ and\ right}}
+\DoxyCodeLine{00027\ \ \ \mbox{\hyperlink{namespaceperipherals_ab7c14f3b41de10657b7efa0ea4690e86a6967ef7fa5a36c7a2410b4b36f8c2536}{kMono}},\ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ mono\ input\ to\ output\ duplicated\ onto\ left\ and\ right}}
+\DoxyCodeLine{00028\ \ \ \mbox{\hyperlink{namespaceperipherals_ab7c14f3b41de10657b7efa0ea4690e86a96041a21280d4b1128987b85e100a1c0}{kMonoLeft}},\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ mono\ input\ to\ output\ onto\ left\ only}}
+\DoxyCodeLine{00029\ \ \ \mbox{\hyperlink{namespaceperipherals_ab7c14f3b41de10657b7efa0ea4690e86a44d51951b2973d059f7f9c6d6f176bb5}{kMonoRight}},\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ mono\ input\ to\ output\ onto\ right\ only}}
+\DoxyCodeLine{00030\ \ \ \mbox{\hyperlink{namespaceperipherals_ab7c14f3b41de10657b7efa0ea4690e86acb555347922f4482db761c3bcbe8f656}{kMonoLeftRightMix}},\ \ \textcolor{comment}{//\ stereo\ input\ mono-\/mixed\ to\ output\ onto\ left\ and\ right}}
+\DoxyCodeLine{00031\ \};}
+\DoxyCodeLine{00032\ }
+\DoxyCodeLine{00033\ \textcolor{keyword}{enum}\ \mbox{\hyperlink{namespaceperipherals_af626525ab1f31877ef0e677b01c8b9b3}{AudioSampleRate}}\ \{}
+\DoxyCodeLine{00034\ \ \ \mbox{\hyperlink{namespaceperipherals_af626525ab1f31877ef0e677b01c8b9b3a354e9e5184e2781f230ef6c576c30fa7}{kRate\_8000}}\ =\ 8000,}
+\DoxyCodeLine{00035\ \ \ \mbox{\hyperlink{namespaceperipherals_af626525ab1f31877ef0e677b01c8b9b3aabf88a7cdb63382b8a147b84934b8785}{kRate\_11025}}\ =\ 11025,}
+\DoxyCodeLine{00036\ \ \ \mbox{\hyperlink{namespaceperipherals_af626525ab1f31877ef0e677b01c8b9b3a87cfce6e7ee2ec7c0a21439ceafe99e1}{kRate\_12000}}\ =\ 12000,}
+\DoxyCodeLine{00037\ \ \ \mbox{\hyperlink{namespaceperipherals_af626525ab1f31877ef0e677b01c8b9b3ad344be961f8b828786904a48c308b64f}{kRate\_16000}}\ =\ 16000,}
+\DoxyCodeLine{00038\ \ \ \mbox{\hyperlink{namespaceperipherals_af626525ab1f31877ef0e677b01c8b9b3a70a0fe7d67cb68f5a22b0f5741d02838}{kRate\_22050}}\ =\ 22050,}
+\DoxyCodeLine{00039\ \ \ \mbox{\hyperlink{namespaceperipherals_af626525ab1f31877ef0e677b01c8b9b3a5f51137863c3c293d4ab4d2b3a14cb2c}{kRate\_24000}}\ =\ 24000,}
+\DoxyCodeLine{00040\ \ \ \mbox{\hyperlink{namespaceperipherals_af626525ab1f31877ef0e677b01c8b9b3a858fc64cd938b114a4414cad3cc37b70}{kRate\_32000}}\ =\ 32000,}
+\DoxyCodeLine{00041\ \ \ \mbox{\hyperlink{namespaceperipherals_af626525ab1f31877ef0e677b01c8b9b3adab8de174ab8733bd71262022a6c71ba}{kRate\_44100}}\ =\ 44100,}
+\DoxyCodeLine{00042\ \ \ \mbox{\hyperlink{namespaceperipherals_af626525ab1f31877ef0e677b01c8b9b3ab129b4d24903072b151025973b603e13}{kRate\_48000}}\ =\ 48000,}
+\DoxyCodeLine{00043\ \};}
+\DoxyCodeLine{00044\ }
+\DoxyCodeLine{00045\ \textcolor{keyword}{enum}\ \mbox{\hyperlink{namespaceperipherals_a409f8fcb7a7708cef3e1146bf3c0b921}{AudioSampleWidth}}\ \{}
+\DoxyCodeLine{00046\ \ \ \mbox{\hyperlink{namespaceperipherals_a409f8fcb7a7708cef3e1146bf3c0b921a904963d29753205a25b02aca360dd7fe}{kSize\_8bit}}\ =\ 8,}
+\DoxyCodeLine{00047\ \ \ \mbox{\hyperlink{namespaceperipherals_a409f8fcb7a7708cef3e1146bf3c0b921a642127b0577860c6cd89e53e41152716}{kSize\_16bit}}\ =\ 16,}
+\DoxyCodeLine{00048\ \ \ \mbox{\hyperlink{namespaceperipherals_a409f8fcb7a7708cef3e1146bf3c0b921af36878a39f7e3f837f08b6cf6cd9ae67}{kSize\_20bit}}\ =\ 20,}
+\DoxyCodeLine{00049\ \ \ \mbox{\hyperlink{namespaceperipherals_a409f8fcb7a7708cef3e1146bf3c0b921a192fac0101d1cbe49bf4f19bcddf165c}{kSize\_24bit}}\ =\ 24,}
+\DoxyCodeLine{00050\ \ \ \mbox{\hyperlink{namespaceperipherals_a409f8fcb7a7708cef3e1146bf3c0b921a9be72ecefe8a6b3b7ccaaf37b1aa721f}{kSize\_32bit}}\ =\ 32,}
+\DoxyCodeLine{00051\ \};}
+\DoxyCodeLine{00052\ }
+\DoxyCodeLine{00053\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structperipherals_1_1_audio_configuration}{AudioConfiguration}}\ \{}
+\DoxyCodeLine{00054\ \ \ \mbox{\hyperlink{namespaceperipherals_af626525ab1f31877ef0e677b01c8b9b3}{AudioSampleRate}}\ \mbox{\hyperlink{structperipherals_1_1_audio_configuration_a9970a40828597a4e3a611eb496748da8}{play\_rate}};}
+\DoxyCodeLine{00055\ \ \ \mbox{\hyperlink{namespaceperipherals_af626525ab1f31877ef0e677b01c8b9b3}{AudioSampleRate}}\ \mbox{\hyperlink{structperipherals_1_1_audio_configuration_a632b99ee02919975dfbe9e8c80f1a70d}{record\_rate}};}
+\DoxyCodeLine{00056\ \ \ \mbox{\hyperlink{namespaceperipherals_a409f8fcb7a7708cef3e1146bf3c0b921}{AudioSampleWidth}}\ \mbox{\hyperlink{structperipherals_1_1_audio_configuration_aa4df23b440a45775c4993a44126ff537}{sample\_width}};}
+\DoxyCodeLine{00057\ \ \ \mbox{\hyperlink{namespaceperipherals_ab7c14f3b41de10657b7efa0ea4690e86}{AudioChannelConfig}}\ \mbox{\hyperlink{structperipherals_1_1_audio_configuration_a0457e2f3910e859f64eead88c8723be0}{channel\_config}};}
+\DoxyCodeLine{00058\ \};}
+\DoxyCodeLine{00059\ }
+\DoxyCodeLine{00060\ \textcolor{keyword}{using\ }\mbox{\hyperlink{namespaceperipherals_abf18d6aa4983288b312aaeba2a64c41f}{AudioCallback}}\ =\ std::function<void(\textcolor{keyword}{const}\ \mbox{\hyperlink{namespaceperipherals_a95958b21186e7002e23d2837b9b1990f}{AudioFunction}}\ which)>;}
+\DoxyCodeLine{00061\ }
+\DoxyCodeLine{00062\ \}\ \ \textcolor{comment}{//\ namespace\ peripherals}}
+\DoxyCodeLine{00063\ }
+\DoxyCodeLine{00064\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ PERIPHERALS\_AUDIO\_COMMON\_H\_}}
+
+\end{DoxyCode}

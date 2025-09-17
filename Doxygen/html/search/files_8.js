@@ -1,0 +1,27 @@
+var searchData=
+[
+  ['gather_2ecc_0',['gather.cc',['../gather_8cc.html',1,'']]],
+  ['gather_2ecpp_1',['gather.cpp',['../_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srce901b0942f13faf2f5a2bc30ebe09959.html',1,'(Global Namespace)'],['../_face___access__inferencing_2src_2edge-impulse-sdk_2tensorflow_2lite_2micro_2kernels_2gather_8cpp.html',1,'(Global Namespace)']]],
+  ['gather_5fnd_2ecc_2',['gather_nd.cc',['../gather__nd_8cc.html',1,'']]],
+  ['gather_5fnd_2ecpp_3',['gather_nd.cpp',['../_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcd98fd13b3b8513765741891df2db9ad4.html',1,'(Global Namespace)'],['../_face___access__inferencing_2src_2edge-impulse-sdk_2tensorflow_2lite_2micro_2kernels_2gather__nd_8cpp.html',1,'(Global Namespace)']]],
+  ['gather_5fnd_5ftest_2ecc_4',['gather_nd_test.cc',['../gather__nd__test_8cc.html',1,'']]],
+  ['gather_5ftest_2ecc_5',['gather_test.cc',['../gather__test_8cc.html',1,'']]],
+  ['generate_5fcc_5farrays_2epy_6',['generate_cc_arrays.py',['../generate__cc__arrays_8py.html',1,'']]],
+  ['generate_5fcircular_5fbuffer_5fflexbuffers_5fdata_2ecc_7',['generate_circular_buffer_flexbuffers_data.cc',['../generate__circular__buffer__flexbuffers__data_8cc.html',1,'']]],
+  ['generate_5fdetection_5fpostprocess_5fflexbuffers_5fdata_2ecc_8',['generate_detection_postprocess_flexbuffers_data.cc',['../generate__detection__postprocess__flexbuffers__data_8cc.html',1,'']]],
+  ['generate_5fmicro_5fmutable_5fop_5fresolver_5ffrom_5fmodel_2epy_9',['generate_micro_mutable_op_resolver_from_model.py',['../generate__micro__mutable__op__resolver__from__model_8py.html',1,'']]],
+  ['generate_5fmicro_5fmutable_5fop_5fresolver_5ffrom_5fmodel_5ftest_2epy_10',['generate_micro_mutable_op_resolver_from_model_test.py',['../generate__micro__mutable__op__resolver__from__model__test_8py.html',1,'']]],
+  ['generate_5fper_5flayer_5ftests_2epy_11',['generate_per_layer_tests.py',['../generate__per__layer__tests_8py.html',1,'']]],
+  ['generate_5ftest_5ffor_5fmodel_2epy_12',['generate_test_for_model.py',['../generate__test__for__model_8py.html',1,'']]],
+  ['generate_5ftest_5fmodels_2epy_13',['generate_test_models.py',['../generate__test__models_8py.html',1,'']]],
+  ['generatetest_2epy_14',['GenerateTest.py',['../_generate_test_8py.html',1,'']]],
+  ['generatetrain_2epy_15',['GenerateTrain.py',['../_generate_train_8py.html',1,'']]],
+  ['generic_5fmodel_5fbenchmark_2ecc_16',['generic_model_benchmark.cc',['../generic__model__benchmark_8cc.html',1,'']]],
+  ['graph_2epy_17',['graph.py',['../graph_8py.html',1,'']]],
+  ['greedy_5fmemory_5fplanner_2ecc_18',['greedy_memory_planner.cc',['../greedy__memory__planner_8cc.html',1,'']]],
+  ['greedy_5fmemory_5fplanner_2ecpp_19',['greedy_memory_planner.cpp',['../_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcebbd87b56023986b94cc7bc07c5ec9f2.html',1,'(Global Namespace)'],['../_face___access__inferencing_2src_2edge-impulse-sdk_2tensorflow_2lite_2micro_2memory__planner_2greedy__memory__planner_8cpp.html',1,'(Global Namespace)']]],
+  ['greedy_5fmemory_5fplanner_2eh_20',['greedy_memory_planner.h',['../_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcadb36e3c17b5b8b17f2f6edf178dd430.html',1,'(Global Namespace)'],['../_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_2mi8e4900b780beeab8c97b39709840798c.html',1,'(Global Namespace)'],['../_face___access__inferencing_2src_2edge-impulse-sdk_2tensorflow_2lite_2micro_2memory__planner_2greedy__memory__planner_8h.html',1,'(Global Namespace)']]],
+  ['greedy_5fmemory_5fplanner_5ftest_2ecc_21',['greedy_memory_planner_test.cc',['../greedy__memory__planner__test_8cc.html',1,'']]],
+  ['gsmclientcode_2ecpp_22',['GSMClientCode.cpp',['../_g_s_m_client_code_8cpp.html',1,'']]],
+  ['gyrorotation_2eino_23',['gyrorotation.ino',['../gyrorotation_8ino.html',1,'']]]
+];

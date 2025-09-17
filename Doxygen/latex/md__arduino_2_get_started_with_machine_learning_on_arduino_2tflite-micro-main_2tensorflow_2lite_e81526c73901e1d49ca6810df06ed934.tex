@@ -1,0 +1,34 @@
+\chapter{README}
+\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_e81526c73901e1d49ca6810df06ed934}{}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_e81526c73901e1d49ca6810df06ed934}\index{README@{README}}
+\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_e81526c73901e1d49ca6810df06ed934_autotoc_md328}{}\doxysection{\texorpdfstring{Info}{Info}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_e81526c73901e1d49ca6810df06ed934_autotoc_md328}
+CMSIS-\/\+NN is a library containing kernel optimizations for Arm(\+R) Cortex(\+R)-\/M processors. To use CMSIS-\/\+NN optimized kernels instead of reference kernels, add {\ttfamily OPTIMIZED\+\_\+\+KERNEL\+\_\+\+DIR=cmsis\+\_\+nn} to the make command line. See examples below.
+
+For more information about the optimizations, check out \href{https://github.com/ARM-software/CMSIS_5/blob/develop/CMSIS/NN/README.md}{\texttt{ CMSIS-\/\+NN documentation}}.
+
+By default CMSIS-\/\+NN is built by code that is downloaded to the TFLM tree. It also possible to build CMSIS-\/\+NN code from an external path by specifying CMSIS\+\_\+\+PATH=\texorpdfstring{$<$}{<}../path\texorpdfstring{$>$}{>} and CMSIS\+\_\+\+NN\+\_\+\+PATH=\texorpdfstring{$<$}{<}../path\texorpdfstring{$>$}{>}. Note that both CMSIS\+\_\+\+PATH and CMSIS\+\_\+\+NN\+\_\+\+PATH is needed since CMSIS-\/\+NN has a dependency to CMSIS-\/\+Core. As a third option CMSIS-\/\+NN can be provided manually as an external library. The examples below will illustrate this.\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_e81526c73901e1d49ca6810df06ed934_autotoc_md329}{}\doxysection{\texorpdfstring{Example -\/ FVP based on Arm Corstone-\/300 software.}{Example -\/ FVP based on Arm Corstone-\/300 software.}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_e81526c73901e1d49ca6810df06ed934_autotoc_md329}
+In this example, the kernel conv unit test is built. For more information about this specific target, check out the \href{https://github.com/tensorflow/tflite-micro/tree/main/tensorflow/lite/micro/cortex_m_corstone_300/README.md}{\texttt{ Corstone-\/300 readme}}.
+
+Downloaded CMSIS-\/\+NN code is built\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{make\ -\/f\ tensorflow/lite/micro/tools/make/Makefile\ OPTIMIZED\_KERNEL\_DIR=cmsis\_nn\ TARGET=cortex\_m\_corstone\_300\ TARGET\_ARCH=cortex-\/m55\ kernel\_conv\_test}
+
+\end{DoxyCode}
+
+
+External CMSIS-\/\+NN code is built\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{make\ -\/f\ tensorflow/lite/micro/tools/make/Makefile\ OPTIMIZED\_KERNEL\_DIR=cmsis\_nn\ CMSIS\_PATH=<external/path/to/cmsis/>\ CMSIS\_NN\_PATH=<external/path/to/cmsis-\/nn/>\ \ TARGET=cortex\_m\_corstone\_300\ TARGET\_ARCH=cortex-\/m55\ kernel\_conv\_test}
+
+\end{DoxyCode}
+
+
+External CMSIS-\/\+NN library is linked in\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{make\ -\/f\ tensorflow/lite/micro/tools/make/Makefile\ OPTIMIZED\_KERNEL\_DIR=cmsis\_nn\ CMSIS\_NN\_LIBS=<path/to/cmsis-\/nn.a>\ CMSIS\_PATH=<path/to/cmsis/>\ TARGET=cortex\_m\_corstone\_300\ TARGET\_ARCH=cortex-\/m55\ kernel\_conv\_test}
+
+\end{DoxyCode}
+
+
+Please note that performance and/or size might be affected when using an external CMSIS-\/\+NN library as different compiler options may have been used.
+
+Also note that if specifying CMSIS\+\_\+\+NN\+\_\+\+LIBS but not CMSIS\+\_\+\+PATH and or CMSIS\+\_\+\+NN\+\_\+\+PATH, headers and system/startup code from the default downloaded path of CMSIS would be used. So CMSIS\+\_\+\+NN\+\_\+\+LIBS, CMSIS\+\_\+\+NN\+\_\+\+PATH and CMSIS\+\_\+\+PATH should have the same base path and if not there will be a build error. 

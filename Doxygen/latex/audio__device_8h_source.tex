@@ -1,0 +1,218 @@
+\doxysection{audio\+\_\+device.\+h}
+\hypertarget{audio__device_8h_source}{}\label{audio__device_8h_source}\index{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/arduino-\/examples-\/main/src/peripherals/audio\_device.h@{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/arduino-\/examples-\/main/src/peripherals/audio\_device.h}}
+\mbox{\hyperlink{audio__device_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{/*\ Copyright\ 2022\ The\ TensorFlow\ Authors.\ All\ Rights\ Reserved.}}
+\DoxyCodeLine{00002\ \textcolor{comment}{}}
+\DoxyCodeLine{00003\ \textcolor{comment}{Licensed\ under\ the\ Apache\ License,\ Version\ 2.0\ (the\ "{}License"{});}}
+\DoxyCodeLine{00004\ \textcolor{comment}{you\ may\ not\ use\ this\ file\ except\ in\ compliance\ with\ the\ License.}}
+\DoxyCodeLine{00005\ \textcolor{comment}{You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{00006\ \textcolor{comment}{}}
+\DoxyCodeLine{00007\ \textcolor{comment}{\ \ \ \ http://www.apache.org/licenses/LICENSE-\/2.0}}
+\DoxyCodeLine{00008\ \textcolor{comment}{}}
+\DoxyCodeLine{00009\ \textcolor{comment}{Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ software}}
+\DoxyCodeLine{00010\ \textcolor{comment}{distributed\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,}}
+\DoxyCodeLine{00011\ \textcolor{comment}{WITHOUT\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,\ either\ express\ or\ implied.}}
+\DoxyCodeLine{00012\ \textcolor{comment}{See\ the\ License\ for\ the\ specific\ language\ governing\ permissions\ and}}
+\DoxyCodeLine{00013\ \textcolor{comment}{limitations\ under\ the\ License.}}
+\DoxyCodeLine{00014\ \textcolor{comment}{==============================================================================*/}}
+\DoxyCodeLine{00015\ }
+\DoxyCodeLine{00016\ \textcolor{preprocessor}{\#ifndef\ PERIPHERALS\_AUDIO\_DEVICE\_H\_}}
+\DoxyCodeLine{00017\ \textcolor{preprocessor}{\#define\ PERIPHERALS\_AUDIO\_DEVICE\_H\_}}
+\DoxyCodeLine{00018\ }
+\DoxyCodeLine{00019\ \textcolor{preprocessor}{\#include\ <cstddef>}}
+\DoxyCodeLine{00020\ \textcolor{preprocessor}{\#include\ <cstdint>}}
+\DoxyCodeLine{00021\ }
+\DoxyCodeLine{00022\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{audio__codec_8h}{audio\_codec.h}}"{}}}
+\DoxyCodeLine{00023\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{audio__common_8h}{audio\_common.h}}"{}}}
+\DoxyCodeLine{00024\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{audio__i2s_8h}{audio\_i2s.h}}"{}}}
+\DoxyCodeLine{00025\ }
+\DoxyCodeLine{00026\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespaceperipherals}{peripherals}}\ \{}
+\DoxyCodeLine{00027\ }
+\DoxyCodeLine{00028\ \textcolor{comment}{//\ composite\ default\ audio\ device\ interface}}
+\DoxyCodeLine{00029\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classperipherals_1_1_audio_device}{AudioDevice}}\ \{}
+\DoxyCodeLine{00030\ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00031\ \ \ \textcolor{comment}{//\ Get\ the\ current\ audio\ configuration.}}
+\DoxyCodeLine{00032\ \ \ \textcolor{comment}{//\ The\ current\ audio\ configuration\ is\ always\ valid.}}
+\DoxyCodeLine{00033\ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{00034\ \ \ \textcolor{comment}{//\ Returns:}}
+\DoxyCodeLine{00035\ \ \ \textcolor{comment}{//\ \ copy\ of\ AudioConfiguration}}
+\DoxyCodeLine{00036\ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{structperipherals_1_1_audio_configuration}{AudioConfiguration}}\ \mbox{\hyperlink{classperipherals_1_1_audio_device_a5e46c3da4832b80fcd3a60f5c02dd9b6}{GetCurrentConfiguration}}()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{00037\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classperipherals_1_1_audio_device_ab042b06f14546cd69043113418418b31}{i2s\_}}.\mbox{\hyperlink{classperipherals_1_1_i_audio_i2_s_ab67a3384960232e78056b03b3b7d8b69}{GetCurrentConfiguration}}();}
+\DoxyCodeLine{00038\ \ \ \}}
+\DoxyCodeLine{00039\ }
+\DoxyCodeLine{00040\ \ \ \textcolor{comment}{//\ Set\ the\ current\ audio\ configuration.}}
+\DoxyCodeLine{00041\ \ \ \textcolor{comment}{//\ This\ method\ cannot\ be\ used\ within\ the\ audio\ callback\ handler.}}
+\DoxyCodeLine{00042\ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{00043\ \ \ \textcolor{comment}{//\ Returns:}}
+\DoxyCodeLine{00044\ \ \ \textcolor{comment}{//\ \ true\ if\ the\ audio\ configuration\ is\ valid}}
+\DoxyCodeLine{00045\ \ \ \textcolor{comment}{//\ \ false\ otherwise}}
+\DoxyCodeLine{00046\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classperipherals_1_1_audio_device_a4f5077089d75e4e94c122ca1a0522e11}{SetCurrentConfiguration}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structperipherals_1_1_audio_configuration}{AudioConfiguration}}\&\ new\_config)\ \{}
+\DoxyCodeLine{00047\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{classperipherals_1_1_audio_device_a5600d906d9f81f2cb7f124577a69f701}{is\_callback\_handler\_active\_}})\ \{}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00049\ \ \ \ \ \}}
+\DoxyCodeLine{00050\ }
+\DoxyCodeLine{00051\ \ \ \ \ \mbox{\hyperlink{classperipherals_1_1_audio_device_ab042b06f14546cd69043113418418b31}{i2s\_}}.\mbox{\hyperlink{classperipherals_1_1_i_audio_i2_s_ad7b893051a8de9791d05230e826ca4fa}{Stop}}(\mbox{\hyperlink{namespaceperipherals_a95958b21186e7002e23d2837b9b1990fa6c7afde930fd6029a08a367c02ec4fd4}{kPlay}});}
+\DoxyCodeLine{00052\ \ \ \ \ \mbox{\hyperlink{classperipherals_1_1_audio_device_ab69c37fa918640b731b71fd0da802ecb}{codec\_}}.\mbox{\hyperlink{classperipherals_1_1_i_audio_codec_a1f28cf3b9c88f659d4ed4e02d6371a61}{Stop}}(\mbox{\hyperlink{namespaceperipherals_a95958b21186e7002e23d2837b9b1990fa6c7afde930fd6029a08a367c02ec4fd4}{kPlay}});}
+\DoxyCodeLine{00053\ \ \ \ \ \mbox{\hyperlink{classperipherals_1_1_audio_device_ab042b06f14546cd69043113418418b31}{i2s\_}}.\mbox{\hyperlink{classperipherals_1_1_i_audio_i2_s_ad7b893051a8de9791d05230e826ca4fa}{Stop}}(\mbox{\hyperlink{namespaceperipherals_a95958b21186e7002e23d2837b9b1990faec0820801bb5eab0035cfed810e9eb33}{kRecord}});}
+\DoxyCodeLine{00054\ \ \ \ \ \mbox{\hyperlink{classperipherals_1_1_audio_device_ab69c37fa918640b731b71fd0da802ecb}{codec\_}}.\mbox{\hyperlink{classperipherals_1_1_i_audio_codec_a1f28cf3b9c88f659d4ed4e02d6371a61}{Stop}}(\mbox{\hyperlink{namespaceperipherals_a95958b21186e7002e23d2837b9b1990faec0820801bb5eab0035cfed810e9eb33}{kRecord}});}
+\DoxyCodeLine{00055\ }
+\DoxyCodeLine{00056\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}}\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00057\ \ \ \ \ \mbox{\hyperlink{structperipherals_1_1_audio_configuration}{AudioConfiguration}}\ old\_config;}
+\DoxyCodeLine{00058\ \ \ \ \ old\_config\ =\ \mbox{\hyperlink{classperipherals_1_1_audio_device_ab042b06f14546cd69043113418418b31}{i2s\_}}.\mbox{\hyperlink{classperipherals_1_1_i_audio_i2_s_ab67a3384960232e78056b03b3b7d8b69}{GetCurrentConfiguration}}();}
+\DoxyCodeLine{00059\ \ \ \ \ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}}\ =\ \mbox{\hyperlink{classperipherals_1_1_audio_device_ab042b06f14546cd69043113418418b31}{i2s\_}}.\mbox{\hyperlink{classperipherals_1_1_i_audio_i2_s_a76b85ebf3caee831a599c3b645cb0665}{SetCurrentConfiguration}}(new\_config);}
+\DoxyCodeLine{00060\ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}})\ \{}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00062\ \ \ \ \ \}}
+\DoxyCodeLine{00063\ }
+\DoxyCodeLine{00064\ \ \ \ \ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}}\ =\ \mbox{\hyperlink{classperipherals_1_1_audio_device_ab69c37fa918640b731b71fd0da802ecb}{codec\_}}.\mbox{\hyperlink{classperipherals_1_1_i_audio_codec_ace3a74786b903a3f58228103183ed8d7}{SetCurrentConfiguration}}(new\_config);}
+\DoxyCodeLine{00065\ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}})\ \{}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \mbox{\hyperlink{classperipherals_1_1_audio_device_ab042b06f14546cd69043113418418b31}{i2s\_}}.\mbox{\hyperlink{classperipherals_1_1_i_audio_i2_s_a76b85ebf3caee831a599c3b645cb0665}{SetCurrentConfiguration}}(old\_config);}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00068\ \ \ \ \ \}}
+\DoxyCodeLine{00069\ }
+\DoxyCodeLine{00070\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}};}
+\DoxyCodeLine{00071\ \ \ \}}
+\DoxyCodeLine{00072\ }
+\DoxyCodeLine{00073\ \ \ \textcolor{comment}{//\ Start\ playback\ or\ recording.}}
+\DoxyCodeLine{00074\ \ \ \textcolor{comment}{//\ This\ method\ cannot\ be\ used\ within\ the\ audio\ callback\ handler.}}
+\DoxyCodeLine{00075\ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{00076\ \ \ \textcolor{comment}{//\ Notes:}}
+\DoxyCodeLine{00077\ \ \ \textcolor{comment}{//\ \ When\ starting\ playback,\ the\ internal\ playback\ buffers\ are}}
+\DoxyCodeLine{00078\ \ \ \textcolor{comment}{//\ \ zero-\/filled\ and\ playback\ begins\ immediately}}
+\DoxyCodeLine{00079\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classperipherals_1_1_audio_device_acbb03eae0ba3512e5ab3c85f2a465e08}{Start}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{namespaceperipherals_a95958b21186e7002e23d2837b9b1990f}{AudioFunction}}\ which)\ \{}
+\DoxyCodeLine{00080\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{classperipherals_1_1_audio_device_a5600d906d9f81f2cb7f124577a69f701}{is\_callback\_handler\_active\_}})\ \{}
+\DoxyCodeLine{00081\ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00082\ \ \ \ \ \}}
+\DoxyCodeLine{00083\ \ \ \ \ \mbox{\hyperlink{classperipherals_1_1_audio_device_ab69c37fa918640b731b71fd0da802ecb}{codec\_}}.\mbox{\hyperlink{classperipherals_1_1_i_audio_codec_a1d0a39db3b4e4f924c75c4aef7ef79bd}{Start}}(which);}
+\DoxyCodeLine{00084\ \ \ \ \ \mbox{\hyperlink{classperipherals_1_1_audio_device_ab042b06f14546cd69043113418418b31}{i2s\_}}.\mbox{\hyperlink{classperipherals_1_1_i_audio_i2_s_ab444134f88c4bfdeeece26be24627f60}{Start}}(which);}
+\DoxyCodeLine{00085\ \ \ \}}
+\DoxyCodeLine{00086\ }
+\DoxyCodeLine{00087\ \ \ \textcolor{comment}{//\ Stop\ playback\ or\ recording.}}
+\DoxyCodeLine{00088\ \ \ \textcolor{comment}{//\ This\ method\ cannot\ be\ used\ within\ the\ audio\ callback\ handler.}}
+\DoxyCodeLine{00089\ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{00090\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classperipherals_1_1_audio_device_aafbcb33b5cc22c91647b9dda8133a89e}{Stop}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{namespaceperipherals_a95958b21186e7002e23d2837b9b1990f}{AudioFunction}}\ which)\ \{}
+\DoxyCodeLine{00091\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{classperipherals_1_1_audio_device_a5600d906d9f81f2cb7f124577a69f701}{is\_callback\_handler\_active\_}})\ \{}
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00093\ \ \ \ \ \}}
+\DoxyCodeLine{00094\ \ \ \ \ \mbox{\hyperlink{classperipherals_1_1_audio_device_ab042b06f14546cd69043113418418b31}{i2s\_}}.\mbox{\hyperlink{classperipherals_1_1_i_audio_i2_s_ad7b893051a8de9791d05230e826ca4fa}{Stop}}(which);}
+\DoxyCodeLine{00095\ \ \ \ \ \mbox{\hyperlink{classperipherals_1_1_audio_device_ab69c37fa918640b731b71fd0da802ecb}{codec\_}}.\mbox{\hyperlink{classperipherals_1_1_i_audio_codec_a1f28cf3b9c88f659d4ed4e02d6371a61}{Stop}}(which);}
+\DoxyCodeLine{00096\ \ \ \}}
+\DoxyCodeLine{00097\ }
+\DoxyCodeLine{00098\ \ \ \textcolor{comment}{//\ Get\ and\ reset\ the\ current\ playback\ underrun\ state.}}
+\DoxyCodeLine{00099\ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{00100\ \ \ \textcolor{comment}{//\ Returns:}}
+\DoxyCodeLine{00101\ \ \ \textcolor{comment}{//\ \ true\ if\ there\ was\ a\ playback\ underrun}}
+\DoxyCodeLine{00102\ \ \ \textcolor{comment}{//\ \ false\ otherwise}}
+\DoxyCodeLine{00103\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classperipherals_1_1_audio_device_ab797dc794be91803ba940dd7e90b8953}{HadPlayUnderrun}}()\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classperipherals_1_1_audio_device_ab042b06f14546cd69043113418418b31}{i2s\_}}.\mbox{\hyperlink{classperipherals_1_1_i_audio_i2_s_a4f77a1b44d69f6e2eda91255844e90be}{HadPlayUnderrun}}();\ \}}
+\DoxyCodeLine{00104\ }
+\DoxyCodeLine{00105\ \ \ \textcolor{comment}{//\ Get\ and\ reset\ the\ current\ recording\ overrun\ state.}}
+\DoxyCodeLine{00106\ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{00107\ \ \ \textcolor{comment}{//\ Returns:}}
+\DoxyCodeLine{00108\ \ \ \textcolor{comment}{//\ \ true\ if\ there\ was\ a\ recording\ overrun}}
+\DoxyCodeLine{00109\ \ \ \textcolor{comment}{//\ \ false\ otherwise}}
+\DoxyCodeLine{00110\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classperipherals_1_1_audio_device_aa57be453d89d1235b8bf2aa1eb354263}{HadRecordOverrun}}()\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classperipherals_1_1_audio_device_ab042b06f14546cd69043113418418b31}{i2s\_}}.\mbox{\hyperlink{classperipherals_1_1_i_audio_i2_s_ae89d1819f903fb2de2f9e5e99cb5967e}{HadRecordOverrun}}();\ \}}
+\DoxyCodeLine{00111\ }
+\DoxyCodeLine{00112\ \ \ \textcolor{comment}{//\ Feed\ sample\ data\ to\ the\ internal\ playback\ buffers.}}
+\DoxyCodeLine{00113\ \ \ \textcolor{comment}{//\ This\ method\ is\ non-\/blocking.}}
+\DoxyCodeLine{00114\ \ \ \textcolor{comment}{//\ The\ number\ of\ samples\ transferred\ may\ be\ less\ than\ the\ requested\ amount.}}
+\DoxyCodeLine{00115\ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{00116\ \ \ \textcolor{comment}{//\ Returns:}}
+\DoxyCodeLine{00117\ \ \ \textcolor{comment}{//\ \ number\ of\ samples\ transferred}}
+\DoxyCodeLine{00118\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{classperipherals_1_1_audio_device_a049f0957f6edfc5c06edbe20ad12b9cb}{WritePlayBuffer}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{void}*\ from,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ samples)\ \{}
+\DoxyCodeLine{00119\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classperipherals_1_1_audio_device_ab042b06f14546cd69043113418418b31}{i2s\_}}.\mbox{\hyperlink{classperipherals_1_1_i_audio_i2_s_ab6bda6ee75cb381d620120b2645d7ef3}{WritePlayBuffer}}(from,\ samples);}
+\DoxyCodeLine{00120\ \ \ \}}
+\DoxyCodeLine{00121\ }
+\DoxyCodeLine{00122\ \ \ \textcolor{comment}{//\ Drain\ sample\ data\ from\ the\ internal\ recording\ buffers.}}
+\DoxyCodeLine{00123\ \ \ \textcolor{comment}{//\ This\ method\ is\ non-\/blocking.}}
+\DoxyCodeLine{00124\ \ \ \textcolor{comment}{//\ The\ number\ of\ samples\ transferred\ may\ be\ less\ than\ the\ requested\ amount.}}
+\DoxyCodeLine{00125\ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{00126\ \ \ \textcolor{comment}{//\ Returns:}}
+\DoxyCodeLine{00127\ \ \ \textcolor{comment}{//\ \ number\ of\ samples\ transferred}}
+\DoxyCodeLine{00128\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{classperipherals_1_1_audio_device_a85303c394417ecb1fb199e9025119756}{ReadRecordBuffer}}(\textcolor{keywordtype}{void}*\ to,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ samples)\ \{}
+\DoxyCodeLine{00129\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classperipherals_1_1_audio_device_ab042b06f14546cd69043113418418b31}{i2s\_}}.\mbox{\hyperlink{classperipherals_1_1_i_audio_i2_s_a43113ad1e4d57df83a9942acb545bea8}{ReadRecordBuffer}}(to,\ samples);}
+\DoxyCodeLine{00130\ \ \ \}}
+\DoxyCodeLine{00131\ }
+\DoxyCodeLine{00132\ \ \ \textcolor{comment}{//\ Get\ the\ playback/recording\ sample\ counter.}}
+\DoxyCodeLine{00133\ \ \ \textcolor{comment}{//\ The\ counters\ remain\ available\ after\ calling\ the\ Stop\ method.}}
+\DoxyCodeLine{00134\ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{00135\ \ \ \textcolor{comment}{//\ Returns:}}
+\DoxyCodeLine{00136\ \ \ \textcolor{comment}{//\ \ count\ of\ samples\ played\ or\ recorded}}
+\DoxyCodeLine{00137\ \ \ \textcolor{keyword}{virtual}\ uint64\_t\ \mbox{\hyperlink{classperipherals_1_1_audio_device_a2e4bfd8b67b9369ac127f1c0e8dabd6b}{SampleCount}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{namespaceperipherals_a95958b21186e7002e23d2837b9b1990f}{AudioFunction}}\ which)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{00138\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classperipherals_1_1_audio_device_ab042b06f14546cd69043113418418b31}{i2s\_}}.\mbox{\hyperlink{classperipherals_1_1_i_audio_i2_s_a3ae899ca82b36a2e2fa8b6d524214efa}{SampleCount}}(which);}
+\DoxyCodeLine{00139\ \ \ \}}
+\DoxyCodeLine{00140\ }
+\DoxyCodeLine{00141\ \ \ \textcolor{comment}{//\ Get\ the\ internal\ buffer\ space\ available.}}
+\DoxyCodeLine{00142\ \ \ \textcolor{comment}{//\ For\ playback,\ this\ is\ the\ number\ of\ samples\ that\ can\ be\ fed\ to\ the}}
+\DoxyCodeLine{00143\ \ \ \textcolor{comment}{//\ internal\ buffers.}}
+\DoxyCodeLine{00144\ \ \ \textcolor{comment}{//\ For\ recording,\ this\ is\ the\ number\ of\ samples\ that\ can\ be\ drained}}
+\DoxyCodeLine{00145\ \ \ \textcolor{comment}{//\ from\ the\ internal\ buffers.}}
+\DoxyCodeLine{00146\ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{00147\ \ \ \textcolor{comment}{//\ Returns:}}
+\DoxyCodeLine{00148\ \ \ \textcolor{comment}{//\ \ number\ of\ samples}}
+\DoxyCodeLine{00149\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{classperipherals_1_1_audio_device_a8815436371ce14007e874a54afde7e43}{BufferAvailable}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{namespaceperipherals_a95958b21186e7002e23d2837b9b1990f}{AudioFunction}}\ which)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{00150\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classperipherals_1_1_audio_device_ab042b06f14546cd69043113418418b31}{i2s\_}}.\mbox{\hyperlink{classperipherals_1_1_i_audio_i2_s_a4a26750b1b1d84f0dde2bbe30b8e5c6a}{BufferAvailable}}(which);}
+\DoxyCodeLine{00151\ \ \ \}}
+\DoxyCodeLine{00152\ }
+\DoxyCodeLine{00153\ \ \ \textcolor{comment}{//\ Set\ the\ playback\ or\ recording\ volume\ as\ a\ percentage\ (0-\/100)}}
+\DoxyCodeLine{00154\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classperipherals_1_1_audio_device_aaf2638ffe58787b05afc3d209aa907b8}{SetVolume}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{namespaceperipherals_a95958b21186e7002e23d2837b9b1990f}{AudioFunction}}\ which,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{float}\ percent)\ \{}
+\DoxyCodeLine{00155\ \ \ \ \ \mbox{\hyperlink{classperipherals_1_1_audio_device_ab69c37fa918640b731b71fd0da802ecb}{codec\_}}.\mbox{\hyperlink{classperipherals_1_1_i_audio_codec_aad37614b7d8aae83634b35588354f443}{SetVolume}}(which,\ percent);}
+\DoxyCodeLine{00156\ \ \ \}}
+\DoxyCodeLine{00157\ }
+\DoxyCodeLine{00158\ \ \ \textcolor{comment}{//\ Mute\ the\ playback\ or\ recording}}
+\DoxyCodeLine{00159\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classperipherals_1_1_audio_device_ab0b9711ebd12873608c0816b909d16c4}{Mute}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{namespaceperipherals_a95958b21186e7002e23d2837b9b1990f}{AudioFunction}}\ which,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{bool}\ enable)\ \{}
+\DoxyCodeLine{00160\ \ \ \ \ \mbox{\hyperlink{classperipherals_1_1_audio_device_ab69c37fa918640b731b71fd0da802ecb}{codec\_}}.\mbox{\hyperlink{classperipherals_1_1_i_audio_codec_acbc7030ebf457ef23764b62a2d89380d}{Mute}}(which,\ enable);}
+\DoxyCodeLine{00161\ \ \ \}}
+\DoxyCodeLine{00162\ }
+\DoxyCodeLine{00163\ \ \ \textcolor{comment}{//\ Set\ the\ audio\ callback\ handler.}}
+\DoxyCodeLine{00164\ \ \ \textcolor{comment}{//\ The\ callback\ handler\ will\ be\ executed\ on\ each\ internal\ buffer\ update,}}
+\DoxyCodeLine{00165\ \ \ \textcolor{comment}{//\ when\ playback\ and/or\ recording\ is\ active.}}
+\DoxyCodeLine{00166\ \ \ \textcolor{comment}{//\ This\ method\ cannot\ be\ used\ within\ the\ audio\ callback\ handler.}}
+\DoxyCodeLine{00167\ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{00168\ \ \ \textcolor{comment}{//\ Notes:}}
+\DoxyCodeLine{00169\ \ \ \textcolor{comment}{//\ \ The\ callback\ handler\ may\ be\ executed\ from\ within\ an\ interrupt\ handler.}}
+\DoxyCodeLine{00170\ \ \ \textcolor{comment}{//\ \ Therefore,\ time\ spent\ in\ the\ callback\ handler\ should\ be\ minimized.}}
+\DoxyCodeLine{00171\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classperipherals_1_1_audio_device_a7d4f92594030d94291c63f8561dae0c1}{SetCallbackHandler}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{namespaceperipherals_abf18d6aa4983288b312aaeba2a64c41f}{AudioCallback}}\ handler)\ \{}
+\DoxyCodeLine{00172\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{classperipherals_1_1_audio_device_a5600d906d9f81f2cb7f124577a69f701}{is\_callback\_handler\_active\_}})\ \{}
+\DoxyCodeLine{00173\ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00174\ \ \ \ \ \}}
+\DoxyCodeLine{00175\ \ \ \ \ \mbox{\hyperlink{classperipherals_1_1_audio_device_a5ed137a19b7faf93d6591e1d5af168f9}{callback\_handler\_}}\ =\ handler;}
+\DoxyCodeLine{00176\ \ \ \ \ \textcolor{keywordflow}{if}\ (handler\ ==\ \textcolor{keyword}{nullptr})\ \{}
+\DoxyCodeLine{00177\ \ \ \ \ \ \ \mbox{\hyperlink{classperipherals_1_1_audio_device_ab042b06f14546cd69043113418418b31}{i2s\_}}.\mbox{\hyperlink{classperipherals_1_1_i_audio_i2_s_a2b9dc87b67f87afbad46471326c2d0cb}{SetCallbackHandler}}(\textcolor{keyword}{nullptr});}
+\DoxyCodeLine{00178\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00179\ \ \ \ \ \ \ \mbox{\hyperlink{namespaceperipherals_abf18d6aa4983288b312aaeba2a64c41f}{AudioCallback}}\ cb\ =\ [\textcolor{keyword}{this}](\textcolor{keyword}{const}\ \mbox{\hyperlink{namespaceperipherals_a95958b21186e7002e23d2837b9b1990f}{AudioFunction}}\ which)\ \{}
+\DoxyCodeLine{00180\ \ \ \ \ \ \ \ \ this-\/>\mbox{\hyperlink{classperipherals_1_1_audio_device_ab34016233c26921ab36850c5bfd15d15}{CallbackHandler}}(which);}
+\DoxyCodeLine{00181\ \ \ \ \ \ \ \};}
+\DoxyCodeLine{00182\ \ \ \ \ \ \ \mbox{\hyperlink{classperipherals_1_1_audio_device_ab042b06f14546cd69043113418418b31}{i2s\_}}.\mbox{\hyperlink{classperipherals_1_1_i_audio_i2_s_a2b9dc87b67f87afbad46471326c2d0cb}{SetCallbackHandler}}(cb);}
+\DoxyCodeLine{00183\ \ \ \ \ \}}
+\DoxyCodeLine{00184\ \ \ \}}
+\DoxyCodeLine{00185\ }
+\DoxyCodeLine{00186\ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{00187\ \ \ \mbox{\hyperlink{classperipherals_1_1_i_audio_i2_s}{IAudioI2S}}\&\ \mbox{\hyperlink{classperipherals_1_1_audio_device_ab042b06f14546cd69043113418418b31}{i2s\_}};}
+\DoxyCodeLine{00188\ \ \ \mbox{\hyperlink{classperipherals_1_1_i_audio_codec}{IAudioCodec}}\&\ \mbox{\hyperlink{classperipherals_1_1_audio_device_ab69c37fa918640b731b71fd0da802ecb}{codec\_}};}
+\DoxyCodeLine{00189\ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classperipherals_1_1_audio_device_a5600d906d9f81f2cb7f124577a69f701}{is\_callback\_handler\_active\_}};}
+\DoxyCodeLine{00190\ \ \ \mbox{\hyperlink{namespaceperipherals_abf18d6aa4983288b312aaeba2a64c41f}{AudioCallback}}\ \mbox{\hyperlink{classperipherals_1_1_audio_device_a5ed137a19b7faf93d6591e1d5af168f9}{callback\_handler\_}};}
+\DoxyCodeLine{00191\ }
+\DoxyCodeLine{00192\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classperipherals_1_1_audio_device_ab34016233c26921ab36850c5bfd15d15}{CallbackHandler}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{namespaceperipherals_a95958b21186e7002e23d2837b9b1990f}{AudioFunction}}\ which)\ \{}
+\DoxyCodeLine{00193\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{classperipherals_1_1_audio_device_a5ed137a19b7faf93d6591e1d5af168f9}{callback\_handler\_}}\ !=\ \textcolor{keyword}{nullptr})\ \{}
+\DoxyCodeLine{00194\ \ \ \ \ \ \ \mbox{\hyperlink{classperipherals_1_1_audio_device_a5600d906d9f81f2cb7f124577a69f701}{is\_callback\_handler\_active\_}}\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00195\ \ \ \ \ \ \ \mbox{\hyperlink{classperipherals_1_1_audio_device_a5ed137a19b7faf93d6591e1d5af168f9}{callback\_handler\_}}(which);}
+\DoxyCodeLine{00196\ \ \ \ \ \ \ \mbox{\hyperlink{classperipherals_1_1_audio_device_a5600d906d9f81f2cb7f124577a69f701}{is\_callback\_handler\_active\_}}\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00197\ \ \ \ \ \}}
+\DoxyCodeLine{00198\ \ \ \}}
+\DoxyCodeLine{00199\ }
+\DoxyCodeLine{00200\ \ \ \mbox{\hyperlink{classperipherals_1_1_audio_device_ad3c4b0900cb2408edefb191e41e20cab}{AudioDevice}}()\ =\ \textcolor{keyword}{delete};}
+\DoxyCodeLine{00201\ }
+\DoxyCodeLine{00202\ \ \textcolor{keyword}{protected}:}
+\DoxyCodeLine{00203\ \ \ \textcolor{keyword}{explicit}\ \mbox{\hyperlink{classperipherals_1_1_audio_device_a64936e97729f018a6dc89caeef3448ce}{AudioDevice}}(\mbox{\hyperlink{classperipherals_1_1_i_audio_i2_s}{IAudioI2S}}\&\ i2s,\ \mbox{\hyperlink{classperipherals_1_1_i_audio_codec}{IAudioCodec}}\&\ codec)}
+\DoxyCodeLine{00204\ \ \ \ \ \ \ :\ \mbox{\hyperlink{classperipherals_1_1_audio_device_ab042b06f14546cd69043113418418b31}{i2s\_}}\{i2s\},}
+\DoxyCodeLine{00205\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classperipherals_1_1_audio_device_ab69c37fa918640b731b71fd0da802ecb}{codec\_}}\{codec\},}
+\DoxyCodeLine{00206\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classperipherals_1_1_audio_device_a5600d906d9f81f2cb7f124577a69f701}{is\_callback\_handler\_active\_}}\{false\},}
+\DoxyCodeLine{00207\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classperipherals_1_1_audio_device_a5ed137a19b7faf93d6591e1d5af168f9}{callback\_handler\_}}\{nullptr\}\ \{\}}
+\DoxyCodeLine{00208\ \};}
+\DoxyCodeLine{00209\ }
+\DoxyCodeLine{00210\ \}\ \ \textcolor{comment}{//\ namespace\ peripherals}}
+\DoxyCodeLine{00211\ }
+\DoxyCodeLine{00212\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ PERIPHERALS\_AUDIO\_DEVICE\_H\_}}
+
+\end{DoxyCode}

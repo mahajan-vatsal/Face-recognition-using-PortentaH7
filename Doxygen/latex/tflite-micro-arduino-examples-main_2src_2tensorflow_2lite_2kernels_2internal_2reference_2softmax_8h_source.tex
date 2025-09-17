@@ -1,0 +1,239 @@
+\doxysection{softmax.\+h}
+\hypertarget{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2kernels_2internal_2reference_2softmax_8h_source}{}\label{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2kernels_2internal_2reference_2softmax_8h_source}\index{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/arduino-\/examples-\/main/src/tensorflow/lite/kernels/internal/reference/softmax.h@{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/arduino-\/examples-\/main/src/tensorflow/lite/kernels/internal/reference/softmax.h}}
+\mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2kernels_2internal_2reference_2softmax_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{/*\ Copyright\ 2017\ The\ TensorFlow\ Authors.\ All\ Rights\ Reserved.}}
+\DoxyCodeLine{00002\ \textcolor{comment}{}}
+\DoxyCodeLine{00003\ \textcolor{comment}{Licensed\ under\ the\ Apache\ License,\ Version\ 2.0\ (the\ "{}License"{});}}
+\DoxyCodeLine{00004\ \textcolor{comment}{you\ may\ not\ use\ this\ file\ except\ in\ compliance\ with\ the\ License.}}
+\DoxyCodeLine{00005\ \textcolor{comment}{You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{00006\ \textcolor{comment}{}}
+\DoxyCodeLine{00007\ \textcolor{comment}{\ \ \ \ http://www.apache.org/licenses/LICENSE-\/2.0}}
+\DoxyCodeLine{00008\ \textcolor{comment}{}}
+\DoxyCodeLine{00009\ \textcolor{comment}{Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ software}}
+\DoxyCodeLine{00010\ \textcolor{comment}{distributed\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,}}
+\DoxyCodeLine{00011\ \textcolor{comment}{WITHOUT\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,\ either\ express\ or\ implied.}}
+\DoxyCodeLine{00012\ \textcolor{comment}{See\ the\ License\ for\ the\ specific\ language\ governing\ permissions\ and}}
+\DoxyCodeLine{00013\ \textcolor{comment}{limitations\ under\ the\ License.}}
+\DoxyCodeLine{00014\ \textcolor{comment}{==============================================================================*/}}
+\DoxyCodeLine{00015\ \textcolor{preprocessor}{\#ifndef\ TENSORFLOW\_LITE\_KERNELS\_INTERNAL\_REFERENCE\_SOFTMAX\_H\_}}
+\DoxyCodeLine{00016\ \textcolor{preprocessor}{\#define\ TENSORFLOW\_LITE\_KERNELS\_INTERNAL\_REFERENCE\_SOFTMAX\_H\_}}
+\DoxyCodeLine{00017\ }
+\DoxyCodeLine{00018\ \textcolor{preprocessor}{\#include\ <algorithm>}}
+\DoxyCodeLine{00019\ \textcolor{preprocessor}{\#include\ <limits>}}
+\DoxyCodeLine{00020\ }
+\DoxyCodeLine{00021\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{fixedpoint_8h}{third\_party/gemmlowp/fixedpoint/fixedpoint.h}}"{}}}
+\DoxyCodeLine{00022\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/kernels/internal/common.h"{}}}
+\DoxyCodeLine{00023\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/kernels/internal/cppmath.h"{}}}
+\DoxyCodeLine{00024\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/kernels/internal/quantization\_util.h"{}}}
+\DoxyCodeLine{00025\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/kernels/internal/types.h"{}}}
+\DoxyCodeLine{00026\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/kernels/op\_macros.h"{}}}
+\DoxyCodeLine{00027\ }
+\DoxyCodeLine{00028\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacetflite}{tflite}}\ \{}
+\DoxyCodeLine{00029\ \textcolor{keyword}{namespace\ }reference\_ops\ \{}
+\DoxyCodeLine{00030\ }
+\DoxyCodeLine{00031\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1reference__ops_ae06af6ac80f340cc1edfb85fc6f72633}{Softmax}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structtflite_1_1_softmax_params}{SoftmaxParams}}\&\ \mbox{\hyperlink{comparisons_8cpp_a434686eb00eea897154eb5c3f9364ef7}{params}},}
+\DoxyCodeLine{00032\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classtflite_1_1_runtime_shape}{RuntimeShape}}\&\ input\_shape,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{float}*\ \mbox{\hyperlink{add__n__test_8cc_a5612ba79d1f0b544c7aeae4621166fea}{input\_data}},}
+\DoxyCodeLine{00033\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classtflite_1_1_runtime_shape}{RuntimeShape}}\&\ output\_shape,\ \textcolor{keywordtype}{float}*\ \mbox{\hyperlink{add__n__test_8cc_a3305b43869c4b837b0a33c12cff5069b}{output\_data}})\ \{}
+\DoxyCodeLine{00034\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ trailing\_dim\ =\ input\_shape.DimensionsCount()\ -\/\ 1;}
+\DoxyCodeLine{00035\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{log__softmax_8cpp_a92e854aebd9d62035d2fd510ab0c4a23}{outer\_size}}\ =}
+\DoxyCodeLine{00036\ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_a583aa9df5709d8dcbcfb84ad682cde78}{MatchingFlatSizeSkipDim}}(input\_shape,\ trailing\_dim,\ output\_shape);}
+\DoxyCodeLine{00037\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{log__softmax_8cpp_a820c167ceaaa9759b0ca2695d22db55c}{depth}}\ =}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_ada769909634e3191fceac8c9b8505a36}{MatchingDim}}(input\_shape,\ trailing\_dim,\ output\_shape,\ trailing\_dim);}
+\DoxyCodeLine{00039\ }
+\DoxyCodeLine{00040\ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ \mbox{\hyperlink{log__softmax_8cpp_a92e854aebd9d62035d2fd510ab0c4a23}{outer\_size}};\ ++i)\ \{}
+\DoxyCodeLine{00041\ \ \ \ \ \textcolor{comment}{//\ Find\ max\ element\ value\ which\ we'll\ use\ to\ ensure\ numerical\ stability}}
+\DoxyCodeLine{00042\ \ \ \ \ \textcolor{comment}{//\ taking\ advantage\ of\ the\ following\ equality:}}
+\DoxyCodeLine{00043\ \ \ \ \ \textcolor{comment}{//\ exp(x[i])/sum(exp(x[i]))\ ==\ exp(x[i]+C)/sum(exp(x[i]+C))}}
+\DoxyCodeLine{00044\ \ \ \ \ \textcolor{keywordtype}{float}\ max\ =\ std::numeric\_limits<float>::lowest();}
+\DoxyCodeLine{00045\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ c\ =\ 0;\ c\ <\ \mbox{\hyperlink{log__softmax_8cpp_a820c167ceaaa9759b0ca2695d22db55c}{depth}};\ ++c)\ \{}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ max\ =\ std::max(max,\ \mbox{\hyperlink{add__n__test_8cc_a5612ba79d1f0b544c7aeae4621166fea}{input\_data}}[i\ *\ \mbox{\hyperlink{log__softmax_8cpp_a820c167ceaaa9759b0ca2695d22db55c}{depth}}\ +\ c]);}
+\DoxyCodeLine{00047\ \ \ \ \ \}}
+\DoxyCodeLine{00048\ }
+\DoxyCodeLine{00049\ \ \ \ \ \textcolor{comment}{//\ Compute\ sum.}}
+\DoxyCodeLine{00050\ \ \ \ \ \textcolor{keywordtype}{float}\ sum\ =\ 0.f;}
+\DoxyCodeLine{00051\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ c\ =\ 0;\ c\ <\ \mbox{\hyperlink{log__softmax_8cpp_a820c167ceaaa9759b0ca2695d22db55c}{depth}};\ ++c)\ \{}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{float}\ exp\_c\ =\ std::exp((\mbox{\hyperlink{add__n__test_8cc_a5612ba79d1f0b544c7aeae4621166fea}{input\_data}}[i\ *\ \mbox{\hyperlink{log__softmax_8cpp_a820c167ceaaa9759b0ca2695d22db55c}{depth}}\ +\ c]\ -\/\ max)\ *}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{float}\textcolor{keyword}{>}(\mbox{\hyperlink{comparisons_8cpp_a434686eb00eea897154eb5c3f9364ef7}{params}}.beta));}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \mbox{\hyperlink{add__n__test_8cc_a3305b43869c4b837b0a33c12cff5069b}{output\_data}}[i\ *\ \mbox{\hyperlink{log__softmax_8cpp_a820c167ceaaa9759b0ca2695d22db55c}{depth}}\ +\ c]\ =\ exp\_c;}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ sum\ +=\ exp\_c;}
+\DoxyCodeLine{00056\ \ \ \ \ \}}
+\DoxyCodeLine{00057\ }
+\DoxyCodeLine{00058\ \ \ \ \ \textcolor{comment}{//\ Compute\ result.}}
+\DoxyCodeLine{00059\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ c\ =\ 0;\ c\ <\ \mbox{\hyperlink{log__softmax_8cpp_a820c167ceaaa9759b0ca2695d22db55c}{depth}};\ ++c)\ \{}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \mbox{\hyperlink{add__n__test_8cc_a3305b43869c4b837b0a33c12cff5069b}{output\_data}}[i\ *\ \mbox{\hyperlink{log__softmax_8cpp_a820c167ceaaa9759b0ca2695d22db55c}{depth}}\ +\ c]\ =\ \mbox{\hyperlink{add__n__test_8cc_a3305b43869c4b837b0a33c12cff5069b}{output\_data}}[i\ *\ \mbox{\hyperlink{log__softmax_8cpp_a820c167ceaaa9759b0ca2695d22db55c}{depth}}\ +\ c]\ /\ sum;}
+\DoxyCodeLine{00061\ \ \ \ \ \}}
+\DoxyCodeLine{00062\ \ \ \}}
+\DoxyCodeLine{00063\ \}}
+\DoxyCodeLine{00064\ }
+\DoxyCodeLine{00065\ \textcolor{comment}{//\ Quantized\ softmax\ with\ int8\_t/uint8\_t\ input\ and\ int8\_t/uint8\_t/int16\_t}}
+\DoxyCodeLine{00066\ \textcolor{comment}{//\ output.}}
+\DoxyCodeLine{00067\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ InputT,\ \textcolor{keyword}{typename}\ OutputT>}
+\DoxyCodeLine{00068\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1reference__ops_ae06af6ac80f340cc1edfb85fc6f72633}{Softmax}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structtflite_1_1_softmax_params}{SoftmaxParams}}\&\ \mbox{\hyperlink{comparisons_8cpp_a434686eb00eea897154eb5c3f9364ef7}{params}},}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classtflite_1_1_runtime_shape}{RuntimeShape}}\&\ input\_shape,\ \textcolor{keyword}{const}\ InputT*\ \mbox{\hyperlink{add__n__test_8cc_a5612ba79d1f0b544c7aeae4621166fea}{input\_data}},}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classtflite_1_1_runtime_shape}{RuntimeShape}}\&\ output\_shape,\ OutputT*\ \mbox{\hyperlink{add__n__test_8cc_a3305b43869c4b837b0a33c12cff5069b}{output\_data}})\ \{}
+\DoxyCodeLine{00071\ \ \ \textcolor{keyword}{const}\ int32\_t\ input\_beta\_multiplier\ =\ \mbox{\hyperlink{comparisons_8cpp_a434686eb00eea897154eb5c3f9364ef7}{params}}.input\_multiplier;}
+\DoxyCodeLine{00072\ \ \ \textcolor{keyword}{const}\ int32\_t\ input\_beta\_left\_shift\ =\ \mbox{\hyperlink{comparisons_8cpp_a434686eb00eea897154eb5c3f9364ef7}{params}}.input\_left\_shift;}
+\DoxyCodeLine{00073\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{log__softmax_8cpp_a2a44abace57d10e8bb3f61eeb635b2a8}{diff\_min}}\ =\ \mbox{\hyperlink{comparisons_8cpp_a434686eb00eea897154eb5c3f9364ef7}{params}}.diff\_min;}
+\DoxyCodeLine{00074\ \ \ \textcolor{comment}{//\ The\ representation\ chosen\ for\ the\ input\ to\ the\ exp()\ function\ is\ Q5.26.}}
+\DoxyCodeLine{00075\ \ \ \textcolor{comment}{//\ We\ need\ to\ leave\ extra\ space\ since\ values\ that\ we\ skip\ might\ be\ as\ large\ as}}
+\DoxyCodeLine{00076\ \ \ \textcolor{comment}{//\ -\/32\ before\ multiplying\ by\ input\_beta\_multiplier,\ and\ therefore\ as\ large\ as}}
+\DoxyCodeLine{00077\ \ \ \textcolor{comment}{//\ -\/16\ afterwards.\ \ Note\ that\ exp(-\/8)\ is\ definitely\ not\ insignificant\ to}}
+\DoxyCodeLine{00078\ \ \ \textcolor{comment}{//\ accumulation,\ but\ exp(-\/16)\ definitely\ is.}}
+\DoxyCodeLine{00079\ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ kScaledDiffIntegerBits\ =\ 5;}
+\DoxyCodeLine{00080\ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ kAccumulationIntegerBits\ =\ 12;}
+\DoxyCodeLine{00081\ \ \ \textcolor{keyword}{using\ }FixedPointScaledDiff\ =}
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \mbox{\hyperlink{classgemmlowp_1_1_fixed_point}{gemmlowp::FixedPoint<int32\_t,\ kScaledDiffIntegerBits>}};}
+\DoxyCodeLine{00083\ \ \ \textcolor{keyword}{using\ }FixedPointAccum\ =}
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \mbox{\hyperlink{classgemmlowp_1_1_fixed_point}{gemmlowp::FixedPoint<int32\_t,\ kAccumulationIntegerBits>}};}
+\DoxyCodeLine{00085\ \ \ \textcolor{keyword}{using\ }FixedPoint0\ =\ \mbox{\hyperlink{classgemmlowp_1_1_fixed_point}{gemmlowp::FixedPoint<int32\_t,\ 0>}};}
+\DoxyCodeLine{00086\ }
+\DoxyCodeLine{00087\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ trailing\_dim\ =\ input\_shape.DimensionsCount()\ -\/\ 1;}
+\DoxyCodeLine{00088\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{log__softmax_8cpp_a92e854aebd9d62035d2fd510ab0c4a23}{outer\_size}}\ =}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_a583aa9df5709d8dcbcfb84ad682cde78}{MatchingFlatSizeSkipDim}}(input\_shape,\ trailing\_dim,\ output\_shape);}
+\DoxyCodeLine{00090\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{log__softmax_8cpp_a820c167ceaaa9759b0ca2695d22db55c}{depth}}\ =}
+\DoxyCodeLine{00091\ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_ada769909634e3191fceac8c9b8505a36}{MatchingDim}}(input\_shape,\ trailing\_dim,\ output\_shape,\ trailing\_dim);}
+\DoxyCodeLine{00092\ }
+\DoxyCodeLine{00093\ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ \mbox{\hyperlink{log__softmax_8cpp_a92e854aebd9d62035d2fd510ab0c4a23}{outer\_size}};\ ++i)\ \{}
+\DoxyCodeLine{00094\ \ \ \ \ InputT\ max\_in\_row\ =\ std::numeric\_limits<InputT>::min();}
+\DoxyCodeLine{00095\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ c\ =\ 0;\ c\ <\ \mbox{\hyperlink{log__softmax_8cpp_a820c167ceaaa9759b0ca2695d22db55c}{depth}};\ ++c)\ \{}
+\DoxyCodeLine{00096\ \ \ \ \ \ \ max\_in\_row\ =\ std::max(max\_in\_row,\ \mbox{\hyperlink{add__n__test_8cc_a5612ba79d1f0b544c7aeae4621166fea}{input\_data}}[i\ *\ \mbox{\hyperlink{log__softmax_8cpp_a820c167ceaaa9759b0ca2695d22db55c}{depth}}\ +\ c]);}
+\DoxyCodeLine{00097\ \ \ \ \ \}}
+\DoxyCodeLine{00098\ }
+\DoxyCodeLine{00099\ \ \ \ \ FixedPointAccum\ sum\_of\_exps\ =\ FixedPointAccum::Zero();}
+\DoxyCodeLine{00100\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ c\ =\ 0;\ c\ <\ \mbox{\hyperlink{log__softmax_8cpp_a820c167ceaaa9759b0ca2695d22db55c}{depth}};\ ++c)\ \{}
+\DoxyCodeLine{00101\ \ \ \ \ \ \ int32\_t\ input\_diff\ =}
+\DoxyCodeLine{00102\ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static\_cast<}int32\_t\textcolor{keyword}{>}(\mbox{\hyperlink{add__n__test_8cc_a5612ba79d1f0b544c7aeae4621166fea}{input\_data}}[i\ *\ \mbox{\hyperlink{log__softmax_8cpp_a820c167ceaaa9759b0ca2695d22db55c}{depth}}\ +\ c])\ -\/\ max\_in\_row;}
+\DoxyCodeLine{00103\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (input\_diff\ >=\ \mbox{\hyperlink{log__softmax_8cpp_a2a44abace57d10e8bb3f61eeb635b2a8}{diff\_min}})\ \{}
+\DoxyCodeLine{00104\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ int32\_t\ input\_diff\_rescaled\ =}
+\DoxyCodeLine{00105\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_af6e41c0b657bdbaddfb16fa6949268b4}{MultiplyByQuantizedMultiplierGreaterThanOne}}(}
+\DoxyCodeLine{00106\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ input\_diff,\ input\_beta\_multiplier,\ input\_beta\_left\_shift);}
+\DoxyCodeLine{00107\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ FixedPointScaledDiff\ scaled\_diff\_f8\ =}
+\DoxyCodeLine{00108\ \ \ \ \ \ \ \ \ \ \ \ \ FixedPointScaledDiff::FromRaw(input\_diff\_rescaled);}
+\DoxyCodeLine{00109\ \ \ \ \ \ \ \ \ sum\_of\_exps\ =\ sum\_of\_exps\ +\ \mbox{\hyperlink{namespacegemmlowp_a3187e2ee96777e8d15e8b77a2feccf79}{gemmlowp::Rescale<kAccumulationIntegerBits>}}(}
+\DoxyCodeLine{00110\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ exp\_on\_negative\_values(scaled\_diff\_f8));}
+\DoxyCodeLine{00111\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00112\ \ \ \ \ \}}
+\DoxyCodeLine{00113\ }
+\DoxyCodeLine{00114\ \ \ \ \ \textcolor{keywordtype}{int}\ num\_bits\_over\_unit;}
+\DoxyCodeLine{00115\ \ \ \ \ FixedPoint0\ shifted\_scale\ =\ FixedPoint0::FromRaw(\mbox{\hyperlink{namespacetflite_a7f5e467aa646ee62259f3919d2a5a738}{GetReciprocal}}(}
+\DoxyCodeLine{00116\ \ \ \ \ \ \ \ \ sum\_of\_exps.raw(),\ kAccumulationIntegerBits,\ \&num\_bits\_over\_unit));}
+\DoxyCodeLine{00117\ }
+\DoxyCodeLine{00118\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ c\ =\ 0;\ c\ <\ \mbox{\hyperlink{log__softmax_8cpp_a820c167ceaaa9759b0ca2695d22db55c}{depth}};\ ++c)\ \{}
+\DoxyCodeLine{00119\ \ \ \ \ \ \ int32\_t\ input\_diff\ =}
+\DoxyCodeLine{00120\ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static\_cast<}int32\_t\textcolor{keyword}{>}(\mbox{\hyperlink{add__n__test_8cc_a5612ba79d1f0b544c7aeae4621166fea}{input\_data}}[i\ *\ \mbox{\hyperlink{log__softmax_8cpp_a820c167ceaaa9759b0ca2695d22db55c}{depth}}\ +\ c])\ -\/\ max\_in\_row;}
+\DoxyCodeLine{00121\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (input\_diff\ >=\ \mbox{\hyperlink{log__softmax_8cpp_a2a44abace57d10e8bb3f61eeb635b2a8}{diff\_min}})\ \{}
+\DoxyCodeLine{00122\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ int32\_t\ input\_diff\_rescaled\ =}
+\DoxyCodeLine{00123\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_af6e41c0b657bdbaddfb16fa6949268b4}{MultiplyByQuantizedMultiplierGreaterThanOne}}(}
+\DoxyCodeLine{00124\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ input\_diff,\ input\_beta\_multiplier,\ input\_beta\_left\_shift);}
+\DoxyCodeLine{00125\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ FixedPointScaledDiff\ scaled\_diff\_f8\ =}
+\DoxyCodeLine{00126\ \ \ \ \ \ \ \ \ \ \ \ \ FixedPointScaledDiff::FromRaw(input\_diff\_rescaled);}
+\DoxyCodeLine{00127\ }
+\DoxyCodeLine{00128\ \ \ \ \ \ \ \ \ FixedPoint0\ exp\_in\_0\ =\ exp\_on\_negative\_values(scaled\_diff\_f8);}
+\DoxyCodeLine{00129\ \ \ \ \ \ \ \ \ int32\_t\ unsat\_output\ =\ \mbox{\hyperlink{namespacegemmlowp_a7d5169f4bc71a22c6a5adf9c1b73267d}{gemmlowp::RoundingDivideByPOT}}(}
+\DoxyCodeLine{00130\ \ \ \ \ \ \ \ \ \ \ \ \ (shifted\_scale\ *\ exp\_in\_0).raw(),}
+\DoxyCodeLine{00131\ \ \ \ \ \ \ \ \ \ \ \ \ num\_bits\_over\_unit\ +\ 31\ -\/\ (\textcolor{keyword}{sizeof}(OutputT)\ *\ 8));}
+\DoxyCodeLine{00132\ }
+\DoxyCodeLine{00133\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ int32\_t\ shifted\_output\ =}
+\DoxyCodeLine{00134\ \ \ \ \ \ \ \ \ \ \ \ \ unsat\_output\ +}
+\DoxyCodeLine{00135\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static\_cast<}int32\_t\textcolor{keyword}{>}(std::numeric\_limits<OutputT>::min());}
+\DoxyCodeLine{00136\ }
+\DoxyCodeLine{00137\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{add__n__test_8cc_a3305b43869c4b837b0a33c12cff5069b}{output\_data}}[i\ *\ \mbox{\hyperlink{log__softmax_8cpp_a820c167ceaaa9759b0ca2695d22db55c}{depth}}\ +\ c]\ =\ \textcolor{keyword}{static\_cast<}OutputT\textcolor{keyword}{>}(std::max(}
+\DoxyCodeLine{00138\ \ \ \ \ \ \ \ \ \ \ \ \ std::min(shifted\_output,}
+\DoxyCodeLine{00139\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static\_cast<}int32\_t\textcolor{keyword}{>}(std::numeric\_limits<OutputT>::max())),}
+\DoxyCodeLine{00140\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static\_cast<}int32\_t\textcolor{keyword}{>}(std::numeric\_limits<OutputT>::min())));}
+\DoxyCodeLine{00141\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00142\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{add__n__test_8cc_a3305b43869c4b837b0a33c12cff5069b}{output\_data}}[i\ *\ \mbox{\hyperlink{log__softmax_8cpp_a820c167ceaaa9759b0ca2695d22db55c}{depth}}\ +\ c]\ =\ std::numeric\_limits<OutputT>::min();}
+\DoxyCodeLine{00143\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00144\ \ \ \ \ \}}
+\DoxyCodeLine{00145\ \ \ \}}
+\DoxyCodeLine{00146\ \}}
+\DoxyCodeLine{00147\ }
+\DoxyCodeLine{00148\ \textcolor{comment}{//\ Computes\ exp(input\ -\/\ max\_input)}}
+\DoxyCodeLine{00149\ \textcolor{keyword}{inline}\ int16\_t\ \mbox{\hyperlink{namespacetflite_1_1reference__ops_a2f080b76b86799d9b3529d32a7e77cb5}{SoftMaxCalculateExp}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structtflite_1_1_softmax_params}{SoftmaxParams}}\&\ \mbox{\hyperlink{comparisons_8cpp_a434686eb00eea897154eb5c3f9364ef7}{params}},}
+\DoxyCodeLine{00150\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ int16\_t*\ \mbox{\hyperlink{add__n__test_8cc_a5612ba79d1f0b544c7aeae4621166fea}{input\_data}},\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{log__softmax_8cpp_a820c167ceaaa9759b0ca2695d22db55c}{depth}},}
+\DoxyCodeLine{00151\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ int16\_t\ max\_in\_row,\ \textcolor{keywordtype}{int}\ i,\ \textcolor{keywordtype}{int}\ c)\ \{}
+\DoxyCodeLine{00152\ \ \ int32\_t\ input\_diff\ =\ \mbox{\hyperlink{add__n__test_8cc_a5612ba79d1f0b544c7aeae4621166fea}{input\_data}}[i\ *\ \mbox{\hyperlink{log__softmax_8cpp_a820c167ceaaa9759b0ca2695d22db55c}{depth}}\ +\ c]\ -\/\ max\_in\_row;}
+\DoxyCodeLine{00153\ \ \ \textcolor{comment}{//\ scale\ the\ input\_diff\ such\ that\ [-\/65535,\ 0]\ correspond\ to\ [-\/10.0,\ 0.0]}}
+\DoxyCodeLine{00154\ \ \ \textcolor{comment}{//\ exp\ lut\ generated\ with\ range\ [-\/10,\ 0],\ as\ exp(-\/10)\ is\ negligible.}}
+\DoxyCodeLine{00155\ \ \ int32\_t\ scaled\_diff\ =\ \mbox{\hyperlink{namespacetflite_a680551edd476cf4545b014a401a532cb}{MultiplyByQuantizedMultiplier}}(}
+\DoxyCodeLine{00156\ \ \ \ \ \ \ input\_diff,\ \mbox{\hyperlink{comparisons_8cpp_a434686eb00eea897154eb5c3f9364ef7}{params}}.input\_multiplier,\ \mbox{\hyperlink{comparisons_8cpp_a434686eb00eea897154eb5c3f9364ef7}{params}}.input\_left\_shift);}
+\DoxyCodeLine{00157\ \ \ \textcolor{comment}{//\ recenter\ to\ [-\/32768,\ 32767]}}
+\DoxyCodeLine{00158\ \ \ int32\_t\ sym\_scaled\_diff\ =\ scaled\_diff\ +\ 32767;}
+\DoxyCodeLine{00159\ \ \ int16\_t\ sat\_sym\_scaled\_diff\ =}
+\DoxyCodeLine{00160\ \ \ \ \ \ \ std::min(std::max(sym\_scaled\_diff,\ \textcolor{keyword}{static\_cast<}int32\_t\textcolor{keyword}{>}(-\/32768)),}
+\DoxyCodeLine{00161\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static\_cast<}int32\_t\textcolor{keyword}{>}(32767));}
+\DoxyCodeLine{00162\ \ \ \textcolor{comment}{//\ apply\ the\ exp()\ LUT\ activation\ function}}
+\DoxyCodeLine{00163\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacetflite_af3cb549a185a8970419fc95354980452}{LUTLookup}}(sat\_sym\_scaled\_diff,\ \mbox{\hyperlink{comparisons_8cpp_a434686eb00eea897154eb5c3f9364ef7}{params}}.exp\_lut);}
+\DoxyCodeLine{00164\ \}}
+\DoxyCodeLine{00165\ \textcolor{comment}{//\ Quantized\ softmax\ with\ int16\_t\ input\ and\ int16\_t\ output.}}
+\DoxyCodeLine{00166\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1reference__ops_ad7ba37e48f6598619adab6c9c1766026}{SoftmaxInt16}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structtflite_1_1_softmax_params}{SoftmaxParams}}\&\ \mbox{\hyperlink{comparisons_8cpp_a434686eb00eea897154eb5c3f9364ef7}{params}},}
+\DoxyCodeLine{00167\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classtflite_1_1_runtime_shape}{RuntimeShape}}\&\ input\_shape,}
+\DoxyCodeLine{00168\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ int16\_t*\ \mbox{\hyperlink{add__n__test_8cc_a5612ba79d1f0b544c7aeae4621166fea}{input\_data}},}
+\DoxyCodeLine{00169\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classtflite_1_1_runtime_shape}{RuntimeShape}}\&\ output\_shape,}
+\DoxyCodeLine{00170\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ int16\_t*\ \mbox{\hyperlink{add__n__test_8cc_a3305b43869c4b837b0a33c12cff5069b}{output\_data}})\ \{}
+\DoxyCodeLine{00171\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ trailing\_dim\ =\ input\_shape.DimensionsCount()\ -\/\ 1;}
+\DoxyCodeLine{00172\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{log__softmax_8cpp_a92e854aebd9d62035d2fd510ab0c4a23}{outer\_size}}\ =}
+\DoxyCodeLine{00173\ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_a583aa9df5709d8dcbcfb84ad682cde78}{MatchingFlatSizeSkipDim}}(input\_shape,\ trailing\_dim,\ output\_shape);}
+\DoxyCodeLine{00174\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{log__softmax_8cpp_a820c167ceaaa9759b0ca2695d22db55c}{depth}}\ =}
+\DoxyCodeLine{00175\ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_ada769909634e3191fceac8c9b8505a36}{MatchingDim}}(input\_shape,\ trailing\_dim,\ output\_shape,\ trailing\_dim);}
+\DoxyCodeLine{00176\ }
+\DoxyCodeLine{00177\ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ \mbox{\hyperlink{log__softmax_8cpp_a92e854aebd9d62035d2fd510ab0c4a23}{outer\_size}};\ ++i)\ \{}
+\DoxyCodeLine{00178\ \ \ \ \ \textcolor{comment}{//\ Find\ the\ largest\ element}}
+\DoxyCodeLine{00179\ \ \ \ \ int16\_t\ max\_in\_row\ =\ std::numeric\_limits<int16\_t>::min();}
+\DoxyCodeLine{00180\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ c\ =\ 0;\ c\ <\ \mbox{\hyperlink{log__softmax_8cpp_a820c167ceaaa9759b0ca2695d22db55c}{depth}};\ ++c)\ \{}
+\DoxyCodeLine{00181\ \ \ \ \ \ \ max\_in\_row\ =\ std::max(max\_in\_row,\ \mbox{\hyperlink{add__n__test_8cc_a5612ba79d1f0b544c7aeae4621166fea}{input\_data}}[i\ *\ \mbox{\hyperlink{log__softmax_8cpp_a820c167ceaaa9759b0ca2695d22db55c}{depth}}\ +\ c]);}
+\DoxyCodeLine{00182\ \ \ \ \ \}}
+\DoxyCodeLine{00183\ }
+\DoxyCodeLine{00184\ \ \ \ \ \textcolor{comment}{//\ This\ loops\ computes\ the\ exp\ values\ and\ their\ sum.\ We\ will\ need\ the\ exp}}
+\DoxyCodeLine{00185\ \ \ \ \ \textcolor{comment}{//\ values\ later\ on\ in\ the\ function\ so\ we\ cache\ them\ in\ the\ output\_data}}
+\DoxyCodeLine{00186\ \ \ \ \ \textcolor{comment}{//\ buffer.\ This\ is\ an\ optimization\ done\ to\ avoid\ calculating\ the\ exp\ values}}
+\DoxyCodeLine{00187\ \ \ \ \ \textcolor{comment}{//\ twice\ making\ use\ of\ the\ output\_data\ buffer\ as\ scratch\ memory.}}
+\DoxyCodeLine{00188\ \ \ \ \ int32\_t\ sum\_of\_exps\ =\ 0;\ \ \textcolor{comment}{//\ Q16.15\ fixed\ point\ format.}}
+\DoxyCodeLine{00189\ \ \ \ \ int16\_t*\ exp\_results\_Q015\ =\ \mbox{\hyperlink{add__n__test_8cc_a3305b43869c4b837b0a33c12cff5069b}{output\_data}}\ +\ i\ *\ \mbox{\hyperlink{log__softmax_8cpp_a820c167ceaaa9759b0ca2695d22db55c}{depth}};}
+\DoxyCodeLine{00190\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ c\ =\ 0;\ c\ <\ \mbox{\hyperlink{log__softmax_8cpp_a820c167ceaaa9759b0ca2695d22db55c}{depth}};\ ++c)\ \{}
+\DoxyCodeLine{00191\ \ \ \ \ \ \ exp\_results\_Q015[c]\ =}
+\DoxyCodeLine{00192\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_1_1reference__ops_a2f080b76b86799d9b3529d32a7e77cb5}{SoftMaxCalculateExp}}(\mbox{\hyperlink{comparisons_8cpp_a434686eb00eea897154eb5c3f9364ef7}{params}},\ \mbox{\hyperlink{add__n__test_8cc_a5612ba79d1f0b544c7aeae4621166fea}{input\_data}},\ \mbox{\hyperlink{log__softmax_8cpp_a820c167ceaaa9759b0ca2695d22db55c}{depth}},\ max\_in\_row,\ i,\ c);}
+\DoxyCodeLine{00193\ \ \ \ \ \ \ sum\_of\_exps\ +=\ exp\_results\_Q015[c];}
+\DoxyCodeLine{00194\ \ \ \ \ \}}
+\DoxyCodeLine{00195\ }
+\DoxyCodeLine{00196\ \ \ \ \ \textcolor{comment}{//\ Compute\ the\ reciprocal\ 1/sum\_of\_exps}}
+\DoxyCodeLine{00197\ \ \ \ \ uint8\_t\ headroom\_plus\_one\ =}
+\DoxyCodeLine{00198\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_a90b39c749aaf4b036ab5268d03fed4b5}{CountLeadingZeros}}(\textcolor{keyword}{static\_cast<}uint32\_t\textcolor{keyword}{>}(sum\_of\_exps));}
+\DoxyCodeLine{00199\ \ \ \ \ int32\_t\ shifted\_sum\ =}
+\DoxyCodeLine{00200\ \ \ \ \ \ \ \ \ ((\textcolor{keyword}{static\_cast<}int64\_t\textcolor{keyword}{>}(sum\_of\_exps)\ <<\ (headroom\_plus\_one\ -\/\ 1))\ +}
+\DoxyCodeLine{00201\ \ \ \ \ \ \ \ \ \ (1\ <<\ 13))\ >>}
+\DoxyCodeLine{00202\ \ \ \ \ \ \ \ \ 14;}
+\DoxyCodeLine{00203\ \ \ \ \ \textcolor{comment}{//\ since\ the\ LUT\ computes\ 1/(1\ +\ x)\ we\ need\ to\ first\ compute\ x\ =\ (sum\ -\/\ 1).}}
+\DoxyCodeLine{00204\ \ \ \ \ \textcolor{comment}{//\ also,\ the\ LUT\ expects\ a\ symmetrical\ input,\ so\ we\ must\ also\ recenter\ x}}
+\DoxyCodeLine{00205\ \ \ \ \ \textcolor{comment}{//\ from\ [0,\ 65535]\ to\ [-\/32768,\ 32767].}}
+\DoxyCodeLine{00206\ \ \ \ \ int32\_t\ sym\_shifted\_sum\ =\ shifted\_sum\ +\ (-\/((1\ <<\ 15)\ +\ (1\ <<\ 16)));}
+\DoxyCodeLine{00207\ \ \ \ \ int16\_t\ sat\_sym\_shifted\_sum\ =\ \textcolor{keyword}{static\_cast<}int16\_t\textcolor{keyword}{>}(}
+\DoxyCodeLine{00208\ \ \ \ \ \ \ \ \ std::min(std::max(sym\_shifted\_sum,\ \textcolor{keyword}{static\_cast<}int32\_t\textcolor{keyword}{>}(-\/32768)),}
+\DoxyCodeLine{00209\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static\_cast<}int32\_t\textcolor{keyword}{>}(32767)));}
+\DoxyCodeLine{00210\ \ \ \ \ \textcolor{comment}{//\ apply\ 1/(1\ +\ x)\ LUT\ activation\ function}}
+\DoxyCodeLine{00211\ \ \ \ \ int16\_t\ reciprocal\_scale\_Q015\ =}
+\DoxyCodeLine{00212\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_af3cb549a185a8970419fc95354980452}{LUTLookup}}(sat\_sym\_shifted\_sum,\ \mbox{\hyperlink{comparisons_8cpp_a434686eb00eea897154eb5c3f9364ef7}{params}}.one\_over\_one\_plus\_x\_lut);}
+\DoxyCodeLine{00213\ }
+\DoxyCodeLine{00214\ \ \ \ \ \textcolor{comment}{//\ Rescale\ the\ exp\_result\ with\ reciprocal}}
+\DoxyCodeLine{00215\ \ \ \ \ \textcolor{comment}{//\ range\ of\ output\ is\ [0,\ 32767]\ correspond\ to\ [0.0,\ 1.0]}}
+\DoxyCodeLine{00216\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ c\ =\ 0;\ c\ <\ \mbox{\hyperlink{log__softmax_8cpp_a820c167ceaaa9759b0ca2695d22db55c}{depth}};\ ++c)\ \{}
+\DoxyCodeLine{00217\ \ \ \ \ \ \ uint8\_t\ right\_shift\ =\ 31\ -\/\ headroom\_plus\_one;}
+\DoxyCodeLine{00218\ \ \ \ \ \ \ int64\_t\ round\ =\ 1\ <<\ (right\_shift\ -\/\ 1);}
+\DoxyCodeLine{00219\ \ \ \ \ \ \ int32\_t\ result\ =\ (\textcolor{keyword}{static\_cast<}int64\_t\textcolor{keyword}{>}(exp\_results\_Q015[c])\ *}
+\DoxyCodeLine{00220\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static\_cast<}int64\_t\textcolor{keyword}{>}(reciprocal\_scale\_Q015)\ +}
+\DoxyCodeLine{00221\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ round)\ >>}
+\DoxyCodeLine{00222\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ right\_shift;}
+\DoxyCodeLine{00223\ \ \ \ \ \ \ \mbox{\hyperlink{add__n__test_8cc_a3305b43869c4b837b0a33c12cff5069b}{output\_data}}[i\ *\ \mbox{\hyperlink{log__softmax_8cpp_a820c167ceaaa9759b0ca2695d22db55c}{depth}}\ +\ c]\ =\ \textcolor{keyword}{static\_cast<}int16\_t\textcolor{keyword}{>}(}
+\DoxyCodeLine{00224\ \ \ \ \ \ \ \ \ \ \ std::min(std::max(result,\ \textcolor{keyword}{static\_cast<}int32\_t\textcolor{keyword}{>}(0)),}
+\DoxyCodeLine{00225\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static\_cast<}int32\_t\textcolor{keyword}{>}(32767)));}
+\DoxyCodeLine{00226\ \ \ \ \ \}}
+\DoxyCodeLine{00227\ \ \ \}}
+\DoxyCodeLine{00228\ \}}
+\DoxyCodeLine{00229\ }
+\DoxyCodeLine{00230\ \}\ \ \textcolor{comment}{//\ namespace\ reference\_ops}}
+\DoxyCodeLine{00231\ \}\ \ \textcolor{comment}{//\ namespace\ tflite}}
+\DoxyCodeLine{00232\ }
+\DoxyCodeLine{00233\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ TENSORFLOW\_LITE\_KERNELS\_INTERNAL\_REFERENCE\_SOFTMAX\_H\_}}
+
+\end{DoxyCode}

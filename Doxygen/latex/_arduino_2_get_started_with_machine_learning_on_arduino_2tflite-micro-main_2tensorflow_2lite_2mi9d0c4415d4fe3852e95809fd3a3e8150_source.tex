@@ -1,0 +1,75 @@
+\doxysection{recording\+\_\+micro\+\_\+interpreter.\+h}
+\hypertarget{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_2mi9d0c4415d4fe3852e95809fd3a3e8150_source}{}\label{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_2mi9d0c4415d4fe3852e95809fd3a3e8150_source}\index{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/main/tensorflow/lite/micro/recording\_micro\_interpreter.h@{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/main/tensorflow/lite/micro/recording\_micro\_interpreter.h}}
+\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_2mi9d0c4415d4fe3852e95809fd3a3e8150}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{/*\ Copyright\ 2022\ The\ TensorFlow\ Authors.\ All\ Rights\ Reserved.}}
+\DoxyCodeLine{00002\ \textcolor{comment}{}}
+\DoxyCodeLine{00003\ \textcolor{comment}{Licensed\ under\ the\ Apache\ License,\ Version\ 2.0\ (the\ "{}License"{});}}
+\DoxyCodeLine{00004\ \textcolor{comment}{you\ may\ not\ use\ this\ file\ except\ in\ compliance\ with\ the\ License.}}
+\DoxyCodeLine{00005\ \textcolor{comment}{You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{00006\ \textcolor{comment}{}}
+\DoxyCodeLine{00007\ \textcolor{comment}{\ \ \ \ http://www.apache.org/licenses/LICENSE-\/2.0}}
+\DoxyCodeLine{00008\ \textcolor{comment}{}}
+\DoxyCodeLine{00009\ \textcolor{comment}{Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ software}}
+\DoxyCodeLine{00010\ \textcolor{comment}{distributed\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,}}
+\DoxyCodeLine{00011\ \textcolor{comment}{WITHOUT\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,\ either\ express\ or\ implied.}}
+\DoxyCodeLine{00012\ \textcolor{comment}{See\ the\ License\ for\ the\ specific\ language\ governing\ permissions\ and}}
+\DoxyCodeLine{00013\ \textcolor{comment}{limitations\ under\ the\ License.}}
+\DoxyCodeLine{00014\ \textcolor{comment}{==============================================================================*/}}
+\DoxyCodeLine{00015\ }
+\DoxyCodeLine{00016\ \textcolor{preprocessor}{\#ifndef\ TENSORFLOW\_LITE\_MICRO\_RECORDING\_MICRO\_INTERPRETER\_H\_}}
+\DoxyCodeLine{00017\ \textcolor{preprocessor}{\#define\ TENSORFLOW\_LITE\_MICRO\_RECORDING\_MICRO\_INTERPRETER\_H\_}}
+\DoxyCodeLine{00018\ }
+\DoxyCodeLine{00019\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/micro/micro\_interpreter.h"{}}}
+\DoxyCodeLine{00020\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/micro/micro\_profiler\_interface.h"{}}}
+\DoxyCodeLine{00021\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/micro/recording\_micro\_allocator.h"{}}}
+\DoxyCodeLine{00022\ }
+\DoxyCodeLine{00023\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacetflite}{tflite}}\ \{}
+\DoxyCodeLine{00024\ }
+\DoxyCodeLine{00025\ \textcolor{comment}{//\ Utility\ subclass\ that\ enables\ internal\ recordings\ of\ the\ MicroInterpreter.}}
+\DoxyCodeLine{00026\ \textcolor{comment}{//\ This\ class\ should\ be\ used\ to\ audit\ and\ analyze\ memory\ arena\ usage\ for\ a\ given}}
+\DoxyCodeLine{00027\ \textcolor{comment}{//\ model\ and\ interpreter.}}
+\DoxyCodeLine{00028\ \textcolor{comment}{//}}
+\DoxyCodeLine{00029\ \textcolor{comment}{//\ After\ construction\ and\ the\ first\ Invoke()\ or\ AllocateTensors()\ call\ -\/\ the}}
+\DoxyCodeLine{00030\ \textcolor{comment}{//\ memory\ usage\ is\ recorded\ and\ available\ through\ the\ GetMicroAllocator()}}
+\DoxyCodeLine{00031\ \textcolor{comment}{//\ function.\ See\ RecordingMicroAlloctor\ for\ more\ details\ on\ what\ is\ currently}}
+\DoxyCodeLine{00032\ \textcolor{comment}{//\ recorded\ from\ arena\ allocations.}}
+\DoxyCodeLine{00033\ \textcolor{comment}{//}}
+\DoxyCodeLine{00034\ \textcolor{comment}{//\ It\ is\ recommended\ for\ users\ to\ increase\ the\ tensor\ arena\ size\ by\ at\ least\ 1kb}}
+\DoxyCodeLine{00035\ \textcolor{comment}{//\ to\ ensure\ enough\ additional\ memory\ is\ available\ for\ internal\ recordings.}}
+\DoxyCodeLine{00036\ \textcolor{keyword}{class\ }RecordingMicroInterpreter\ :\ \textcolor{keyword}{public}\ MicroInterpreter\ \{}
+\DoxyCodeLine{00037\ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00038\ \ \ \mbox{\hyperlink{classtflite_1_1_recording_micro_interpreter_ac0b37415daa2952507f5cbfcce938c4b}{RecordingMicroInterpreter}}(\textcolor{keyword}{const}\ Model*\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2model_8h_ae142afd8c2e2c711c1c62440deebe03c}{model}},}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classtflite_1_1_micro_op_resolver}{MicroOpResolver}}\&\ op\_resolver,}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ uint8\_t*\ \mbox{\hyperlink{namespacetflite_ad7380db20a16cb04f096c963d9ade791}{tensor\_arena}},\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{person__detection__test_8cc_a5af3a65557f88ed72dd512ad65b55096}{tensor\_arena\_size}},}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classtflite_1_1_micro_resource_variables}{MicroResourceVariables}}*\ resource\_variable\ =\ \textcolor{keyword}{nullptr},}
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classtflite_1_1_micro_profiler_interface}{MicroProfilerInterface}}*\ profiler\ =\ \textcolor{keyword}{nullptr})}
+\DoxyCodeLine{00043\ \ \ \ \ \ \ :\ \mbox{\hyperlink{classtflite_1_1_micro_interpreter}{MicroInterpreter}}(}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2model_8h_ae142afd8c2e2c711c1c62440deebe03c}{model}},\ op\_resolver,}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classtflite_1_1_recording_micro_allocator}{RecordingMicroAllocator}}::Create(\mbox{\hyperlink{namespacetflite_ad7380db20a16cb04f096c963d9ade791}{tensor\_arena}},\ \mbox{\hyperlink{person__detection__test_8cc_a5af3a65557f88ed72dd512ad65b55096}{tensor\_arena\_size}}),}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \ \ \ \ \ \ resource\_variable,\ profiler),}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classtflite_1_1_recording_micro_interpreter_a15b5e92e69ccfee6cc8e33dc584bdfd3}{recording\_micro\_allocator\_}}(}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \ \ \ \ \ \ static\_cast<const\ \mbox{\hyperlink{classtflite_1_1_recording_micro_allocator}{RecordingMicroAllocator}}\&>(\mbox{\hyperlink{classtflite_1_1_micro_interpreter_abff489cbe3f4c78f7133bc7bba21034b}{allocator}}()))\ \{\}}
+\DoxyCodeLine{00049\ }
+\DoxyCodeLine{00050\ \ \ \mbox{\hyperlink{classtflite_1_1_recording_micro_interpreter_acc331368615826bbfb01748d9f6d9466}{RecordingMicroInterpreter}}(\textcolor{keyword}{const}\ Model*\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2model_8h_ae142afd8c2e2c711c1c62440deebe03c}{model}},}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classtflite_1_1_micro_op_resolver}{MicroOpResolver}}\&\ op\_resolver,}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classtflite_1_1_recording_micro_allocator}{RecordingMicroAllocator}}*\ \mbox{\hyperlink{classtflite_1_1_micro_interpreter_abff489cbe3f4c78f7133bc7bba21034b}{allocator}},}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classtflite_1_1_micro_resource_variables}{MicroResourceVariables}}*\ resource\_variable\ =\ \textcolor{keyword}{nullptr},}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classtflite_1_1_micro_profiler_interface}{MicroProfilerInterface}}*\ profiler\ =\ \textcolor{keyword}{nullptr})}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ :\ \mbox{\hyperlink{classtflite_1_1_micro_interpreter}{MicroInterpreter}}(\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2model_8h_ae142afd8c2e2c711c1c62440deebe03c}{model}},\ op\_resolver,\ \mbox{\hyperlink{classtflite_1_1_micro_interpreter_abff489cbe3f4c78f7133bc7bba21034b}{allocator}},\ resource\_variable,}
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ profiler),}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classtflite_1_1_recording_micro_interpreter_a15b5e92e69ccfee6cc8e33dc584bdfd3}{recording\_micro\_allocator\_}}(*\mbox{\hyperlink{classtflite_1_1_micro_interpreter_abff489cbe3f4c78f7133bc7bba21034b}{allocator}})\ \{\}}
+\DoxyCodeLine{00058\ }
+\DoxyCodeLine{00059\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classtflite_1_1_recording_micro_allocator}{RecordingMicroAllocator}}\&\ \mbox{\hyperlink{classtflite_1_1_recording_micro_interpreter_a86337c6b30d03082460c2125bc3d7cd3}{GetMicroAllocator}}()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{00060\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1_recording_micro_interpreter_a15b5e92e69ccfee6cc8e33dc584bdfd3}{recording\_micro\_allocator\_}};}
+\DoxyCodeLine{00061\ \ \ \}}
+\DoxyCodeLine{00062\ }
+\DoxyCodeLine{00063\ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{00064\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classtflite_1_1_recording_micro_allocator}{RecordingMicroAllocator}}\&\ \mbox{\hyperlink{classtflite_1_1_recording_micro_interpreter_a15b5e92e69ccfee6cc8e33dc584bdfd3}{recording\_micro\_allocator\_}};}
+\DoxyCodeLine{00065\ \};}
+\DoxyCodeLine{00066\ }
+\DoxyCodeLine{00067\ \}\ \ \textcolor{comment}{//\ namespace\ tflite}}
+\DoxyCodeLine{00068\ }
+\DoxyCodeLine{00069\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ TENSORFLOW\_LITE\_MICRO\_RECORDING\_MICRO\_INTERPRETER\_H\_}}
+
+\end{DoxyCode}

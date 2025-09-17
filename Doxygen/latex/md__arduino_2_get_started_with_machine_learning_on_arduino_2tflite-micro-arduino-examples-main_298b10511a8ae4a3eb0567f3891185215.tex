@@ -1,0 +1,143 @@
+\chapter{README for the \texorpdfstring{$<$}{<}a href="{}create\+\_\+tflm\+\_\+arduino.\+py"{} \texorpdfstring{$>$}{>}create\+\_\+tflm\+\_\+arduino\texorpdfstring{$<$}{<}/a\texorpdfstring{$>$}{>} script.}
+\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_298b10511a8ae4a3eb0567f3891185215}{}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_298b10511a8ae4a3eb0567f3891185215}\index{README for the $<$a href="{}create\_tflm\_arduino.py"{} $>$create\_tflm\_arduino$<$/a$>$ script.@{README for the $<$a href=""create\_tflm\_arduino.py"" $>$create\_tflm\_arduino$<$/a$>$ script.}}
+\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_298b10511a8ae4a3eb0567f3891185215_autotoc_md39}%
+\Hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_298b10511a8ae4a3eb0567f3891185215_autotoc_md39}%
+
+
+This python 3.\+x script is used to create an {\ttfamily output directory} containing all the files necessary for a Tensor\+Flow Lite Micro (TFLM) library. The created TFLM library is ready for use with the Arduino IDE. The {\ttfamily output directory} can also be used to update the \href{https://github.com/tensorflow/tflite-micro-arduino-examples}{\texttt{ Arduino Examples repository}} by the repository maintainers.
+
+The \href{create_tflm_arduino.py}{\texttt{ create\+\_\+tflm\+\_\+arduino}} script accepts the following arguments\+:
+\begin{DoxyItemize}
+\item {\ttfamily -\/-\/output\+\_\+dir}
+
+The {\ttfamily output directory} for the TFLM library to be created.
+\item {\ttfamily -\/-\/base\+\_\+dir}
+
+This is the {\ttfamily base directory} containing a base set of files from the \href{https://github.com/tensorflow/tflite-micro}{\texttt{ TFLM repository}}.
+\item {\ttfamily -\/-\/manifest\+\_\+file}
+
+Specifies which {\ttfamily manifest} file to use. The {\ttfamily manifest} uses Windows INI format, and \href{MANIFEST.ini}{\texttt{ MANIFEST.\+ini}} is the default.
+\item {\ttfamily -\/-\/is\+\_\+dry\+\_\+run}
+
+A debugging flag. All actions that would have been taken are output, but not executed.
+\end{DoxyItemize}
+
+The operation of the \href{create_tflm_arduino.py}{\texttt{ create\+\_\+tflm\+\_\+arduino}} script is to copy files from the \href{https://github.com/tensorflow/tflite-micro-arduino-examples}{\texttt{ Arduino Examples repository}} and the {\ttfamily base directory} to the {\ttfamily output directory}. Depending on file source and suffix, a content and/or file name transformation is applied. The {\ttfamily manifest} contains directives that determine which files are copied to the {\ttfamily output directory} as well as additional content transforms to apply.
+
+The {\ttfamily base directory} is created using the \href{https://github.com/tensorflow/tflite-micro/blob/main/tensorflow/lite/micro/tools/project_generation/create_tflm_tree.py}{\texttt{ create\+\_\+tflm\+\_\+tree}} script. This script allows for a specific platform target to be chosen, as well as which TFLM example applications are to be included in the {\ttfamily base directory}.\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_298b10511a8ae4a3eb0567f3891185215_autotoc_md40}{}\doxysection{\texorpdfstring{Detailed steps of the \href{create_tflm_arduino.py}{\texttt{ create\+\_\+tflm\+\_\+arduino}} script}{Detailed steps of the \href{create_tflm_arduino.py}{\texttt{ create\+\_\+tflm\+\_\+arduino}} script}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_298b10511a8ae4a3eb0567f3891185215_autotoc_md40}
+
+\begin{DoxyEnumerate}
+\item Parse script arguments
+
+The script command-\/line arguments are parsed.
+\end{DoxyEnumerate}
+\begin{DoxyEnumerate}
+\item Parse {\ttfamily manifest} file
+
+Generate the following lists from the {\ttfamily manifest} directives\+:
+\begin{DoxyItemize}
+\item Files that will be copied from the repository to the {\ttfamily output directory}
+\item Files that will not be copied from the {\ttfamily base directory} to the {\ttfamily output directory}
+\item Files that will be copied from the repository to the {\ttfamily output directory} with a changed file name/path
+\item Files that will be copied from the {\ttfamily base directory} to the {\ttfamily output directory} with a changed file name/path
+\item Files in the {\ttfamily output directory} that will be transformed by a {\ttfamily sed} regular-\/expression script
+\end{DoxyItemize}
+
+Each of these lists are used as filters in subsequent path tuple generation operations.
+\end{DoxyEnumerate}
+\begin{DoxyEnumerate}
+\item Clean the {\ttfamily output directory}
+
+Removes any files or directories in the {\ttfamily output directory}
+\end{DoxyEnumerate}
+\begin{DoxyEnumerate}
+\item Generate list of tuples of base paths which will be transformed
+
+Each tuple in the list consists of a source path relative to the {\ttfamily base directory}, and a destination path relative to the {\ttfamily output directory}.
+
+The list is initially all files in the {\ttfamily base directory}, and is filtered by the {\ttfamily manifest} directives applicable to source paths in the {\ttfamily base directory}.
+
+The list is again filtered such that only source paths with the following suffixes are included\+: {\ttfamily .c .cc .cpp .h .ino}
+
+All destination paths with a {\ttfamily .cc} suffix are changed to a {\ttfamily .cpp} suffix.
+\end{DoxyEnumerate}
+\begin{DoxyEnumerate}
+\item Generate list of tuples of base paths that will not be transformed
+
+Each tuple in the list consists of a source path relative to the {\ttfamily base directory}, and a destination path relative to the {\ttfamily output directory}.
+
+The list is initially all files in the {\ttfamily base directory}, and is filtered by the {\ttfamily manifest} directives applicable to source paths in the {\ttfamily base directory}.
+
+The list is again filtered such that only source paths with the following suffixes are excluded\+: {\ttfamily .c .cc .cpp .h .ino}
+\end{DoxyEnumerate}
+\begin{DoxyEnumerate}
+\item Generate list of tuples of repository paths which will be transformed
+
+Each tuple in the list consists of a source path relative to the repository, and a destination path relative to the {\ttfamily output directory}.
+
+The list is generated by the {\ttfamily manifest} directives applicable to source paths in the repository.
+
+The list is filtered such that only source paths with the following suffixes are included\+: {\ttfamily .c .cc .cpp .h .ino}
+
+The list is again filtered such that it includes only files whose source path is within the {\ttfamily src/third\+\_\+party} directory tree.
+\end{DoxyEnumerate}
+\begin{DoxyEnumerate}
+\item Generate list of tuples of repository paths that will not be transformed
+
+Each tuple in the list consists of a source path relative to the repository, and a destination path relative to the {\ttfamily output directory}.
+
+The list is generated by the {\ttfamily manifest} directives applicable to source paths in the repository.
+
+The list is filtered such that only source paths with the following suffixes are excluded\+: {\ttfamily .c .cc .cpp .h .ino}
+
+The suffix exclusion filter is only applied where the source path is within the {\ttfamily src/third\+\_\+party} directory tree.
+\end{DoxyEnumerate}
+\begin{DoxyEnumerate}
+\item Create directory tree in {\ttfamily output directory}
+
+The previously generated lists of paths are used to create the directory tree structure in {\ttfamily output directory}. Only directories are created, in preparation for subsequent file copy operations.
+\end{DoxyEnumerate}
+\begin{DoxyEnumerate}
+\item Generate dictionary of header files
+
+A dictionary is generated where the keys are the names of the example applications. The value for each dictionary entry is a list of header file paths. The list of header file paths represents header files in the {\ttfamily output directory}, residing within each example application and under the {\ttfamily src/third\+\_\+party} directory.
+
+An additional default key entry is also generated. The value for this dictionary entry is a list of header file paths. The list of header file paths represents header files in the {\ttfamily output directory}, under the {\ttfamily src/third\+\_\+party} directory.
+
+This dictionary of header files is used as an input parameter to the \href{transform_source.py}{\texttt{ transform\+\_\+source}} script.
+\end{DoxyEnumerate}
+\begin{DoxyEnumerate}
+\item Transform and copy files in the list of base paths
+
+The list of base paths which will be transformed is used to copy files from the {\ttfamily base directory} to the {\ttfamily output directory}. Each file to be copied is transformed using the \href{transform_source.py}{\texttt{ transform\+\_\+source}} script.
+\end{DoxyEnumerate}
+\begin{DoxyEnumerate}
+\item Transform and copy files in the list of repository paths
+
+The list of repository paths which will be transformed is used to copy files from the repository to the {\ttfamily output directory}. Each file to be copied is transformed using the \href{transform_source.py}{\texttt{ transform\+\_\+source}} script.
+\end{DoxyEnumerate}
+\begin{DoxyEnumerate}
+\item Copy files with no transform in the list of base paths
+
+The list of base paths that will not be transformed is used to copy files from the {\ttfamily base directory} to the {\ttfamily output directory}.
+\end{DoxyEnumerate}
+\begin{DoxyEnumerate}
+\item Copy files with no transform in the list of repository paths
+
+The list of repository paths that will not be transformed is used to copy files from the repository to the {\ttfamily output directory}.
+\end{DoxyEnumerate}
+\begin{DoxyEnumerate}
+\item Flatten file tree of the example applications in the {\ttfamily output directory}
+
+Some example applications have sub-\/directories. These sub-\/directories must be flattened to make the example applications compatible with the Arduino IDE. This flatenning causes all sub-\/directory files to be moved to the top-\/level directories of the example applications. The script \href{fix_arduino_subfolders.py}{\texttt{ fix\+\_\+arduino\+\_\+subfolders}} performs the flattening operation.
+\end{DoxyEnumerate}
+\begin{DoxyEnumerate}
+\item Patch files in {\ttfamily output directory} using {\ttfamily manifest} directives
+
+The files in the {\ttfamily output directory} have {\ttfamily sed} regular-\/expression script directives applied as specified in the {\ttfamily manifest}.
+\end{DoxyEnumerate}
+\begin{DoxyEnumerate}
+\item Remove empty directories in the {\ttfamily output directory}
+
+Remove any empty directories that are a result of the previous step of flattening the example application directories. 
+\end{DoxyEnumerate}

@@ -1,0 +1,174 @@
+\doxysection{hard\+\_\+swish.\+h}
+\hypertarget{tflite-micro-main_2tensorflow_2lite_2kernels_2internal_2reference_2hard__swish_8h_source}{}\label{tflite-micro-main_2tensorflow_2lite_2kernels_2internal_2reference_2hard__swish_8h_source}\index{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/main/tensorflow/lite/kernels/internal/reference/hard\_swish.h@{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/main/tensorflow/lite/kernels/internal/reference/hard\_swish.h}}
+\mbox{\hyperlink{tflite-micro-main_2tensorflow_2lite_2kernels_2internal_2reference_2hard__swish_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{/*\ Copyright\ 2020\ The\ TensorFlow\ Authors.\ All\ Rights\ Reserved.}}
+\DoxyCodeLine{00002\ \textcolor{comment}{}}
+\DoxyCodeLine{00003\ \textcolor{comment}{Licensed\ under\ the\ Apache\ License,\ Version\ 2.0\ (the\ "{}License"{});}}
+\DoxyCodeLine{00004\ \textcolor{comment}{you\ may\ not\ use\ this\ file\ except\ in\ compliance\ with\ the\ License.}}
+\DoxyCodeLine{00005\ \textcolor{comment}{You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{00006\ \textcolor{comment}{}}
+\DoxyCodeLine{00007\ \textcolor{comment}{\ \ \ \ http://www.apache.org/licenses/LICENSE-\/2.0}}
+\DoxyCodeLine{00008\ \textcolor{comment}{}}
+\DoxyCodeLine{00009\ \textcolor{comment}{Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ software}}
+\DoxyCodeLine{00010\ \textcolor{comment}{distributed\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,}}
+\DoxyCodeLine{00011\ \textcolor{comment}{WITHOUT\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,\ either\ express\ or\ implied.}}
+\DoxyCodeLine{00012\ \textcolor{comment}{See\ the\ License\ for\ the\ specific\ language\ governing\ permissions\ and}}
+\DoxyCodeLine{00013\ \textcolor{comment}{limitations\ under\ the\ License.}}
+\DoxyCodeLine{00014\ \textcolor{comment}{==============================================================================*/}}
+\DoxyCodeLine{00015\ \textcolor{preprocessor}{\#ifndef\ TENSORFLOW\_LITE\_KERNELS\_INTERNAL\_REFERENCE\_HARD\_SWISH\_H\_}}
+\DoxyCodeLine{00016\ \textcolor{preprocessor}{\#define\ TENSORFLOW\_LITE\_KERNELS\_INTERNAL\_REFERENCE\_HARD\_SWISH\_H\_}}
+\DoxyCodeLine{00017\ }
+\DoxyCodeLine{00018\ \textcolor{preprocessor}{\#include\ <algorithm>}}
+\DoxyCodeLine{00019\ }
+\DoxyCodeLine{00020\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{instrumentation_8h}{ruy/profiler/instrumentation.h}}"{}}\ \ \textcolor{comment}{//\ from\ @ruy}}
+\DoxyCodeLine{00021\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/kernels/internal/common.h"{}}}
+\DoxyCodeLine{00022\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/kernels/internal/types.h"{}}}
+\DoxyCodeLine{00023\ }
+\DoxyCodeLine{00024\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacetflite}{tflite}}\ \{}
+\DoxyCodeLine{00025\ \textcolor{keyword}{namespace\ }reference\_ops\ \{}
+\DoxyCodeLine{00026\ }
+\DoxyCodeLine{00027\ \textcolor{keyword}{inline}\ int16\_t\ \mbox{\hyperlink{namespacetflite_1_1reference__ops_a9531a4ed6192bfa49149410cc69ae1a1}{SaturatingLeftShift}}(int16\_t\ \mbox{\hyperlink{wm8960__regs_8h_a638e4503e0ae6ce655b7ad2e17e8f0ad}{value}},\ \textcolor{keywordtype}{int}\ amount)\ \{}
+\DoxyCodeLine{00028\ \ \ int64\_t\ result\ =\ \textcolor{keyword}{static\_cast<}int64\_t\textcolor{keyword}{>}(\mbox{\hyperlink{wm8960__regs_8h_a638e4503e0ae6ce655b7ad2e17e8f0ad}{value}})\ *\ (1\ <<\ amount);}
+\DoxyCodeLine{00029\ \ \ result\ =\ std::min<int64\_t>(result,\ std::numeric\_limits<int16\_t>::max());}
+\DoxyCodeLine{00030\ \ \ result\ =\ std::max<int64\_t>(result,\ std::numeric\_limits<int16\_t>::min());}
+\DoxyCodeLine{00031\ \ \ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{00032\ \}}
+\DoxyCodeLine{00033\ }
+\DoxyCodeLine{00034\ \textcolor{comment}{//\ Similar\ to\ ARM\ instruction\ SQDMULH.}}
+\DoxyCodeLine{00035\ \textcolor{comment}{//\ Similar\ to\ gemmlowp::SaturatingRoundingDoublingHighMul\ except}}
+\DoxyCodeLine{00036\ \textcolor{comment}{//\ rounding\ to\ zero\ instead\ of\ to\ nearest\ (SQRDMULH).}}
+\DoxyCodeLine{00037\ \textcolor{keyword}{inline}\ std::int16\_t\ \mbox{\hyperlink{namespacetflite_1_1reference__ops_a836b5d11eac28eac1e6d22b23e77e766}{SaturatingDoublingHighMul}}(std::int16\_t\ a,\ std::int16\_t\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}})\ \{}
+\DoxyCodeLine{00038\ \ \ \textcolor{keywordtype}{bool}\ overflow\ =\ \mbox{\hyperlink{namespacetflite-camera-button_ac1be43aa5f1883983bb8e5bb88cd53a1}{a}}\ ==\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}}\ \&\&\ \mbox{\hyperlink{namespacetflite-camera-button_ac1be43aa5f1883983bb8e5bb88cd53a1}{a}}\ ==\ std::numeric\_limits<std::int16\_t>::min();}
+\DoxyCodeLine{00039\ \ \ std::int32\_t\ a\_32(a);}
+\DoxyCodeLine{00040\ \ \ std::int32\_t\ b\_32(\mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}});}
+\DoxyCodeLine{00041\ \ \ std::int32\_t\ ab\_32\ =\ a\_32\ *\ b\_32;}
+\DoxyCodeLine{00042\ \ \ std::int16\_t\ ab\_x2\_high16\ =\ \textcolor{keyword}{static\_cast<}std::int16\_t\textcolor{keyword}{>}((ab\_32)\ /\ (1\ <<\ 15));}
+\DoxyCodeLine{00043\ \ \ \textcolor{keywordflow}{return}\ overflow\ ?\ std::numeric\_limits<std::int16\_t>::max()\ :\ ab\_x2\_high16;}
+\DoxyCodeLine{00044\ \}}
+\DoxyCodeLine{00045\ }
+\DoxyCodeLine{00046\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{00047\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1reference__ops_a2c03a19f9f0470681c93a9c7f840a884}{HardSwish}}(\textcolor{keyword}{const}\ RuntimeShape\&\ input\_shape,\ \textcolor{keyword}{const}\ T*\ \mbox{\hyperlink{add__n__test_8cc_a5612ba79d1f0b544c7aeae4621166fea}{input\_data}},}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ RuntimeShape\&\ output\_shape,\ T*\ \mbox{\hyperlink{add__n__test_8cc_a3305b43869c4b837b0a33c12cff5069b}{output\_data}})\ \{}
+\DoxyCodeLine{00049\ \ \ \mbox{\hyperlink{classruy_1_1profiler_1_1_scope_label}{ruy::profiler::ScopeLabel}}\ \mbox{\hyperlink{namespace_arduino_tinyml_workshop_aa3ba06fbb1cde2537e5c8d5173ef6c87}{label}}(\textcolor{stringliteral}{"{}ReferenceHardSwish/Float"{}});}
+\DoxyCodeLine{00050\ \ \ \textcolor{keyword}{auto}\ matching\_size\ =\ \mbox{\hyperlink{namespacetflite_a8d6998b7eb7b2f0d21f8352da6f6271f}{MatchingFlatSize}}(input\_shape,\ output\_shape);}
+\DoxyCodeLine{00051\ \ \ \textcolor{keyword}{const}\ T*\ in\_end\ =\ \mbox{\hyperlink{add__n__test_8cc_a5612ba79d1f0b544c7aeae4621166fea}{input\_data}}\ +\ matching\_size;}
+\DoxyCodeLine{00052\ \ \ \textcolor{keywordflow}{for}\ (;\ \mbox{\hyperlink{add__n__test_8cc_a5612ba79d1f0b544c7aeae4621166fea}{input\_data}}\ <\ in\_end;\ \mbox{\hyperlink{add__n__test_8cc_a5612ba79d1f0b544c7aeae4621166fea}{input\_data}}++,\ \mbox{\hyperlink{add__n__test_8cc_a3305b43869c4b837b0a33c12cff5069b}{output\_data}}++)\ \{}
+\DoxyCodeLine{00053\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{float}\ in\ =\ *\mbox{\hyperlink{add__n__test_8cc_a5612ba79d1f0b544c7aeae4621166fea}{input\_data}};}
+\DoxyCodeLine{00054\ \ \ \ \ *\mbox{\hyperlink{add__n__test_8cc_a3305b43869c4b837b0a33c12cff5069b}{output\_data}}\ =}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \ \ in\ *\ std::min(\textcolor{keyword}{static\_cast<}T\textcolor{keyword}{>}(6),\ std::max(\textcolor{keyword}{static\_cast<}T\textcolor{keyword}{>}(0),\ in\ +\ 3))\ /}
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \ \ 6;}
+\DoxyCodeLine{00057\ \ \ \}}
+\DoxyCodeLine{00058\ \}}
+\DoxyCodeLine{00059\ }
+\DoxyCodeLine{00060\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{00061\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1reference__ops_a2c03a19f9f0470681c93a9c7f840a884}{HardSwish}}(\textcolor{keyword}{const}\ HardSwishParams\&\ \mbox{\hyperlink{comparisons_8cpp_a434686eb00eea897154eb5c3f9364ef7}{params}},}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ RuntimeShape\&\ input\_shape,\ \textcolor{keyword}{const}\ T*\ \mbox{\hyperlink{add__n__test_8cc_a5612ba79d1f0b544c7aeae4621166fea}{input\_data}},}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ RuntimeShape\&\ output\_shape,\ T*\ \mbox{\hyperlink{add__n__test_8cc_a3305b43869c4b837b0a33c12cff5069b}{output\_data}})\ \{}
+\DoxyCodeLine{00064\ \ \ \mbox{\hyperlink{classruy_1_1profiler_1_1_scope_label}{ruy::profiler::ScopeLabel}}\ \mbox{\hyperlink{namespace_arduino_tinyml_workshop_aa3ba06fbb1cde2537e5c8d5173ef6c87}{label}}(\textcolor{stringliteral}{"{}ReferenceHardSwish/Quantized"{}});}
+\DoxyCodeLine{00065\ }
+\DoxyCodeLine{00066\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ flat\_size\ =\ \mbox{\hyperlink{namespacetflite_a8d6998b7eb7b2f0d21f8352da6f6271f}{MatchingFlatSize}}(input\_shape,\ output\_shape);}
+\DoxyCodeLine{00067\ }
+\DoxyCodeLine{00068\ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ flat\_size;\ i++)\ \{}
+\DoxyCodeLine{00069\ \ \ \ \ \textcolor{keyword}{const}\ int16\_t\ input\_value\ =\ \mbox{\hyperlink{add__n__test_8cc_a5612ba79d1f0b544c7aeae4621166fea}{input\_data}}[i]\ -\/\ \mbox{\hyperlink{comparisons_8cpp_a434686eb00eea897154eb5c3f9364ef7}{params}}.input\_zero\_point;}
+\DoxyCodeLine{00070\ \ \ \ \ \textcolor{comment}{//\ Left-\/shift\ as\ much\ as\ we\ can\ without\ overflow/saturation\ to\ put}}
+\DoxyCodeLine{00071\ \ \ \ \ \textcolor{comment}{//\ significant\ bits\ in\ the\ high\ bits\ of\ our\ 16-\/bit\ fixedpoint\ values,\ so}}
+\DoxyCodeLine{00072\ \ \ \ \ \textcolor{comment}{//\ that\ fixed-\/point\ approximate\ computations\ below\ are\ as\ accurate\ as}}
+\DoxyCodeLine{00073\ \ \ \ \ \textcolor{comment}{//\ possible.}}
+\DoxyCodeLine{00074\ \ \ \ \ \textcolor{keyword}{const}\ int16\_t\ input\_value\_on\_hires\_input\_scale\ =\ input\_value\ *\ (1\ <<\ 7);}
+\DoxyCodeLine{00075\ \ \ \ \ \textcolor{comment}{//\ Compute\ the\ input\ value\ on\ essentially\ the\ output\ scale,\ just\ not}}
+\DoxyCodeLine{00076\ \ \ \ \ \textcolor{comment}{//\ right-\/shifted\ yet.\ This\ is\ the\ value\ that\ we'll\ use\ in\ the\ (x\ >=\ +3)}}
+\DoxyCodeLine{00077\ \ \ \ \ \textcolor{comment}{//\ case,\ and\ that\ in\ the\ general\ case\ we'll\ multiply\ against\ the\ "{}relu-\/ish"{}}}
+\DoxyCodeLine{00078\ \ \ \ \ \textcolor{comment}{//\ fixed-\/point\ multiplier\ in\ [0,\ 1].}}
+\DoxyCodeLine{00079\ \ \ \ \ \textcolor{keyword}{const}\ int16\_t\ input\_value\_on\_preshift\_output\_scale\ =}
+\DoxyCodeLine{00080\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacegemmlowp_a7ef1c7121f41059f08e28aad77e2736f}{gemmlowp::SaturatingRoundingDoublingHighMul}}(}
+\DoxyCodeLine{00081\ \ \ \ \ \ \ \ \ \ \ \ \ input\_value\_on\_hires\_input\_scale,}
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{comparisons_8cpp_a434686eb00eea897154eb5c3f9364ef7}{params}}.output\_multiplier\_fixedpoint\_int16);}
+\DoxyCodeLine{00083\ \ \ \ \ \textcolor{comment}{//\ Now\ compute\ the\ "{}relu-\/ish\ multiplier"{}.\ In\ the\ (-\/3\ <=\ x\ <=\ +3)\ case,\ that}}
+\DoxyCodeLine{00084\ \ \ \ \ \textcolor{comment}{//\ is\ just\ an\ affine\ rescaling\ of\ x\ from\ [-\/3,\ 3]\ to\ [0,\ 1].\ In\ the\ general}}
+\DoxyCodeLine{00085\ \ \ \ \ \textcolor{comment}{//\ case,\ it\ is\ just\ that\ plus\ saturation\ at\ the\ boundaries\ of\ [-\/3,\ 3].}}
+\DoxyCodeLine{00086\ \ \ \ \ \textcolor{comment}{//\ First,\ we\ rescale\ from\ [-\/3,\ 3]\ to\ [-\/1,\ 1],\ saturating.}}
+\DoxyCodeLine{00087\ \ \ \ \ \textcolor{comment}{//\ That\ is\ done\ by\ rescaling\ the\ input\ value\ with\ a\ fixed-\/point\ multiplier}}
+\DoxyCodeLine{00088\ \ \ \ \ \textcolor{comment}{//\ (reluish\_multiplier\_fixedpoint)\ and\ bit-\/shift\ such\ that\ we\ represent}}
+\DoxyCodeLine{00089\ \ \ \ \ \textcolor{comment}{//\ that\ input\ value\ on\ the\ scale\ where\ the\ real\ value\ 3.0f\ is\ represented}}
+\DoxyCodeLine{00090\ \ \ \ \ \textcolor{comment}{//\ by\ the\ quantized\ value\ 32768.\ \ (+32768\ is\ actually\ not\ representable\ as}}
+\DoxyCodeLine{00091\ \ \ \ \ \textcolor{comment}{//\ int16\_t,\ so\ this\ saturates\ at\ +32767,\ and\ that\ is\ seen\ empirically\ to\ be}}
+\DoxyCodeLine{00092\ \ \ \ \ \textcolor{comment}{//\ a\ negligible\ contribution\ to\ numerical\ error/bias).}}
+\DoxyCodeLine{00093\ \ \ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{00094\ \ \ \ \ \textcolor{comment}{//\ This\ code\ is\ careful\ to\ correctly\ implement\ any\ magnitude\ of\ multiplier,}}
+\DoxyCodeLine{00095\ \ \ \ \ \textcolor{comment}{//\ involving\ either\ a\ right\ shift\ or\ a\ left\ shift,\ with\ correct\ saturation}}
+\DoxyCodeLine{00096\ \ \ \ \ \textcolor{comment}{//\ behavior\ in\ the\ left-\/shift\ case.\ This\ forces\ this\ code\ to\ be\ more}}
+\DoxyCodeLine{00097\ \ \ \ \ \textcolor{comment}{//\ complicated,\ but\ is\ necessary\ for\ real\ applications:\ a\ partially}}
+\DoxyCodeLine{00098\ \ \ \ \ \textcolor{comment}{//\ trained\ quantized\ MobileNet\ v3-\/small\ model\ that\ motivated\ this\ code}}
+\DoxyCodeLine{00099\ \ \ \ \ \textcolor{comment}{//\ exhibits\ some\ large\ [min,\ max]\ range\ boundaries,\ of\ the\ order\ of}}
+\DoxyCodeLine{00100\ \ \ \ \ \textcolor{comment}{//\ magnitude\ of\ 10\ or\ 100\ depending\ on\ layers.}}
+\DoxyCodeLine{00101\ \ \ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{00102\ \ \ \ \ \textcolor{comment}{//\ The\ next\ few\ lines\ are\ basically\ just\ an\ ordinary}}
+\DoxyCodeLine{00103\ \ \ \ \ \textcolor{comment}{//\ MultiplyByQuantizedMultiplier,\ except\ that\ we\ are\ more\ careful\ here}}
+\DoxyCodeLine{00104\ \ \ \ \ \textcolor{comment}{//\ about\ the\ fine\ details\ of\ saturation\ when\ left-\/shifting,\ because\ here}}
+\DoxyCodeLine{00105\ \ \ \ \ \textcolor{comment}{//\ overflow\ in\ left-\/shift\ is\ a\ common\ case,\ not\ an\ anomaly\ as}}
+\DoxyCodeLine{00106\ \ \ \ \ \textcolor{comment}{//\ MultiplyByQuantizedMultiplier\ assumes.}}
+\DoxyCodeLine{00107\ \ \ \ \ int16\_t\ reluish\_value\ =\ input\_value\_on\_hires\_input\_scale;}
+\DoxyCodeLine{00108\ \ \ \ \ \textcolor{comment}{//\ Shift\ left,\ saturating,\ as\ much\ as\ we\ can\ while\ ensuring\ that\ this}}
+\DoxyCodeLine{00109\ \ \ \ \ \textcolor{comment}{//\ saturation\ will\ not\ contribute\ to\ the\ result.\ That\ is,\ left\ shift\ amount}}
+\DoxyCodeLine{00110\ \ \ \ \ \textcolor{comment}{//\ reduced\ by\ 1.}}
+\DoxyCodeLine{00111\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{comparisons_8cpp_a434686eb00eea897154eb5c3f9364ef7}{params}}.reluish\_multiplier\_exponent\ >\ 0)\ \{}
+\DoxyCodeLine{00112\ \ \ \ \ \ \ reluish\_value\ =\ \mbox{\hyperlink{namespacetflite_1_1reference__ops_a9531a4ed6192bfa49149410cc69ae1a1}{SaturatingLeftShift}}(}
+\DoxyCodeLine{00113\ \ \ \ \ \ \ \ \ \ \ reluish\_value,\ \mbox{\hyperlink{comparisons_8cpp_a434686eb00eea897154eb5c3f9364ef7}{params}}.reluish\_multiplier\_exponent\ -\/\ 1);}
+\DoxyCodeLine{00114\ \ \ \ \ \}}
+\DoxyCodeLine{00115\ \ \ \ \ \textcolor{comment}{//\ Apply\ the\ fixed-\/point\ multiplier,\ dividing\ the\ value\ by\ a\ divisor}}
+\DoxyCodeLine{00116\ \ \ \ \ \textcolor{comment}{//\ ranging\ in\ [1,\ 2].}}
+\DoxyCodeLine{00117\ \ \ \ \ reluish\_value\ =\ \mbox{\hyperlink{namespacegemmlowp_a7ef1c7121f41059f08e28aad77e2736f}{gemmlowp::SaturatingRoundingDoublingHighMul}}(}
+\DoxyCodeLine{00118\ \ \ \ \ \ \ \ \ reluish\_value,\ \mbox{\hyperlink{comparisons_8cpp_a434686eb00eea897154eb5c3f9364ef7}{params}}.reluish\_multiplier\_fixedpoint\_int16);}
+\DoxyCodeLine{00119\ \ \ \ \ \textcolor{comment}{//\ Apply\ the\ last\ bit\ of\ left-\/shift.\ Thus,\ in\ the\ left-\/shifting\ case,\ if}}
+\DoxyCodeLine{00120\ \ \ \ \ \textcolor{comment}{//\ any\ saturation\ affects\ the\ result,\ it\ is\ happening\ here\ -\/-\/-\/\ any}}
+\DoxyCodeLine{00121\ \ \ \ \ \textcolor{comment}{//\ saturation\ having\ occurred\ above\ is\ overwritten\ here,\ not\ affecting\ the}}
+\DoxyCodeLine{00122\ \ \ \ \ \textcolor{comment}{//\ result.}}
+\DoxyCodeLine{00123\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{comparisons_8cpp_a434686eb00eea897154eb5c3f9364ef7}{params}}.reluish\_multiplier\_exponent\ >\ 0)\ \{}
+\DoxyCodeLine{00124\ \ \ \ \ \ \ reluish\_value\ =\ \mbox{\hyperlink{namespacetflite_1_1reference__ops_a9531a4ed6192bfa49149410cc69ae1a1}{SaturatingLeftShift}}(reluish\_value,\ 1);}
+\DoxyCodeLine{00125\ \ \ \ \ \}}
+\DoxyCodeLine{00126\ \ \ \ \ \textcolor{comment}{//\ Shift\ right,\ in\ the\ right-\/shifting\ case.}}
+\DoxyCodeLine{00127\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{comparisons_8cpp_a434686eb00eea897154eb5c3f9364ef7}{params}}.reluish\_multiplier\_exponent\ <\ 0)\ \{}
+\DoxyCodeLine{00128\ \ \ \ \ \ \ reluish\_value\ =\ \mbox{\hyperlink{namespacegemmlowp_a7d5169f4bc71a22c6a5adf9c1b73267d}{gemmlowp::RoundingDivideByPOT}}(}
+\DoxyCodeLine{00129\ \ \ \ \ \ \ \ \ \ \ reluish\_value,\ -\/\mbox{\hyperlink{comparisons_8cpp_a434686eb00eea897154eb5c3f9364ef7}{params}}.reluish\_multiplier\_exponent);}
+\DoxyCodeLine{00130\ \ \ \ \ \}}
+\DoxyCodeLine{00131\ \ \ \ \ \textcolor{comment}{//\ At\ this\ point\ we\ have\ rescaled\ the\ value\ into\ a\ 16bit\ fixedpoint}}
+\DoxyCodeLine{00132\ \ \ \ \ \textcolor{comment}{//\ reluish\_value\ in\ [-\/1,\ 1].}}
+\DoxyCodeLine{00133\ \ \ \ \ \textcolor{comment}{//\ We\ now\ convert\ that\ to\ a\ 16bit\ fixedpoint\ value\ in\ [0,\ 1].}}
+\DoxyCodeLine{00134\ \ \ \ \ reluish\_value\ =\ (reluish\_value\ +\ (1\ <<\ 15))\ >>\ 1;}
+\DoxyCodeLine{00135\ \ \ \ \ \textcolor{comment}{//\ Use\ of\ SaturatingDoublingHighMul\ here\ is\ important\ to\ cancel\ the\ biases}}
+\DoxyCodeLine{00136\ \ \ \ \ \textcolor{comment}{//\ from\ the\ above\ SaturatingRoundingDoublingHighMul.}}
+\DoxyCodeLine{00137\ \ \ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{00138\ \ \ \ \ \textcolor{comment}{//\ On\ a\ partially\ trained\ MobileNet-\/v3-\/small,}}
+\DoxyCodeLine{00139\ \ \ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{00140\ \ \ \ \ \textcolor{comment}{//\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ |\ bias\ on\ \ \ \ |\ \ ImageNet}}
+\DoxyCodeLine{00141\ \ \ \ \ \textcolor{comment}{//\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ |\ quantized\ \ |\ \ Top-\/1}}
+\DoxyCodeLine{00142\ \ \ \ \ \textcolor{comment}{//\ Operation\ used\ here\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ |\ values\ \ \ \ \ |\ \ accuracy\ (50k)}}
+\DoxyCodeLine{00143\ \ \ \ \ \textcolor{comment}{//\ -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/+-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/+-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}}
+\DoxyCodeLine{00144\ \ \ \ \ \textcolor{comment}{//\ SaturatingDoublingHighMul\ \ \ \ \ \ \ \ \ \ \ \ \ |\ -\/0.0024\ \ \ \ |\ \ 58.920}}
+\DoxyCodeLine{00145\ \ \ \ \ \textcolor{comment}{//\ SaturatingRoundingDoublingHighMul\ \ \ \ \ |\ -\/0.0067\ \ \ \ |\ \ 58.064}}
+\DoxyCodeLine{00146\ \ \ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{00147\ \ \ \ \ \textcolor{comment}{//\ In\ activations\_test,\ this\ is\ covered\ by\ this\ testcase:}}
+\DoxyCodeLine{00148\ \ \ \ \ \textcolor{comment}{//\ \ \ \ \ QuantizedActivationsOpTest.HardSwishBias}}
+\DoxyCodeLine{00149\ \ \ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{00150\ \ \ \ \ \textcolor{keyword}{const}\ int16\_t\ preshift\_output\_value\ =\ \mbox{\hyperlink{namespacetflite_1_1reference__ops_a836b5d11eac28eac1e6d22b23e77e766}{SaturatingDoublingHighMul}}(}
+\DoxyCodeLine{00151\ \ \ \ \ \ \ \ \ reluish\_value,\ input\_value\_on\_preshift\_output\_scale);}
+\DoxyCodeLine{00152\ \ \ \ \ \textcolor{comment}{//\ We\ were\ so\ far\ operating\ on\ the\ pre-\/shift\ output\ scale.\ Now\ we\ finally}}
+\DoxyCodeLine{00153\ \ \ \ \ \textcolor{comment}{//\ apply\ that\ output\ shift,\ arriving\ at\ the\ final\ output\ scale.}}
+\DoxyCodeLine{00154\ \ \ \ \ int16\_t\ output\_value\ =\ \mbox{\hyperlink{namespacegemmlowp_a7d5169f4bc71a22c6a5adf9c1b73267d}{gemmlowp::RoundingDivideByPOT}}(}
+\DoxyCodeLine{00155\ \ \ \ \ \ \ \ \ preshift\_output\_value,\ -\/\mbox{\hyperlink{comparisons_8cpp_a434686eb00eea897154eb5c3f9364ef7}{params}}.output\_multiplier\_exponent);}
+\DoxyCodeLine{00156\ \ \ \ \ output\_value\ +=\ \mbox{\hyperlink{comparisons_8cpp_a434686eb00eea897154eb5c3f9364ef7}{params}}.output\_zero\_point;}
+\DoxyCodeLine{00157\ \ \ \ \ output\_value\ =}
+\DoxyCodeLine{00158\ \ \ \ \ \ \ \ \ std::min<int16\_t>(output\_value,\ std::numeric\_limits<T>::max());}
+\DoxyCodeLine{00159\ \ \ \ \ output\_value\ =}
+\DoxyCodeLine{00160\ \ \ \ \ \ \ \ \ std::max<int16\_t>(output\_value,\ std::numeric\_limits<T>::min());}
+\DoxyCodeLine{00161\ \ \ \ \ \mbox{\hyperlink{add__n__test_8cc_a3305b43869c4b837b0a33c12cff5069b}{output\_data}}[i]\ =\ output\_value;}
+\DoxyCodeLine{00162\ \ \ \}}
+\DoxyCodeLine{00163\ \}}
+\DoxyCodeLine{00164\ }
+\DoxyCodeLine{00165\ \}\ \ \textcolor{comment}{//\ namespace\ reference\_ops}}
+\DoxyCodeLine{00166\ \}\ \ \textcolor{comment}{//\ namespace\ tflite}}
+\DoxyCodeLine{00167\ }
+\DoxyCodeLine{00168\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ TENSORFLOW\_LITE\_KERNELS\_INTERNAL\_REFERENCE\_HARD\_SWISH\_H\_}}
+
+\end{DoxyCode}

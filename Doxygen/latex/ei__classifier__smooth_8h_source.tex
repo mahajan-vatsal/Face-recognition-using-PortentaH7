@@ -1,0 +1,127 @@
+\doxysection{ei\+\_\+classifier\+\_\+smooth.\+h}
+\hypertarget{ei__classifier__smooth_8h_source}{}\label{ei__classifier__smooth_8h_source}\index{Face\_Access\_inferencing/src/edge-\/impulse-\/sdk/classifier/ei\_classifier\_smooth.h@{Face\_Access\_inferencing/src/edge-\/impulse-\/sdk/classifier/ei\_classifier\_smooth.h}}
+\mbox{\hyperlink{ei__classifier__smooth_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{00002\ \textcolor{comment}{\ *\ Copyright\ (c)\ 2022\ EdgeImpulse\ Inc.}}
+\DoxyCodeLine{00003\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00004\ \textcolor{comment}{\ *\ Licensed\ under\ the\ Apache\ License,\ Version\ 2.0\ (the\ "{}License"{});}}
+\DoxyCodeLine{00005\ \textcolor{comment}{\ *\ you\ may\ not\ use\ this\ file\ except\ in\ compliance\ with\ the\ License.}}
+\DoxyCodeLine{00006\ \textcolor{comment}{\ *\ You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{00007\ \textcolor{comment}{\ *\ http://www.apache.org/licenses/LICENSE-\/2.0}}
+\DoxyCodeLine{00008\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00009\ \textcolor{comment}{\ *\ Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,}}
+\DoxyCodeLine{00010\ \textcolor{comment}{\ *\ software\ distributed\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS}}
+\DoxyCodeLine{00011\ \textcolor{comment}{\ *\ IS"{}\ BASIS,\ WITHOUT\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,\ either}}
+\DoxyCodeLine{00012\ \textcolor{comment}{\ *\ express\ or\ implied.\ See\ the\ License\ for\ the\ specific\ language}}
+\DoxyCodeLine{00013\ \textcolor{comment}{\ *\ governing\ permissions\ and\ limitations\ under\ the\ License.}}
+\DoxyCodeLine{00014\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00015\ \textcolor{comment}{\ *\ SPDX-\/License-\/Identifier:\ Apache-\/2.0}}
+\DoxyCodeLine{00016\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{00017\ }
+\DoxyCodeLine{00018\ \textcolor{preprocessor}{\#ifndef\ \_EI\_CLASSIFIER\_SMOOTH\_H\_}}
+\DoxyCodeLine{00019\ \textcolor{preprocessor}{\#define\ \_EI\_CLASSIFIER\_SMOOTH\_H\_}}
+\DoxyCodeLine{00020\ }
+\DoxyCodeLine{00021\ \textcolor{preprocessor}{\#if\ EI\_CLASSIFIER\_OBJECT\_DETECTION\ !=\ 1}}
+\DoxyCodeLine{00022\ }
+\DoxyCodeLine{00023\ \textcolor{preprocessor}{\#include\ <stdint.h>}}
+\DoxyCodeLine{00024\ }
+\DoxyCodeLine{00025\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structei__classifier__smooth}{ei\_classifier\_smooth}}\ \{}
+\DoxyCodeLine{00026\ \ \ \ \ \textcolor{keywordtype}{int}\ *\mbox{\hyperlink{structei__classifier__smooth_ad9955e7afb0b4f0a47c35e89dd6a9231}{last\_readings}};}
+\DoxyCodeLine{00027\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{structei__classifier__smooth_a440b2d095707f78063700802ccb20b06}{last\_readings\_size}};}
+\DoxyCodeLine{00028\ \ \ \ \ uint8\_t\ \mbox{\hyperlink{structei__classifier__smooth_ac1cc026513bd99c98fb693648d265b0e}{min\_readings\_same}};}
+\DoxyCodeLine{00029\ \ \ \ \ \textcolor{keywordtype}{float}\ \mbox{\hyperlink{structei__classifier__smooth_a84a6df12c170d3b4b127cef90bb19c4c}{classifier\_confidence}};}
+\DoxyCodeLine{00030\ \ \ \ \ \textcolor{keywordtype}{float}\ \mbox{\hyperlink{structei__classifier__smooth_a35700be9849093e587e24a899ea102e1}{anomaly\_confidence}};}
+\DoxyCodeLine{00031\ \ \ \ \ uint8\_t\ \mbox{\hyperlink{structei__classifier__smooth_ac2509969f718a2c159a8551322321d67}{count}}[\mbox{\hyperlink{model__metadata_8h_a418cb88da93b0cc26bb74f11e5bbd81e}{EI\_CLASSIFIER\_LABEL\_COUNT}}\ +\ 2]\ =\ \{\ 0\ \};}
+\DoxyCodeLine{00032\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{structei__classifier__smooth_a939f6def995549610539ae038a9b9122}{count\_size}}\ =\ \mbox{\hyperlink{model__metadata_8h_a418cb88da93b0cc26bb74f11e5bbd81e}{EI\_CLASSIFIER\_LABEL\_COUNT}}\ +\ 2;}
+\DoxyCodeLine{00033\ \}\ \mbox{\hyperlink{ei__classifier__smooth_8h_a00b4af8970604eeed97abd110e337af0}{ei\_classifier\_smooth\_t}};}
+\DoxyCodeLine{00034\ }
+\DoxyCodeLine{00046\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{ei__classifier__smooth_8h_a8189bf09f7483039d85f44a63d066d78}{ei\_classifier\_smooth\_init}}(\mbox{\hyperlink{structei__classifier__smooth}{ei\_classifier\_smooth\_t}}\ *smooth,\ \textcolor{keywordtype}{size\_t}\ n\_readings,}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ uint8\_t\ min\_readings\_same,\ \textcolor{keywordtype}{float}\ classifier\_confidence\ =\ 0.8,}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}\ anomaly\_confidence\ =\ 0.3)\ \{}
+\DoxyCodeLine{00049\ \ \ \ \ smooth-\/>\mbox{\hyperlink{structei__classifier__smooth_ad9955e7afb0b4f0a47c35e89dd6a9231}{last\_readings}}\ =\ (\textcolor{keywordtype}{int}*)\mbox{\hyperlink{group__ei__user__functions_ga71ecca5661ac4434a709c88e4c39b4aa}{ei\_malloc}}(n\_readings\ *\ \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{int}));}
+\DoxyCodeLine{00050\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ ix\ =\ 0;\ ix\ <\ n\_readings;\ ix++)\ \{}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ smooth-\/>\mbox{\hyperlink{structei__classifier__smooth_ad9955e7afb0b4f0a47c35e89dd6a9231}{last\_readings}}[ix]\ =\ -\/1;\ \textcolor{comment}{//\ -\/1\ ==\ uncertain}}
+\DoxyCodeLine{00052\ \ \ \ \ \}}
+\DoxyCodeLine{00053\ \ \ \ \ smooth-\/>\mbox{\hyperlink{structei__classifier__smooth_a440b2d095707f78063700802ccb20b06}{last\_readings\_size}}\ =\ n\_readings;}
+\DoxyCodeLine{00054\ \ \ \ \ smooth-\/>\mbox{\hyperlink{structei__classifier__smooth_ac1cc026513bd99c98fb693648d265b0e}{min\_readings\_same}}\ =\ min\_readings\_same;}
+\DoxyCodeLine{00055\ \ \ \ \ smooth-\/>\mbox{\hyperlink{structei__classifier__smooth_a84a6df12c170d3b4b127cef90bb19c4c}{classifier\_confidence}}\ =\ classifier\_confidence;}
+\DoxyCodeLine{00056\ \ \ \ \ smooth-\/>\mbox{\hyperlink{structei__classifier__smooth_a35700be9849093e587e24a899ea102e1}{anomaly\_confidence}}\ =\ anomaly\_confidence;}
+\DoxyCodeLine{00057\ \ \ \ \ smooth-\/>\mbox{\hyperlink{structei__classifier__smooth_a939f6def995549610539ae038a9b9122}{count\_size}}\ =\ \mbox{\hyperlink{model__metadata_8h_a418cb88da93b0cc26bb74f11e5bbd81e}{EI\_CLASSIFIER\_LABEL\_COUNT}}\ +\ 2;}
+\DoxyCodeLine{00058\ \}}
+\DoxyCodeLine{00059\ }
+\DoxyCodeLine{00066\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \mbox{\hyperlink{ei__classifier__smooth_8h_a1dc2e8e6bc528ea443db32d237436b07}{ei\_classifier\_smooth\_update}}(\mbox{\hyperlink{structei__classifier__smooth}{ei\_classifier\_smooth\_t}}\ *smooth,\ \mbox{\hyperlink{structei__impulse__result__t}{ei\_impulse\_result\_t}}\ *\mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}})\ \{}
+\DoxyCodeLine{00067\ \ \ \ \ \textcolor{comment}{//\ clear\ out\ the\ count\ array}}
+\DoxyCodeLine{00068\ \ \ \ \ memset(smooth-\/>\mbox{\hyperlink{structei__classifier__smooth_ac2509969f718a2c159a8551322321d67}{count}},\ 0,\ \mbox{\hyperlink{model__metadata_8h_a418cb88da93b0cc26bb74f11e5bbd81e}{EI\_CLASSIFIER\_LABEL\_COUNT}}\ +\ 2);}
+\DoxyCodeLine{00069\ }
+\DoxyCodeLine{00070\ \ \ \ \ \textcolor{comment}{//\ roll\ through\ the\ last\_readings\ buffer}}
+\DoxyCodeLine{00071\ \ \ \ \ numpy::roll(smooth-\/>\mbox{\hyperlink{structei__classifier__smooth_ad9955e7afb0b4f0a47c35e89dd6a9231}{last\_readings}},\ smooth-\/>\mbox{\hyperlink{structei__classifier__smooth_a440b2d095707f78063700802ccb20b06}{last\_readings\_size}},\ -\/1);}
+\DoxyCodeLine{00072\ }
+\DoxyCodeLine{00073\ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{_proximity_8ino_a5fa8d7fdcda2ed9555ad800a40a1a810}{reading}}\ =\ -\/1;\ \textcolor{comment}{//\ uncertain}}
+\DoxyCodeLine{00074\ }
+\DoxyCodeLine{00075\ \ \ \ \ \textcolor{comment}{//\ print\ the\ predictions}}
+\DoxyCodeLine{00076\ \ \ \ \ \textcolor{comment}{//\ printf("{}["{});}}
+\DoxyCodeLine{00077\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ ix\ =\ 0;\ ix\ <\ \mbox{\hyperlink{model__metadata_8h_a418cb88da93b0cc26bb74f11e5bbd81e}{EI\_CLASSIFIER\_LABEL\_COUNT}};\ ix++)\ \{}
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}}-\/>classification[ix].value\ >=\ smooth-\/>\mbox{\hyperlink{structei__classifier__smooth_a84a6df12c170d3b4b127cef90bb19c4c}{classifier\_confidence}})\ \{}
+\DoxyCodeLine{00079\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_proximity_8ino_a5fa8d7fdcda2ed9555ad800a40a1a810}{reading}}\ =\ (int)ix;}
+\DoxyCodeLine{00080\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00081\ \ \ \ \ \}}
+\DoxyCodeLine{00082\ \textcolor{preprocessor}{\#if\ EI\_CLASSIFIER\_HAS\_ANOMALY}}
+\DoxyCodeLine{00083\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}}-\/>anomaly\ >=\ smooth-\/>\mbox{\hyperlink{structei__classifier__smooth_a35700be9849093e587e24a899ea102e1}{anomaly\_confidence}})\ \{}
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_proximity_8ino_a5fa8d7fdcda2ed9555ad800a40a1a810}{reading}}\ =\ -\/2;\ \textcolor{comment}{//\ anomaly}}
+\DoxyCodeLine{00085\ \ \ \ \ \}}
+\DoxyCodeLine{00086\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00087\ }
+\DoxyCodeLine{00088\ \ \ \ \ smooth-\/>\mbox{\hyperlink{structei__classifier__smooth_ad9955e7afb0b4f0a47c35e89dd6a9231}{last\_readings}}[smooth-\/>\mbox{\hyperlink{structei__classifier__smooth_a440b2d095707f78063700802ccb20b06}{last\_readings\_size}}\ -\/\ 1]\ =\ \mbox{\hyperlink{_proximity_8ino_a5fa8d7fdcda2ed9555ad800a40a1a810}{reading}};}
+\DoxyCodeLine{00089\ }
+\DoxyCodeLine{00090\ \ \ \ \ \textcolor{comment}{//\ now\ count\ last\ 10\ readings\ and\ see\ what\ we\ actually\ see...}}
+\DoxyCodeLine{00091\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ ix\ =\ 0;\ ix\ <\ smooth-\/>\mbox{\hyperlink{structei__classifier__smooth_a440b2d095707f78063700802ccb20b06}{last\_readings\_size}};\ ix++)\ \{}
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (smooth-\/>\mbox{\hyperlink{structei__classifier__smooth_ad9955e7afb0b4f0a47c35e89dd6a9231}{last\_readings}}[ix]\ >=\ 0)\ \{}
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \ \ \ \ \ \ smooth-\/>\mbox{\hyperlink{structei__classifier__smooth_ac2509969f718a2c159a8551322321d67}{count}}[smooth-\/>\mbox{\hyperlink{structei__classifier__smooth_ad9955e7afb0b4f0a47c35e89dd6a9231}{last\_readings}}[ix]]++;}
+\DoxyCodeLine{00094\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00095\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (smooth-\/>\mbox{\hyperlink{structei__classifier__smooth_ad9955e7afb0b4f0a47c35e89dd6a9231}{last\_readings}}[ix]\ ==\ -\/1)\ \{\ \textcolor{comment}{//\ uncertain}}
+\DoxyCodeLine{00096\ \ \ \ \ \ \ \ \ \ \ \ \ smooth-\/>\mbox{\hyperlink{structei__classifier__smooth_ac2509969f718a2c159a8551322321d67}{count}}[\mbox{\hyperlink{model__metadata_8h_a418cb88da93b0cc26bb74f11e5bbd81e}{EI\_CLASSIFIER\_LABEL\_COUNT}}]++;}
+\DoxyCodeLine{00097\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00098\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (smooth-\/>\mbox{\hyperlink{structei__classifier__smooth_ad9955e7afb0b4f0a47c35e89dd6a9231}{last\_readings}}[ix]\ ==\ -\/2)\ \{\ \textcolor{comment}{//\ anomaly}}
+\DoxyCodeLine{00099\ \ \ \ \ \ \ \ \ \ \ \ \ smooth-\/>\mbox{\hyperlink{structei__classifier__smooth_ac2509969f718a2c159a8551322321d67}{count}}[\mbox{\hyperlink{model__metadata_8h_a418cb88da93b0cc26bb74f11e5bbd81e}{EI\_CLASSIFIER\_LABEL\_COUNT}}\ +\ 1]++;}
+\DoxyCodeLine{00100\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00101\ \ \ \ \ \}}
+\DoxyCodeLine{00102\ }
+\DoxyCodeLine{00103\ \ \ \ \ \textcolor{comment}{//\ then\ loop\ over\ the\ count\ and\ see\ which\ is\ highest}}
+\DoxyCodeLine{00104\ \ \ \ \ uint8\_t\ top\_result\ =\ 0;}
+\DoxyCodeLine{00105\ \ \ \ \ uint8\_t\ top\_count\ =\ 0;}
+\DoxyCodeLine{00106\ \ \ \ \ \textcolor{keywordtype}{bool}\ met\_confidence\_threshold\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00107\ \ \ \ \ uint8\_t\ confidence\_threshold\ =\ smooth-\/>\mbox{\hyperlink{structei__classifier__smooth_ac1cc026513bd99c98fb693648d265b0e}{min\_readings\_same}};\ \textcolor{comment}{//\ XX\%\ of\ windows\ should\ be\ the\ same}}
+\DoxyCodeLine{00108\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ ix\ =\ 0;\ ix\ <\ \mbox{\hyperlink{model__metadata_8h_a418cb88da93b0cc26bb74f11e5bbd81e}{EI\_CLASSIFIER\_LABEL\_COUNT}}\ +\ 2;\ ix++)\ \{}
+\DoxyCodeLine{00109\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (smooth-\/>\mbox{\hyperlink{structei__classifier__smooth_ac2509969f718a2c159a8551322321d67}{count}}[ix]\ >\ top\_count)\ \{}
+\DoxyCodeLine{00110\ \ \ \ \ \ \ \ \ \ \ \ \ top\_result\ =\ ix;}
+\DoxyCodeLine{00111\ \ \ \ \ \ \ \ \ \ \ \ \ top\_count\ =\ smooth-\/>\mbox{\hyperlink{structei__classifier__smooth_ac2509969f718a2c159a8551322321d67}{count}}[ix];}
+\DoxyCodeLine{00112\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00113\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (smooth-\/>\mbox{\hyperlink{structei__classifier__smooth_ac2509969f718a2c159a8551322321d67}{count}}[ix]\ >=\ confidence\_threshold)\ \{}
+\DoxyCodeLine{00114\ \ \ \ \ \ \ \ \ \ \ \ \ met\_confidence\_threshold\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00115\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00116\ \ \ \ \ \}}
+\DoxyCodeLine{00117\ }
+\DoxyCodeLine{00118\ \ \ \ \ \textcolor{keywordflow}{if}\ (met\_confidence\_threshold)\ \{}
+\DoxyCodeLine{00119\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (top\_result\ ==\ \mbox{\hyperlink{model__metadata_8h_a418cb88da93b0cc26bb74f11e5bbd81e}{EI\_CLASSIFIER\_LABEL\_COUNT}})\ \{}
+\DoxyCodeLine{00120\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}uncertain"{}};}
+\DoxyCodeLine{00121\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00122\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (top\_result\ ==\ \mbox{\hyperlink{model__metadata_8h_a418cb88da93b0cc26bb74f11e5bbd81e}{EI\_CLASSIFIER\_LABEL\_COUNT}}\ +\ 1)\ \{}
+\DoxyCodeLine{00123\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}anomaly"{}};}
+\DoxyCodeLine{00124\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00125\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00126\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}}-\/>classification[top\_result].label;}
+\DoxyCodeLine{00127\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00128\ \ \ \ \ \}}
+\DoxyCodeLine{00129\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}uncertain"{}};}
+\DoxyCodeLine{00130\ \}}
+\DoxyCodeLine{00131\ }
+\DoxyCodeLine{00135\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{ei__classifier__smooth_8h_a522ebd3a3f0dd8f9d360cb4393cdedc4}{ei\_classifier\_smooth\_free}}(\mbox{\hyperlink{structei__classifier__smooth}{ei\_classifier\_smooth\_t}}\ *smooth)\ \{}
+\DoxyCodeLine{00136\ \ \ \ \ \mbox{\hyperlink{group__ei__user__functions_ga7a6a70833407ff1870c12396ce2c4aa3}{ei\_free}}(smooth-\/>\mbox{\hyperlink{structei__classifier__smooth_ad9955e7afb0b4f0a47c35e89dd6a9231}{last\_readings}});}
+\DoxyCodeLine{00137\ \}}
+\DoxyCodeLine{00138\ }
+\DoxyCodeLine{00139\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ \#if\ EI\_CLASSIFIER\_OBJECT\_DETECTION\ !=\ 1}}
+\DoxyCodeLine{00140\ }
+\DoxyCodeLine{00141\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ \_EI\_CLASSIFIER\_SMOOTH\_H\_}}
+
+\end{DoxyCode}

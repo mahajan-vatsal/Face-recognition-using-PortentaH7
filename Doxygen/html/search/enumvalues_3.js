@@ -1,0 +1,16 @@
+var searchData=
+[
+  ['dct_5fnormalization_5fnone_0',['DCT_NORMALIZATION_NONE',['../numpy__types_8h.html#a40701d30aad9350e66c0e10c9b167ab8a0422c071514c59109b489fdcfec6ae6f',1,'numpy_types.h']]],
+  ['dct_5fnormalization_5fortho_1',['DCT_NORMALIZATION_ORTHO',['../numpy__types_8h.html#a40701d30aad9350e66c0e10c9b167ab8a18511e97663ebace8d24ce58f08f8b71',1,'numpy_types.h']]],
+  ['dimensiontype_5fdense_2',['DimensionType_DENSE',['../namespacetflite.html#a5f63ec31ff8bfdb543418268c5c179c0a822822fc301d6901d1e31a071447bdac',1,'tflite']]],
+  ['dimensiontype_5fmax_3',['DimensionType_MAX',['../namespacetflite.html#a5f63ec31ff8bfdb543418268c5c179c0a0937dc1687d2a86eb15437cbb83052fe',1,'tflite']]],
+  ['dimensiontype_5fmin_4',['DimensionType_MIN',['../namespacetflite.html#a5f63ec31ff8bfdb543418268c5c179c0a5c55507e2c48818d999738c8fe2f9e1f',1,'tflite']]],
+  ['dimensiontype_5fsparse_5fcsr_5',['DimensionType_SPARSE_CSR',['../namespacetflite.html#a5f63ec31ff8bfdb543418268c5c179c0ae6bb87b05892d54947837c5442965c0a',1,'tflite']]],
+  ['dma_5ffault_5fsrc_5faxi_5fm0_6',['DMA_FAULT_SRC_AXI_M0',['../ethosu55__interface_8h.html#af3e23555b3059405dbc6c16cba699bcaa01617e41b47021cdc262859c24d2cd57',1,'DMA_FAULT_SRC_AXI_M0:&#160;ethosu55_interface.h'],['../ethosu65__interface_8h.html#af3e23555b3059405dbc6c16cba699bcaa01617e41b47021cdc262859c24d2cd57',1,'DMA_FAULT_SRC_AXI_M0:&#160;ethosu65_interface.h']]],
+  ['dma_5ffault_5fsrc_5faxi_5fm1_7',['DMA_FAULT_SRC_AXI_M1',['../ethosu55__interface_8h.html#af3e23555b3059405dbc6c16cba699bcaac67dca6800714f6effbf2532d0185d90',1,'DMA_FAULT_SRC_AXI_M1:&#160;ethosu55_interface.h'],['../ethosu65__interface_8h.html#af3e23555b3059405dbc6c16cba699bcaac67dca6800714f6effbf2532d0185d90',1,'DMA_FAULT_SRC_AXI_M1:&#160;ethosu65_interface.h']]],
+  ['dma_5fregion_5fmode_5fexternal_8',['DMA_REGION_MODE_EXTERNAL',['../ethosu55__interface_8h.html#a3643e1f90a6a7bc393076f7d1bf3c572ad8ec07c88a28392905a180122a134f39',1,'DMA_REGION_MODE_EXTERNAL:&#160;ethosu55_interface.h'],['../ethosu65__interface_8h.html#a3643e1f90a6a7bc393076f7d1bf3c572ad8ec07c88a28392905a180122a134f39',1,'DMA_REGION_MODE_EXTERNAL:&#160;ethosu65_interface.h']]],
+  ['dma_5fregion_5fmode_5finternal_9',['DMA_REGION_MODE_INTERNAL',['../ethosu55__interface_8h.html#a3643e1f90a6a7bc393076f7d1bf3c572accad3647f96643373557b1ba9a6584e0',1,'DMA_REGION_MODE_INTERNAL:&#160;ethosu55_interface.h'],['../ethosu65__interface_8h.html#a3643e1f90a6a7bc393076f7d1bf3c572accad3647f96643373557b1ba9a6584e0',1,'DMA_REGION_MODE_INTERNAL:&#160;ethosu65_interface.h']]],
+  ['dma_5fstride_5fmode_5fd1_10',['DMA_STRIDE_MODE_D1',['../ethosu55__interface_8h.html#a80393ba0c03ca780da9eafdb33406d8aa85086eb461335a68ad50bfd875cd82a3',1,'DMA_STRIDE_MODE_D1:&#160;ethosu55_interface.h'],['../ethosu65__interface_8h.html#a80393ba0c03ca780da9eafdb33406d8aa85086eb461335a68ad50bfd875cd82a3',1,'DMA_STRIDE_MODE_D1:&#160;ethosu65_interface.h']]],
+  ['dma_5fstride_5fmode_5fd2_11',['DMA_STRIDE_MODE_D2',['../ethosu65__interface_8h.html#a80393ba0c03ca780da9eafdb33406d8aa04425bce8178bb701370781865682014',1,'ethosu65_interface.h']]],
+  ['dma_5fstride_5fmode_5fd3_12',['DMA_STRIDE_MODE_D3',['../ethosu65__interface_8h.html#a80393ba0c03ca780da9eafdb33406d8aa34b8e1df21b97269cbb0a1452f42b199',1,'ethosu65_interface.h']]]
+];

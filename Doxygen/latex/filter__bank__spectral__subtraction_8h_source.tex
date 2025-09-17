@@ -1,0 +1,79 @@
+\doxysection{filter\+\_\+bank\+\_\+spectral\+\_\+subtraction.\+h}
+\hypertarget{filter__bank__spectral__subtraction_8h_source}{}\label{filter__bank__spectral__subtraction_8h_source}\index{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/main/signal/src/filter\_bank\_spectral\_subtraction.h@{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/main/signal/src/filter\_bank\_spectral\_subtraction.h}}
+\mbox{\hyperlink{filter__bank__spectral__subtraction_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{/*\ Copyright\ 2019\ The\ TensorFlow\ Authors.\ All\ Rights\ Reserved.}}
+\DoxyCodeLine{00002\ \textcolor{comment}{}}
+\DoxyCodeLine{00003\ \textcolor{comment}{Licensed\ under\ the\ Apache\ License,\ Version\ 2.0\ (the\ "{}License"{});}}
+\DoxyCodeLine{00004\ \textcolor{comment}{you\ may\ not\ use\ this\ file\ except\ in\ compliance\ with\ the\ License.}}
+\DoxyCodeLine{00005\ \textcolor{comment}{You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{00006\ \textcolor{comment}{}}
+\DoxyCodeLine{00007\ \textcolor{comment}{\ \ \ \ http://www.apache.org/licenses/LICENSE-\/2.0}}
+\DoxyCodeLine{00008\ \textcolor{comment}{}}
+\DoxyCodeLine{00009\ \textcolor{comment}{Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ software}}
+\DoxyCodeLine{00010\ \textcolor{comment}{distributed\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,}}
+\DoxyCodeLine{00011\ \textcolor{comment}{WITHOUT\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,\ either\ express\ or\ implied.}}
+\DoxyCodeLine{00012\ \textcolor{comment}{See\ the\ License\ for\ the\ specific\ language\ governing\ permissions\ and}}
+\DoxyCodeLine{00013\ \textcolor{comment}{limitations\ under\ the\ License.}}
+\DoxyCodeLine{00014\ \textcolor{comment}{==============================================================================*/}}
+\DoxyCodeLine{00015\ }
+\DoxyCodeLine{00016\ \textcolor{preprocessor}{\#ifndef\ SIGNAL\_SRC\_FILTER\_BANK\_SPECTRAL\_SUBTRACTION\_H\_}}
+\DoxyCodeLine{00017\ \textcolor{preprocessor}{\#define\ SIGNAL\_SRC\_FILTER\_BANK\_SPECTRAL\_SUBTRACTION\_H\_}}
+\DoxyCodeLine{00018\ }
+\DoxyCodeLine{00019\ \textcolor{preprocessor}{\#include\ <stdint.h>}}
+\DoxyCodeLine{00020\ }
+\DoxyCodeLine{00021\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacetflite}{tflite}}\ \{}
+\DoxyCodeLine{00022\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacetflm__signal}{tflm\_signal}}\ \{}
+\DoxyCodeLine{00023\ \textcolor{comment}{//\ TODO(b/286250473):\ remove\ namespace\ once\ de-\/duped\ libraries\ above}}
+\DoxyCodeLine{00024\ }
+\DoxyCodeLine{00025\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structtflite_1_1tflm__signal_1_1_spectral_subtraction_config}{SpectralSubtractionConfig}}\ \{}
+\DoxyCodeLine{00026\ \ \ \textcolor{comment}{//\ Number\ of\ filterbank\ channels\ in\ input\ and\ output}}
+\DoxyCodeLine{00027\ \ \ int32\_t\ \mbox{\hyperlink{structtflite_1_1tflm__signal_1_1_spectral_subtraction_config_aa8634424e8d39f243214b4c57cd0d06c}{num\_channels}};}
+\DoxyCodeLine{00028\ \ \ \textcolor{comment}{//\ The\ constant\ used\ for\ the\ lowpass\ filter\ for\ finding\ the\ noise.}}
+\DoxyCodeLine{00029\ \ \ \textcolor{comment}{//\ Higher\ values\ correspond\ to\ more\ aggressively\ adapting\ estimates}}
+\DoxyCodeLine{00030\ \ \ \textcolor{comment}{//\ of\ the\ noise.}}
+\DoxyCodeLine{00031\ \ \ \textcolor{comment}{//\ Scale\ is\ 1\ <<\ spectral\_subtraction\_bits}}
+\DoxyCodeLine{00032\ \ \ uint32\_t\ \mbox{\hyperlink{structtflite_1_1tflm__signal_1_1_spectral_subtraction_config_a99838f6efd647faa0104f59f4e6e0830}{smoothing}};}
+\DoxyCodeLine{00033\ \ \ \textcolor{comment}{//\ One\ minus\ smoothing\ constant\ for\ low\ pass\ filter.}}
+\DoxyCodeLine{00034\ \ \ \textcolor{comment}{//\ Scale\ is\ 1\ <<\ spectral\_subtraction\_bits}}
+\DoxyCodeLine{00035\ \ \ uint32\_t\ \mbox{\hyperlink{structtflite_1_1tflm__signal_1_1_spectral_subtraction_config_a8db7c5dcbe29c06487db59cd4a81cbef}{one\_minus\_smoothing}};}
+\DoxyCodeLine{00036\ \ \ \textcolor{comment}{//\ The\ maximum\ cap\ to\ subtract\ away\ from\ the\ signal\ (ie,\ if\ this\ is}}
+\DoxyCodeLine{00037\ \ \ \textcolor{comment}{//\ 0.2,\ then\ the\ result\ of\ spectral\ subtraction\ will\ not\ go\ below}}
+\DoxyCodeLine{00038\ \ \ \textcolor{comment}{//\ 0.2\ *\ signal).}}
+\DoxyCodeLine{00039\ \ \ \textcolor{comment}{//\ \ Scale\ is\ 1\ <<\ spectral\_subtraction\_bits}}
+\DoxyCodeLine{00040\ \ \ uint32\_t\ \mbox{\hyperlink{structtflite_1_1tflm__signal_1_1_spectral_subtraction_config_a0c5ba62088eb7def6aecefb3b91fe5ca}{min\_signal\_remaining}};}
+\DoxyCodeLine{00041\ \ \ \textcolor{comment}{//\ If\ positive,\ specifies\ the\ filter\ coefficient\ for\ odd-\/index}}
+\DoxyCodeLine{00042\ \ \ \textcolor{comment}{//\ channels,\ while\ 'smoothing'\ is\ used\ as\ the\ coefficient\ for\ even-\/}}
+\DoxyCodeLine{00043\ \ \ \textcolor{comment}{//\ index\ channels.\ Otherwise,\ the\ same\ filter\ coefficient\ is}}
+\DoxyCodeLine{00044\ \ \ \textcolor{comment}{//\ used\ on\ all\ channels.}}
+\DoxyCodeLine{00045\ \ \ \textcolor{comment}{//\ \ Scale\ is\ 1\ <<\ spectral\_subtraction\_bits}}
+\DoxyCodeLine{00046\ \ \ uint32\_t\ \mbox{\hyperlink{structtflite_1_1tflm__signal_1_1_spectral_subtraction_config_ac2033d2561e7b12d54a75f8ffb436138}{alternate\_smoothing}};}
+\DoxyCodeLine{00047\ \ \ \textcolor{comment}{//\ Alternate\ One\ minus\ smoothing\ constant\ for\ low\ pass\ filter.}}
+\DoxyCodeLine{00048\ \ \ \textcolor{comment}{//\ Scale\ is\ 1\ <<\ spectral\_subtraction\_bits}}
+\DoxyCodeLine{00049\ \ \ uint32\_t\ \mbox{\hyperlink{structtflite_1_1tflm__signal_1_1_spectral_subtraction_config_acd830f510647f1f2be3e49c9a2b2d524}{alternate\_one\_minus\_smoothing}};}
+\DoxyCodeLine{00050\ \ \ \textcolor{comment}{//\ Extra\ fractional\ bits\ for\ the\ noise\_estimate\ smoothing\ filter.}}
+\DoxyCodeLine{00051\ \ \ uint32\_t\ \mbox{\hyperlink{structtflite_1_1tflm__signal_1_1_spectral_subtraction_config_a1cd17044a7a13f5ae17715857936844c}{smoothing\_bits}};}
+\DoxyCodeLine{00052\ \ \ \textcolor{comment}{//\ Scaling\ bits\ for\ some\ members\ of\ this\ struct}}
+\DoxyCodeLine{00053\ \ \ uint32\_t\ \mbox{\hyperlink{structtflite_1_1tflm__signal_1_1_spectral_subtraction_config_ad9ca358aec58281ad15b887a54c1dcaa}{spectral\_subtraction\_bits}};}
+\DoxyCodeLine{00054\ \ \ \textcolor{comment}{//\ If\ true,\ when\ the\ filterbank\ level\ drops\ below\ the\ output,}}
+\DoxyCodeLine{00055\ \ \ \textcolor{comment}{//\ the\ noise\ estimate\ will\ be\ forced\ down\ to\ the\ new\ noise\ level.}}
+\DoxyCodeLine{00056\ \ \ \textcolor{comment}{//\ If\ false,\ the\ noise\ estimate\ will\ remain\ above\ the\ current}}
+\DoxyCodeLine{00057\ \ \ \textcolor{comment}{//\ filterbank\ output\ (but\ the\ subtraction\ will\ still\ keep\ the}}
+\DoxyCodeLine{00058\ \ \ \textcolor{comment}{//\ output\ non\ negative).}}
+\DoxyCodeLine{00059\ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{structtflite_1_1tflm__signal_1_1_spectral_subtraction_config_a9f8239a8e12bce9c63b81491ed886bf6}{clamping}};}
+\DoxyCodeLine{00060\ \};}
+\DoxyCodeLine{00061\ }
+\DoxyCodeLine{00062\ \textcolor{comment}{//\ Apply\ spectral\ subtraction\ to\ each\ element\ in\ \`{}input`,\ then\ write\ the\ result}}
+\DoxyCodeLine{00063\ \textcolor{comment}{//\ to\ \`{}output`\ and\ \`{}noise\_estimate`.\ \`{}input`,\ \`{}output`\ and\ \`{}noise\ estimate`}}
+\DoxyCodeLine{00064\ \textcolor{comment}{//\ must\ all\ be\ of\ size\ \`{}config.num\_channels`.\ \`{}config`\ holds\ the}}
+\DoxyCodeLine{00065\ \textcolor{comment}{//\ \ parameters\ of\ the\ spectral\ subtraction\ algorithm.}}
+\DoxyCodeLine{00066\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1tflm__signal_a66a4b1e9b215b1ef046a61cabffc4e82}{FilterbankSpectralSubtraction}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structtflite_1_1tflm__signal_1_1_spectral_subtraction_config}{SpectralSubtractionConfig}}*\ \mbox{\hyperlink{micro_2kernels_2filter__bank_8cc_ac0f32fd234a078ace764ae2fc15c41a0}{config}},}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ uint32\_t*\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src5afb18c45f6346167aa977a363205143_a9cebfb3d6ddd692fbdd268cf4b9ad024}{input}},\ uint32\_t*\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbcd3bbe90c4644d53fde1ce4e312f437_a7a2a916a8059078c2d7a05f46c7126fd}{output}},}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ uint32\_t*\ \mbox{\hyperlink{micro_2kernels_2filter__bank__spectral__subtraction_8cc_a855c4080f2da2e16b0d994735afe8a65}{noise\_estimate}});}
+\DoxyCodeLine{00069\ }
+\DoxyCodeLine{00070\ \}\ \ \textcolor{comment}{//\ namespace\ tflm\_signal}}
+\DoxyCodeLine{00071\ \}\ \ \textcolor{comment}{//\ namespace\ tflite}}
+\DoxyCodeLine{00072\ }
+\DoxyCodeLine{00073\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ SIGNAL\_SRC\_FILTER\_BANK\_SPECTRAL\_SUBTRACTION\_H\_}}
+
+\end{DoxyCode}

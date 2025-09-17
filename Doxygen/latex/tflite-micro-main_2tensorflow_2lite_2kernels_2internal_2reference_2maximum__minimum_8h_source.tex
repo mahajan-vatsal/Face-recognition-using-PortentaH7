@@ -1,0 +1,70 @@
+\doxysection{maximum\+\_\+minimum.\+h}
+\hypertarget{tflite-micro-main_2tensorflow_2lite_2kernels_2internal_2reference_2maximum__minimum_8h_source}{}\label{tflite-micro-main_2tensorflow_2lite_2kernels_2internal_2reference_2maximum__minimum_8h_source}\index{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/main/tensorflow/lite/kernels/internal/reference/maximum\_minimum.h@{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/main/tensorflow/lite/kernels/internal/reference/maximum\_minimum.h}}
+\mbox{\hyperlink{tflite-micro-main_2tensorflow_2lite_2kernels_2internal_2reference_2maximum__minimum_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{/*\ Copyright\ 2017\ The\ TensorFlow\ Authors.\ All\ Rights\ Reserved.}}
+\DoxyCodeLine{00002\ \textcolor{comment}{}}
+\DoxyCodeLine{00003\ \textcolor{comment}{Licensed\ under\ the\ Apache\ License,\ Version\ 2.0\ (the\ "{}License"{});}}
+\DoxyCodeLine{00004\ \textcolor{comment}{you\ may\ not\ use\ this\ file\ except\ in\ compliance\ with\ the\ License.}}
+\DoxyCodeLine{00005\ \textcolor{comment}{You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{00006\ \textcolor{comment}{}}
+\DoxyCodeLine{00007\ \textcolor{comment}{\ \ \ \ http://www.apache.org/licenses/LICENSE-\/2.0}}
+\DoxyCodeLine{00008\ \textcolor{comment}{}}
+\DoxyCodeLine{00009\ \textcolor{comment}{Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ software}}
+\DoxyCodeLine{00010\ \textcolor{comment}{distributed\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,}}
+\DoxyCodeLine{00011\ \textcolor{comment}{WITHOUT\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,\ either\ express\ or\ implied.}}
+\DoxyCodeLine{00012\ \textcolor{comment}{See\ the\ License\ for\ the\ specific\ language\ governing\ permissions\ and}}
+\DoxyCodeLine{00013\ \textcolor{comment}{limitations\ under\ the\ License.}}
+\DoxyCodeLine{00014\ \textcolor{comment}{==============================================================================*/}}
+\DoxyCodeLine{00015\ \textcolor{preprocessor}{\#ifndef\ TENSORFLOW\_LITE\_KERNELS\_INTERNAL\_REFERENCE\_MAXIMUM\_MINIMUM\_H\_}}
+\DoxyCodeLine{00016\ \textcolor{preprocessor}{\#define\ TENSORFLOW\_LITE\_KERNELS\_INTERNAL\_REFERENCE\_MAXIMUM\_MINIMUM\_H\_}}
+\DoxyCodeLine{00017\ }
+\DoxyCodeLine{00018\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/kernels/internal/common.h"{}}}
+\DoxyCodeLine{00019\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/kernels/internal/types.h"{}}}
+\DoxyCodeLine{00020\ }
+\DoxyCodeLine{00021\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacetflite}{tflite}}\ \{}
+\DoxyCodeLine{00022\ \textcolor{keyword}{namespace\ }reference\_ops\ \{}
+\DoxyCodeLine{00023\ }
+\DoxyCodeLine{00024\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T,\ \textcolor{keyword}{typename}\ Op,\ \textcolor{keywordtype}{int}\ N\ =\ 5>}
+\DoxyCodeLine{00025\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1reference__ops_aed5f5bd29b487702bf13a65edad51104}{MaximumMinimumBroadcastSlow}}(\textcolor{keyword}{const}\ RuntimeShape\&\ unextended\_input1\_shape,}
+\DoxyCodeLine{00026\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ T*\ \mbox{\hyperlink{div__test_8cc_aaa3dc5d0e541e598f33e079b201185f9}{input1\_data}},}
+\DoxyCodeLine{00027\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ RuntimeShape\&\ unextended\_input2\_shape,}
+\DoxyCodeLine{00028\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ T*\ \mbox{\hyperlink{div__test_8cc_a70b003e7ad90ac4daa3f400c2a022d50}{input2\_data}},}
+\DoxyCodeLine{00029\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ RuntimeShape\&\ unextended\_output\_shape,}
+\DoxyCodeLine{00030\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ T*\ \mbox{\hyperlink{add__n__test_8cc_a3305b43869c4b837b0a33c12cff5069b}{output\_data}},\ Op\ op)\ \{}
+\DoxyCodeLine{00031\ \ \ \textcolor{comment}{//\ Uses\ element-\/wise\ calculation\ if\ broadcast\ is\ not\ required.}}
+\DoxyCodeLine{00032\ \ \ \textcolor{keywordflow}{if}\ (unextended\_input1\_shape\ ==\ unextended\_input2\_shape)\ \{}
+\DoxyCodeLine{00033\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ flat\_size\ =}
+\DoxyCodeLine{00034\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_afb8547c1a1f4bf544c87a9d2f0967347}{MatchingElementsSize}}(unextended\_input1\_shape,\ unextended\_input2\_shape,}
+\DoxyCodeLine{00035\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ unextended\_output\_shape);}
+\DoxyCodeLine{00036\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ flat\_size;\ ++i)\ \{}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \mbox{\hyperlink{add__n__test_8cc_a3305b43869c4b837b0a33c12cff5069b}{output\_data}}[i]\ =\ op(\mbox{\hyperlink{div__test_8cc_aaa3dc5d0e541e598f33e079b201185f9}{input1\_data}}[i],\ \mbox{\hyperlink{div__test_8cc_a70b003e7ad90ac4daa3f400c2a022d50}{input2\_data}}[i]);}
+\DoxyCodeLine{00038\ \ \ \ \ \}}
+\DoxyCodeLine{00039\ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00040\ \ \ \ \ \mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2kernels_2internal_2compatibility_8h_a153a4c7bc866139ad88ebf7cb7f4c400}{TFLITE\_DCHECK\_LE}}(unextended\_input1\_shape.DimensionsCount(),\ N);}
+\DoxyCodeLine{00041\ \ \ \ \ \mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2kernels_2internal_2compatibility_8h_a153a4c7bc866139ad88ebf7cb7f4c400}{TFLITE\_DCHECK\_LE}}(unextended\_input2\_shape.DimensionsCount(),\ N);}
+\DoxyCodeLine{00042\ \ \ \ \ \mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2kernels_2internal_2compatibility_8h_a153a4c7bc866139ad88ebf7cb7f4c400}{TFLITE\_DCHECK\_LE}}(unextended\_output\_shape.DimensionsCount(),\ N);}
+\DoxyCodeLine{00043\ }
+\DoxyCodeLine{00044\ \ \ \ \ NdArrayDesc<N>\ desc1;}
+\DoxyCodeLine{00045\ \ \ \ \ NdArrayDesc<N>\ desc2;}
+\DoxyCodeLine{00046\ \ \ \ \ NdArrayDesc<N>\ output\_desc;}
+\DoxyCodeLine{00047\ \ \ \ \ \mbox{\hyperlink{namespacetflite_a760e75250ae8653f7ce34572b7ec80e6}{NdArrayDescsForElementwiseBroadcast}}(}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \ \ unextended\_input1\_shape,\ unextended\_input2\_shape,\ \&desc1,\ \&desc2);}
+\DoxyCodeLine{00049\ \ \ \ \ \mbox{\hyperlink{namespacetflite_a068e281f9d29fd4d26c51235d6d74086}{CopyDimsToDesc}}(\mbox{\hyperlink{classtflite_1_1_runtime_shape_a647264349b0f266c94102a8b3dda22cf}{RuntimeShape::ExtendedShape}}(N,\ unextended\_output\_shape),}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&output\_desc);}
+\DoxyCodeLine{00051\ }
+\DoxyCodeLine{00052\ \ \ \ \ \textcolor{keyword}{auto}\ maxmin\_func\ =\ [\&](\textcolor{keywordtype}{int}\ indexes[N])\ \{}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \mbox{\hyperlink{add__n__test_8cc_a3305b43869c4b837b0a33c12cff5069b}{output\_data}}[\mbox{\hyperlink{namespacetflite_ada717d5a5b12736592e0970790b6e24c}{SubscriptToIndex}}(output\_desc,\ indexes)]\ =}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \ \ \ \ op(\mbox{\hyperlink{div__test_8cc_aaa3dc5d0e541e598f33e079b201185f9}{input1\_data}}[\mbox{\hyperlink{namespacetflite_ada717d5a5b12736592e0970790b6e24c}{SubscriptToIndex}}(desc1,\ indexes)],}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{div__test_8cc_a70b003e7ad90ac4daa3f400c2a022d50}{input2\_data}}[\mbox{\hyperlink{namespacetflite_ada717d5a5b12736592e0970790b6e24c}{SubscriptToIndex}}(desc2,\ indexes)]);}
+\DoxyCodeLine{00056\ \ \ \ \ \};}
+\DoxyCodeLine{00057\ \ \ \ \ \mbox{\hyperlink{namespacetflite_ad8d71bb7ed70864ba58a0576a516a30d}{NDOpsHelper<N>}}(output\_desc,\ maxmin\_func);}
+\DoxyCodeLine{00058\ \ \ \}}
+\DoxyCodeLine{00059\ \}}
+\DoxyCodeLine{00060\ }
+\DoxyCodeLine{00061\ \}\ \ \textcolor{comment}{//\ namespace\ reference\_ops}}
+\DoxyCodeLine{00062\ \}\ \ \textcolor{comment}{//\ namespace\ tflite}}
+\DoxyCodeLine{00063\ }
+\DoxyCodeLine{00064\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ TENSORFLOW\_LITE\_KERNELS\_INTERNAL\_REFERENCE\_MAXIMUM\_MINIMUM\_H\_}}
+
+\end{DoxyCode}

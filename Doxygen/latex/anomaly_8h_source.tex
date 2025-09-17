@@ -1,0 +1,258 @@
+\doxysection{anomaly.\+h}
+\hypertarget{anomaly_8h_source}{}\label{anomaly_8h_source}\index{Face\_Access\_inferencing/src/edge-\/impulse-\/sdk/classifier/inferencing\_engines/anomaly.h@{Face\_Access\_inferencing/src/edge-\/impulse-\/sdk/classifier/inferencing\_engines/anomaly.h}}
+\mbox{\hyperlink{anomaly_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{00002\ \textcolor{comment}{\ *\ Copyright\ (c)\ 2022\ EdgeImpulse\ Inc.}}
+\DoxyCodeLine{00003\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00004\ \textcolor{comment}{\ *\ Licensed\ under\ the\ Apache\ License,\ Version\ 2.0\ (the\ "{}License"{});}}
+\DoxyCodeLine{00005\ \textcolor{comment}{\ *\ you\ may\ not\ use\ this\ file\ except\ in\ compliance\ with\ the\ License.}}
+\DoxyCodeLine{00006\ \textcolor{comment}{\ *\ You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{00007\ \textcolor{comment}{\ *\ http://www.apache.org/licenses/LICENSE-\/2.0}}
+\DoxyCodeLine{00008\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00009\ \textcolor{comment}{\ *\ Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,}}
+\DoxyCodeLine{00010\ \textcolor{comment}{\ *\ software\ distributed\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS}}
+\DoxyCodeLine{00011\ \textcolor{comment}{\ *\ IS"{}\ BASIS,\ WITHOUT\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,\ either}}
+\DoxyCodeLine{00012\ \textcolor{comment}{\ *\ express\ or\ implied.\ See\ the\ License\ for\ the\ specific\ language}}
+\DoxyCodeLine{00013\ \textcolor{comment}{\ *\ governing\ permissions\ and\ limitations\ under\ the\ License.}}
+\DoxyCodeLine{00014\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00015\ \textcolor{comment}{\ *\ SPDX-\/License-\/Identifier:\ Apache-\/2.0}}
+\DoxyCodeLine{00016\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{00017\ }
+\DoxyCodeLine{00018\ \textcolor{preprocessor}{\#ifndef\ \_EDGE\_IMPULSE\_INFERENCING\_ANOMALY\_H\_}}
+\DoxyCodeLine{00019\ \textcolor{preprocessor}{\#define\ \_EDGE\_IMPULSE\_INFERENCING\_ANOMALY\_H\_}}
+\DoxyCodeLine{00020\ }
+\DoxyCodeLine{00021\ \textcolor{preprocessor}{\#if\ (EI\_CLASSIFIER\_HAS\_ANOMALY)}}
+\DoxyCodeLine{00022\ }
+\DoxyCodeLine{00023\ \textcolor{preprocessor}{\#include\ <cmath>}}
+\DoxyCodeLine{00024\ \textcolor{preprocessor}{\#include\ <stdlib.h>}}
+\DoxyCodeLine{00025\ \textcolor{preprocessor}{\#include\ <stdio.h>}}
+\DoxyCodeLine{00026\ \textcolor{preprocessor}{\#include\ <math.h>}}
+\DoxyCodeLine{00027\ \textcolor{preprocessor}{\#include\ <stdint.h>}}
+\DoxyCodeLine{00028\ }
+\DoxyCodeLine{00029\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{ei__classifier__types_8h}{edge-\/impulse-\/sdk/classifier/ei\_classifier\_types.h}}"{}}}
+\DoxyCodeLine{00030\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{ei__aligned__malloc_8h}{edge-\/impulse-\/sdk/classifier/ei\_aligned\_malloc.h}}"{}}}
+\DoxyCodeLine{00031\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{ei__classifier__porting_8h}{edge-\/impulse-\/sdk/porting/ei\_classifier\_porting.h}}"{}}}
+\DoxyCodeLine{00032\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{engines_8h}{edge-\/impulse-\/sdk/classifier/inferencing\_engines/engines.h}}"{}}}
+\DoxyCodeLine{00033\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{ei__fill__result__struct_8h}{edge-\/impulse-\/sdk/classifier/ei\_fill\_result\_struct.h}}"{}}}
+\DoxyCodeLine{00034\ }
+\DoxyCodeLine{00035\ \textcolor{preprocessor}{\#ifdef\ \_\_cplusplus}}
+\DoxyCodeLine{00036\ \textcolor{keyword}{namespace\ }\{}
+\DoxyCodeLine{00037\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ \_\_cplusplus}}
+\DoxyCodeLine{00038\ }
+\DoxyCodeLine{00047\ \textcolor{keywordtype}{void}\ standard\_scaler(\textcolor{keywordtype}{float}\ *\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src5afb18c45f6346167aa977a363205143_a9cebfb3d6ddd692fbdd268cf4b9ad024}{input}},\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{float}\ *\mbox{\hyperlink{batch__matmul__test_8cc_ab89fe30f475eefcbf59653d919c456bd}{scale}},\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{float}\ *mean,\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{irfft_8cc_a56f49c6b551e4aec18e30116c206dd5b}{input\_size}})\ \{}
+\DoxyCodeLine{00048\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ ix\ =\ 0;\ ix\ <\ \mbox{\hyperlink{irfft_8cc_a56f49c6b551e4aec18e30116c206dd5b}{input\_size}};\ ix++)\ \{}
+\DoxyCodeLine{00049\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src5afb18c45f6346167aa977a363205143_a9cebfb3d6ddd692fbdd268cf4b9ad024}{input}}[ix]\ =\ (\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src5afb18c45f6346167aa977a363205143_a9cebfb3d6ddd692fbdd268cf4b9ad024}{input}}[ix]\ -\/\ mean[ix])\ /\ \mbox{\hyperlink{batch__matmul__test_8cc_ab89fe30f475eefcbf59653d919c456bd}{scale}}[ix];}
+\DoxyCodeLine{00050\ \ \ \ \ \}}
+\DoxyCodeLine{00051\ \}}
+\DoxyCodeLine{00052\ }
+\DoxyCodeLine{00059\ \textcolor{keywordtype}{float}\ calculate\_cluster\_distance(\textcolor{keywordtype}{float}\ *\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src5afb18c45f6346167aa977a363205143_a9cebfb3d6ddd692fbdd268cf4b9ad024}{input}},\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{irfft_8cc_a56f49c6b551e4aec18e30116c206dd5b}{input\_size}},\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structei__classifier__anom__cluster__t}{ei\_classifier\_anom\_cluster\_t}}\ *cluster)\ \{}
+\DoxyCodeLine{00060\ \ \ \ \ \textcolor{comment}{//\ todo:\ check\ input\_size\ and\ centroid\ size?}}
+\DoxyCodeLine{00061\ }
+\DoxyCodeLine{00062\ \ \ \ \ \textcolor{keywordtype}{float}\ dist\ =\ 0.0f;}
+\DoxyCodeLine{00063\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ ix\ =\ 0;\ ix\ <\ \mbox{\hyperlink{irfft_8cc_a56f49c6b551e4aec18e30116c206dd5b}{input\_size}};\ ix++)\ \{}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \ \ dist\ +=\ pow(\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src5afb18c45f6346167aa977a363205143_a9cebfb3d6ddd692fbdd268cf4b9ad024}{input}}[ix]\ -\/\ cluster-\/>\mbox{\hyperlink{structei__classifier__anom__cluster__t_aca78a43d985442bd76d7780cda9d0408}{centroid}}[ix],\ 2);}
+\DoxyCodeLine{00065\ \ \ \ \ \}}
+\DoxyCodeLine{00066\ \ \ \ \ \textcolor{keywordflow}{return}\ sqrt(dist)\ -\/\ cluster-\/>\mbox{\hyperlink{structei__classifier__anom__cluster__t_ad9ae74ba1c116d66ec625d44111413c3}{max\_error}};}
+\DoxyCodeLine{00067\ \}}
+\DoxyCodeLine{00068\ }
+\DoxyCodeLine{00076\ \textcolor{keywordtype}{float}\ get\_min\_distance\_to\_cluster(\textcolor{keywordtype}{float}\ *\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src5afb18c45f6346167aa977a363205143_a9cebfb3d6ddd692fbdd268cf4b9ad024}{input}},\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{irfft_8cc_a56f49c6b551e4aec18e30116c206dd5b}{input\_size}},\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structei__classifier__anom__cluster__t}{ei\_classifier\_anom\_cluster\_t}}\ *clusters,\ \textcolor{keywordtype}{size\_t}\ cluster\_size)\ \{}
+\DoxyCodeLine{00077\ \ \ \ \ \textcolor{keywordtype}{float}\ \mbox{\hyperlink{common__functions_8h_ac6afabdc09a49a433ee19d8a9486056d}{min}}\ =\ 1000.0f;}
+\DoxyCodeLine{00078\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ ix\ =\ 0;\ ix\ <\ cluster\_size;\ ix++)\ \{}
+\DoxyCodeLine{00079\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}\ dist\ =\ calculate\_cluster\_distance(\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src5afb18c45f6346167aa977a363205143_a9cebfb3d6ddd692fbdd268cf4b9ad024}{input}},\ \mbox{\hyperlink{irfft_8cc_a56f49c6b551e4aec18e30116c206dd5b}{input\_size}},\ \&clusters[ix]);}
+\DoxyCodeLine{00080\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (dist\ <\ \mbox{\hyperlink{common__functions_8h_ac6afabdc09a49a433ee19d8a9486056d}{min}})\ \{}
+\DoxyCodeLine{00081\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{common__functions_8h_ac6afabdc09a49a433ee19d8a9486056d}{min}}\ =\ dist;}
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00083\ \ \ \ \ \}}
+\DoxyCodeLine{00084\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{common__functions_8h_ac6afabdc09a49a433ee19d8a9486056d}{min}};}
+\DoxyCodeLine{00085\ \}}
+\DoxyCodeLine{00086\ }
+\DoxyCodeLine{00087\ \textcolor{preprocessor}{\#ifdef\ \_\_cplusplus}}
+\DoxyCodeLine{00088\ \}}
+\DoxyCodeLine{00089\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ \_\_cplusplus}}
+\DoxyCodeLine{00090\ }
+\DoxyCodeLine{00091\ }
+\DoxyCodeLine{00101\ \mbox{\hyperlink{group__ei__returntypes_gad9580b47a6cd5e74cfc31a03bdfecebe}{EI\_IMPULSE\_ERROR}}\ extract\_anomaly\_input\_values(}
+\DoxyCodeLine{00102\ \ \ \ \ \mbox{\hyperlink{structei__feature__t}{ei\_feature\_t}}\ *fmatrix,}
+\DoxyCodeLine{00103\ \ \ \ \ uint32\_t*\ input\_block\_ids,}
+\DoxyCodeLine{00104\ \ \ \ \ uint32\_t\ input\_block\_ids\_size,}
+\DoxyCodeLine{00105\ \ \ \ \ uint32\_t\ anom\_axes\_size,}
+\DoxyCodeLine{00106\ \ \ \ \ \textcolor{keyword}{const}\ uint16\_t\ *anom\_axis,}
+\DoxyCodeLine{00107\ \ \ \ \ \textcolor{keywordtype}{float}\ *\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src5afb18c45f6346167aa977a363205143_a9cebfb3d6ddd692fbdd268cf4b9ad024}{input}})}
+\DoxyCodeLine{00108\ \{}
+\DoxyCodeLine{00109\ \ \ \ \ \textcolor{keywordflow}{if}\ (input\_block\_ids\_size\ ==\ 1)\ \{}
+\DoxyCodeLine{00110\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ ix\ =\ 0;\ ix\ <\ anom\_axes\_size;\ ix++)\ \{}
+\DoxyCodeLine{00111\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src5afb18c45f6346167aa977a363205143_a9cebfb3d6ddd692fbdd268cf4b9ad024}{input}}[ix]\ =\ fmatrix[0].\mbox{\hyperlink{structei__feature__t_a971fb9c93bddb4631925e579f5b88ebf}{matrix}}-\/>buffer[anom\_axis[ix]];}
+\DoxyCodeLine{00112\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00113\ \ \ \ \ \}}
+\DoxyCodeLine{00114\ \ \ \ \ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00115\ \textcolor{preprocessor}{\#if\ EI\_CLASSIFIER\_SINGLE\_FEATURE\_INPUT\ ==\ 0}}
+\DoxyCodeLine{00116\ \ \ \ \ \ \ \ \ ei::matrix\_t*\ matrix\ =\ NULL;}
+\DoxyCodeLine{00117\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00118\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ tracks\ where\ we\ are\ now\ in\ the\ combined\ feature\ matrix}}
+\DoxyCodeLine{00119\ \ \ \ \ \ \ \ \ uint32\_t\ global\_buf\_pos\ =\ 0;}
+\DoxyCodeLine{00120\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ we\ add\ the\ size\ of\ passed\ matrix\ to\ it}}
+\DoxyCodeLine{00121\ \ \ \ \ \ \ \ \ uint32\_t\ buf\_offset\ =\ 0;}
+\DoxyCodeLine{00122\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ current\ index\ of\ input\ feature}}
+\DoxyCodeLine{00123\ \ \ \ \ \ \ \ \ uint32\_t\ input\_pos\ =\ 0;}
+\DoxyCodeLine{00124\ }
+\DoxyCodeLine{00125\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ input\_block\_ids\_size;\ i++)\ \{}
+\DoxyCodeLine{00126\ \textcolor{preprocessor}{\#if\ EI\_CLASSIFIER\_SINGLE\_FEATURE\_INPUT\ ==\ 0}}
+\DoxyCodeLine{00127\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ cur\_mtx\ =\ input\_block\_ids[i];}
+\DoxyCodeLine{00128\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!find\_mtx\_by\_idx(fmatrix,\ \&matrix,\ cur\_mtx,\ anom\_axes\_size))\ \{}
+\DoxyCodeLine{00129\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}ERR:\ Cannot\ find\ matrix\ with\ id\ \%zu\(\backslash\)n"{}},\ cur\_mtx);}
+\DoxyCodeLine{00130\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{group__ei__returntypes_ggad9580b47a6cd5e74cfc31a03bdfecebeab011336593a9cc40639bac0c8a32a51e}{EI\_IMPULSE\_INVALID\_SIZE}};}
+\DoxyCodeLine{00131\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00132\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00133\ \ \ \ \ \ \ \ \ \ \ \ \ ei::matrix\_t*\ matrix\ =\ fmatrix[0].\mbox{\hyperlink{structei__feature__t_a971fb9c93bddb4631925e579f5b88ebf}{matrix}};}
+\DoxyCodeLine{00134\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00135\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ ix\ =\ 0;\ ix\ <\ anom\_axes\_size;\ ix++)\ \{}
+\DoxyCodeLine{00136\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ global\_buf\_pos\ =\ anom\_axis[input\_pos];}
+\DoxyCodeLine{00137\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (global\_buf\_pos\ <=\ buf\_offset\ +\ (matrix-\/>rows\ *\ matrix-\/>cols))\ \{}
+\DoxyCodeLine{00138\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src5afb18c45f6346167aa977a363205143_a9cebfb3d6ddd692fbdd268cf4b9ad024}{input}}[input\_pos]\ =\ matrix-\/>buffer[anom\_axis[input\_pos]\ -\/\ buf\_offset];}
+\DoxyCodeLine{00139\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ input\_pos++;}
+\DoxyCodeLine{00140\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (input\_pos\ >=\ anom\_axes\_size)\ \{\ \textcolor{keywordflow}{goto}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcdc91c794b43404000e39f72876c1c287_a4415abf9861e3883a31d588f3909eba9}{end}};\ \}}
+\DoxyCodeLine{00141\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00142\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00143\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00144\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00145\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00146\ \ \ \ \ \ \ \ \ \ \ \ \ buf\_offset\ +=\ matrix-\/>rows\ *\ matrix-\/>cols;}
+\DoxyCodeLine{00147\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00148\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcdc91c794b43404000e39f72876c1c287_a4415abf9861e3883a31d588f3909eba9}{end}}:;}
+\DoxyCodeLine{00149\ \ \ \ \ \}}
+\DoxyCodeLine{00150\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{ei__fill__result__struct_8h_a2fb43be102b153d659b668ad295aff40}{EI\_IMPULSE\_OK}};}
+\DoxyCodeLine{00151\ \}}
+\DoxyCodeLine{00152\ }
+\DoxyCodeLine{00153\ }
+\DoxyCodeLine{00154\ \mbox{\hyperlink{group__ei__returntypes_gad9580b47a6cd5e74cfc31a03bdfecebe}{EI\_IMPULSE\_ERROR}}\ \mbox{\hyperlink{engines_8h_ac6ad2d3cc730155fd35a7b2f6cf40440}{run\_kmeans\_anomaly}}(}
+\DoxyCodeLine{00155\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structei__impulse}{ei\_impulse\_t}}\ *impulse,}
+\DoxyCodeLine{00156\ \ \ \ \ \mbox{\hyperlink{structei__feature__t}{ei\_feature\_t}}\ *fmatrix,}
+\DoxyCodeLine{00157\ \ \ \ \ uint32\_t\ learn\_block\_index,}
+\DoxyCodeLine{00158\ \ \ \ \ uint32\_t*\ input\_block\_ids,}
+\DoxyCodeLine{00159\ \ \ \ \ uint32\_t\ input\_block\_ids\_size,}
+\DoxyCodeLine{00160\ \ \ \ \ \mbox{\hyperlink{structei__impulse__result__t}{ei\_impulse\_result\_t}}\ *\mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}},}
+\DoxyCodeLine{00161\ \ \ \ \ \textcolor{keywordtype}{void}\ *\mbox{\hyperlink{ei__run__dsp_8h_a0819d397f9fba7b345b75fef1c1f782a}{config\_ptr}},}
+\DoxyCodeLine{00162\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{ei__fill__result__struct_8h_a881f62341b5a41a3c5707268bd537be1}{debug}}\ =\ \textcolor{keyword}{false})}
+\DoxyCodeLine{00163\ \{}
+\DoxyCodeLine{00164\ \ \ \ \ \mbox{\hyperlink{structei__learning__block__config__anomaly__kmeans__t}{ei\_learning\_block\_config\_anomaly\_kmeans\_t}}\ *\mbox{\hyperlink{ei__fill__result__struct_8h_aafcd7d36638d6a564b6edbceef06ea8b}{block\_config}}\ =\ (\mbox{\hyperlink{structei__learning__block__config__anomaly__kmeans__t}{ei\_learning\_block\_config\_anomaly\_kmeans\_t}}*)\mbox{\hyperlink{ei__run__dsp_8h_a0819d397f9fba7b345b75fef1c1f782a}{config\_ptr}};}
+\DoxyCodeLine{00165\ }
+\DoxyCodeLine{00166\ \ \ \ \ uint64\_t\ anomaly\_start\_us\ =\ \mbox{\hyperlink{group__ei__user__functions_gac9aae7befaa896e21417df1f00518416}{ei\_read\_timer\_us}}();}
+\DoxyCodeLine{00167\ }
+\DoxyCodeLine{00168\ \ \ \ \ \textcolor{keywordtype}{float}\ *\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src5afb18c45f6346167aa977a363205143_a9cebfb3d6ddd692fbdd268cf4b9ad024}{input}}\ =\ (\textcolor{keywordtype}{float}*)\mbox{\hyperlink{group__ei__user__functions_ga71ecca5661ac4434a709c88e4c39b4aa}{ei\_malloc}}(\mbox{\hyperlink{ei__fill__result__struct_8h_aafcd7d36638d6a564b6edbceef06ea8b}{block\_config}}-\/>anom\_axes\_size\ *\ \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{float}));}
+\DoxyCodeLine{00169\ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src5afb18c45f6346167aa977a363205143_a9cebfb3d6ddd692fbdd268cf4b9ad024}{input}})\ \{}
+\DoxyCodeLine{00170\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}Failed\ to\ allocate\ memory\ for\ anomaly\ input\ buffer"{}});}
+\DoxyCodeLine{00171\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{group__ei__returntypes_ggad9580b47a6cd5e74cfc31a03bdfecebead0236d7fea5da8a0c29305ab2394fa56}{EI\_IMPULSE\_OUT\_OF\_MEMORY}};}
+\DoxyCodeLine{00172\ \ \ \ \ \}}
+\DoxyCodeLine{00173\ }
+\DoxyCodeLine{00174\ \ \ \ \ extract\_anomaly\_input\_values(fmatrix,\ input\_block\_ids,\ input\_block\_ids\_size,\ \mbox{\hyperlink{ei__fill__result__struct_8h_aafcd7d36638d6a564b6edbceef06ea8b}{block\_config}}-\/>anom\_axes\_size,\ \mbox{\hyperlink{ei__fill__result__struct_8h_aafcd7d36638d6a564b6edbceef06ea8b}{block\_config}}-\/>anom\_axis,\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src5afb18c45f6346167aa977a363205143_a9cebfb3d6ddd692fbdd268cf4b9ad024}{input}});}
+\DoxyCodeLine{00175\ }
+\DoxyCodeLine{00176\ \ \ \ \ standard\_scaler(\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src5afb18c45f6346167aa977a363205143_a9cebfb3d6ddd692fbdd268cf4b9ad024}{input}},\ \mbox{\hyperlink{ei__fill__result__struct_8h_aafcd7d36638d6a564b6edbceef06ea8b}{block\_config}}-\/>anom\_scale,\ \mbox{\hyperlink{ei__fill__result__struct_8h_aafcd7d36638d6a564b6edbceef06ea8b}{block\_config}}-\/>anom\_mean,\ \mbox{\hyperlink{ei__fill__result__struct_8h_aafcd7d36638d6a564b6edbceef06ea8b}{block\_config}}-\/>anom\_axes\_size);}
+\DoxyCodeLine{00177\ \ \ \ \ \textcolor{keywordtype}{float}\ anomaly\ =\ get\_min\_distance\_to\_cluster(}
+\DoxyCodeLine{00178\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src5afb18c45f6346167aa977a363205143_a9cebfb3d6ddd692fbdd268cf4b9ad024}{input}},\ \mbox{\hyperlink{ei__fill__result__struct_8h_aafcd7d36638d6a564b6edbceef06ea8b}{block\_config}}-\/>anom\_axes\_size,\ \mbox{\hyperlink{ei__fill__result__struct_8h_aafcd7d36638d6a564b6edbceef06ea8b}{block\_config}}-\/>anom\_clusters,\ \mbox{\hyperlink{ei__fill__result__struct_8h_aafcd7d36638d6a564b6edbceef06ea8b}{block\_config}}-\/>anom\_cluster\_count);}
+\DoxyCodeLine{00179\ }
+\DoxyCodeLine{00180\ \ \ \ \ uint64\_t\ anomaly\_end\_us\ =\ \mbox{\hyperlink{group__ei__user__functions_gac9aae7befaa896e21417df1f00518416}{ei\_read\_timer\_us}}();}
+\DoxyCodeLine{00181\ }
+\DoxyCodeLine{00182\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{ei__fill__result__struct_8h_a881f62341b5a41a3c5707268bd537be1}{debug}})\ \{}
+\DoxyCodeLine{00183\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}Anomaly\ score\ (time:\ \%d\ ms.):\ "{}},\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{int}\textcolor{keyword}{>}(anomaly\_end\_us\ -\/\ anomaly\_start\_us));}
+\DoxyCodeLine{00184\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group__ei__user__functions_gadcb0babc6f41a7d0aa4c0801c96ae7e4}{ei\_printf\_float}}(anomaly);}
+\DoxyCodeLine{00185\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}\(\backslash\)n"{}});}
+\DoxyCodeLine{00186\ \ \ \ \ \}}
+\DoxyCodeLine{00187\ }
+\DoxyCodeLine{00188\ \ \ \ \ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}}-\/>timing.anomaly\_us\ =\ anomaly\_end\_us\ -\/\ anomaly\_start\_us;}
+\DoxyCodeLine{00189\ \ \ \ \ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}}-\/>timing.anomaly\ =\ (\mbox{\hyperlink{namespacefoto_a1005e20fd9ccefeed966f9fee79837cb}{int}})(\mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}}-\/>timing.anomaly\_us/1000);}
+\DoxyCodeLine{00190\ \ \ \ \ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}}-\/>anomaly\ =\ anomaly;}
+\DoxyCodeLine{00191\ \ \ \ \ \mbox{\hyperlink{group__ei__user__functions_ga7a6a70833407ff1870c12396ce2c4aa3}{ei\_free}}(\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src5afb18c45f6346167aa977a363205143_a9cebfb3d6ddd692fbdd268cf4b9ad024}{input}});}
+\DoxyCodeLine{00192\ }
+\DoxyCodeLine{00193\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{ei__fill__result__struct_8h_a2fb43be102b153d659b668ad295aff40}{EI\_IMPULSE\_OK}};}
+\DoxyCodeLine{00194\ \}}
+\DoxyCodeLine{00195\ }
+\DoxyCodeLine{00196\ \textcolor{preprocessor}{\#if\ (EI\_CLASSIFIER\_INFERENCING\_ENGINE\ !=\ EI\_CLASSIFIER\_NONE)}}
+\DoxyCodeLine{00197\ \mbox{\hyperlink{group__ei__returntypes_gad9580b47a6cd5e74cfc31a03bdfecebe}{EI\_IMPULSE\_ERROR}}\ \mbox{\hyperlink{engines_8h_a59407c0414bd06748719ba7f4529c1ea}{run\_gmm\_anomaly}}(}
+\DoxyCodeLine{00198\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structei__impulse}{ei\_impulse\_t}}\ *impulse,}
+\DoxyCodeLine{00199\ \ \ \ \ \mbox{\hyperlink{structei__feature__t}{ei\_feature\_t}}\ *fmatrix,}
+\DoxyCodeLine{00200\ \ \ \ \ uint32\_t\ learn\_block\_index,}
+\DoxyCodeLine{00201\ \ \ \ \ uint32\_t*\ input\_block\_ids,}
+\DoxyCodeLine{00202\ \ \ \ \ uint32\_t\ input\_block\_ids\_size,}
+\DoxyCodeLine{00203\ \ \ \ \ \mbox{\hyperlink{structei__impulse__result__t}{ei\_impulse\_result\_t}}\ *\mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}},}
+\DoxyCodeLine{00204\ \ \ \ \ \textcolor{keywordtype}{void}\ *\mbox{\hyperlink{ei__run__dsp_8h_a0819d397f9fba7b345b75fef1c1f782a}{config\_ptr}},}
+\DoxyCodeLine{00205\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{ei__fill__result__struct_8h_a881f62341b5a41a3c5707268bd537be1}{debug}}\ =\ \textcolor{keyword}{false})}
+\DoxyCodeLine{00206\ \{}
+\DoxyCodeLine{00207\ \ \ \ \ \mbox{\hyperlink{structei__learning__block__config__anomaly__gmm__t}{ei\_learning\_block\_config\_anomaly\_gmm\_t}}\ *\mbox{\hyperlink{ei__fill__result__struct_8h_aafcd7d36638d6a564b6edbceef06ea8b}{block\_config}}\ =\ (\mbox{\hyperlink{structei__learning__block__config__anomaly__gmm__t}{ei\_learning\_block\_config\_anomaly\_gmm\_t}}*)\mbox{\hyperlink{ei__run__dsp_8h_a0819d397f9fba7b345b75fef1c1f782a}{config\_ptr}};}
+\DoxyCodeLine{00208\ }
+\DoxyCodeLine{00209\ \ \ \ \ \mbox{\hyperlink{structei__learning__block__config__tflite__graph__t}{ei\_learning\_block\_config\_tflite\_graph\_t}}\ ei\_learning\_block\_config\_gmm\ =\ \{}
+\DoxyCodeLine{00210\ \ \ \ \ \ \ \ \ .implementation\_version\ =\ 1,}
+\DoxyCodeLine{00211\ \ \ \ \ \ \ \ \ .classification\_mode\ =\ \mbox{\hyperlink{ei__fill__result__struct_8h_aafcd7d36638d6a564b6edbceef06ea8b}{block\_config}}-\/>\mbox{\hyperlink{structei__learning__block__config__tflite__graph__t_af9fe6a426e28a08c4f73d5f325cc4861}{classification\_mode}},}
+\DoxyCodeLine{00212\ \ \ \ \ \ \ \ \ .block\_id\ =\ 0,}
+\DoxyCodeLine{00213\ \ \ \ \ \ \ \ \ .object\_detection\ =\ 0,}
+\DoxyCodeLine{00214\ \ \ \ \ \ \ \ \ .object\_detection\_last\_layer\ =\ \mbox{\hyperlink{ei__model__types_8h_a67edebb42ed0ac73b3a4337ae07a281e}{EI\_CLASSIFIER\_LAST\_LAYER\_UNKNOWN}},}
+\DoxyCodeLine{00215\ \ \ \ \ \ \ \ \ .output\_data\_tensor\ =\ 0,}
+\DoxyCodeLine{00216\ \ \ \ \ \ \ \ \ .output\_labels\_tensor\ =\ 0,}
+\DoxyCodeLine{00217\ \ \ \ \ \ \ \ \ .output\_score\_tensor\ =\ 0,}
+\DoxyCodeLine{00218\ \ \ \ \ \ \ \ \ .threshold\ =\ \mbox{\hyperlink{ei__fill__result__struct_8h_aafcd7d36638d6a564b6edbceef06ea8b}{block\_config}}-\/>anomaly\_threshold,}
+\DoxyCodeLine{00219\ \ \ \ \ \ \ \ \ .\mbox{\hyperlink{structei__learning__block__config__tflite__graph__t_a236c1ec337b36737f91b21516aa72182}{quantized}}\ =\ 0,}
+\DoxyCodeLine{00220\ \ \ \ \ \ \ \ \ .compiled\ =\ 0,}
+\DoxyCodeLine{00221\ \ \ \ \ \ \ \ \ .graph\_config\ =\ \mbox{\hyperlink{ei__fill__result__struct_8h_aafcd7d36638d6a564b6edbceef06ea8b}{block\_config}}-\/>\mbox{\hyperlink{structei__learning__block__config__tflite__graph__t_a42210921fb4db239d6b53c0409f6e5d9}{graph\_config}}}
+\DoxyCodeLine{00222\ \ \ \ \ \};}
+\DoxyCodeLine{00223\ }
+\DoxyCodeLine{00224\ \ \ \ \ \mbox{\hyperlink{structei__impulse__result__t}{ei\_impulse\_result\_t}}\ anomaly\_result\ =\ \{\ 0\ \};}
+\DoxyCodeLine{00225\ }
+\DoxyCodeLine{00226\ \ \ \ \ std::unique\_ptr<ei\_feature\_t[]>\ input\_ptr(\textcolor{keyword}{new}\ \mbox{\hyperlink{structei__feature__t}{ei\_feature\_t}}[1]);}
+\DoxyCodeLine{00227\ \ \ \ \ \mbox{\hyperlink{structei__feature__t}{ei\_feature\_t}}*\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src5afb18c45f6346167aa977a363205143_a9cebfb3d6ddd692fbdd268cf4b9ad024}{input}}\ =\ input\_ptr.get();}
+\DoxyCodeLine{00228\ }
+\DoxyCodeLine{00229\ \ \ \ \ memset(\&anomaly\_result,\ 0,\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{structei__impulse__result__t}{ei\_impulse\_result\_t}}));}
+\DoxyCodeLine{00230\ }
+\DoxyCodeLine{00231\ \ \ \ \ std::unique\_ptr<ei::matrix\_t>\ matrix\_ptr(\textcolor{keyword}{new}\ ei::matrix\_t(1,\ \mbox{\hyperlink{ei__fill__result__struct_8h_aafcd7d36638d6a564b6edbceef06ea8b}{block\_config}}-\/>anom\_axes\_size));}
+\DoxyCodeLine{00232\ }
+\DoxyCodeLine{00233\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{ei__fill__result__struct_8h_aafcd7d36638d6a564b6edbceef06ea8b}{block\_config}}-\/>\mbox{\hyperlink{structei__learning__block__config__tflite__graph__t_af9fe6a426e28a08c4f73d5f325cc4861}{classification\_mode}}\ ==\ \mbox{\hyperlink{ei__model__types_8h_aada46d079098c0ef52e23bde98c4fdc7}{EI\_CLASSIFIER\_CLASSIFICATION\_MODE\_VISUAL\_ANOMALY}})\ \{}
+\DoxyCodeLine{00234\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ [JJ]\ Here\ we\ assume\ that\ the\ feature\ extractor\ block\ is\ always\ directly\ before\ the\ GMM\ block}}
+\DoxyCodeLine{00235\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ if\ that\ changes\ (which\ I\ assume\ it\ will\ at\ some\ point,\ e.g.\ if\ we\ have\ a\ shared\ backbone)}}
+\DoxyCodeLine{00236\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ this\ will\ break.\ Would\ it\ be\ better\ if\ \`{}run\_nn\_inference`\ would\ get\ pointers\ to\ the\ input/output}}
+\DoxyCodeLine{00237\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ matrices\ instead?}}
+\DoxyCodeLine{00238\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src5afb18c45f6346167aa977a363205143_a9cebfb3d6ddd692fbdd268cf4b9ad024}{input}}[0].matrix\ =\ fmatrix[impulse-\/>\mbox{\hyperlink{structei__impulse_aab279e170490f9b5c0c59eff0b6fa484}{dsp\_blocks\_size}}\ +\ (learn\_block\_index\ -\/\ 1)].matrix;}
+\DoxyCodeLine{00239\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src5afb18c45f6346167aa977a363205143_a9cebfb3d6ddd692fbdd268cf4b9ad024}{input}}[0].blockId\ =\ fmatrix[impulse-\/>\mbox{\hyperlink{structei__impulse_aab279e170490f9b5c0c59eff0b6fa484}{dsp\_blocks\_size}}\ +\ (learn\_block\_index\ -\/\ 1)].blockId;}
+\DoxyCodeLine{00240\ }
+\DoxyCodeLine{00241\ \ \ \ \ \ \ \ \ input\_block\_ids\_size\ =\ 1;}
+\DoxyCodeLine{00242\ \ \ \ \ \}}
+\DoxyCodeLine{00243\ \ \ \ \ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00244\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src5afb18c45f6346167aa977a363205143_a9cebfb3d6ddd692fbdd268cf4b9ad024}{input}}[0].matrix\ =\ matrix\_ptr.get();}
+\DoxyCodeLine{00245\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src5afb18c45f6346167aa977a363205143_a9cebfb3d6ddd692fbdd268cf4b9ad024}{input}}[0].blockId\ =\ 0;}
+\DoxyCodeLine{00246\ }
+\DoxyCodeLine{00247\ \ \ \ \ \ \ \ \ extract\_anomaly\_input\_values(fmatrix,\ input\_block\_ids,\ input\_block\_ids\_size,\ \mbox{\hyperlink{ei__fill__result__struct_8h_aafcd7d36638d6a564b6edbceef06ea8b}{block\_config}}-\/>anom\_axes\_size,\ \mbox{\hyperlink{ei__fill__result__struct_8h_aafcd7d36638d6a564b6edbceef06ea8b}{block\_config}}-\/>anom\_axis,\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src5afb18c45f6346167aa977a363205143_a9cebfb3d6ddd692fbdd268cf4b9ad024}{input}}[0].matrix-\/>buffer);}
+\DoxyCodeLine{00248\ \ \ \ \ \ \ \ \ input\_block\_ids\_size\ =\ 1;}
+\DoxyCodeLine{00249\ \ \ \ \ \}}
+\DoxyCodeLine{00250\ }
+\DoxyCodeLine{00251\ \ \ \ \ \mbox{\hyperlink{group__ei__returntypes_gad9580b47a6cd5e74cfc31a03bdfecebe}{EI\_IMPULSE\_ERROR}}\ res\ =\ \mbox{\hyperlink{akida_8h_ae95031a834aea77650106530f566fdb5}{run\_nn\_inference}}(impulse,\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src5afb18c45f6346167aa977a363205143_a9cebfb3d6ddd692fbdd268cf4b9ad024}{input}},\ learn\_block\_index,\ input\_block\_ids,\ input\_block\_ids\_size,\ \&anomaly\_result,\ (\textcolor{keywordtype}{void}*)\&ei\_learning\_block\_config\_gmm,\ \mbox{\hyperlink{ei__fill__result__struct_8h_a881f62341b5a41a3c5707268bd537be1}{debug}});}
+\DoxyCodeLine{00252\ \ \ \ \ \textcolor{keywordflow}{if}\ (res\ !=\ \mbox{\hyperlink{ei__fill__result__struct_8h_a2fb43be102b153d659b668ad295aff40}{EI\_IMPULSE\_OK}})\ \{}
+\DoxyCodeLine{00253\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ res;}
+\DoxyCodeLine{00254\ \ \ \ \ \}}
+\DoxyCodeLine{00255\ }
+\DoxyCodeLine{00256\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{ei__fill__result__struct_8h_a881f62341b5a41a3c5707268bd537be1}{debug}})\ \{}
+\DoxyCodeLine{00257\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}Anomaly\ score\ (time:\ \%d\ ms.):\ "{}},\ anomaly\_result.\mbox{\hyperlink{structei__impulse__result__t_ae6b4e6f4d01735b62af63e85cb28ed24}{timing}}.\mbox{\hyperlink{structei__impulse__result__timing__t_a2787f79a4d56383c5f9c2640de1e1c82}{classification}});}
+\DoxyCodeLine{00258\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group__ei__user__functions_gadcb0babc6f41a7d0aa4c0801c96ae7e4}{ei\_printf\_float}}(anomaly\_result.\mbox{\hyperlink{structei__impulse__result__t_a4ce4dfe5ade5d643674e563b2f02665c}{classification}}[0].\mbox{\hyperlink{structei__impulse__result__classification__t_a9866d873de990eb97ef792d297010e5b}{value}});}
+\DoxyCodeLine{00259\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}\(\backslash\)n"{}});}
+\DoxyCodeLine{00260\ \ \ \ \ \}}
+\DoxyCodeLine{00261\ }
+\DoxyCodeLine{00262\ \ \ \ \ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}}-\/>timing.anomaly\_us\ =\ anomaly\_result.\mbox{\hyperlink{structei__impulse__result__t_ae6b4e6f4d01735b62af63e85cb28ed24}{timing}}.\mbox{\hyperlink{structei__impulse__result__timing__t_a2767fa2272cadfc4c55c515ddbf62967}{classification\_us}};}
+\DoxyCodeLine{00263\ \ \ \ \ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}}-\/>timing.anomaly\ =\ anomaly\_result.\mbox{\hyperlink{structei__impulse__result__t_ae6b4e6f4d01735b62af63e85cb28ed24}{timing}}.\mbox{\hyperlink{structei__impulse__result__timing__t_a2787f79a4d56383c5f9c2640de1e1c82}{classification}};}
+\DoxyCodeLine{00264\ }
+\DoxyCodeLine{00265\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{ei__fill__result__struct_8h_aafcd7d36638d6a564b6edbceef06ea8b}{block\_config}}-\/>\mbox{\hyperlink{structei__learning__block__config__tflite__graph__t_af9fe6a426e28a08c4f73d5f325cc4861}{classification\_mode}}\ ==\ \mbox{\hyperlink{ei__model__types_8h_aada46d079098c0ef52e23bde98c4fdc7}{EI\_CLASSIFIER\_CLASSIFICATION\_MODE\_VISUAL\_ANOMALY}})\ \{}
+\DoxyCodeLine{00266\ \textcolor{preprocessor}{\#if\ EI\_CLASSIFIER\_HAS\_VISUAL\_ANOMALY}}
+\DoxyCodeLine{00267\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}}-\/>visual\_ad\_grid\_cells\ =\ anomaly\_result.visual\_ad\_grid\_cells;}
+\DoxyCodeLine{00268\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}}-\/>visual\_ad\_count\ =\ anomaly\_result.visual\_ad\_count;}
+\DoxyCodeLine{00269\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}}-\/>visual\_ad\_result.mean\_value\ =\ anomaly\_result.visual\_ad\_result.mean\_value;}
+\DoxyCodeLine{00270\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}}-\/>visual\_ad\_result.max\_value\ =\ anomaly\_result.visual\_ad\_result.max\_value;}
+\DoxyCodeLine{00271\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ EI\_CLASSIFIER\_HAS\_VISUAL\_ANOMALY}}
+\DoxyCodeLine{00272\ \ \ \ \ \}}
+\DoxyCodeLine{00273\ \ \ \ \ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00274\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}}-\/>anomaly\ =\ anomaly\_result.\mbox{\hyperlink{structei__impulse__result__t_a4ce4dfe5ade5d643674e563b2f02665c}{classification}}[0].\mbox{\hyperlink{structei__impulse__result__classification__t_a9866d873de990eb97ef792d297010e5b}{value}};}
+\DoxyCodeLine{00275\ \ \ \ \ \}}
+\DoxyCodeLine{00276\ }
+\DoxyCodeLine{00277\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{ei__fill__result__struct_8h_a2fb43be102b153d659b668ad295aff40}{EI\_IMPULSE\_OK}};}
+\DoxyCodeLine{00278\ \}}
+\DoxyCodeLine{00279\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ (EI\_CLASSIFIER\_INFERENCING\_ENGINE\ !=\ EI\_CLASSIFIER\_NONE)}}
+\DoxyCodeLine{00280\ }
+\DoxyCodeLine{00281\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\#if\ (EI\_CLASSIFIER\_HAS\_ANOMALY\ ==\ 1)}}
+\DoxyCodeLine{00282\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ \_EDGE\_IMPULSE\_INFERENCING\_ANOMALY\_H\_}}
+
+\end{DoxyCode}

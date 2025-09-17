@@ -1,0 +1,92 @@
+\doxysection{kernel\+\_\+runner.\+h}
+\hypertarget{tflite-micro-main_2tensorflow_2lite_2micro_2kernels_2kernel__runner_8h_source}{}\label{tflite-micro-main_2tensorflow_2lite_2micro_2kernels_2kernel__runner_8h_source}\index{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/main/tensorflow/lite/micro/kernels/kernel\_runner.h@{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/main/tensorflow/lite/micro/kernels/kernel\_runner.h}}
+\mbox{\hyperlink{tflite-micro-main_2tensorflow_2lite_2micro_2kernels_2kernel__runner_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{/*\ Copyright\ 2020\ The\ TensorFlow\ Authors.\ All\ Rights\ Reserved.}}
+\DoxyCodeLine{00002\ \textcolor{comment}{}}
+\DoxyCodeLine{00003\ \textcolor{comment}{Licensed\ under\ the\ Apache\ License,\ Version\ 2.0\ (the\ "{}License"{});}}
+\DoxyCodeLine{00004\ \textcolor{comment}{you\ may\ not\ use\ this\ file\ except\ in\ compliance\ with\ the\ License.}}
+\DoxyCodeLine{00005\ \textcolor{comment}{You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{00006\ \textcolor{comment}{}}
+\DoxyCodeLine{00007\ \textcolor{comment}{\ \ \ \ http://www.apache.org/licenses/LICENSE-\/2.0}}
+\DoxyCodeLine{00008\ \textcolor{comment}{}}
+\DoxyCodeLine{00009\ \textcolor{comment}{Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ software}}
+\DoxyCodeLine{00010\ \textcolor{comment}{distributed\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,}}
+\DoxyCodeLine{00011\ \textcolor{comment}{WITHOUT\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,\ either\ express\ or\ implied.}}
+\DoxyCodeLine{00012\ \textcolor{comment}{See\ the\ License\ for\ the\ specific\ language\ governing\ permissions\ and}}
+\DoxyCodeLine{00013\ \textcolor{comment}{limitations\ under\ the\ License.}}
+\DoxyCodeLine{00014\ \textcolor{comment}{==============================================================================*/}}
+\DoxyCodeLine{00015\ }
+\DoxyCodeLine{00016\ \textcolor{preprocessor}{\#ifndef\ TENSORFLOW\_LITE\_MICRO\_KERNELS\_KERNEL\_RUNNER\_H\_}}
+\DoxyCodeLine{00017\ \textcolor{preprocessor}{\#define\ TENSORFLOW\_LITE\_MICRO\_KERNELS\_KERNEL\_RUNNER\_H\_}}
+\DoxyCodeLine{00018\ }
+\DoxyCodeLine{00019\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/c/common.h"{}}}
+\DoxyCodeLine{00020\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/kernels/internal/compatibility.h"{}}}
+\DoxyCodeLine{00021\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/micro/arena\_allocator/single\_arena\_buffer\_allocator.h"{}}}
+\DoxyCodeLine{00022\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/micro/fake\_micro\_context.h"{}}}
+\DoxyCodeLine{00023\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/micro/mock\_micro\_graph.h"{}}}
+\DoxyCodeLine{00024\ }
+\DoxyCodeLine{00025\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacetflite}{tflite}}\ \{}
+\DoxyCodeLine{00026\ \textcolor{keyword}{namespace\ }micro\ \{}
+\DoxyCodeLine{00027\ }
+\DoxyCodeLine{00028\ \textcolor{comment}{//\ Helper\ class\ to\ perform\ a\ simulated\ kernel\ (i.e.\ TFLMRegistration)}}
+\DoxyCodeLine{00029\ \textcolor{comment}{//\ lifecycle\ (init,\ prepare,\ invoke).\ All\ internal\ allocations\ are\ handled\ by}}
+\DoxyCodeLine{00030\ \textcolor{comment}{//\ this\ class.\ Simply\ pass\ in\ the\ registration,\ list\ of\ required\ tensors,\ inputs}}
+\DoxyCodeLine{00031\ \textcolor{comment}{//\ array,\ outputs\ array,\ and\ any\ pre-\/builtin\ data.\ Calling\ Invoke()\ will}}
+\DoxyCodeLine{00032\ \textcolor{comment}{//\ automatically\ walk\ the\ kernel\ and\ outputs\ will\ be\ ready\ on\ the\ TfLiteTensor}}
+\DoxyCodeLine{00033\ \textcolor{comment}{//\ output\ provided\ during\ construction.}}
+\DoxyCodeLine{00034\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classtflite_1_1micro_1_1_kernel_runner}{KernelRunner}}\ \{}
+\DoxyCodeLine{00035\ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00036\ \ \ \mbox{\hyperlink{classtflite_1_1micro_1_1_kernel_runner_a89d193aef786ec0acdc8b1757002bcf3}{KernelRunner}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{struct_t_f_l_m_registration}{TFLMRegistration}}\&\ registration,\ \mbox{\hyperlink{struct_tf_lite_tensor}{TfLiteTensor}}*\ tensors,}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ tensors\_size,\ \mbox{\hyperlink{struct_tf_lite_int_array}{TfLiteIntArray}}*\ \mbox{\hyperlink{hello__world__model_8cc_a0daa8689be975e1395cf34b8a38121d3}{inputs}},}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_tf_lite_int_array}{TfLiteIntArray}}*\ \mbox{\hyperlink{hello__world__model_8cc_af907ab92e8169bbfa248dd4f8eb0005c}{outputs}},\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{void}*\ \mbox{\hyperlink{hello__world__model_8cc_ac78b3db8b592b472b8ea2ffd2b194737}{builtin\_data}},}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_tf_lite_int_array}{TfLiteIntArray}}*\ intermediates\ =\ \textcolor{keyword}{nullptr});}
+\DoxyCodeLine{00040\ }
+\DoxyCodeLine{00041\ \ \ \textcolor{comment}{//\ Calls\ init\ and\ prepare\ on\ the\ kernel\ (i.e.\ TFLMRegistration)\ struct.}}
+\DoxyCodeLine{00042\ \ \ \textcolor{comment}{//\ Any\ exceptions\ will\ be\ DebugLog'd\ and\ returned\ as\ a\ status\ code.}}
+\DoxyCodeLine{00043\ \ \ \mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2core_2c_2c__api__types_8h_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1micro_1_1_kernel_runner_ab038efef8f2f300d196bb9a58a759c57}{InitAndPrepare}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ init\_data\ =\ \textcolor{keyword}{nullptr},}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ length\ =\ 0);}
+\DoxyCodeLine{00045\ }
+\DoxyCodeLine{00046\ \ \ \textcolor{comment}{//\ Calls\ invoke\ on\ a\ given\ TFLMRegistration\ pointer.\ After\ successful}}
+\DoxyCodeLine{00047\ \ \ \textcolor{comment}{//\ invoke,\ results\ will\ be\ available\ in\ the\ output\ tensor\ as\ passed\ into\ the}}
+\DoxyCodeLine{00048\ \ \ \textcolor{comment}{//\ constructor\ of\ this\ class.}}
+\DoxyCodeLine{00049\ \ \ \mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2core_2c_2c__api__types_8h_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1micro_1_1_kernel_runner_a38121b58eefd078f6dcc1b26b4a0aea7}{Invoke}}();}
+\DoxyCodeLine{00050\ }
+\DoxyCodeLine{00051\ \ \ \textcolor{comment}{//\ Calls\ Free\ on\ a\ given\ TFLMRegistration\ pointer(if\ it's\ implemented).}}
+\DoxyCodeLine{00052\ \ \ \textcolor{comment}{//\ After\ successful\ Free,\ kTfLiteOk\ status\ will\ be\ returned.\ If\ Free\ is\ not}}
+\DoxyCodeLine{00053\ \ \ \textcolor{comment}{//\ implemented\ for\ a\ given\ kernel\ kTfLiteError\ will\ be\ returned.}}
+\DoxyCodeLine{00054\ \ \ \mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2core_2c_2c__api__types_8h_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1micro_1_1_kernel_runner_af4c98104d9232b63dab20215379c4646}{Free}}();}
+\DoxyCodeLine{00055\ }
+\DoxyCodeLine{00056\ \ \ \textcolor{comment}{//\ Calls\ Reset\ on\ a\ given\ TFLMRegistration\ pointer(if\ it's\ implemented).}}
+\DoxyCodeLine{00057\ \ \ \textcolor{comment}{//\ After\ successful\ Reset,\ kTfLiteOk\ status\ will\ be\ returned.\ If\ Free\ is\ not}}
+\DoxyCodeLine{00058\ \ \ \textcolor{comment}{//\ implemented\ for\ a\ given\ kernel\ kTfLiteError\ will\ be\ returned.}}
+\DoxyCodeLine{00059\ \ \ \mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2core_2c_2c__api__types_8h_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1micro_1_1_kernel_runner_ab4fa3a9df45f8e07448faae907131565}{Reset}}();}
+\DoxyCodeLine{00060\ }
+\DoxyCodeLine{00061\ \ \ \textcolor{comment}{//\ Returns\ a\ pointer\ to\ the\ internal\ MockMicroGraph\ which\ KernelRunner\ uses}}
+\DoxyCodeLine{00062\ \ \ \textcolor{comment}{//\ to\ stub\ out\ MicroGraph\ methods\ and\ track\ invocations\ on\ each\ subgraph.}}
+\DoxyCodeLine{00063\ \ \ \mbox{\hyperlink{classtflite_1_1_mock_micro_graph}{MockMicroGraph}}*\ \mbox{\hyperlink{classtflite_1_1micro_1_1_kernel_runner_ae5c20f8644bc919141753d2b29d13468}{GetMockGraph}}()\ \{\ \textcolor{keywordflow}{return}\ \&\mbox{\hyperlink{classtflite_1_1micro_1_1_kernel_runner_a06aa211bc3de73c918307ddd54e56496}{mock\_micro\_graph\_}};\ \}}
+\DoxyCodeLine{00064\ }
+\DoxyCodeLine{00065\ \ \ \textcolor{comment}{//\ Returns\ true\ if\ all\ temp\ buffer\ in\ tests\ are\ deallocated.}}
+\DoxyCodeLine{00066\ \ \ \textcolor{comment}{//\ TODO(b/209453859):\ move\ this\ function\ to\ private\ after\ deallocation\ checks}}
+\DoxyCodeLine{00067\ \ \ \textcolor{comment}{//\ are\ enabled\ for\ all\ kernel\ tests.}}
+\DoxyCodeLine{00068\ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classtflite_1_1micro_1_1_kernel_runner_a86b6be1aad7a5af293c5bb08648a5c26}{ValidateTempBufferDeallocated}}();}
+\DoxyCodeLine{00069\ }
+\DoxyCodeLine{00070\ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{00071\ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{classtflite_1_1micro_1_1_kernel_runner_a692ac6a17d0511cf7816f79b7befee23}{kKernelRunnerBufferSize\_}}\ =\ 10000;}
+\DoxyCodeLine{00072\ \ \ \textcolor{keyword}{static}\ uint8\_t\ \mbox{\hyperlink{classtflite_1_1micro_1_1_kernel_runner_a60db3e1b616cb4ce5d47c477965e5f7a}{kKernelRunnerBuffer\_}}[\mbox{\hyperlink{classtflite_1_1micro_1_1_kernel_runner_a692ac6a17d0511cf7816f79b7befee23}{kKernelRunnerBufferSize\_}}];}
+\DoxyCodeLine{00073\ }
+\DoxyCodeLine{00074\ \ \ \mbox{\hyperlink{struct_tf_lite_context}{TfLiteContext}}\ \mbox{\hyperlink{classtflite_1_1micro_1_1_kernel_runner_ac7421b55b46c3f47351a34dd5de3c44f}{context\_}}\ =\ \{\};}
+\DoxyCodeLine{00075\ \ \ \mbox{\hyperlink{struct_tf_lite_node}{TfLiteNode}}\ \mbox{\hyperlink{classtflite_1_1micro_1_1_kernel_runner_ab252a1025e772a340874414fd033d1c8}{node\_}}\ =\ \{\};}
+\DoxyCodeLine{00076\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_t_f_l_m_registration}{TFLMRegistration}}\&\ \mbox{\hyperlink{classtflite_1_1micro_1_1_kernel_runner_a05354a9970ed0f083fea84ec290e808c}{registration\_}};}
+\DoxyCodeLine{00077\ }
+\DoxyCodeLine{00078\ \ \ \mbox{\hyperlink{classtflite_1_1_single_arena_buffer_allocator}{SingleArenaBufferAllocator}}*\ \mbox{\hyperlink{classtflite_1_1micro_1_1_kernel_runner_a6adb2ec91a1755da4e312de2f0c4743c}{allocator\_}};}
+\DoxyCodeLine{00079\ \ \ \mbox{\hyperlink{classtflite_1_1_mock_micro_graph}{MockMicroGraph}}\ \mbox{\hyperlink{classtflite_1_1micro_1_1_kernel_runner_a06aa211bc3de73c918307ddd54e56496}{mock\_micro\_graph\_}};}
+\DoxyCodeLine{00080\ \ \ \mbox{\hyperlink{classtflite_1_1_fake_micro_context}{FakeMicroContext}}\ \mbox{\hyperlink{classtflite_1_1micro_1_1_kernel_runner_ae6efe1bf3a0707c5bc403e717e2d3149}{fake\_micro\_context\_}};}
+\DoxyCodeLine{00081\ \};}
+\DoxyCodeLine{00082\ }
+\DoxyCodeLine{00083\ \}\ \ \textcolor{comment}{//\ namespace\ micro}}
+\DoxyCodeLine{00084\ \}\ \ \textcolor{comment}{//\ namespace\ tflite}}
+\DoxyCodeLine{00085\ }
+\DoxyCodeLine{00086\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ TENSORFLOW\_LITE\_MICRO\_KERNELS\_KERNEL\_RUNNER\_H\_}}
+
+\end{DoxyCode}

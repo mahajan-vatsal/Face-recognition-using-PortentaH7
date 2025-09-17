@@ -1,0 +1,585 @@
+\doxysection{lstm\+\_\+test\+\_\+data.\+h}
+\hypertarget{lstm__test__data_8h_source}{}\label{lstm__test__data_8h_source}\index{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/main/tensorflow/lite/micro/kernels/testdata/lstm\_test\_data.h@{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/main/tensorflow/lite/micro/kernels/testdata/lstm\_test\_data.h}}
+\mbox{\hyperlink{lstm__test__data_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{/*\ Copyright\ 2022\ The\ TensorFlow\ Authors.\ All\ Rights\ Reserved.}}
+\DoxyCodeLine{00002\ \textcolor{comment}{}}
+\DoxyCodeLine{00003\ \textcolor{comment}{Licensed\ under\ the\ Apache\ License,\ Version\ 2.0\ (the\ "{}License"{});}}
+\DoxyCodeLine{00004\ \textcolor{comment}{you\ may\ not\ use\ this\ file\ except\ in\ compliance\ with\ the\ License.}}
+\DoxyCodeLine{00005\ \textcolor{comment}{You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{00006\ \textcolor{comment}{}}
+\DoxyCodeLine{00007\ \textcolor{comment}{\ \ \ \ http://www.apache.org/licenses/LICENSE-\/2.0}}
+\DoxyCodeLine{00008\ \textcolor{comment}{}}
+\DoxyCodeLine{00009\ \textcolor{comment}{Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ software}}
+\DoxyCodeLine{00010\ \textcolor{comment}{distributed\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,}}
+\DoxyCodeLine{00011\ \textcolor{comment}{WITHOUT\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,\ either\ express\ or\ implied.}}
+\DoxyCodeLine{00012\ \textcolor{comment}{See\ the\ License\ for\ the\ specific\ language\ governing\ permissions\ and}}
+\DoxyCodeLine{00013\ \textcolor{comment}{limitations\ under\ the\ License.}}
+\DoxyCodeLine{00014\ \textcolor{comment}{==============================================================================*/}}
+\DoxyCodeLine{00015\ }
+\DoxyCodeLine{00016\ \textcolor{preprocessor}{\#ifndef\ TENSORFLOW\_LITE\_MICRO\_KERNELS\_TESTDATA\_LSTM\_TEST\_DATA\_H\_}}
+\DoxyCodeLine{00017\ \textcolor{preprocessor}{\#define\ TENSORFLOW\_LITE\_MICRO\_KERNELS\_TESTDATA\_LSTM\_TEST\_DATA\_H\_}}
+\DoxyCodeLine{00018\ \textcolor{preprocessor}{\#include\ <string>}}
+\DoxyCodeLine{00019\ }
+\DoxyCodeLine{00020\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/c/common.h"{}}}
+\DoxyCodeLine{00021\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/kernels/internal/portable\_tensor\_utils.h"{}}}
+\DoxyCodeLine{00022\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/micro/kernels/lstm\_shared.h"{}}}
+\DoxyCodeLine{00023\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/micro/test\_helpers.h"{}}}
+\DoxyCodeLine{00024\ }
+\DoxyCodeLine{00025\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacetflite}{tflite}}\ \{}
+\DoxyCodeLine{00026\ \textcolor{keyword}{namespace\ }testing\ \{}
+\DoxyCodeLine{00027\ \textcolor{comment}{//\ Data\ structure\ to\ store\ all\ the\ data\ used\ to\ check\ output\ of\ internal\ gates}}
+\DoxyCodeLine{00028\ \textcolor{comment}{//\ of\ one\ time\ step}}
+\DoxyCodeLine{00029\ \textcolor{comment}{//\ input\_size\ =\ batch\_size*input\_dimension\ (size\ of\ the\ input\ array)}}
+\DoxyCodeLine{00030\ \textcolor{comment}{//\ gate\_output\_size\ =\ batch\_size*state\_dimension\ (size\ of\ the\ gate\ output)}}
+\DoxyCodeLine{00031\ \textcolor{keyword}{template}\ <\textcolor{keywordtype}{int}\ input\_size,\ \textcolor{keywordtype}{int}\ gate\_output\_size>}
+\DoxyCodeLine{00032\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structtflite_1_1testing_1_1_gate_output_check_data}{GateOutputCheckData}}\ \{}
+\DoxyCodeLine{00033\ \ \ \textcolor{keywordtype}{float}\ \mbox{\hyperlink{structtflite_1_1testing_1_1_gate_output_check_data_a5017f183eb47b30ef1906884be032a19}{input\_data}}[\mbox{\hyperlink{irfft_8cc_a56f49c6b551e4aec18e30116c206dd5b}{input\_size}}];}
+\DoxyCodeLine{00034\ \ \ \textcolor{keywordtype}{float}\ \mbox{\hyperlink{structtflite_1_1testing_1_1_gate_output_check_data_a6c249f2598f2ade563209a2e189196fb}{hidden\_state}}[gate\_output\_size];}
+\DoxyCodeLine{00035\ \ \ \textcolor{keywordtype}{float}\ \mbox{\hyperlink{structtflite_1_1testing_1_1_gate_output_check_data_a323be41553743096be70aa4abed86824}{cell\_state}}[gate\_output\_size];}
+\DoxyCodeLine{00036\ \ \ \textcolor{keywordtype}{float}\ \mbox{\hyperlink{structtflite_1_1testing_1_1_gate_output_check_data_aed90b23d2f7d50c31ce5df4f8dde11b3}{expected\_forget\_gate\_output}}[gate\_output\_size];}
+\DoxyCodeLine{00037\ \ \ \textcolor{keywordtype}{float}\ \mbox{\hyperlink{structtflite_1_1testing_1_1_gate_output_check_data_a6b96cb93d3350f1640ec25736da651ca}{expected\_input\_gate\_output}}[gate\_output\_size];}
+\DoxyCodeLine{00038\ \ \ \textcolor{keywordtype}{float}\ \mbox{\hyperlink{structtflite_1_1testing_1_1_gate_output_check_data_a2a46b05632712e8362fe9b3c43176831}{expected\_output\_gate\_output}}[gate\_output\_size];}
+\DoxyCodeLine{00039\ \ \ \textcolor{keywordtype}{float}\ \mbox{\hyperlink{structtflite_1_1testing_1_1_gate_output_check_data_a2e77780ab75b1a28825c3944bf7ad57a}{expected\_cell\_gate\_output}}[gate\_output\_size];}
+\DoxyCodeLine{00040\ \ \ \textcolor{keywordtype}{float}\ \mbox{\hyperlink{structtflite_1_1testing_1_1_gate_output_check_data_a20894504f2e404dc94346df78afef212}{expected\_updated\_cell}}[gate\_output\_size];}
+\DoxyCodeLine{00041\ \ \ \textcolor{keywordtype}{float}\ \mbox{\hyperlink{structtflite_1_1testing_1_1_gate_output_check_data_aea28512852acd4f8d503813e3ff01cbf}{expected\_updated\_hidden}}[gate\_output\_size];}
+\DoxyCodeLine{00042\ \};}
+\DoxyCodeLine{00043\ }
+\DoxyCodeLine{00044\ \textcolor{comment}{//\ Data\ structure\ to\ store\ all\ the\ data\ used\ to\ check\ the\ output\ of\ the\ kernel}}
+\DoxyCodeLine{00045\ \textcolor{comment}{//\ of\ multiple\ batch,\ multiple\ timesteps}}
+\DoxyCodeLine{00046\ \textcolor{comment}{//\ input\_size\ =\ batch\_size*time\_steps*input\_dimension\ (size\ of\ the\ input\ array)}}
+\DoxyCodeLine{00047\ \textcolor{comment}{//\ gate\_output\_size\ =\ batch\_size*state\_dimension\ (size\ of\ the\ gate\ output)}}
+\DoxyCodeLine{00048\ \textcolor{comment}{//\ output\_size\ =\ time\_steps*gate\_output\_size\ (size\ of\ the\ output\ from\ the}}
+\DoxyCodeLine{00049\ \textcolor{comment}{//\ kernel)}}
+\DoxyCodeLine{00050\ \textcolor{keyword}{template}\ <\textcolor{keywordtype}{int}\ input\_size,\ \textcolor{keywordtype}{int}\ gate\_output\_size,\ \textcolor{keywordtype}{int}\ output\_size>}
+\DoxyCodeLine{00051\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structtflite_1_1testing_1_1_lstm_eval_check_data}{LstmEvalCheckData}}\ \{}
+\DoxyCodeLine{00052\ \ \ \textcolor{keywordtype}{float}\ \mbox{\hyperlink{structtflite_1_1testing_1_1_lstm_eval_check_data_a88fd733c3396c8889e0b333697aad087}{input\_data}}[\mbox{\hyperlink{irfft_8cc_a56f49c6b551e4aec18e30116c206dd5b}{input\_size}}];}
+\DoxyCodeLine{00053\ \ \ \textcolor{keywordtype}{float}\ \mbox{\hyperlink{structtflite_1_1testing_1_1_lstm_eval_check_data_a37fec0033031aecf42055945fe478a6d}{hidden\_state}}[gate\_output\_size];}
+\DoxyCodeLine{00054\ \ \ \textcolor{keywordtype}{float}\ \mbox{\hyperlink{structtflite_1_1testing_1_1_lstm_eval_check_data_a487c85c15dadc30e0d1891ce55fd0316}{expected\_output}}[\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcaf138809236f667e9686fdd4aaf17705_ad8d3d4ec9395e78bb589ab744c5fbaaa}{output\_size}}];}
+\DoxyCodeLine{00055\ \ \ \textcolor{keywordtype}{float}\ \mbox{\hyperlink{structtflite_1_1testing_1_1_lstm_eval_check_data_a59ff9958f2e1bb69e3cf7c7c07b33d14}{expected\_hidden\_state}}[gate\_output\_size];}
+\DoxyCodeLine{00056\ \ \ \textcolor{keywordtype}{float}\ \mbox{\hyperlink{structtflite_1_1testing_1_1_lstm_eval_check_data_a37a4d902707c5ef630e7fa5849bbe04d}{expected\_cell\_state}}[gate\_output\_size];}
+\DoxyCodeLine{00057\ \};}
+\DoxyCodeLine{00058\ }
+\DoxyCodeLine{00059\ \textcolor{comment}{//\ Struct\ that\ holds\ the\ weight/bias\ information\ for\ a\ standard\ gate\ (i.e.\ no}}
+\DoxyCodeLine{00060\ \textcolor{comment}{//\ modification\ such\ as\ layer\ normalization,\ peephole,\ etc.)}}
+\DoxyCodeLine{00061\ \textcolor{comment}{//\ Every\ gate\ is\ defined\ by\ the\ type\ and\ size\ of\ the\ weights\ (bias\ included)}}
+\DoxyCodeLine{00062\ \textcolor{comment}{//\ inside.}}
+\DoxyCodeLine{00063\ \textcolor{comment}{//\ Specifically,\ types\ are\ weight\ type\ and\ bias\ type\ (normally\ the\ same}}
+\DoxyCodeLine{00064\ \textcolor{comment}{//\ type\ of\ MatMul\ accumulator).}}
+\DoxyCodeLine{00065\ \textcolor{comment}{//\ activation\_weight\ has\ shape\ (hidden\ state\ dimension\ *\ input\ tensor\ dimension)}}
+\DoxyCodeLine{00066\ \textcolor{comment}{//\ recurrent\_weight\ has\ shape\ (hidden\ state\ dimension\ *\ hidden\ state\ dimension)}}
+\DoxyCodeLine{00067\ \textcolor{comment}{//\ bias\ has\ shape\ (hidden\ state\ dimension,\ 1)}}
+\DoxyCodeLine{00068\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ WeightType,\ \textcolor{keyword}{typename}\ BiasType,\ \textcolor{keywordtype}{int}\ input\_dimension,}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ state\_dimension>}
+\DoxyCodeLine{00070\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structtflite_1_1testing_1_1_gate_data}{GateData}}\ \{}
+\DoxyCodeLine{00071\ \ \ WeightType\ \mbox{\hyperlink{structtflite_1_1testing_1_1_gate_data_a52ec9d7b08980f9f66030c25a6cbc559}{activation\_weight}}[state\_dimension\ *\ input\_dimension];}
+\DoxyCodeLine{00072\ \ \ WeightType\ \mbox{\hyperlink{structtflite_1_1testing_1_1_gate_data_aeb4afed0149de49dbc42e510ce87a32a}{recurrent\_weight}}[state\_dimension\ *\ state\_dimension];}
+\DoxyCodeLine{00073\ \ \ BiasType\ \mbox{\hyperlink{structtflite_1_1testing_1_1_gate_data_a5efec55b93b4b97d56550d110ca44b37}{fused\_bias}}[state\_dimension];}
+\DoxyCodeLine{00074\ \ \ \textcolor{comment}{//\ Quantized\ model\ folded\ the\ zero\ point\ of\ activations\ into\ biases:}}
+\DoxyCodeLine{00075\ \ \ \textcolor{comment}{//\ bias\ +\ zero\_point\ *\ weight.}}
+\DoxyCodeLine{00076\ \ \ \textcolor{comment}{//\ Note:\ folded\ bias\ is\ only\ required\ for\ the\ legacy\ 8x8-\/>16\ pass.\ Therefore}}
+\DoxyCodeLine{00077\ \ \ \textcolor{comment}{//\ the\ data\ type\ is\ fixed\ here\ to\ avoid\ compilation\ errors\ (the\ computation\ of}}
+\DoxyCodeLine{00078\ \ \ \textcolor{comment}{//\ folding\ does\ not\ support\ other\ types)}}
+\DoxyCodeLine{00079\ \ \ int32\_t\ \mbox{\hyperlink{structtflite_1_1testing_1_1_gate_data_adfc2a4639489c6958d2db64e45c95122}{activation\_zp\_folded\_bias}}[state\_dimension];}
+\DoxyCodeLine{00080\ \ \ int32\_t\ \mbox{\hyperlink{structtflite_1_1testing_1_1_gate_data_aa1e09c46f69e9536c58ddcaac5c1d6d7}{recurrent\_zp\_folded\_bias}}[state\_dimension];}
+\DoxyCodeLine{00081\ \};}
+\DoxyCodeLine{00082\ }
+\DoxyCodeLine{00083\ \textcolor{comment}{//\ A\ struct\ that\ holds\ quantization\ parameters\ for\ a\ LSTM\ Tensor}}
+\DoxyCodeLine{00084\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structtflite_1_1testing_1_1_tensor_quantization_parameters}{TensorQuantizationParameters}}\ \{}
+\DoxyCodeLine{00085\ \ \ \textcolor{keywordtype}{double}\ \mbox{\hyperlink{structtflite_1_1testing_1_1_tensor_quantization_parameters_a776b7b1126870d436f74bd23a3f07fd9}{scale}};}
+\DoxyCodeLine{00086\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{structtflite_1_1testing_1_1_tensor_quantization_parameters_a0707931dba7f625cd0e30c2227f2449b}{zero\_point}};}
+\DoxyCodeLine{00087\ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{structtflite_1_1testing_1_1_tensor_quantization_parameters_a3a8a8c132a008c1cefb62c6729c70723}{symmetry}};}
+\DoxyCodeLine{00088\ \};}
+\DoxyCodeLine{00089\ }
+\DoxyCodeLine{00090\ \textcolor{comment}{//\ A\ struct\ that\ holds\ quantization\ parameters\ for\ an\ internal\ gate,\ which\ is}}
+\DoxyCodeLine{00091\ \textcolor{comment}{//\ defined\ by\ activation/recurrent\ weight\ and\ bias\ (assuming\ no\ internal\ layer}}
+\DoxyCodeLine{00092\ \textcolor{comment}{//\ normalization)}}
+\DoxyCodeLine{00093\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structtflite_1_1testing_1_1_gate_quantization_parameters}{GateQuantizationParameters}}\ \{}
+\DoxyCodeLine{00094\ \ \ \mbox{\hyperlink{structtflite_1_1testing_1_1_tensor_quantization_parameters}{TensorQuantizationParameters}}\ \mbox{\hyperlink{structtflite_1_1testing_1_1_gate_quantization_parameters_a754e01b7750e4e7b4554a873cc7f1590}{activation\_weight}};}
+\DoxyCodeLine{00095\ \ \ \mbox{\hyperlink{structtflite_1_1testing_1_1_tensor_quantization_parameters}{TensorQuantizationParameters}}\ \mbox{\hyperlink{structtflite_1_1testing_1_1_gate_quantization_parameters_a229a3a778196e5ed5334dc8d40329510}{recurrent\_weight}};}
+\DoxyCodeLine{00096\ \ \ \mbox{\hyperlink{structtflite_1_1testing_1_1_tensor_quantization_parameters}{TensorQuantizationParameters}}\ \mbox{\hyperlink{structtflite_1_1testing_1_1_gate_quantization_parameters_a009d6c5a84072c8a960d260eba6a708c}{bias}};}
+\DoxyCodeLine{00097\ \};}
+\DoxyCodeLine{00098\ }
+\DoxyCodeLine{00099\ \textcolor{comment}{//\ A\ struct\ that\ holds\ the\ quantization\ settings\ for\ the\ LSTM\ node.\ Data}}
+\DoxyCodeLine{00100\ \textcolor{comment}{//\ members\ can\ be\ grouped\ into\ five\ parts.}}
+\DoxyCodeLine{00101\ \textcolor{comment}{//\ 1.\ Data\ types\ (activation,weight,\ cell,\ bias)}}
+\DoxyCodeLine{00102\ \textcolor{comment}{//\ 2.\ Non-\/linear\ activation\ (i.e.,\ tanh\ and\ sigmoid)\ fixed\ point}}
+\DoxyCodeLine{00103\ \textcolor{comment}{//\ calculation\ settings}}
+\DoxyCodeLine{00104\ \textcolor{comment}{//\ 3.\ Input/output\ tensor\ quantization\ settings}}
+\DoxyCodeLine{00105\ \textcolor{comment}{//\ 4.\ Internal\ state\ (hidden\ and\ cell)\ quantization\ settings}}
+\DoxyCodeLine{00106\ \textcolor{comment}{//\ 5.\ Internal\ gate\ (forget,\ input,\ cell,\ output)\ settings}}
+\DoxyCodeLine{00107\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structtflite_1_1testing_1_1_node_quantization_parameters}{NodeQuantizationParameters}}\ \{}
+\DoxyCodeLine{00108\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_a8a47ba81bdef28b5c479ee7928a7d123}{TfLiteType}}\ \mbox{\hyperlink{structtflite_1_1testing_1_1_node_quantization_parameters_a643d4453cac27b9383adeeab52dcc0a3}{activation\_type}};}
+\DoxyCodeLine{00109\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_a8a47ba81bdef28b5c479ee7928a7d123}{TfLiteType}}\ \mbox{\hyperlink{structtflite_1_1testing_1_1_node_quantization_parameters_a920ea3ec0f99444914c1e1f04653096e}{weight\_type}};}
+\DoxyCodeLine{00110\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_a8a47ba81bdef28b5c479ee7928a7d123}{TfLiteType}}\ \mbox{\hyperlink{structtflite_1_1testing_1_1_node_quantization_parameters_ac23be7a0ead67f14f7aa56c1b4f7ec72}{cell\_type}};}
+\DoxyCodeLine{00111\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_a8a47ba81bdef28b5c479ee7928a7d123}{TfLiteType}}\ \mbox{\hyperlink{structtflite_1_1testing_1_1_node_quantization_parameters_a33d63a66d095f99d0b18a4814457e4b5}{bias\_type}};}
+\DoxyCodeLine{00112\ \ \ \textcolor{comment}{//\ Fixed\ point\ setting\ for\ integer\ nonlinear\ activation\ calculation}}
+\DoxyCodeLine{00113\ \ \ \textcolor{keywordtype}{double}\ \mbox{\hyperlink{structtflite_1_1testing_1_1_node_quantization_parameters_a099e77e9434eddb1dfa9804275a3f064}{nonlinear\_activation\_input\_scale}};}
+\DoxyCodeLine{00114\ \ \ \textcolor{keywordtype}{double}\ \mbox{\hyperlink{structtflite_1_1testing_1_1_node_quantization_parameters_a2f047e3d7b87eb785a05921306bc5bf1}{nonlinear\_activation\_output\_scale}};}
+\DoxyCodeLine{00115\ \ \ \textcolor{comment}{//\ Quantization\ parameters\ for\ input/output}}
+\DoxyCodeLine{00116\ \ \ \mbox{\hyperlink{structtflite_1_1testing_1_1_tensor_quantization_parameters}{TensorQuantizationParameters}}\ \mbox{\hyperlink{structtflite_1_1testing_1_1_node_quantization_parameters_af8b11a97a74a87b30740de2acc260c68}{input}};}
+\DoxyCodeLine{00117\ \ \ \mbox{\hyperlink{structtflite_1_1testing_1_1_tensor_quantization_parameters}{TensorQuantizationParameters}}\ \mbox{\hyperlink{structtflite_1_1testing_1_1_node_quantization_parameters_a0ba6e36d011e8e670e6fed9299da0938}{output}};}
+\DoxyCodeLine{00118\ \ \ \textcolor{comment}{//\ Quantization\ parameters\ for\ internal\ states}}
+\DoxyCodeLine{00119\ \ \ \mbox{\hyperlink{structtflite_1_1testing_1_1_tensor_quantization_parameters}{TensorQuantizationParameters}}\ \mbox{\hyperlink{structtflite_1_1testing_1_1_node_quantization_parameters_acabe3c0ee38796c6e67867a652914853}{hidden\_state}};}
+\DoxyCodeLine{00120\ \ \ \mbox{\hyperlink{structtflite_1_1testing_1_1_tensor_quantization_parameters}{TensorQuantizationParameters}}\ \mbox{\hyperlink{structtflite_1_1testing_1_1_node_quantization_parameters_ac51991cae779015d79e81a349544858d}{cell\_state}};}
+\DoxyCodeLine{00121\ \ \ \textcolor{comment}{//\ Quantization\ parameters\ for\ gates}}
+\DoxyCodeLine{00122\ \ \ \mbox{\hyperlink{structtflite_1_1testing_1_1_gate_quantization_parameters}{GateQuantizationParameters}}\ \mbox{\hyperlink{structtflite_1_1testing_1_1_node_quantization_parameters_a1ccf648c067c55b4c2c933c27f405811}{forget\_gate}};}
+\DoxyCodeLine{00123\ \ \ \mbox{\hyperlink{structtflite_1_1testing_1_1_gate_quantization_parameters}{GateQuantizationParameters}}\ \mbox{\hyperlink{structtflite_1_1testing_1_1_node_quantization_parameters_ac1f9937f2a93465969b60d9cd000bcc3}{input\_gate}};}
+\DoxyCodeLine{00124\ \ \ \mbox{\hyperlink{structtflite_1_1testing_1_1_gate_quantization_parameters}{GateQuantizationParameters}}\ \mbox{\hyperlink{structtflite_1_1testing_1_1_node_quantization_parameters_af82d6f046e1e35740f4775f0d804a106}{cell\_gate}};}
+\DoxyCodeLine{00125\ \ \ \mbox{\hyperlink{structtflite_1_1testing_1_1_gate_quantization_parameters}{GateQuantizationParameters}}\ \mbox{\hyperlink{structtflite_1_1testing_1_1_node_quantization_parameters_a047265c339d8d8572b1ad531fc0efd1a}{output\_gate}};}
+\DoxyCodeLine{00126\ \};}
+\DoxyCodeLine{00127\ }
+\DoxyCodeLine{00128\ \textcolor{comment}{//\ Data\ structure\ that\ holds\ all\ the\ information\ to\ evaluate\ a\ LSTM\ kernel}}
+\DoxyCodeLine{00129\ \textcolor{comment}{//\ (mimic\ the\ LSTM\ node).}}
+\DoxyCodeLine{00130\ \textcolor{comment}{//\ Tensor\ Types:}}
+\DoxyCodeLine{00131\ \textcolor{comment}{//\ ActivationType\ defines\ the\ data\ type\ of\ input/output\ of\ the\ layer.\ The\ hidden}}
+\DoxyCodeLine{00132\ \textcolor{comment}{//\ state\ has\ the\ ActivationType\ as\ well\ since\ it\ is\ the\ layer\ output\ of\ the}}
+\DoxyCodeLine{00133\ \textcolor{comment}{//\ previous\ time.}}
+\DoxyCodeLine{00134\ \textcolor{comment}{//\ WeightType\ defines\ the\ weight\ data\ type\ inside\ the\ internal\ gates.}}
+\DoxyCodeLine{00135\ \textcolor{comment}{//\ BiasType\ defines\ the\ bias\ data\ type\ inside\ the\ internal\ gates.\ (normally\ the}}
+\DoxyCodeLine{00136\ \textcolor{comment}{//\ same\ type\ of\ MatMul\ accumulator).}}
+\DoxyCodeLine{00137\ \textcolor{comment}{//\ Tensor\ Shapes:}}
+\DoxyCodeLine{00138\ \textcolor{comment}{//\ The\ input\ to\ the\ layer\ has\ shape\ (batch\_size,time\_steps,input\_dimension).}}
+\DoxyCodeLine{00139\ \textcolor{comment}{//\ Both\ the\ hidden\ state\ and\ cell\ state\ has\ shape\ (state\_dimension,\ 1)}}
+\DoxyCodeLine{00140\ \textcolor{comment}{//\ The\ output\ of\ the\ layer\ has\ shape\ (batch\_size,time\_steps,state\_dimension)}}
+\DoxyCodeLine{00141\ \textcolor{comment}{//\ \ Note:\ state\ values\ can\ change\ through\ calls\ (stateful)}}
+\DoxyCodeLine{00142\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ ActivationType,\ \textcolor{keyword}{typename}\ WeightType,\ \textcolor{keyword}{typename}\ BiasType,}
+\DoxyCodeLine{00143\ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{typename}\ CellType,\ \textcolor{keywordtype}{int}\ batch\_size,\ \textcolor{keywordtype}{int}\ time\_steps,}
+\DoxyCodeLine{00144\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ input\_dimension,\ \textcolor{keywordtype}{int}\ state\_dimension>}
+\DoxyCodeLine{00145\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content}{LstmNodeContent}}\ \{}
+\DoxyCodeLine{00146\ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00147\ \ \ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_acbb0075d4eb002c93544405d805e910e}{LstmNodeContent}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content}{LstmNodeContent}}\&\ other)\ =\ \textcolor{keywordflow}{default};}
+\DoxyCodeLine{00148\ \ \ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content}{LstmNodeContent}}\&\ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_ae1b2515e0d27e6051d156301dc634711}{operator=}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content}{LstmNodeContent}}\&\ other)\ =\ \textcolor{keywordflow}{default};}
+\DoxyCodeLine{00149\ \ \ \textcolor{comment}{//\ Use\ the\ general\ model\ setting\ (builtin\ data)\ and\ the\ four\ gates\ data\ to}}
+\DoxyCodeLine{00150\ \ \ \textcolor{comment}{//\ construct\ the\ node\ content.\ Note\ the\ input,\ hidden\ state,\ and\ cell\ state}}
+\DoxyCodeLine{00151\ \ \ \textcolor{comment}{//\ data\ is\ provided\ later\ for\ flexible\ testing\ (initialize\ as\ zero\ now)}}
+\DoxyCodeLine{00152\ \ \ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_a0e737ee696b229a699758281c505648f}{LstmNodeContent}}(}
+\DoxyCodeLine{00153\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_tf_lite_unidirectional_sequence_l_s_t_m_params}{TfLiteUnidirectionalSequenceLSTMParams}}\ \mbox{\hyperlink{hello__world__model_8cc_ac78b3db8b592b472b8ea2ffd2b194737}{builtin\_data}},}
+\DoxyCodeLine{00154\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structtflite_1_1testing_1_1_gate_data}{GateData<WeightType,\ BiasType,\ input\_dimension,\ state\_dimension>}}}
+\DoxyCodeLine{00155\ \ \ \ \ \ \ \ \ \ \ forget\_gate\_params,}
+\DoxyCodeLine{00156\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structtflite_1_1testing_1_1_gate_data}{GateData<WeightType,\ BiasType,\ input\_dimension,\ state\_dimension>}}}
+\DoxyCodeLine{00157\ \ \ \ \ \ \ \ \ \ \ input\_gate\_params,}
+\DoxyCodeLine{00158\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structtflite_1_1testing_1_1_gate_data}{GateData<WeightType,\ BiasType,\ input\_dimension,\ state\_dimension>}}}
+\DoxyCodeLine{00159\ \ \ \ \ \ \ \ \ \ \ cell\_gate\_params,}
+\DoxyCodeLine{00160\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structtflite_1_1testing_1_1_gate_data}{GateData<WeightType,\ BiasType,\ input\_dimension,\ state\_dimension>}}}
+\DoxyCodeLine{00161\ \ \ \ \ \ \ \ \ \ \ output\_gate\_params)}
+\DoxyCodeLine{00162\ \ \ \ \ \ \ :\ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_afde19c23f172ccf64ee2e84be147d38f}{builtin\_data\_}}(\mbox{\hyperlink{hello__world__model_8cc_ac78b3db8b592b472b8ea2ffd2b194737}{builtin\_data}}),}
+\DoxyCodeLine{00163\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_a62ef218e96f1a5c41dc742785ccbf30a}{forget\_gate\_data\_}}(forget\_gate\_params),}
+\DoxyCodeLine{00164\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_ad23ae409868d5d094a3c83d17a26ae5f}{input\_gate\_data\_}}(input\_gate\_params),}
+\DoxyCodeLine{00165\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_acd9c3736358b189a5df381c655b37df3}{cell\_gate\_data\_}}(cell\_gate\_params),}
+\DoxyCodeLine{00166\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_afe4af28db31ece31080d87bddb3b0d42}{output\_gate\_data\_}}(output\_gate\_params)\ \{}
+\DoxyCodeLine{00167\ \ \ \ \ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_a1605947be22c1d5c7ccca83abf1e0b7c}{InitializeTensors}}();}
+\DoxyCodeLine{00168\ \ \ \}}
+\DoxyCodeLine{00169\ }
+\DoxyCodeLine{00170\ \ \ \textcolor{comment}{//\ Add\ quantization\ parameters\ (scale,\ zero\ point)\ to\ tensors}}
+\DoxyCodeLine{00171\ \ \ \textcolor{comment}{//\ Only\ required\ for\ the\ integer\ kernel}}
+\DoxyCodeLine{00172\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_a6d29a3d7fa2a2db1b25bfa21e72c0971}{AddQuantizationParameters}}(}
+\DoxyCodeLine{00173\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structtflite_1_1testing_1_1_node_quantization_parameters}{NodeQuantizationParameters}}\&\ quantization\_params)\ \{}
+\DoxyCodeLine{00174\ \ \ \ \ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_a21ec9e442db07c5ba45fbaa83dad508e}{quantization\_settings\_}}\ =\ quantization\_params;}
+\DoxyCodeLine{00175\ \ \ \ \ \textcolor{comment}{//\ Input\ Tensor}}
+\DoxyCodeLine{00176\ \ \ \ \ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_a9cbc2c1e063b4d539ecfc7362b045b33}{SetTensorQuantizationParam}}(\mbox{\hyperlink{namespacetflite_a0d543ffd50ba6ad339fbc52e8a794464}{kLstmInputTensor}},\ quantization\_params.\mbox{\hyperlink{structtflite_1_1testing_1_1_node_quantization_parameters_af8b11a97a74a87b30740de2acc260c68}{input}});}
+\DoxyCodeLine{00177\ \ \ \ \ \textcolor{comment}{//\ Forget\ Gate\ Tensors}}
+\DoxyCodeLine{00178\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ forget\_gate\_quant\_param\ =\ quantization\_params.\mbox{\hyperlink{structtflite_1_1testing_1_1_node_quantization_parameters_a1ccf648c067c55b4c2c933c27f405811}{forget\_gate}};}
+\DoxyCodeLine{00179\ \ \ \ \ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_a9cbc2c1e063b4d539ecfc7362b045b33}{SetTensorQuantizationParam}}(\mbox{\hyperlink{namespacetflite_a925381bc9bd766738a79b6f283cddf30}{kLstmInputToForgetWeightsTensor}},}
+\DoxyCodeLine{00180\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ forget\_gate\_quant\_param.activation\_weight);}
+\DoxyCodeLine{00181\ \ \ \ \ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_a9cbc2c1e063b4d539ecfc7362b045b33}{SetTensorQuantizationParam}}(\mbox{\hyperlink{namespacetflite_a818c88048026b3f09e45c58f37642218}{kLstmRecurrentToForgetWeightsTensor}},}
+\DoxyCodeLine{00182\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ forget\_gate\_quant\_param.recurrent\_weight);}
+\DoxyCodeLine{00183\ \ \ \ \ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_a9cbc2c1e063b4d539ecfc7362b045b33}{SetTensorQuantizationParam}}(\mbox{\hyperlink{namespacetflite_aeb1e7ea3b1d025a81fd7e66e8a117fd4}{kLstmForgetGateBiasTensor}},}
+\DoxyCodeLine{00184\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ forget\_gate\_quant\_param.bias);}
+\DoxyCodeLine{00185\ \ \ \ \ \textcolor{comment}{//\ Input\ Gate\ Tensors}}
+\DoxyCodeLine{00186\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ input\_gate\_quant\_param\ =\ quantization\_params.\mbox{\hyperlink{structtflite_1_1testing_1_1_node_quantization_parameters_ac1f9937f2a93465969b60d9cd000bcc3}{input\_gate}};}
+\DoxyCodeLine{00187\ \ \ \ \ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_a9cbc2c1e063b4d539ecfc7362b045b33}{SetTensorQuantizationParam}}(\mbox{\hyperlink{namespacetflite_a70ac6f91cf3d2a90cdc2dec1ffef7721}{kLstmInputToInputWeightsTensor}},}
+\DoxyCodeLine{00188\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ input\_gate\_quant\_param.activation\_weight);}
+\DoxyCodeLine{00189\ \ \ \ \ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_a9cbc2c1e063b4d539ecfc7362b045b33}{SetTensorQuantizationParam}}(\mbox{\hyperlink{namespacetflite_ad894a248e3c08cb48e79ccf07dd9e4af}{kLstmRecurrentToInputWeightsTensor}},}
+\DoxyCodeLine{00190\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ input\_gate\_quant\_param.recurrent\_weight);}
+\DoxyCodeLine{00191\ \ \ \ \ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_a9cbc2c1e063b4d539ecfc7362b045b33}{SetTensorQuantizationParam}}(\mbox{\hyperlink{namespacetflite_aa68401a0fd81bb1294d483da8e3cd3ee}{kLstmInputGateBiasTensor}},}
+\DoxyCodeLine{00192\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ input\_gate\_quant\_param.bias);}
+\DoxyCodeLine{00193\ \ \ \ \ \textcolor{comment}{//\ Cell\ Gate\ Tensors}}
+\DoxyCodeLine{00194\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ cell\_gate\_quant\_param\ =\ quantization\_params.\mbox{\hyperlink{structtflite_1_1testing_1_1_node_quantization_parameters_af82d6f046e1e35740f4775f0d804a106}{cell\_gate}};}
+\DoxyCodeLine{00195\ \ \ \ \ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_a9cbc2c1e063b4d539ecfc7362b045b33}{SetTensorQuantizationParam}}(\mbox{\hyperlink{namespacetflite_ac673b42d7a9a1c014a7e2a9f6006fa57}{kLstmInputToCellWeightsTensor}},}
+\DoxyCodeLine{00196\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ cell\_gate\_quant\_param.activation\_weight);}
+\DoxyCodeLine{00197\ \ \ \ \ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_a9cbc2c1e063b4d539ecfc7362b045b33}{SetTensorQuantizationParam}}(\mbox{\hyperlink{namespacetflite_a1e09e035ffa219ffae9554361910fd6d}{kLstmRecurrentToCellWeightsTensor}},}
+\DoxyCodeLine{00198\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ cell\_gate\_quant\_param.recurrent\_weight);}
+\DoxyCodeLine{00199\ \ \ \ \ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_a9cbc2c1e063b4d539ecfc7362b045b33}{SetTensorQuantizationParam}}(\mbox{\hyperlink{namespacetflite_a483156fb3ce48333d464c3cbdc220739}{kLstmCellGateBiasTensor}},}
+\DoxyCodeLine{00200\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ cell\_gate\_quant\_param.bias);}
+\DoxyCodeLine{00201\ \ \ \ \ \textcolor{comment}{//\ Output\ Gate\ Tensors}}
+\DoxyCodeLine{00202\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ output\_gate\_quant\_param\ =\ quantization\_params.\mbox{\hyperlink{structtflite_1_1testing_1_1_node_quantization_parameters_a047265c339d8d8572b1ad531fc0efd1a}{output\_gate}};}
+\DoxyCodeLine{00203\ \ \ \ \ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_a9cbc2c1e063b4d539ecfc7362b045b33}{SetTensorQuantizationParam}}(\mbox{\hyperlink{namespacetflite_a43be7892b85e0722fdab31b8f46cb307}{kLstmInputToOutputWeightsTensor}},}
+\DoxyCodeLine{00204\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ output\_gate\_quant\_param.activation\_weight);}
+\DoxyCodeLine{00205\ \ \ \ \ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_a9cbc2c1e063b4d539ecfc7362b045b33}{SetTensorQuantizationParam}}(\mbox{\hyperlink{namespacetflite_af8bab5715b38a29112bd4fa262b466e2}{kLstmRecurrentToOutputWeightsTensor}},}
+\DoxyCodeLine{00206\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ output\_gate\_quant\_param.recurrent\_weight);}
+\DoxyCodeLine{00207\ \ \ \ \ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_a9cbc2c1e063b4d539ecfc7362b045b33}{SetTensorQuantizationParam}}(\mbox{\hyperlink{namespacetflite_ac291e27747f1bcec3796f91332e247f5}{kLstmOutputGateBiasTensor}},}
+\DoxyCodeLine{00208\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ output\_gate\_quant\_param.bias);}
+\DoxyCodeLine{00209\ \ \ \ \ \textcolor{comment}{//\ State\ Tensors}}
+\DoxyCodeLine{00210\ \ \ \ \ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_a9cbc2c1e063b4d539ecfc7362b045b33}{SetTensorQuantizationParam}}(\mbox{\hyperlink{namespacetflite_aae0ff0c18408d6ef583741da24e612e4}{kLstmOutputStateTensor}},}
+\DoxyCodeLine{00211\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ quantization\_params.\mbox{\hyperlink{structtflite_1_1testing_1_1_node_quantization_parameters_acabe3c0ee38796c6e67867a652914853}{hidden\_state}});}
+\DoxyCodeLine{00212\ \ \ \ \ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_a9cbc2c1e063b4d539ecfc7362b045b33}{SetTensorQuantizationParam}}(\mbox{\hyperlink{namespacetflite_a7068c4580fa7e971c41c9f1c60b978d5}{kLstmCellStateTensor}},}
+\DoxyCodeLine{00213\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ quantization\_params.\mbox{\hyperlink{structtflite_1_1testing_1_1_node_quantization_parameters_ac51991cae779015d79e81a349544858d}{cell\_state}});}
+\DoxyCodeLine{00214\ \ \ \ \ \textcolor{comment}{//\ Output\ Tensor}}
+\DoxyCodeLine{00215\ \ \ \ \ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_a9cbc2c1e063b4d539ecfc7362b045b33}{SetTensorQuantizationParam}}(24,\ quantization\_params.\mbox{\hyperlink{structtflite_1_1testing_1_1_node_quantization_parameters_a0ba6e36d011e8e670e6fed9299da0938}{output}});}
+\DoxyCodeLine{00216\ \ \ \}}
+\DoxyCodeLine{00217\ }
+\DoxyCodeLine{00218\ \ \ \textcolor{comment}{//\ Provide\ interface\ to\ set\ the\ input\ tensor\ values\ for\ flexible\ testing}}
+\DoxyCodeLine{00219\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_ac2e9d4ac03b3374191b60bbc2b925d3a}{SetInputData}}(\textcolor{keyword}{const}\ ActivationType*\ \mbox{\hyperlink{hello__world__model_8cc_ab2a9259b73b53c0bb06a6b242aa7ae32}{data}})\ \{}
+\DoxyCodeLine{00220\ \ \ \ \ std::memcpy(}
+\DoxyCodeLine{00221\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_a7e693cf690c209a5c4fc282590de8b39}{input\_}},\ \mbox{\hyperlink{hello__world__model_8cc_ab2a9259b73b53c0bb06a6b242aa7ae32}{data}},}
+\DoxyCodeLine{00222\ \ \ \ \ \ \ \ \ batch\_size\ *\ input\_dimension\ *\ time\_steps\ *\ \textcolor{keyword}{sizeof}(ActivationType));}
+\DoxyCodeLine{00223\ \ \ \ \ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_a4d19f11796e5f8116f6a06280b7a2486}{SetTensor}}(\mbox{\hyperlink{namespacetflite_a0d543ffd50ba6ad339fbc52e8a794464}{kLstmInputTensor}},\ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_a7e693cf690c209a5c4fc282590de8b39}{input\_}},\ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_a2281a9bce69f8a76c00ea64ccbb79c81}{input\_size\_}});}
+\DoxyCodeLine{00224\ \ \ \}}
+\DoxyCodeLine{00225\ \ \ \textcolor{keyword}{const}\ ActivationType*\ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_a2ace37a6463f8e6995c39f3799ebe4e1}{GetInputData}}()\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_a7e693cf690c209a5c4fc282590de8b39}{input\_}};\ \}}
+\DoxyCodeLine{00226\ }
+\DoxyCodeLine{00227\ \ \ \textcolor{comment}{//\ Provide\ interface\ to\ set\ the\ hidden\ state\ tensor\ values\ for\ flexible}}
+\DoxyCodeLine{00228\ \ \ \textcolor{comment}{//\ testing}}
+\DoxyCodeLine{00229\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_afce04386b3c7820de0992fb13d9f58a3}{SetHiddenStateData}}(\textcolor{keyword}{const}\ ActivationType*\ \mbox{\hyperlink{hello__world__model_8cc_ab2a9259b73b53c0bb06a6b242aa7ae32}{data}})\ \{}
+\DoxyCodeLine{00230\ \ \ \ \ std::memcpy(\mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_a5b358cda584f83f27685ff8ca72d30d8}{hidden\_state\_}},\ \mbox{\hyperlink{hello__world__model_8cc_ab2a9259b73b53c0bb06a6b242aa7ae32}{data}},}
+\DoxyCodeLine{00231\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ batch\_size\ *\ state\_dimension\ *\ \textcolor{keyword}{sizeof}(ActivationType));}
+\DoxyCodeLine{00232\ \ \ \}}
+\DoxyCodeLine{00233\ \ \ ActivationType*\ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_ae6c341eddc4a947d90c62cbb1bd7f5d9}{GetHiddenStateData}}()\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_a5b358cda584f83f27685ff8ca72d30d8}{hidden\_state\_}};\ \}}
+\DoxyCodeLine{00234\ }
+\DoxyCodeLine{00235\ \ \ \textcolor{comment}{//\ Provide\ interface\ to\ set\ the\ cell\ state\ tensor\ values\ for\ flexible}}
+\DoxyCodeLine{00236\ \ \ \textcolor{comment}{//\ testing}}
+\DoxyCodeLine{00237\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_a28dbadbbca93f73915a66a1b974f23d5}{SetCellStateData}}(\textcolor{keyword}{const}\ CellType*\ \mbox{\hyperlink{hello__world__model_8cc_ab2a9259b73b53c0bb06a6b242aa7ae32}{data}})\ \{}
+\DoxyCodeLine{00238\ \ \ \ \ std::memcpy(\mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_a0f4d461db0584343e1a5908cb1cb4a17}{cell\_state\_}},\ \mbox{\hyperlink{hello__world__model_8cc_ab2a9259b73b53c0bb06a6b242aa7ae32}{data}},}
+\DoxyCodeLine{00239\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ batch\_size\ *\ state\_dimension\ *\ \textcolor{keyword}{sizeof}(CellType));}
+\DoxyCodeLine{00240\ \ \ \}}
+\DoxyCodeLine{00241\ \ \ CellType*\ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_a8e19bc78977963dced3fe7be38f074a8}{GetCellStateData}}()\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_a0f4d461db0584343e1a5908cb1cb4a17}{cell\_state\_}};\ \}}
+\DoxyCodeLine{00242\ \ \ ActivationType*\ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_a83b62e0c71e8d2c3315fb8faf8aa4955}{GetOutputData}}()\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_abbfed394569f4199b537cbf00d02d32b}{output\_}};\ \}}
+\DoxyCodeLine{00243\ }
+\DoxyCodeLine{00244\ \ \ \textcolor{comment}{//\ Internal\ tensors,\ see\ lstm\_shared.h\ for\ tensor\ names}}
+\DoxyCodeLine{00245\ \ \ \mbox{\hyperlink{struct_tf_lite_eval_tensor}{TfLiteEvalTensor}}*\ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_aa597601f285d8f0754b8e272257f755f}{GetEvalTensor}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ tensor\_index)\ \{}
+\DoxyCodeLine{00246\ \ \ \ \ \textcolor{keyword}{auto}\ valid\_index\ =\ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_a3b5950c1d21a3e7c5566f2a5a59a2c89}{input\_tensor\_indices\_}}[tensor\_index\ +\ 1];}
+\DoxyCodeLine{00247\ \ \ \ \ \textcolor{keywordflow}{if}\ (valid\_index\ <\ 0)\ \{}
+\DoxyCodeLine{00248\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{00249\ \ \ \ \ \}}
+\DoxyCodeLine{00250\ \ \ \ \ \textcolor{keywordflow}{return}\ \&\mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_a33c00267c87e1ee1e2f6947c6c3619ea}{eval\_tensors\_}}[tensor\_index];}
+\DoxyCodeLine{00251\ \ \ \}}
+\DoxyCodeLine{00252\ }
+\DoxyCodeLine{00253\ \ \ \mbox{\hyperlink{struct_tf_lite_tensor}{TfLiteTensor}}*\ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_ad7aead7bb9608272ae020a69384be50b}{GetTensors}}()\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_ac56fefeef0813c291a6aa5eeec0b6660}{tensors\_}};\ \}}
+\DoxyCodeLine{00254\ }
+\DoxyCodeLine{00255\ \ \ \textcolor{comment}{//\ Required\ by\ the\ kernel\ runner}}
+\DoxyCodeLine{00256\ \ \ \mbox{\hyperlink{struct_tf_lite_int_array}{TfLiteIntArray}}*\ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_a1e26aac45e80f25fc6443a28c984c406}{KernelInputs}}()\ \{}
+\DoxyCodeLine{00257\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacetflite_1_1testing_a7a359c4133e1b2a4751e4c7778d10b56}{IntArrayFromInts}}(\mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_a3b5950c1d21a3e7c5566f2a5a59a2c89}{input\_tensor\_indices\_}});}
+\DoxyCodeLine{00258\ \ \ \}}
+\DoxyCodeLine{00259\ \ \ \textcolor{comment}{//\ Required\ by\ the\ kernel\ runner}}
+\DoxyCodeLine{00260\ \ \ \mbox{\hyperlink{struct_tf_lite_int_array}{TfLiteIntArray}}*\ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_ad0d5758169a5b59a71283786c7535c96}{KernelOutputs}}()\ \{}
+\DoxyCodeLine{00261\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacetflite_1_1testing_a7a359c4133e1b2a4751e4c7778d10b56}{IntArrayFromInts}}(\mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_a192c88a428dc3c8a7b937479971ff8f9}{output\_tensor\_indices\_}});}
+\DoxyCodeLine{00262\ \ \ \}}
+\DoxyCodeLine{00263\ }
+\DoxyCodeLine{00264\ \ \ \textcolor{comment}{//\ Variable\ tensors\ (will\ be\ changed,\ can\ not\ be\ const)}}
+\DoxyCodeLine{00265\ \ \ \mbox{\hyperlink{struct_tf_lite_eval_tensor}{TfLiteEvalTensor}}*\ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_a2878f6f7d85abad7ba68398e6546f9aa}{HiddenStateEvalTensor}}()\ \{}
+\DoxyCodeLine{00266\ \ \ \ \ \textcolor{keywordflow}{return}\ \&\mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_a33c00267c87e1ee1e2f6947c6c3619ea}{eval\_tensors\_}}[\mbox{\hyperlink{namespacetflite_aae0ff0c18408d6ef583741da24e612e4}{kLstmOutputStateTensor}}];}
+\DoxyCodeLine{00267\ \ \ \}}
+\DoxyCodeLine{00268\ \ \ \mbox{\hyperlink{struct_tf_lite_eval_tensor}{TfLiteEvalTensor}}*\ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_a0d63d642da81b62da4c50a72c1219380}{CellStateEvalTensor}}()\ \{}
+\DoxyCodeLine{00269\ \ \ \ \ \textcolor{keywordflow}{return}\ \&\mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_a33c00267c87e1ee1e2f6947c6c3619ea}{eval\_tensors\_}}[\mbox{\hyperlink{namespacetflite_a7068c4580fa7e971c41c9f1c60b978d5}{kLstmCellStateTensor}}];}
+\DoxyCodeLine{00270\ \ \ \}}
+\DoxyCodeLine{00271\ \ \ \mbox{\hyperlink{struct_tf_lite_eval_tensor}{TfLiteEvalTensor}}*\ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_aeb184ac6d8194b32488d98bdcc5bcdbd}{OutputEvalTensor}}()\ \{\ \textcolor{keywordflow}{return}\ \&\mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_a33c00267c87e1ee1e2f6947c6c3619ea}{eval\_tensors\_}}[24];\ \}}
+\DoxyCodeLine{00272\ }
+\DoxyCodeLine{00273\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structtflite_1_1testing_1_1_gate_data}{GateData<WeightType,\ BiasType,\ input\_dimension,\ state\_dimension>}}\&}
+\DoxyCodeLine{00274\ \ \ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_a66e05704beb51a3b74bf4f0f0285aad5}{ForgetGateData}}()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{00275\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_a62ef218e96f1a5c41dc742785ccbf30a}{forget\_gate\_data\_}};}
+\DoxyCodeLine{00276\ \ \ \}}
+\DoxyCodeLine{00277\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structtflite_1_1testing_1_1_gate_data}{GateData<WeightType,\ BiasType,\ input\_dimension,\ state\_dimension>}}\&}
+\DoxyCodeLine{00278\ \ \ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_a2ae00db79736262572a67c8ee6a01a9a}{InputGateData}}()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{00279\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_ad23ae409868d5d094a3c83d17a26ae5f}{input\_gate\_data\_}};}
+\DoxyCodeLine{00280\ \ \ \}}
+\DoxyCodeLine{00281\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structtflite_1_1testing_1_1_gate_data}{GateData<WeightType,\ BiasType,\ input\_dimension,\ state\_dimension>}}\&}
+\DoxyCodeLine{00282\ \ \ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_ac4c98adc876c66d4bd776cb7baa50998}{CellGateData}}()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{00283\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_acd9c3736358b189a5df381c655b37df3}{cell\_gate\_data\_}};}
+\DoxyCodeLine{00284\ \ \ \}}
+\DoxyCodeLine{00285\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structtflite_1_1testing_1_1_gate_data}{GateData<WeightType,\ BiasType,\ input\_dimension,\ state\_dimension>}}\&}
+\DoxyCodeLine{00286\ \ \ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_a632d6495f68701ddef1aa519a8da6668}{OutputGateData}}()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{00287\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_afe4af28db31ece31080d87bddb3b0d42}{output\_gate\_data\_}};}
+\DoxyCodeLine{00288\ \ \ \}}
+\DoxyCodeLine{00289\ }
+\DoxyCodeLine{00290\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_tf_lite_unidirectional_sequence_l_s_t_m_params}{TfLiteUnidirectionalSequenceLSTMParams}}\&\ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_a613c9c9041cdc86702d17bbda8e6fbf8}{BuiltinData}}()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{00291\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_afde19c23f172ccf64ee2e84be147d38f}{builtin\_data\_}};}
+\DoxyCodeLine{00292\ \ \ \}}
+\DoxyCodeLine{00293\ }
+\DoxyCodeLine{00294\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structtflite_1_1testing_1_1_node_quantization_parameters}{NodeQuantizationParameters}}\&\ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_a94fa0321772f19424d3d7a25e499dbd2}{QuantizationSettings}}()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{00295\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_a21ec9e442db07c5ba45fbaa83dad508e}{quantization\_settings\_}};}
+\DoxyCodeLine{00296\ \ \ \}}
+\DoxyCodeLine{00297\ }
+\DoxyCodeLine{00298\ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{00299\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_a1605947be22c1d5c7ccca83abf1e0b7c}{InitializeTensors}}()\ \{}
+\DoxyCodeLine{00300\ \ \ \ \ \textcolor{comment}{//\ Invalid\ all\ the\ input\ tensors\ untill\ we\ set\ it}}
+\DoxyCodeLine{00301\ \ \ \ \ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_a3b5950c1d21a3e7c5566f2a5a59a2c89}{input\_tensor\_indices\_}}[0]\ =\ 24;\ \ \textcolor{comment}{//\ tot\ elements}}
+\DoxyCodeLine{00302\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 1;\ i\ <\ 25;\ i++)\ \{}
+\DoxyCodeLine{00303\ \ \ \ \ \ \ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_a3b5950c1d21a3e7c5566f2a5a59a2c89}{input\_tensor\_indices\_}}[i]\ =\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src0ad488291f7fc2ff7a022d8a6e141a3e_a8d06552b8caba7ae7b54bae7b38f0cb6}{kTfLiteOptionalTensor}};}
+\DoxyCodeLine{00304\ \ \ \ \ \}}
+\DoxyCodeLine{00305\ \ \ \ \ \textcolor{comment}{//\ Input\ Tensor}}
+\DoxyCodeLine{00306\ \ \ \ \ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_a4d19f11796e5f8116f6a06280b7a2486}{SetTensor}}(\mbox{\hyperlink{namespacetflite_a0d543ffd50ba6ad339fbc52e8a794464}{kLstmInputTensor}},\ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_a7e693cf690c209a5c4fc282590de8b39}{input\_}},\ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_a2281a9bce69f8a76c00ea64ccbb79c81}{input\_size\_}});}
+\DoxyCodeLine{00307\ \ \ \ \ \textcolor{comment}{//\ Forget\ Gate\ Tensors}}
+\DoxyCodeLine{00308\ \ \ \ \ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_a4d19f11796e5f8116f6a06280b7a2486}{SetTensor}}(\mbox{\hyperlink{namespacetflite_a925381bc9bd766738a79b6f283cddf30}{kLstmInputToForgetWeightsTensor}},}
+\DoxyCodeLine{00309\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_a62ef218e96f1a5c41dc742785ccbf30a}{forget\_gate\_data\_}}.activation\_weight,\ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_adaf48cf939e54ffdcfad8dc16567aa75}{activation\_weight\_size\_}});}
+\DoxyCodeLine{00310\ \ \ \ \ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_a4d19f11796e5f8116f6a06280b7a2486}{SetTensor}}(\mbox{\hyperlink{namespacetflite_a818c88048026b3f09e45c58f37642218}{kLstmRecurrentToForgetWeightsTensor}},}
+\DoxyCodeLine{00311\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_a62ef218e96f1a5c41dc742785ccbf30a}{forget\_gate\_data\_}}.recurrent\_weight,\ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_a3a3bf4195c454885e2caab95ecec0851}{recurrent\_weight\_size\_}});}
+\DoxyCodeLine{00312\ \ \ \ \ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_a4d19f11796e5f8116f6a06280b7a2486}{SetTensor}}(\mbox{\hyperlink{namespacetflite_aeb1e7ea3b1d025a81fd7e66e8a117fd4}{kLstmForgetGateBiasTensor}},\ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_a62ef218e96f1a5c41dc742785ccbf30a}{forget\_gate\_data\_}}.fused\_bias,}
+\DoxyCodeLine{00313\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_a31d9fdcc99bd797cb81df5154315f08b}{bias\_size\_}});}
+\DoxyCodeLine{00314\ \ \ \ \ \textcolor{comment}{//\ Input\ Gate\ Tensors}}
+\DoxyCodeLine{00315\ \ \ \ \ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_a4d19f11796e5f8116f6a06280b7a2486}{SetTensor}}(\mbox{\hyperlink{namespacetflite_a70ac6f91cf3d2a90cdc2dec1ffef7721}{kLstmInputToInputWeightsTensor}},}
+\DoxyCodeLine{00316\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_ad23ae409868d5d094a3c83d17a26ae5f}{input\_gate\_data\_}}.activation\_weight,\ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_adaf48cf939e54ffdcfad8dc16567aa75}{activation\_weight\_size\_}});}
+\DoxyCodeLine{00317\ \ \ \ \ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_a4d19f11796e5f8116f6a06280b7a2486}{SetTensor}}(\mbox{\hyperlink{namespacetflite_ad894a248e3c08cb48e79ccf07dd9e4af}{kLstmRecurrentToInputWeightsTensor}},}
+\DoxyCodeLine{00318\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_ad23ae409868d5d094a3c83d17a26ae5f}{input\_gate\_data\_}}.recurrent\_weight,\ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_a3a3bf4195c454885e2caab95ecec0851}{recurrent\_weight\_size\_}});}
+\DoxyCodeLine{00319\ \ \ \ \ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_a4d19f11796e5f8116f6a06280b7a2486}{SetTensor}}(\mbox{\hyperlink{namespacetflite_aa68401a0fd81bb1294d483da8e3cd3ee}{kLstmInputGateBiasTensor}},\ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_ad23ae409868d5d094a3c83d17a26ae5f}{input\_gate\_data\_}}.fused\_bias,}
+\DoxyCodeLine{00320\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_a31d9fdcc99bd797cb81df5154315f08b}{bias\_size\_}});}
+\DoxyCodeLine{00321\ \ \ \ \ \textcolor{comment}{//\ Cell\ Gate\ Tensors}}
+\DoxyCodeLine{00322\ \ \ \ \ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_a4d19f11796e5f8116f6a06280b7a2486}{SetTensor}}(\mbox{\hyperlink{namespacetflite_ac673b42d7a9a1c014a7e2a9f6006fa57}{kLstmInputToCellWeightsTensor}},\ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_acd9c3736358b189a5df381c655b37df3}{cell\_gate\_data\_}}.activation\_weight,}
+\DoxyCodeLine{00323\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_adaf48cf939e54ffdcfad8dc16567aa75}{activation\_weight\_size\_}});}
+\DoxyCodeLine{00324\ \ \ \ \ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_a4d19f11796e5f8116f6a06280b7a2486}{SetTensor}}(\mbox{\hyperlink{namespacetflite_a1e09e035ffa219ffae9554361910fd6d}{kLstmRecurrentToCellWeightsTensor}},}
+\DoxyCodeLine{00325\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_acd9c3736358b189a5df381c655b37df3}{cell\_gate\_data\_}}.recurrent\_weight,\ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_a3a3bf4195c454885e2caab95ecec0851}{recurrent\_weight\_size\_}});}
+\DoxyCodeLine{00326\ \ \ \ \ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_a4d19f11796e5f8116f6a06280b7a2486}{SetTensor}}(\mbox{\hyperlink{namespacetflite_a483156fb3ce48333d464c3cbdc220739}{kLstmCellGateBiasTensor}},\ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_acd9c3736358b189a5df381c655b37df3}{cell\_gate\_data\_}}.fused\_bias,\ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_a31d9fdcc99bd797cb81df5154315f08b}{bias\_size\_}});}
+\DoxyCodeLine{00327\ \ \ \ \ \textcolor{comment}{//\ Output\ Gate\ Tensors}}
+\DoxyCodeLine{00328\ \ \ \ \ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_a4d19f11796e5f8116f6a06280b7a2486}{SetTensor}}(\mbox{\hyperlink{namespacetflite_a43be7892b85e0722fdab31b8f46cb307}{kLstmInputToOutputWeightsTensor}},}
+\DoxyCodeLine{00329\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_afe4af28db31ece31080d87bddb3b0d42}{output\_gate\_data\_}}.activation\_weight,\ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_adaf48cf939e54ffdcfad8dc16567aa75}{activation\_weight\_size\_}});}
+\DoxyCodeLine{00330\ \ \ \ \ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_a4d19f11796e5f8116f6a06280b7a2486}{SetTensor}}(\mbox{\hyperlink{namespacetflite_af8bab5715b38a29112bd4fa262b466e2}{kLstmRecurrentToOutputWeightsTensor}},}
+\DoxyCodeLine{00331\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_afe4af28db31ece31080d87bddb3b0d42}{output\_gate\_data\_}}.recurrent\_weight,\ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_a3a3bf4195c454885e2caab95ecec0851}{recurrent\_weight\_size\_}});}
+\DoxyCodeLine{00332\ \ \ \ \ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_a4d19f11796e5f8116f6a06280b7a2486}{SetTensor}}(\mbox{\hyperlink{namespacetflite_ac291e27747f1bcec3796f91332e247f5}{kLstmOutputGateBiasTensor}},\ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_afe4af28db31ece31080d87bddb3b0d42}{output\_gate\_data\_}}.fused\_bias,}
+\DoxyCodeLine{00333\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_a31d9fdcc99bd797cb81df5154315f08b}{bias\_size\_}});}
+\DoxyCodeLine{00334\ \ \ \ \ \textcolor{comment}{//\ State\ Tensors}}
+\DoxyCodeLine{00335\ \ \ \ \ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_a4d19f11796e5f8116f6a06280b7a2486}{SetTensor}}(\mbox{\hyperlink{namespacetflite_aae0ff0c18408d6ef583741da24e612e4}{kLstmOutputStateTensor}},\ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_a5b358cda584f83f27685ff8ca72d30d8}{hidden\_state\_}},\ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_a287f71893d66a1a9750a24e1f088f7c9}{state\_size\_}},}
+\DoxyCodeLine{00336\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{/*is\_variable=*/}\textcolor{keyword}{true});}
+\DoxyCodeLine{00337\ \ \ \ \ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_a4d19f11796e5f8116f6a06280b7a2486}{SetTensor}}(\mbox{\hyperlink{namespacetflite_a7068c4580fa7e971c41c9f1c60b978d5}{kLstmCellStateTensor}},\ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_a0f4d461db0584343e1a5908cb1cb4a17}{cell\_state\_}},\ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_a287f71893d66a1a9750a24e1f088f7c9}{state\_size\_}},}
+\DoxyCodeLine{00338\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{/*is\_variable=*/}\textcolor{keyword}{true});}
+\DoxyCodeLine{00339\ \ \ \ \ \textcolor{comment}{//\ //\ Output\ Tensor}}
+\DoxyCodeLine{00340\ \ \ \ \ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_a4d19f11796e5f8116f6a06280b7a2486}{SetTensor}}(24,\ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_abbfed394569f4199b537cbf00d02d32b}{output\_}},\ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_ada9fc2e723d6f700941c9e26a9d933e0}{output\_size\_}},\ \textcolor{comment}{/*is\_variable=*/}\textcolor{keyword}{true});}
+\DoxyCodeLine{00341\ \ \ \}}
+\DoxyCodeLine{00342\ }
+\DoxyCodeLine{00343\ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{00344\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_a4d19f11796e5f8116f6a06280b7a2486}{SetTensor}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ index,\ \textcolor{keyword}{const}\ T*\ \mbox{\hyperlink{hello__world__model_8cc_ab2a9259b73b53c0bb06a6b242aa7ae32}{data}},\ \textcolor{keywordtype}{int}*\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcdc91c794b43404000e39f72876c1c287_aedadeec3ef499c79fc32c00079f7982d}{dims}},}
+\DoxyCodeLine{00345\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{bool}\ is\_variable\ =\ \textcolor{keyword}{false})\ \{}
+\DoxyCodeLine{00346\ \ \ \ \ \textcolor{comment}{//\ Lite\ tensors\ for\ kernel\ level\ testing}}
+\DoxyCodeLine{00347\ \ \ \ \ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_ac56fefeef0813c291a6aa5eeec0b6660}{tensors\_}}[index].\mbox{\hyperlink{struct_tf_lite_tensor_a31678fd0752ef9e3b3debb11e7956fb0}{data}}.\mbox{\hyperlink{union_tf_lite_ptr_union_a1346f4caaf988973166e76d16b7ee48f}{data}}\ =\ \textcolor{keyword}{const\_cast<}T*\textcolor{keyword}{>}(\mbox{\hyperlink{hello__world__model_8cc_ab2a9259b73b53c0bb06a6b242aa7ae32}{data}});}
+\DoxyCodeLine{00348\ \ \ \ \ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_ac56fefeef0813c291a6aa5eeec0b6660}{tensors\_}}[index].\mbox{\hyperlink{struct_tf_lite_tensor_aef61bd69c4ea6b7179623c290f7955fa}{dims}}\ =\ \mbox{\hyperlink{namespacetflite_1_1testing_a7a359c4133e1b2a4751e4c7778d10b56}{IntArrayFromInts}}(\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcdc91c794b43404000e39f72876c1c287_aedadeec3ef499c79fc32c00079f7982d}{dims}});}
+\DoxyCodeLine{00349\ \ \ \ \ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_ac56fefeef0813c291a6aa5eeec0b6660}{tensors\_}}[index].\mbox{\hyperlink{struct_tf_lite_tensor_a24d579d439274a598ce79f0ec6bf6f50}{type}}\ =\ \mbox{\hyperlink{namespacetflite_a1d14d9702ca0640b7abfcfb4749697f3}{typeToTfLiteType<T>}}();}
+\DoxyCodeLine{00350\ \ \ \ \ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_ac56fefeef0813c291a6aa5eeec0b6660}{tensors\_}}[index].\mbox{\hyperlink{struct_tf_lite_tensor_a39290cf2770c0eebc8bd63faf12dac2f}{is\_variable}}\ =\ is\_variable;}
+\DoxyCodeLine{00351\ \ \ \ \ \textcolor{comment}{//\ Eval\ tensors\ for\ internal\ computation\ testing}}
+\DoxyCodeLine{00352\ \ \ \ \ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_a33c00267c87e1ee1e2f6947c6c3619ea}{eval\_tensors\_}}[index].\mbox{\hyperlink{struct_tf_lite_eval_tensor_a82292e62c5af51d1f96ff418361f8205}{data}}.\mbox{\hyperlink{union_tf_lite_ptr_union_a1346f4caaf988973166e76d16b7ee48f}{data}}\ =\ \textcolor{keyword}{const\_cast<}T*\textcolor{keyword}{>}(\mbox{\hyperlink{hello__world__model_8cc_ab2a9259b73b53c0bb06a6b242aa7ae32}{data}});}
+\DoxyCodeLine{00353\ \ \ \ \ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_a33c00267c87e1ee1e2f6947c6c3619ea}{eval\_tensors\_}}[index].\mbox{\hyperlink{struct_tf_lite_eval_tensor_aeaf6a5ebeb5026105c51f1f905a0091e}{dims}}\ =\ \mbox{\hyperlink{namespacetflite_1_1testing_a7a359c4133e1b2a4751e4c7778d10b56}{IntArrayFromInts}}(\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcdc91c794b43404000e39f72876c1c287_aedadeec3ef499c79fc32c00079f7982d}{dims}});}
+\DoxyCodeLine{00354\ \ \ \ \ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_a33c00267c87e1ee1e2f6947c6c3619ea}{eval\_tensors\_}}[index].\mbox{\hyperlink{struct_tf_lite_eval_tensor_a180bc742f14353dd12e73a872f0e0cb5}{type}}\ =\ \mbox{\hyperlink{namespacetflite_a1d14d9702ca0640b7abfcfb4749697f3}{typeToTfLiteType<T>}}();}
+\DoxyCodeLine{00355\ \ \ \ \ \textcolor{comment}{//\ update\ the\ index}}
+\DoxyCodeLine{00356\ \ \ \ \ \textcolor{keywordflow}{if}\ (index\ <\ 24)\ \{}
+\DoxyCodeLine{00357\ \ \ \ \ \ \ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_a3b5950c1d21a3e7c5566f2a5a59a2c89}{input\_tensor\_indices\_}}[index\ +\ 1]\ =\ index;}
+\DoxyCodeLine{00358\ \ \ \ \ \}}
+\DoxyCodeLine{00359\ \ \ \}}
+\DoxyCodeLine{00360\ }
+\DoxyCodeLine{00361\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_a9cbc2c1e063b4d539ecfc7362b045b33}{SetTensorQuantizationParam}}(}
+\DoxyCodeLine{00362\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ index,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structtflite_1_1testing_1_1_tensor_quantization_parameters}{TensorQuantizationParameters}}\&\ quant\_param)\ \{}
+\DoxyCodeLine{00363\ \ \ \ \ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_ac56fefeef0813c291a6aa5eeec0b6660}{tensors\_}}[index].\mbox{\hyperlink{struct_tf_lite_tensor_ad0fbad4e97f0be0a6e4bfa1b2be0e3fe}{params}}.\mbox{\hyperlink{struct_tf_lite_quantization_params_aedc85f69317ce1c27e6e88f886ea8af8}{scale}}\ =\ quant\_param.\mbox{\hyperlink{structtflite_1_1testing_1_1_tensor_quantization_parameters_a776b7b1126870d436f74bd23a3f07fd9}{scale}};}
+\DoxyCodeLine{00364\ \ \ \ \ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_ac56fefeef0813c291a6aa5eeec0b6660}{tensors\_}}[index].\mbox{\hyperlink{struct_tf_lite_tensor_ad0fbad4e97f0be0a6e4bfa1b2be0e3fe}{params}}.\mbox{\hyperlink{struct_tf_lite_quantization_params_a7bfb85a682ab431a6c0c609d3938ab6e}{zero\_point}}\ =\ quant\_param.\mbox{\hyperlink{structtflite_1_1testing_1_1_tensor_quantization_parameters_a0707931dba7f625cd0e30c2227f2449b}{zero\_point}};}
+\DoxyCodeLine{00365\ \ \ \}}
+\DoxyCodeLine{00366\ }
+\DoxyCodeLine{00367\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_tf_lite_unidirectional_sequence_l_s_t_m_params}{TfLiteUnidirectionalSequenceLSTMParams}}\ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_afde19c23f172ccf64ee2e84be147d38f}{builtin\_data\_}};}
+\DoxyCodeLine{00368\ \ \ \mbox{\hyperlink{structtflite_1_1testing_1_1_gate_data}{GateData<WeightType,\ BiasType,\ input\_dimension,\ state\_dimension>}}}
+\DoxyCodeLine{00369\ \ \ \ \ \ \ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_a62ef218e96f1a5c41dc742785ccbf30a}{forget\_gate\_data\_}};}
+\DoxyCodeLine{00370\ \ \ \mbox{\hyperlink{structtflite_1_1testing_1_1_gate_data}{GateData<WeightType,\ BiasType,\ input\_dimension,\ state\_dimension>}}}
+\DoxyCodeLine{00371\ \ \ \ \ \ \ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_ad23ae409868d5d094a3c83d17a26ae5f}{input\_gate\_data\_}};}
+\DoxyCodeLine{00372\ \ \ \mbox{\hyperlink{structtflite_1_1testing_1_1_gate_data}{GateData<WeightType,\ BiasType,\ input\_dimension,\ state\_dimension>}}}
+\DoxyCodeLine{00373\ \ \ \ \ \ \ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_acd9c3736358b189a5df381c655b37df3}{cell\_gate\_data\_}};}
+\DoxyCodeLine{00374\ \ \ \mbox{\hyperlink{structtflite_1_1testing_1_1_gate_data}{GateData<WeightType,\ BiasType,\ input\_dimension,\ state\_dimension>}}}
+\DoxyCodeLine{00375\ \ \ \ \ \ \ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_afe4af28db31ece31080d87bddb3b0d42}{output\_gate\_data\_}};}
+\DoxyCodeLine{00376\ }
+\DoxyCodeLine{00377\ \ \ \textcolor{comment}{//\ Keep\ to\ ease\ the\ testing\ process\ (although\ all\ quantization\ information\ can}}
+\DoxyCodeLine{00378\ \ \ \textcolor{comment}{//\ be\ obtained\ from\ individual\ tensors,\ they\ are\ well\ organized\ here\ and\ light}}
+\DoxyCodeLine{00379\ \ \ \textcolor{comment}{//\ weighted)}}
+\DoxyCodeLine{00380\ \ \ \mbox{\hyperlink{structtflite_1_1testing_1_1_node_quantization_parameters}{NodeQuantizationParameters}}\ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_a21ec9e442db07c5ba45fbaa83dad508e}{quantization\_settings\_}};}
+\DoxyCodeLine{00381\ }
+\DoxyCodeLine{00382\ \ \ \textcolor{comment}{//\ Not\ const\ since\ IntArrayFromInts\ takes\ int\ *;\ the\ first\ element\ of\ the}}
+\DoxyCodeLine{00383\ \ \ \textcolor{comment}{//\ array\ must\ be\ the\ size\ of\ the\ array}}
+\DoxyCodeLine{00384\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_a2281a9bce69f8a76c00ea64ccbb79c81}{input\_size\_}}[4]\ =\ \{3,\ batch\_size,\ time\_steps,\ input\_dimension\};}
+\DoxyCodeLine{00385\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_ada9fc2e723d6f700941c9e26a9d933e0}{output\_size\_}}[4]\ =\ \{3,\ batch\_size,\ time\_steps,\ state\_dimension\};}
+\DoxyCodeLine{00386\ \ \ \textcolor{comment}{//\ weight\ tensor\ has\ C-\/style\ "{}row-\/major"{}\ memory\ ordering}}
+\DoxyCodeLine{00387\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_adaf48cf939e54ffdcfad8dc16567aa75}{activation\_weight\_size\_}}[3]\ =\ \{2,\ state\_dimension,\ input\_dimension\};}
+\DoxyCodeLine{00388\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_a3a3bf4195c454885e2caab95ecec0851}{recurrent\_weight\_size\_}}[3]\ =\ \{2,\ state\_dimension,\ state\_dimension\};}
+\DoxyCodeLine{00389\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_a31d9fdcc99bd797cb81df5154315f08b}{bias\_size\_}}[2]\ =\ \{1,\ state\_dimension\};}
+\DoxyCodeLine{00390\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_a287f71893d66a1a9750a24e1f088f7c9}{state\_size\_}}[3]\ =\ \{2,\ batch\_size,\ state\_dimension\};}
+\DoxyCodeLine{00391\ }
+\DoxyCodeLine{00392\ \ \ \textcolor{comment}{//\ see\ lstm\_shared.h\ for\ tensor\ names,\ the\ last\ tensor\ is\ the\ output\ tensor}}
+\DoxyCodeLine{00393\ \ \ \mbox{\hyperlink{struct_tf_lite_tensor}{TfLiteTensor}}\ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_ac56fefeef0813c291a6aa5eeec0b6660}{tensors\_}}[24\ +\ 1];}
+\DoxyCodeLine{00394\ \ \ \textcolor{comment}{//\ Use\ for\ internel\ kernel\ testing}}
+\DoxyCodeLine{00395\ \ \ \mbox{\hyperlink{struct_tf_lite_eval_tensor}{TfLiteEvalTensor}}\ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_a33c00267c87e1ee1e2f6947c6c3619ea}{eval\_tensors\_}}[24\ +\ 1];}
+\DoxyCodeLine{00396\ \ \ \textcolor{comment}{//\ indices\ for\ the\ tensors\ inside\ the\ node\ (required\ by\ kernel\ runner)}}
+\DoxyCodeLine{00397\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_a3b5950c1d21a3e7c5566f2a5a59a2c89}{input\_tensor\_indices\_}}[1\ +\ 24]\ =\ \{\};}
+\DoxyCodeLine{00398\ \ \ \textcolor{comment}{//\ single\ output\ (last\ in\ the\ tensors\ array)}}
+\DoxyCodeLine{00399\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_a192c88a428dc3c8a7b937479971ff8f9}{output\_tensor\_indices\_}}[2]\ =\ \{1,\ 24\};}
+\DoxyCodeLine{00400\ }
+\DoxyCodeLine{00401\ \ \ \textcolor{comment}{//\ tennsor\ data}}
+\DoxyCodeLine{00402\ \ \ \textcolor{comment}{//\ states\ are\ initialized\ to\ zero}}
+\DoxyCodeLine{00403\ \ \ ActivationType\ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_a5b358cda584f83f27685ff8ca72d30d8}{hidden\_state\_}}[batch\_size\ *\ state\_dimension]\ =\ \{\};}
+\DoxyCodeLine{00404\ \ \ CellType\ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_a0f4d461db0584343e1a5908cb1cb4a17}{cell\_state\_}}[batch\_size\ *\ state\_dimension]\ =\ \{\};}
+\DoxyCodeLine{00405\ \ \ \textcolor{comment}{//\ input\ is\ defined\ in\ the\ ModelContent\ (const\ across\ all\ derived\ models)}}
+\DoxyCodeLine{00406\ \ \ ActivationType\ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_a7e693cf690c209a5c4fc282590de8b39}{input\_}}[batch\_size\ *\ input\_dimension\ *\ time\_steps]\ =\ \{\};}
+\DoxyCodeLine{00407\ \ \ ActivationType\ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content_abbfed394569f4199b537cbf00d02d32b}{output\_}}[batch\_size\ *\ state\_dimension\ *\ time\_steps]\ =\ \{\};}
+\DoxyCodeLine{00408\ \};}
+\DoxyCodeLine{00409\ }
+\DoxyCodeLine{00410\ \textcolor{comment}{//\ \ Converts\ floating\ point\ gate\ parameters\ to\ the\ corresponding\ quantized}}
+\DoxyCodeLine{00411\ \textcolor{comment}{//\ \ version}}
+\DoxyCodeLine{00412\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ WeightType,\ \textcolor{keyword}{typename}\ BiasType,\ \textcolor{keywordtype}{int}\ input\_dimension,}
+\DoxyCodeLine{00413\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ state\_dimension>}
+\DoxyCodeLine{00414\ GateData<WeightType,\ BiasType,\ input\_dimension,\ state\_dimension>}
+\DoxyCodeLine{00415\ \mbox{\hyperlink{namespacetflite_1_1testing_ae7259dbdabba252a70c24582ab31c9ae}{CreateQuantizedGateData}}(}
+\DoxyCodeLine{00416\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structtflite_1_1testing_1_1_gate_data}{GateData<float,\ float,\ input\_dimension,\ state\_dimension>}}\&}
+\DoxyCodeLine{00417\ \ \ \ \ \ \ \ \ gate\_parameters,}
+\DoxyCodeLine{00418\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structtflite_1_1testing_1_1_tensor_quantization_parameters}{TensorQuantizationParameters}}\&\ input\_quantization\_params,}
+\DoxyCodeLine{00419\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structtflite_1_1testing_1_1_tensor_quantization_parameters}{TensorQuantizationParameters}}\&\ output\_quantization\_params,}
+\DoxyCodeLine{00420\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structtflite_1_1testing_1_1_gate_quantization_parameters}{GateQuantizationParameters}}\&\ gate\_quantization\_params,}
+\DoxyCodeLine{00421\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{bool}\ fold\_zero\_point)\ \{}
+\DoxyCodeLine{00422\ \ \ \mbox{\hyperlink{structtflite_1_1testing_1_1_gate_data}{GateData<WeightType,\ BiasType,\ input\_dimension,\ state\_dimension>}}}
+\DoxyCodeLine{00423\ \ \ \ \ \ \ quantized\_gate\_params;}
+\DoxyCodeLine{00424\ \ \ \mbox{\hyperlink{namespacetflite_af3d20f2457626c466fa9a278773261d9}{tflite::SymmetricQuantize}}(gate\_parameters.\mbox{\hyperlink{structtflite_1_1testing_1_1_gate_data_a52ec9d7b08980f9f66030c25a6cbc559}{activation\_weight}},}
+\DoxyCodeLine{00425\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ quantized\_gate\_params.\mbox{\hyperlink{structtflite_1_1testing_1_1_gate_data_a52ec9d7b08980f9f66030c25a6cbc559}{activation\_weight}},}
+\DoxyCodeLine{00426\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ state\_dimension\ *\ input\_dimension,}
+\DoxyCodeLine{00427\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ gate\_quantization\_params.\mbox{\hyperlink{structtflite_1_1testing_1_1_gate_quantization_parameters_a754e01b7750e4e7b4554a873cc7f1590}{activation\_weight}}.\mbox{\hyperlink{structtflite_1_1testing_1_1_tensor_quantization_parameters_a776b7b1126870d436f74bd23a3f07fd9}{scale}});}
+\DoxyCodeLine{00428\ \ \ \mbox{\hyperlink{namespacetflite_af3d20f2457626c466fa9a278773261d9}{tflite::SymmetricQuantize}}(gate\_parameters.\mbox{\hyperlink{structtflite_1_1testing_1_1_gate_data_aeb4afed0149de49dbc42e510ce87a32a}{recurrent\_weight}},}
+\DoxyCodeLine{00429\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ quantized\_gate\_params.\mbox{\hyperlink{structtflite_1_1testing_1_1_gate_data_aeb4afed0149de49dbc42e510ce87a32a}{recurrent\_weight}},}
+\DoxyCodeLine{00430\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ state\_dimension\ *\ state\_dimension,}
+\DoxyCodeLine{00431\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ gate\_quantization\_params.\mbox{\hyperlink{structtflite_1_1testing_1_1_gate_quantization_parameters_a229a3a778196e5ed5334dc8d40329510}{recurrent\_weight}}.\mbox{\hyperlink{structtflite_1_1testing_1_1_tensor_quantization_parameters_a776b7b1126870d436f74bd23a3f07fd9}{scale}});}
+\DoxyCodeLine{00432\ \ \ \mbox{\hyperlink{namespacetflite_af3d20f2457626c466fa9a278773261d9}{tflite::SymmetricQuantize}}(gate\_parameters.\mbox{\hyperlink{structtflite_1_1testing_1_1_gate_data_a5efec55b93b4b97d56550d110ca44b37}{fused\_bias}},}
+\DoxyCodeLine{00433\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ quantized\_gate\_params.\mbox{\hyperlink{structtflite_1_1testing_1_1_gate_data_a5efec55b93b4b97d56550d110ca44b37}{fused\_bias}},\ state\_dimension,}
+\DoxyCodeLine{00434\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ gate\_quantization\_params.\mbox{\hyperlink{structtflite_1_1testing_1_1_gate_quantization_parameters_a009d6c5a84072c8a960d260eba6a708c}{bias}}.\mbox{\hyperlink{structtflite_1_1testing_1_1_tensor_quantization_parameters_a776b7b1126870d436f74bd23a3f07fd9}{scale}});}
+\DoxyCodeLine{00435\ \ \ \textcolor{comment}{//\ Note:\ steps\ below\ are\ not\ required\ for\ the\ generalized\ LSTM\ evaluation}}
+\DoxyCodeLine{00436\ \ \ \textcolor{comment}{//\ (e.g.,\ 16bits\ activation)}}
+\DoxyCodeLine{00437\ \ \ \textcolor{keywordflow}{if}\ (fold\_zero\_point)\ \{}
+\DoxyCodeLine{00438\ \ \ \ \ \textcolor{comment}{//\ Copy\ the\ bias\ values\ to\ prepare\ zero\_point\ folded}}
+\DoxyCodeLine{00439\ \ \ \ \ \textcolor{comment}{//\ bias\ precomputation.\ bias\ has\ same\ scale\ as}}
+\DoxyCodeLine{00440\ \ \ \ \ \textcolor{comment}{//\ input\_scale*input\_weight\_scale)}}
+\DoxyCodeLine{00441\ \ \ \ \ std::memcpy(quantized\_gate\_params.\mbox{\hyperlink{structtflite_1_1testing_1_1_gate_data_adfc2a4639489c6958d2db64e45c95122}{activation\_zp\_folded\_bias}},}
+\DoxyCodeLine{00442\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ quantized\_gate\_params.\mbox{\hyperlink{structtflite_1_1testing_1_1_gate_data_a5efec55b93b4b97d56550d110ca44b37}{fused\_bias}},\ 2\ *\ \textcolor{keyword}{sizeof}(int32\_t));}
+\DoxyCodeLine{00443\ \ \ \ \ \textcolor{comment}{//\ Pre-\/calculate\ bias\ -\/\ zero\_point\ *\ weight\ (a\ constant).}}
+\DoxyCodeLine{00444\ \ \ \ \ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_aa6ec4142f3565c0a51dfc30afc04faed}{tflite::tensor\_utils::MatrixScalarMultiplyAccumulate}}(}
+\DoxyCodeLine{00445\ \ \ \ \ \ \ \ \ quantized\_gate\_params.\mbox{\hyperlink{structtflite_1_1testing_1_1_gate_data_a52ec9d7b08980f9f66030c25a6cbc559}{activation\_weight}},}
+\DoxyCodeLine{00446\ \ \ \ \ \ \ \ \ -\/1\ *\ input\_quantization\_params.\mbox{\hyperlink{structtflite_1_1testing_1_1_tensor_quantization_parameters_a0707931dba7f625cd0e30c2227f2449b}{zero\_point}},\ 2,\ 2,}
+\DoxyCodeLine{00447\ \ \ \ \ \ \ \ \ quantized\_gate\_params.\mbox{\hyperlink{structtflite_1_1testing_1_1_gate_data_adfc2a4639489c6958d2db64e45c95122}{activation\_zp\_folded\_bias}});}
+\DoxyCodeLine{00448\ }
+\DoxyCodeLine{00449\ \ \ \ \ \textcolor{comment}{//\ Initialize\ the\ folded\ bias\ to\ zeros\ for\ accumulation}}
+\DoxyCodeLine{00450\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ 2;\ i++)\ \{}
+\DoxyCodeLine{00451\ \ \ \ \ \ \ quantized\_gate\_params.\mbox{\hyperlink{structtflite_1_1testing_1_1_gate_data_aa1e09c46f69e9536c58ddcaac5c1d6d7}{recurrent\_zp\_folded\_bias}}[i]\ =\ 0;}
+\DoxyCodeLine{00452\ \ \ \ \ \}}
+\DoxyCodeLine{00453\ \ \ \ \ \textcolor{comment}{//\ Calculate\ :\ -\/zero\_point\ *\ weight\ since\ it\ is\ a\ constant}}
+\DoxyCodeLine{00454\ \ \ \ \ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_aa6ec4142f3565c0a51dfc30afc04faed}{tflite::tensor\_utils::MatrixScalarMultiplyAccumulate}}(}
+\DoxyCodeLine{00455\ \ \ \ \ \ \ \ \ quantized\_gate\_params.\mbox{\hyperlink{structtflite_1_1testing_1_1_gate_data_aeb4afed0149de49dbc42e510ce87a32a}{recurrent\_weight}},}
+\DoxyCodeLine{00456\ \ \ \ \ \ \ \ \ -\/1\ *\ output\_quantization\_params.\mbox{\hyperlink{structtflite_1_1testing_1_1_tensor_quantization_parameters_a0707931dba7f625cd0e30c2227f2449b}{zero\_point}},\ 2,\ 2,}
+\DoxyCodeLine{00457\ \ \ \ \ \ \ \ \ quantized\_gate\_params.\mbox{\hyperlink{structtflite_1_1testing_1_1_gate_data_aa1e09c46f69e9536c58ddcaac5c1d6d7}{recurrent\_zp\_folded\_bias}});}
+\DoxyCodeLine{00458\ \ \ \}}
+\DoxyCodeLine{00459\ \ \ \textcolor{keywordflow}{return}\ quantized\_gate\_params;}
+\DoxyCodeLine{00460\ \}}
+\DoxyCodeLine{00461\ }
+\DoxyCodeLine{00462\ \textcolor{comment}{//\ Create\ integer\ LSTM\ node\ content\ from\ the\ float\ node\ contents\ and}}
+\DoxyCodeLine{00463\ \textcolor{comment}{//\ quantization\ settings}}
+\DoxyCodeLine{00464\ \textcolor{comment}{//\ Note:\ fold\_zero\_point\ folds\ the\ zero\ point\ into\ the\ bias\ (precomputation),}}
+\DoxyCodeLine{00465\ \textcolor{comment}{//\ which\ is\ not\ required\ for\ the\ generalized\ integer\ inference\ (16\ bits\ act}}
+\DoxyCodeLine{00466\ \textcolor{comment}{//\ LSTM).}}
+\DoxyCodeLine{00467\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ ActivationType,\ \textcolor{keyword}{typename}\ WeightType,\ \textcolor{keyword}{typename}\ BiasType,}
+\DoxyCodeLine{00468\ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{typename}\ CellType,\ \textcolor{keywordtype}{int}\ batch\_size,\ \textcolor{keywordtype}{int}\ time\_steps,}
+\DoxyCodeLine{00469\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ input\_dimension,\ \textcolor{keywordtype}{int}\ state\_dimension>}
+\DoxyCodeLine{00470\ LstmNodeContent<ActivationType,\ WeightType,\ BiasType,\ CellType,\ batch\_size,}
+\DoxyCodeLine{00471\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ time\_steps,\ input\_dimension,\ state\_dimension>}
+\DoxyCodeLine{00472\ \mbox{\hyperlink{namespacetflite_1_1testing_a1170dafd8d789592431c286b55e94858}{CreateIntegerNodeContents}}(}
+\DoxyCodeLine{00473\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structtflite_1_1testing_1_1_node_quantization_parameters}{NodeQuantizationParameters}}\&\ quantization\_settings,}
+\DoxyCodeLine{00474\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{bool}\ fold\_zero\_point,}
+\DoxyCodeLine{00475\ \ \ \ \ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content}{LstmNodeContent}}<\textcolor{keywordtype}{float},\ \textcolor{keywordtype}{float},\ \textcolor{keywordtype}{float},\ \textcolor{keywordtype}{float},\ batch\_size,\ time\_steps,}
+\DoxyCodeLine{00476\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ input\_dimension,\ state\_dimension>\&\ float\_node\_contents)\ \{}
+\DoxyCodeLine{00477\ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ quantized\_forget\_gate\_data\ =}
+\DoxyCodeLine{00478\ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_1_1testing_ae7259dbdabba252a70c24582ab31c9ae}{CreateQuantizedGateData}}<WeightType,\ BiasType,\ input\_dimension,}
+\DoxyCodeLine{00479\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ state\_dimension>(}
+\DoxyCodeLine{00480\ \ \ \ \ \ \ \ \ \ \ float\_node\_contents.ForgetGateData(),\ quantization\_settings.\mbox{\hyperlink{structtflite_1_1testing_1_1_node_quantization_parameters_af8b11a97a74a87b30740de2acc260c68}{input}},}
+\DoxyCodeLine{00481\ \ \ \ \ \ \ \ \ \ \ quantization\_settings.\mbox{\hyperlink{structtflite_1_1testing_1_1_node_quantization_parameters_a0ba6e36d011e8e670e6fed9299da0938}{output}},\ quantization\_settings.\mbox{\hyperlink{structtflite_1_1testing_1_1_node_quantization_parameters_a1ccf648c067c55b4c2c933c27f405811}{forget\_gate}},}
+\DoxyCodeLine{00482\ \ \ \ \ \ \ \ \ \ \ fold\_zero\_point);}
+\DoxyCodeLine{00483\ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ quantized\_input\_gate\_data\ =}
+\DoxyCodeLine{00484\ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_1_1testing_ae7259dbdabba252a70c24582ab31c9ae}{CreateQuantizedGateData}}<WeightType,\ BiasType,\ input\_dimension,}
+\DoxyCodeLine{00485\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ state\_dimension>(}
+\DoxyCodeLine{00486\ \ \ \ \ \ \ \ \ \ \ float\_node\_contents.InputGateData(),\ quantization\_settings.\mbox{\hyperlink{structtflite_1_1testing_1_1_node_quantization_parameters_af8b11a97a74a87b30740de2acc260c68}{input}},}
+\DoxyCodeLine{00487\ \ \ \ \ \ \ \ \ \ \ quantization\_settings.\mbox{\hyperlink{structtflite_1_1testing_1_1_node_quantization_parameters_a0ba6e36d011e8e670e6fed9299da0938}{output}},\ quantization\_settings.\mbox{\hyperlink{structtflite_1_1testing_1_1_node_quantization_parameters_ac1f9937f2a93465969b60d9cd000bcc3}{input\_gate}},}
+\DoxyCodeLine{00488\ \ \ \ \ \ \ \ \ \ \ fold\_zero\_point);}
+\DoxyCodeLine{00489\ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ quantized\_cell\_gate\_data\ =}
+\DoxyCodeLine{00490\ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_1_1testing_ae7259dbdabba252a70c24582ab31c9ae}{CreateQuantizedGateData}}<WeightType,\ BiasType,\ input\_dimension,}
+\DoxyCodeLine{00491\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ state\_dimension>(}
+\DoxyCodeLine{00492\ \ \ \ \ \ \ \ \ \ \ float\_node\_contents.CellGateData(),\ quantization\_settings.\mbox{\hyperlink{structtflite_1_1testing_1_1_node_quantization_parameters_af8b11a97a74a87b30740de2acc260c68}{input}},}
+\DoxyCodeLine{00493\ \ \ \ \ \ \ \ \ \ \ quantization\_settings.\mbox{\hyperlink{structtflite_1_1testing_1_1_node_quantization_parameters_a0ba6e36d011e8e670e6fed9299da0938}{output}},\ quantization\_settings.\mbox{\hyperlink{structtflite_1_1testing_1_1_node_quantization_parameters_af82d6f046e1e35740f4775f0d804a106}{cell\_gate}},}
+\DoxyCodeLine{00494\ \ \ \ \ \ \ \ \ \ \ fold\_zero\_point);}
+\DoxyCodeLine{00495\ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ quantized\_output\_gate\_params\ =}
+\DoxyCodeLine{00496\ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_1_1testing_ae7259dbdabba252a70c24582ab31c9ae}{CreateQuantizedGateData}}<WeightType,\ BiasType,\ input\_dimension,}
+\DoxyCodeLine{00497\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ state\_dimension>(}
+\DoxyCodeLine{00498\ \ \ \ \ \ \ \ \ \ \ float\_node\_contents.OutputGateData(),\ quantization\_settings.\mbox{\hyperlink{structtflite_1_1testing_1_1_node_quantization_parameters_af8b11a97a74a87b30740de2acc260c68}{input}},}
+\DoxyCodeLine{00499\ \ \ \ \ \ \ \ \ \ \ quantization\_settings.\mbox{\hyperlink{structtflite_1_1testing_1_1_node_quantization_parameters_a0ba6e36d011e8e670e6fed9299da0938}{output}},\ quantization\_settings.\mbox{\hyperlink{structtflite_1_1testing_1_1_node_quantization_parameters_a047265c339d8d8572b1ad531fc0efd1a}{output\_gate}},}
+\DoxyCodeLine{00500\ \ \ \ \ \ \ \ \ \ \ fold\_zero\_point);}
+\DoxyCodeLine{00501\ \ \ \mbox{\hyperlink{classtflite_1_1testing_1_1_lstm_node_content}{LstmNodeContent}}<ActivationType,\ WeightType,\ BiasType,\ CellType,\ batch\_size,}
+\DoxyCodeLine{00502\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ time\_steps,\ input\_dimension,\ state\_dimension>}
+\DoxyCodeLine{00503\ \ \ \ \ \ \ quantized\_node\_content(}
+\DoxyCodeLine{00504\ \ \ \ \ \ \ \ \ \ \ float\_node\_contents.BuiltinData(),\ quantized\_forget\_gate\_data,}
+\DoxyCodeLine{00505\ \ \ \ \ \ \ \ \ \ \ quantized\_input\_gate\_data,\ quantized\_cell\_gate\_data,}
+\DoxyCodeLine{00506\ \ \ \ \ \ \ \ \ \ \ quantized\_output\_gate\_params);}
+\DoxyCodeLine{00507\ }
+\DoxyCodeLine{00508\ \ \ \textcolor{comment}{//\ Quantize\ the\ floating\ point\ input}}
+\DoxyCodeLine{00509\ \ \ ActivationType\ quantized\_input[batch\_size\ *\ input\_dimension\ *\ time\_steps]\ =}
+\DoxyCodeLine{00510\ \ \ \ \ \ \ \{\};}
+\DoxyCodeLine{00511\ \ \ \mbox{\hyperlink{namespacetflite_a30bddb28b851da7d4a5c3eea35bfc779}{Quantize}}(float\_node\_contents.GetInputData(),\ quantized\_input,}
+\DoxyCodeLine{00512\ \ \ \ \ \ \ \ \ \ \ \ batch\_size\ *\ input\_dimension\ *\ time\_steps,}
+\DoxyCodeLine{00513\ \ \ \ \ \ \ \ \ \ \ \ quantization\_settings.\mbox{\hyperlink{structtflite_1_1testing_1_1_node_quantization_parameters_af8b11a97a74a87b30740de2acc260c68}{input}}.\mbox{\hyperlink{structtflite_1_1testing_1_1_tensor_quantization_parameters_a776b7b1126870d436f74bd23a3f07fd9}{scale}},}
+\DoxyCodeLine{00514\ \ \ \ \ \ \ \ \ \ \ \ quantization\_settings.\mbox{\hyperlink{structtflite_1_1testing_1_1_node_quantization_parameters_af8b11a97a74a87b30740de2acc260c68}{input}}.\mbox{\hyperlink{structtflite_1_1testing_1_1_tensor_quantization_parameters_a0707931dba7f625cd0e30c2227f2449b}{zero\_point}});}
+\DoxyCodeLine{00515\ \ \ quantized\_node\_content.SetInputData(quantized\_input);}
+\DoxyCodeLine{00516\ \ \ \textcolor{comment}{//\ Quantize\ the\ \ floating\ point\ hidden\ state}}
+\DoxyCodeLine{00517\ \ \ ActivationType\ quantized\_hidden\_state[batch\_size\ *\ state\_dimension]\ =\ \{\};}
+\DoxyCodeLine{00518\ \ \ \mbox{\hyperlink{namespacetflite_a30bddb28b851da7d4a5c3eea35bfc779}{Quantize}}(float\_node\_contents.GetHiddenStateData(),\ quantized\_hidden\_state,}
+\DoxyCodeLine{00519\ \ \ \ \ \ \ \ \ \ \ \ batch\_size\ *\ state\_dimension,}
+\DoxyCodeLine{00520\ \ \ \ \ \ \ \ \ \ \ \ quantization\_settings.\mbox{\hyperlink{structtflite_1_1testing_1_1_node_quantization_parameters_acabe3c0ee38796c6e67867a652914853}{hidden\_state}}.\mbox{\hyperlink{structtflite_1_1testing_1_1_tensor_quantization_parameters_a776b7b1126870d436f74bd23a3f07fd9}{scale}},}
+\DoxyCodeLine{00521\ \ \ \ \ \ \ \ \ \ \ \ quantization\_settings.\mbox{\hyperlink{structtflite_1_1testing_1_1_node_quantization_parameters_acabe3c0ee38796c6e67867a652914853}{hidden\_state}}.\mbox{\hyperlink{structtflite_1_1testing_1_1_tensor_quantization_parameters_a0707931dba7f625cd0e30c2227f2449b}{zero\_point}});}
+\DoxyCodeLine{00522\ \ \ quantized\_node\_content.SetHiddenStateData(quantized\_hidden\_state);}
+\DoxyCodeLine{00523\ \ \ \textcolor{comment}{//\ Quantize\ the\ floating\ point\ cell\ state}}
+\DoxyCodeLine{00524\ \ \ CellType\ quantized\_cell\_state[batch\_size\ *\ state\_dimension]\ =\ \{\};}
+\DoxyCodeLine{00525\ \ \ \mbox{\hyperlink{namespacetflite_a30bddb28b851da7d4a5c3eea35bfc779}{Quantize}}(float\_node\_contents.GetCellStateData(),\ quantized\_cell\_state,}
+\DoxyCodeLine{00526\ \ \ \ \ \ \ \ \ \ \ \ batch\_size\ *\ state\_dimension,\ quantization\_settings.\mbox{\hyperlink{structtflite_1_1testing_1_1_node_quantization_parameters_ac51991cae779015d79e81a349544858d}{cell\_state}}.\mbox{\hyperlink{structtflite_1_1testing_1_1_tensor_quantization_parameters_a776b7b1126870d436f74bd23a3f07fd9}{scale}},}
+\DoxyCodeLine{00527\ \ \ \ \ \ \ \ \ \ \ \ quantization\_settings.\mbox{\hyperlink{structtflite_1_1testing_1_1_node_quantization_parameters_ac51991cae779015d79e81a349544858d}{cell\_state}}.\mbox{\hyperlink{structtflite_1_1testing_1_1_tensor_quantization_parameters_a0707931dba7f625cd0e30c2227f2449b}{zero\_point}});}
+\DoxyCodeLine{00528\ \ \ quantized\_node\_content.SetCellStateData(quantized\_cell\_state);}
+\DoxyCodeLine{00529\ }
+\DoxyCodeLine{00530\ \ \ \textcolor{comment}{//\ Add\ scale\ and\ zero\ point\ to\ tensors}}
+\DoxyCodeLine{00531\ \ \ quantized\_node\_content.AddQuantizationParameters(quantization\_settings);}
+\DoxyCodeLine{00532\ \ \ \textcolor{keywordflow}{return}\ quantized\_node\_content;}
+\DoxyCodeLine{00533\ \}}
+\DoxyCodeLine{00534\ }
+\DoxyCodeLine{00535\ \textcolor{comment}{//\ Get\ the\ gate\ output\ data\ (one\ time\ step)\ for\ a\ simple\ 2X2\ model}}
+\DoxyCodeLine{00536\ \textcolor{comment}{//\ batch\_size\ =\ 2;\ time\_steps\ =\ 1;\ input\_dimension\ =\ 2;\ state\_dimension\ =\ 2}}
+\DoxyCodeLine{00537\ \textcolor{comment}{//\ input\_size\ =\ batch\_size*time\_steps*input\_dimension\ =\ 4}}
+\DoxyCodeLine{00538\ \textcolor{comment}{//\ gate\_output\_size\ =\ batch\_size*state\_dimension\ =\ 4}}
+\DoxyCodeLine{00539\ GateOutputCheckData<4,\ 4>\ \mbox{\hyperlink{namespacetflite_1_1testing_a1fe8e2de503dbf00204ded8cee00aebd}{Get2X2GateOutputCheckData}}();}
+\DoxyCodeLine{00540\ }
+\DoxyCodeLine{00541\ \textcolor{comment}{//\ Get\ the\ kernel\ output\ data\ for\ a\ simple\ 2X2\ model}}
+\DoxyCodeLine{00542\ \textcolor{comment}{//\ batch\_size\ =\ 2;\ time\_steps\ =\ 3;\ input\_dimension\ =\ 2;\ state\_dimension\ =\ 2}}
+\DoxyCodeLine{00543\ \textcolor{comment}{//\ input\_size\ =\ batch\_size*time\_steps*input\_dimension\ =\ 12}}
+\DoxyCodeLine{00544\ \textcolor{comment}{//\ gate\_output\_size\ =\ batch\_size*state\_dimension\ =\ 4}}
+\DoxyCodeLine{00545\ \textcolor{comment}{//\ output\_size\ =\ time\_steps*gate\_output\_size\ =\ 12}}
+\DoxyCodeLine{00546\ LstmEvalCheckData<12,\ 4,\ 12>\ \mbox{\hyperlink{namespacetflite_1_1testing_a170ac68d959d1f3f0537eaee860f4fe2}{Get2X2LstmEvalCheckData}}();}
+\DoxyCodeLine{00547\ }
+\DoxyCodeLine{00548\ \textcolor{comment}{//\ Create\ a\ 2x2\ float\ node\ content}}
+\DoxyCodeLine{00549\ \textcolor{comment}{//\ batch\_size\ =\ 2;\ time\_steps\ =\ 3;\ input\_dimension\ =\ 2;\ state\_dimension\ =\ 2}}
+\DoxyCodeLine{00550\ LstmNodeContent<float,\ float,\ float,\ float,\ 2,\ 3,\ 2,\ 2>}
+\DoxyCodeLine{00551\ \mbox{\hyperlink{namespacetflite_1_1testing_aed1b2103deabc0a015d4ea0df537a927}{Create2x3x2X2FloatNodeContents}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{float}*\ \mbox{\hyperlink{add__n__test_8cc_a5612ba79d1f0b544c7aeae4621166fea}{input\_data}}\ =\ \textcolor{keyword}{nullptr},}
+\DoxyCodeLine{00552\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{float}*\ hidden\_state\ =\ \textcolor{keyword}{nullptr},}
+\DoxyCodeLine{00553\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{float}*\ cell\_state\ =\ \textcolor{keyword}{nullptr});}
+\DoxyCodeLine{00554\ }
+\DoxyCodeLine{00555\ \textcolor{comment}{//\ Get\ the\ quantization\ settings\ for\ the\ 2X2\ model}}
+\DoxyCodeLine{00556\ NodeQuantizationParameters\ \mbox{\hyperlink{namespacetflite_1_1testing_a8ae38dd316f8fcf285098f00ded64c3e}{Get2X2Int8LstmQuantizationSettings}}();}
+\DoxyCodeLine{00557\ }
+\DoxyCodeLine{00558\ \textcolor{comment}{//\ Create\ int8\ (activation)\ x\ int8\ (weight)\ -\/>\ int16\ (cell)\ node}}
+\DoxyCodeLine{00559\ \textcolor{comment}{//\ batch\_size\ =\ 2;\ time\_steps\ =\ 3;\ input\_dimension\ =\ 2;\ state\_dimension\ =\ 2}}
+\DoxyCodeLine{00560\ \textcolor{comment}{//\ input\ is\ in\ float\ format\ since\ the\ source\ of\ truth\ is\ always\ the\ float}}
+\DoxyCodeLine{00561\ \textcolor{comment}{//\ configuration}}
+\DoxyCodeLine{00562\ LstmNodeContent<int8\_t,\ int8\_t,\ int32\_t,\ int16\_t,\ 2,\ 3,\ 2,\ 2>}
+\DoxyCodeLine{00563\ \mbox{\hyperlink{namespacetflite_1_1testing_a92a1b42b8b8b15947133cfb0504402d2}{Create2x3x2X2Int8NodeContents}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{float}*\ \mbox{\hyperlink{add__n__test_8cc_a5612ba79d1f0b544c7aeae4621166fea}{input\_data}}\ =\ \textcolor{keyword}{nullptr},}
+\DoxyCodeLine{00564\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{float}*\ hidden\_state\ =\ \textcolor{keyword}{nullptr},}
+\DoxyCodeLine{00565\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{float}*\ cell\_state\ =\ \textcolor{keyword}{nullptr});}
+\DoxyCodeLine{00566\ }
+\DoxyCodeLine{00567\ \textcolor{comment}{//\ Create\ int16\ (activation)\ x\ int8\ (weight)\ -\/>\ int16\ (cell)\ node}}
+\DoxyCodeLine{00568\ \textcolor{comment}{//\ batch\_size\ =\ 2;\ time\_steps\ =\ 3;\ input\_dimension\ =\ 2;\ state\_dimension\ =\ 2}}
+\DoxyCodeLine{00569\ \textcolor{comment}{//\ input\ is\ in\ float\ format\ since\ the\ source\ of\ truth\ is\ always\ the\ float}}
+\DoxyCodeLine{00570\ \textcolor{comment}{//\ configuration}}
+\DoxyCodeLine{00571\ LstmNodeContent<int16\_t,\ int8\_t,\ int64\_t,\ int16\_t,\ 2,\ 3,\ 2,\ 2>}
+\DoxyCodeLine{00572\ \mbox{\hyperlink{namespacetflite_1_1testing_a0c1632d723eccffb60978ae74d083223}{Create2x3x2X2Int16NodeContents}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{float}*\ \mbox{\hyperlink{add__n__test_8cc_a5612ba79d1f0b544c7aeae4621166fea}{input\_data}}\ =\ \textcolor{keyword}{nullptr},}
+\DoxyCodeLine{00573\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{float}*\ hidden\_state\ =\ \textcolor{keyword}{nullptr},}
+\DoxyCodeLine{00574\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{float}*\ cell\_state\ =\ \textcolor{keyword}{nullptr});}
+\DoxyCodeLine{00575\ }
+\DoxyCodeLine{00576\ \}\ \ \textcolor{comment}{//\ namespace\ testing}}
+\DoxyCodeLine{00577\ \}\ \ \textcolor{comment}{//\ namespace\ tflite}}
+\DoxyCodeLine{00578\ }
+\DoxyCodeLine{00579\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ TENSORFLOW\_LITE\_MICRO\_KERNELS\_TESTDATA\_LSTM\_TEST\_DATA\_H\_}}
+
+\end{DoxyCode}

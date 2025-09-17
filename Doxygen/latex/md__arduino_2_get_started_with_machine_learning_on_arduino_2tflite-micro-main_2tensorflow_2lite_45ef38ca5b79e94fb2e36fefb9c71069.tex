@@ -1,0 +1,85 @@
+\chapter{Generate Micro Mutable Op Resolver from a model}
+\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_45ef38ca5b79e94fb2e36fefb9c71069}{}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_45ef38ca5b79e94fb2e36fefb9c71069}\index{Generate Micro Mutable Op Resolver from a model@{Generate Micro Mutable Op Resolver from a model}}
+\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_45ef38ca5b79e94fb2e36fefb9c71069_autotoc_md339}%
+\Hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_45ef38ca5b79e94fb2e36fefb9c71069_autotoc_md339}%
+
+
+The Micro\+Mutable\+Op\+Resolver includes the operators explictly specified in source code. This generally requires manually finding out which operators are used in the model through the use of a visualization tool, which may be impractical in some cases. This script will automatically generate a Micro\+Mutable\+Op\+Resolver with only the used operators for a given model or set of models.
+
+Note\+: Check ci/\+Dockerfile.\+micro for supported python version.\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_45ef38ca5b79e94fb2e36fefb9c71069_autotoc_md340}{}\doxysection{\texorpdfstring{How to run}{How to run}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_45ef38ca5b79e94fb2e36fefb9c71069_autotoc_md340}
+bazel run tensorflow/lite/micro/tools/gen\+\_\+micro\+\_\+mutable\+\_\+op\+\_\+resolver\+:\doxylink{namespacegenerate__micro__mutable__op__resolver__from__model}{generate\+\_\+micro\+\_\+mutable\+\_\+op\+\_\+resolver\+\_\+from\+\_\+model} -- \textbackslash{} --common\+\_\+tflite\+\_\+path=$<$path to tflite file$>$ \textbackslash{} --input\+\_\+tflite\+\_\+files=\texorpdfstring{$<$}{<}name of tflite file(s)\texorpdfstring{$>$}{>} --output\+\_\+dir=$<$output directory$>$
+
+Note that if having only one tflite as input, the final output directory will be $<$output directory$>$/$<$base name of model$>$.
+
+Example\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{bazel\ run\ tensorflow/lite/micro/tools/gen\_micro\_mutable\_op\_resolver:generate\_micro\_mutable\_op\_resolver\_from\_model\ -\/-\/\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ -\/-\/common\_tflite\_path=/tmp/model\_dir\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ -\/-\/input\_tflite\_files=person\_detect.tflite\ -\/-\/output\_dir=/tmp/gen\_dir}
+
+\end{DoxyCode}
+
+
+A header file called, gen\+\_\+micro\+\_\+mutable\+\_\+op\+\_\+resolver.\+h will be created in /tmp/gen\+\_\+dir/person\+\_\+detect.
+
+Example\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{bazel\ run\ tensorflow/lite/micro/tools/gen\_micro\_mutable\_op\_resolver:generate\_micro\_mutable\_op\_resolver\_from\_model\ -\/-\/\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ -\/-\/common\_tflite\_path=/tmp/model\_dir\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ -\/-\/input\_tflite\_files=person\_detect.tflite,keyword\_scrambled.tflite\ -\/-\/output\_dir=/tmp/gen\_dir}
+
+\end{DoxyCode}
+ A header file called, gen\+\_\+micro\+\_\+mutable\+\_\+op\+\_\+resolver.\+h will be created in /tmp/gen\+\_\+dir.
+
+Note that with multiple tflite files as input, the files must be placed in the same common directory.
+
+The generated header file can then be included in the application and used like below\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{tflite::MicroMutableOpResolver<kNumberOperators>\ op\_resolver\ =\ get\_resolver();}
+
+\end{DoxyCode}
+\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_45ef38ca5b79e94fb2e36fefb9c71069_autotoc_md341}{}\doxysection{\texorpdfstring{Verifying the content of the generated header file}{Verifying the content of the generated header file}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_45ef38ca5b79e94fb2e36fefb9c71069_autotoc_md341}
+This is just to test the actual script that generates the micro mutable ops resolver header for a given model. So that the actual list of operators corresponds to a given model and that the syntax of the header is correct.
+
+For this another script can be used to verify the generated header file\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{bazel\ run\ tensorflow/lite/micro/tools/gen\_micro\_mutable\_op\_resolver:generate\_micro\_mutable\_op\_resolver\_from\_model\_test\ -\/-\/\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ -\/-\/input\_tflite\_file=<path\ to\ tflite\ file>\ -\/-\/output\_dir=<output\ directory>}
+
+\end{DoxyCode}
+
+
+This script verifies a single model at a time. It will generate a small inference testing app that is using the generated header file, which can then be executed and tested as a final step. Because of this the specified output path will be appended with the name of the model so that the generated test is named after the model. In other words the final output directory will be $<$output directory$>$/$<$base name of model$>$.
+
+The essence of this is that different output paths need to be specified for the actual header script and the actual test script.
+
+So there will be 3 steps, 1) Generate the micro mutable specifying e.\+g. output path gen\+\_\+dir/$<$base\+\_\+name\+\_\+of\+\_\+model$>$ 2) Generate the micro mutable specifying e.\+g. output path gen\+\_\+dir 3) Run the generated test
+
+Example assuming /tmp/my\+\_\+model.tflite exists\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\#\ Step\ 1\ generates\ header\ to\ gen\_dir/my\_model}
+\DoxyCodeLine{bazel\ run\ tensorflow/lite/micro/tools/gen\_micro\_mutable\_op\_resolver:generate\_micro\_mutable\_op\_resolver\_from\_model\ -\/-\/\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ -\/-\/common\_tflite\_path=/tmp/\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ -\/-\/input\_tflite\_files=my\_model.tflite\ -\/-\/output\_dir=\$(realpath\ gen\_dir/my\_model)}
+\DoxyCodeLine{}
+\DoxyCodeLine{\#\ Step\ 2\ generates\ test\ app\ using\ header\ from\ step\ 1\ to\ gen\_dir/my\_model\ since\ my\ my\_model\ is\ appended}
+\DoxyCodeLine{bazel\ run\ tensorflow/lite/micro/tools/gen\_micro\_mutable\_op\_resolver:generate\_micro\_mutable\_op\_resolver\_from\_model\_test\ -\/-\/\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ -\/-\/input\_tflite\_file=/tmp/my\_model.tflite\ -\/-\/output\_dir=\$(realpath\ gen\_dir)\ -\/-\/verify\_output=1}
+\DoxyCodeLine{}
+\DoxyCodeLine{\#\ Step\ 3\ runs\ the\ generated\ my\_model\ test}
+\DoxyCodeLine{bazel\ run\ gen\_dir/my\_model:micro\_mutable\_op\_resolver\_test}
+
+\end{DoxyCode}
+
+
+Note1\+: Bazel expects absolute paths. Note2\+: By default the inference model test will run without any generated input or verifying the output. Verifying output can be done with --verify\+\_\+output=1, which is done in the example above. Note3\+: Depending on the size of the model the arena size may need to be increased. Arena size can be set with --arena\+\_\+size=$<$size$>$. 

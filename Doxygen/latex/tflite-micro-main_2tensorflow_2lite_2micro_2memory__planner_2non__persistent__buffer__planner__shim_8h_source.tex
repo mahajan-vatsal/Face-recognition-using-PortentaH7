@@ -1,0 +1,139 @@
+\doxysection{non\+\_\+persistent\+\_\+buffer\+\_\+planner\+\_\+shim.\+h}
+\hypertarget{tflite-micro-main_2tensorflow_2lite_2micro_2memory__planner_2non__persistent__buffer__planner__shim_8h_source}{}\label{tflite-micro-main_2tensorflow_2lite_2micro_2memory__planner_2non__persistent__buffer__planner__shim_8h_source}\index{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/main/tensorflow/lite/micro/memory\_planner/non\_persistent\_buffer\_planner\_shim.h@{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/main/tensorflow/lite/micro/memory\_planner/non\_persistent\_buffer\_planner\_shim.h}}
+\mbox{\hyperlink{tflite-micro-main_2tensorflow_2lite_2micro_2memory__planner_2non__persistent__buffer__planner__shim_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{/*\ Copyright\ 2021\ The\ TensorFlow\ Authors.\ All\ Rights\ Reserved.}}
+\DoxyCodeLine{00002\ \textcolor{comment}{}}
+\DoxyCodeLine{00003\ \textcolor{comment}{Licensed\ under\ the\ Apache\ License,\ Version\ 2.0\ (the\ "{}License"{});}}
+\DoxyCodeLine{00004\ \textcolor{comment}{you\ may\ not\ use\ this\ file\ except\ in\ compliance\ with\ the\ License.}}
+\DoxyCodeLine{00005\ \textcolor{comment}{You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{00006\ \textcolor{comment}{}}
+\DoxyCodeLine{00007\ \textcolor{comment}{\ \ \ \ http://www.apache.org/licenses/LICENSE-\/2.0}}
+\DoxyCodeLine{00008\ \textcolor{comment}{}}
+\DoxyCodeLine{00009\ \textcolor{comment}{Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ software}}
+\DoxyCodeLine{00010\ \textcolor{comment}{distributed\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,}}
+\DoxyCodeLine{00011\ \textcolor{comment}{WITHOUT\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,\ either\ express\ or\ implied.}}
+\DoxyCodeLine{00012\ \textcolor{comment}{See\ the\ License\ for\ the\ specific\ language\ governing\ permissions\ and}}
+\DoxyCodeLine{00013\ \textcolor{comment}{limitations\ under\ the\ License.}}
+\DoxyCodeLine{00014\ \textcolor{comment}{==============================================================================*/}}
+\DoxyCodeLine{00015\ }
+\DoxyCodeLine{00016\ \textcolor{preprocessor}{\#ifndef\ TENSORFLOW\_LITE\_MICRO\_MEMORY\_PLANNER\_NON\_PERSISTENT\_MEMORY\_PLANNER\_SHIM\_H\_\_}}
+\DoxyCodeLine{00017\ \textcolor{preprocessor}{\#define\ TENSORFLOW\_LITE\_MICRO\_MEMORY\_PLANNER\_NON\_PERSISTENT\_MEMORY\_PLANNER\_SHIM\_H\_\_}}
+\DoxyCodeLine{00018\ }
+\DoxyCodeLine{00019\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/micro/compatibility.h"{}}}
+\DoxyCodeLine{00020\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/micro/memory\_planner/memory\_plan\_struct.h"{}}}
+\DoxyCodeLine{00021\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/micro/memory\_planner/micro\_memory\_planner.h"{}}}
+\DoxyCodeLine{00022\ }
+\DoxyCodeLine{00023\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacetflite}{tflite}}\ \{}
+\DoxyCodeLine{00024\ }
+\DoxyCodeLine{00025\ \textcolor{comment}{/*\ \ \ This\ is\ an\ experimental\ feature\ and\ subjected\ to\ change.}}
+\DoxyCodeLine{00026\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00027\ \textcolor{comment}{The\ NonPersistentMemoryPlannerShim\ enables\ TFLM\ to\ work\ with\ an\ external\ tooling}}
+\DoxyCodeLine{00028\ \textcolor{comment}{that\ can\ plan\ the\ offset\ of\ each\ non\ persistent\ buffer\ for\ the\ Model\ within\ the}}
+\DoxyCodeLine{00029\ \textcolor{comment}{TFLM\ arena.}}
+\DoxyCodeLine{00030\ \textcolor{comment}{}}
+\DoxyCodeLine{00031\ \textcolor{comment}{If\ the\ NonPersistentMemoryPlannerShim\ is\ used,\ then\ the\ final\ binary\ does\ not}}
+\DoxyCodeLine{00032\ \textcolor{comment}{have\ any\ of\ the\ symbols\ associated\ with\ the\ GreedyMemoryPlanner\ which\ results\ in}}
+\DoxyCodeLine{00033\ \textcolor{comment}{a\ reduced\ memory\ footprint.}}
+\DoxyCodeLine{00034\ \textcolor{comment}{}}
+\DoxyCodeLine{00035\ \textcolor{comment}{Additionally,\ the\ offline\ planning\ of\ the\ non-\/persistent\ buffers\ can\ be\ used\ to}}
+\DoxyCodeLine{00036\ \textcolor{comment}{have\ a\ more\ efficient\ utilization\ compared\ to\ the\ GreedyMemoryPlanner.}}
+\DoxyCodeLine{00037\ \textcolor{comment}{}}
+\DoxyCodeLine{00038\ \textcolor{comment}{For\ example,\ consider\ the\ following\ hypothetical\ model:}}
+\DoxyCodeLine{00039\ \textcolor{comment}{}}
+\DoxyCodeLine{00040\ \textcolor{comment}{A1(400)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ A2(401)}}
+\DoxyCodeLine{00041\ \textcolor{comment}{──┬─────────┐\ \ \ \ ┌───────────}}
+\DoxyCodeLine{00042\ \textcolor{comment}{\ \ │\ \ \ \ \ \ \ \ \ │\ \ \ \ │}}
+\DoxyCodeLine{00043\ \textcolor{comment}{\ \ │\ \ \ \ \ \ \ \ \ │\ \ \ \ │}}
+\DoxyCodeLine{00044\ \textcolor{comment}{\ \ │\ \ \ \ \ \ \ \ \ ▼\ \ \ \ ▼}}
+\DoxyCodeLine{00045\ \textcolor{comment}{\ \ │\ \ \ \ \ \ \ ┌────────┐}}
+\DoxyCodeLine{00046\ \textcolor{comment}{\ \ │\ \ \ \ \ \ \ │\ \ OP1\ \ \ │}}
+\DoxyCodeLine{00047\ \textcolor{comment}{\ \ │\ \ \ \ \ \ \ └───┬────┘\ \ \ \ \ \ \ A4(201)}}
+\DoxyCodeLine{00048\ \textcolor{comment}{\ \ │\ \ \ A3(10)\ \ │\ \ \ \ \ \ \ \ \ \ \ \ \ \ │}}
+\DoxyCodeLine{00049\ \textcolor{comment}{\ \ │\ \ \ \ \ \ \ \ \ \ \ │\ \ \ \ \ \ \ \ \ \ \ \ \ \ │}}
+\DoxyCodeLine{00050\ \textcolor{comment}{\ \ │\ \ \ \ \ \ \ \ \ \ \ │\ \ \ \ \ \ \ \ \ \ \ \ \ \ │}}
+\DoxyCodeLine{00051\ \textcolor{comment}{\ \ │\ \ \ \ \ \ \ ┌───┴────┐\ \ \ \ \ \ \ \ \ │}}
+\DoxyCodeLine{00052\ \textcolor{comment}{\ \ │\ \ \ \ \ \ \ │\ \ OP2\ \ \ │◄────────┤}}
+\DoxyCodeLine{00053\ \textcolor{comment}{\ \ │\ \ \ \ \ \ \ └───┬────┘\ \ \ \ \ \ \ \ \ │}}
+\DoxyCodeLine{00054\ \textcolor{comment}{\ \ │\ \ \ A5(11)\ \ │\ \ \ \ \ \ A6(202)\ │}}
+\DoxyCodeLine{00055\ \textcolor{comment}{\ \ │\ \ \ \ \ \ \ \ \ \ \ │\ \ \ \ \ \ \ │\ \ \ \ \ \ │}}
+\DoxyCodeLine{00056\ \textcolor{comment}{\ \ │\ \ \ \ \ \ \ \ \ \ \ ▼\ \ \ \ \ \ \ │\ \ \ \ \ \ │}}
+\DoxyCodeLine{00057\ \textcolor{comment}{\ \ │\ \ \ \ \ \ \ ┌────────┐\ \ │\ \ \ \ \ \ │}}
+\DoxyCodeLine{00058\ \textcolor{comment}{\ \ │\ \ \ \ \ \ \ │\ \ OP3\ \ \ │◄─┘\ \ \ \ \ \ │}}
+\DoxyCodeLine{00059\ \textcolor{comment}{\ \ │\ \ \ \ \ \ \ └───┬────┘\ \ \ \ \ \ \ \ \ │}}
+\DoxyCodeLine{00060\ \textcolor{comment}{\ \ │\ \ \ \ \ \ \ \ \ \ \ │\ \ \ \ \ \ A8(200)\ │}}
+\DoxyCodeLine{00061\ \textcolor{comment}{\ \ │\ \ \ A7(12)\ \ │\ \ \ \ \ \ \ \ │\ \ \ \ \ │}}
+\DoxyCodeLine{00062\ \textcolor{comment}{\ \ │\ \ \ \ \ \ \ \ \ \ \ │\ \ \ \ \ \ \ \ │\ \ \ \ \ │}}
+\DoxyCodeLine{00063\ \textcolor{comment}{\ \ │\ \ \ \ \ \ \ ┌───┴────┐◄──┘\ \ \ \ \ │}}
+\DoxyCodeLine{00064\ \textcolor{comment}{\ \ └──────►│\ \ OP4\ \ \ │\ \ \ \ \ \ \ \ \ │}}
+\DoxyCodeLine{00065\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ └───┬────┘◄────────┘}}
+\DoxyCodeLine{00066\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ │}}
+\DoxyCodeLine{00067\ \textcolor{comment}{\ \ \ \ \ \ A9(13)\ \ │}}
+\DoxyCodeLine{00068\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ ▼}}
+\DoxyCodeLine{00069\ \textcolor{comment}{}}
+\DoxyCodeLine{00070\ \textcolor{comment}{The\ GreedyMemoryPlanner\ will\ give\ the\ following\ memory\ layout\ that\ requires\ 1012}}
+\DoxyCodeLine{00071\ \textcolor{comment}{bytes\ of\ scratch\ arena\ size:}}
+\DoxyCodeLine{00072\ \textcolor{comment}{}}
+\DoxyCodeLine{00073\ \textcolor{comment}{┌─────────────────────────────────────────┬──────────────────────────┬────────┬───────┐}}
+\DoxyCodeLine{00074\ \textcolor{comment}{│\ \ A2(401)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ │\ \ \ \ \ \ \ \ \ \ A1(400)\ \ \ \ \ \ \ \ \ │\ A4(201)│}}
+\DoxyCodeLine{00075\ \textcolor{comment}{A3(10)│}}
+\DoxyCodeLine{00076\ \textcolor{comment}{└─────────────────────────────────────────┴──────────────────────────┴────────┴───────┘}}
+\DoxyCodeLine{00077\ \textcolor{comment}{}}
+\DoxyCodeLine{00078\ \textcolor{comment}{┌───────────┬──────┬──────┐}}
+\DoxyCodeLine{00079\ \textcolor{comment}{│\ A6(202)\ \ \ │A5(11)│A7(12)│}}
+\DoxyCodeLine{00080\ \textcolor{comment}{└───────────┴──────┴──────┘}}
+\DoxyCodeLine{00081\ \textcolor{comment}{}}
+\DoxyCodeLine{00082\ \textcolor{comment}{┌──────────┬───────┐}}
+\DoxyCodeLine{00083\ \textcolor{comment}{│\ A8(200)\ \ │A9(13)\ │}}
+\DoxyCodeLine{00084\ \textcolor{comment}{└──────────┴───────┘}}
+\DoxyCodeLine{00085\ \textcolor{comment}{}}
+\DoxyCodeLine{00086\ \textcolor{comment}{But\ a\ more\ efficient\ offline\ memory\ plan\ that\ requires\ only\ 826\ bytes\ of\ scratch}}
+\DoxyCodeLine{00087\ \textcolor{comment}{arena\ size\ can\ be}}
+\DoxyCodeLine{00088\ \textcolor{comment}{}}
+\DoxyCodeLine{00089\ \textcolor{comment}{┌──────────────────────────────────────┬─────────────────────────────┬───────┬──────┐}}
+\DoxyCodeLine{00090\ \textcolor{comment}{│\ \ \ \ \ \ A1(400)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ │\ \ \ \ \ \ \ \ \ A2(401)\ \ \ \ \ \ \ \ \ \ \ \ \ │}}
+\DoxyCodeLine{00091\ \textcolor{comment}{A3(10)│A5(11)│}}
+\DoxyCodeLine{00092\ \textcolor{comment}{└──────────────────────────────────────┴─────────────────────────────┴───────┴──────┘}}
+\DoxyCodeLine{00093\ \textcolor{comment}{}}
+\DoxyCodeLine{00094\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ┌────────────────┬────────────┬────────┬───────┐}}
+\DoxyCodeLine{00095\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ │A4(201)\ \ \ \ \ \ \ \ \ │\ \ A8(200)\ \ \ │A9(13)}}
+\DoxyCodeLine{00096\ \textcolor{comment}{│A7(12)\ │\ └────────────────┴────────────┴────────┴───────┘}}
+\DoxyCodeLine{00097\ \textcolor{comment}{}}
+\DoxyCodeLine{00098\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ┌─────────────┐}}
+\DoxyCodeLine{00099\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ │\ \ A6(202)\ \ \ \ │}}
+\DoxyCodeLine{00100\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ └─────────────┘}}
+\DoxyCodeLine{00101\ \textcolor{comment}{}}
+\DoxyCodeLine{00102\ \textcolor{comment}{*/}}
+\DoxyCodeLine{00103\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classtflite_1_1_non_persistent_memory_planner_shim}{NonPersistentMemoryPlannerShim}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{classtflite_1_1_micro_memory_planner}{MicroMemoryPlanner}}\ \{}
+\DoxyCodeLine{00104\ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00105\ \ \ \textcolor{comment}{//\ Does\ not\ take\ ownership\ of\ buffer\_plan,\ which\ must\ refer\ to\ a\ valid}}
+\DoxyCodeLine{00106\ \ \ \textcolor{comment}{//\ BufferPlan\ that\ outlives\ this\ object.}}
+\DoxyCodeLine{00107\ \ \ \textcolor{keyword}{explicit}\ \mbox{\hyperlink{classtflite_1_1_non_persistent_memory_planner_shim_a0a9021131c7bfc2e3a798a83a7f5bf12}{NonPersistentMemoryPlannerShim}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structtflite_1_1_buffer_plan}{BufferPlan}}*\ buffer\_plan);}
+\DoxyCodeLine{00108\ \ \ \mbox{\hyperlink{classtflite_1_1_non_persistent_memory_planner_shim_a38f1f77a84d93ae1ebd5349438116022}{\string~NonPersistentMemoryPlannerShim}}()\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00109\ }
+\DoxyCodeLine{00110\ \ \ \mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2core_2c_2c__api__types_8h_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_non_persistent_memory_planner_shim_a588526d6f39fbfebbb56333ed2fbd70e}{GetOffsetForBuffer}}(\textcolor{keywordtype}{int}\ buffer\_request\_index,}
+\DoxyCodeLine{00111\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}*\ \mbox{\hyperlink{mirror__pad_8cpp_aed7ea92f45bd273dde380a45ddced592}{offset}})\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00112\ }
+\DoxyCodeLine{00113\ \ \ \mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2core_2c_2c__api__types_8h_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_non_persistent_memory_planner_shim_ac1056ba0575773de544ad26a8fee8045}{AddBuffer}}(\textcolor{keywordtype}{int}\ \mbox{\hyperlink{hello__world__model_8cc_a439227feff9d7f55384e8780cfc2eb82}{size}},\ \textcolor{keywordtype}{int}\ first\_time\_used,}
+\DoxyCodeLine{00114\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ last\_time\_used)\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00115\ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{classtflite_1_1_non_persistent_memory_planner_shim_a9c714c2038289252dda09c34e6c6e54f}{GetMaximumMemorySize}}()\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00116\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{classtflite_1_1_non_persistent_memory_planner_shim_a658a25d7cfc80bc6fef8c59e0a151ef1}{GetBufferCount}}()\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00117\ }
+\DoxyCodeLine{00118\ \ \ \textcolor{comment}{//\ Returns\ False\ because\ the\ NonPersistentMemoryPlannerShim\ doesn't\ preserves}}
+\DoxyCodeLine{00119\ \ \ \textcolor{comment}{//\ all\ tensors\ after\ invocation.}}
+\DoxyCodeLine{00120\ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classtflite_1_1_non_persistent_memory_planner_shim_aa66570727e8ac9475152dfe05464584a}{preserves\_all\_tensors}}()\textcolor{keyword}{\ const\ override\ }\{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};\ \}}
+\DoxyCodeLine{00121\ }
+\DoxyCodeLine{00122\ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{00123\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structtflite_1_1_buffer_plan}{BufferPlan}}*\ \mbox{\hyperlink{classtflite_1_1_non_persistent_memory_planner_shim_a5eb58120ff639c43a28ad17fbd2a7853}{buffer\_plan\_}};\ \ \textcolor{comment}{//\ not\ owned,\ can't\ be\ null}}
+\DoxyCodeLine{00124\ }
+\DoxyCodeLine{00125\ \ \ \textcolor{comment}{//\ The\ number\ of\ buffers\ requested\ so\ far.\ Used\ for\ error\ checking.}}
+\DoxyCodeLine{00126\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{classtflite_1_1_non_persistent_memory_planner_shim_ab889e319dbc47c8e52a9abee85183fe3}{buffer\_request\_count\_}};}
+\DoxyCodeLine{00127\ }
+\DoxyCodeLine{00128\ \ \ \mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2micro_2compatibility_8h_a92a34c72cfcc4f6c5bd49086ba082af4}{TF\_LITE\_REMOVE\_VIRTUAL\_DELETE}}}
+\DoxyCodeLine{00129\ \};}
+\DoxyCodeLine{00130\ }
+\DoxyCodeLine{00131\ \}\ \ \textcolor{comment}{//\ namespace\ tflite}}
+\DoxyCodeLine{00132\ }
+\DoxyCodeLine{00133\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ TENSORFLOW\_LITE\_MICRO\_MEMORY\_PLANNER\_NON\_PERSISTENT\_MEMORY\_PLANNER\_SHIM\_H\_\_}}
+
+\end{DoxyCode}

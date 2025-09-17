@@ -1,0 +1,250 @@
+\doxysection{tflite\+\_\+full.\+h}
+\hypertarget{tflite__full_8h_source}{}\label{tflite__full_8h_source}\index{Face\_Access\_inferencing/src/edge-\/impulse-\/sdk/classifier/inferencing\_engines/tflite\_full.h@{Face\_Access\_inferencing/src/edge-\/impulse-\/sdk/classifier/inferencing\_engines/tflite\_full.h}}
+\mbox{\hyperlink{tflite__full_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{00002\ \textcolor{comment}{\ *\ Copyright\ (c)\ 2022\ EdgeImpulse\ Inc.}}
+\DoxyCodeLine{00003\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00004\ \textcolor{comment}{\ *\ Licensed\ under\ the\ Apache\ License,\ Version\ 2.0\ (the\ "{}License"{});}}
+\DoxyCodeLine{00005\ \textcolor{comment}{\ *\ you\ may\ not\ use\ this\ file\ except\ in\ compliance\ with\ the\ License.}}
+\DoxyCodeLine{00006\ \textcolor{comment}{\ *\ You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{00007\ \textcolor{comment}{\ *\ http://www.apache.org/licenses/LICENSE-\/2.0}}
+\DoxyCodeLine{00008\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00009\ \textcolor{comment}{\ *\ Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,}}
+\DoxyCodeLine{00010\ \textcolor{comment}{\ *\ software\ distributed\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS}}
+\DoxyCodeLine{00011\ \textcolor{comment}{\ *\ IS"{}\ BASIS,\ WITHOUT\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,\ either}}
+\DoxyCodeLine{00012\ \textcolor{comment}{\ *\ express\ or\ implied.\ See\ the\ License\ for\ the\ specific\ language}}
+\DoxyCodeLine{00013\ \textcolor{comment}{\ *\ governing\ permissions\ and\ limitations\ under\ the\ License.}}
+\DoxyCodeLine{00014\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00015\ \textcolor{comment}{\ *\ SPDX-\/License-\/Identifier:\ Apache-\/2.0}}
+\DoxyCodeLine{00016\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{00017\ }
+\DoxyCodeLine{00018\ \textcolor{preprocessor}{\#ifndef\ \_EI\_CLASSIFIER\_INFERENCING\_ENGINE\_TFLITE\_FULL\_H\_}}
+\DoxyCodeLine{00019\ \textcolor{preprocessor}{\#define\ \_EI\_CLASSIFIER\_INFERENCING\_ENGINE\_TFLITE\_FULL\_H\_}}
+\DoxyCodeLine{00020\ }
+\DoxyCodeLine{00021\ \textcolor{preprocessor}{\#if\ (EI\_CLASSIFIER\_INFERENCING\_ENGINE\ ==\ EI\_CLASSIFIER\_TFLITE\_FULL)}}
+\DoxyCodeLine{00022\ }
+\DoxyCodeLine{00023\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{model__metadata_8h}{model-\/parameters/model\_metadata.h}}"{}}}
+\DoxyCodeLine{00024\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{trained__model__ops__define_8h}{tflite-\/model/trained\_model\_ops\_define.h}}"{}}}
+\DoxyCodeLine{00025\ }
+\DoxyCodeLine{00026\ \textcolor{preprocessor}{\#include\ <thread>}}
+\DoxyCodeLine{00027\ \textcolor{preprocessor}{\#include\ "{}tensorflow-\/lite/tensorflow/lite/c/common.h"{}}}
+\DoxyCodeLine{00028\ \textcolor{preprocessor}{\#include\ "{}tensorflow-\/lite/tensorflow/lite/interpreter.h"{}}}
+\DoxyCodeLine{00029\ \textcolor{preprocessor}{\#include\ "{}tensorflow-\/lite/tensorflow/lite/kernels/register.h"{}}}
+\DoxyCodeLine{00030\ \textcolor{preprocessor}{\#include\ "{}tensorflow-\/lite/tensorflow/lite/model.h"{}}}
+\DoxyCodeLine{00031\ \textcolor{preprocessor}{\#include\ "{}tensorflow-\/lite/tensorflow/lite/optional\_debug\_tools.h"{}}}
+\DoxyCodeLine{00032\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{kernels_2custom_2tree__ensemble__classifier_8h}{edge-\/impulse-\/sdk/tensorflow/lite/kernels/custom/tree\_ensemble\_classifier.h}}"{}}}
+\DoxyCodeLine{00033\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{ei__fill__result__struct_8h}{edge-\/impulse-\/sdk/classifier/ei\_fill\_result\_struct.h}}"{}}}
+\DoxyCodeLine{00034\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{ei__model__types_8h}{edge-\/impulse-\/sdk/classifier/ei\_model\_types.h}}"{}}}
+\DoxyCodeLine{00035\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{tflite__helper_8h}{edge-\/impulse-\/sdk/classifier/inferencing\_engines/tflite\_helper.h}}"{}}}
+\DoxyCodeLine{00036\ }
+\DoxyCodeLine{00037\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\{}
+\DoxyCodeLine{00038\ \ \ \ \ std::unique\_ptr<tflite::FlatBufferModel>\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2model_8h_ae142afd8c2e2c711c1c62440deebe03c}{model}};}
+\DoxyCodeLine{00039\ \ \ \ \ std::unique\_ptr<tflite::Interpreter>\ \mbox{\hyperlink{_inference_allocate_tensor_8cpp_a0d8f3bb5211083760f7c593d57adb17d}{interpreter}};}
+\DoxyCodeLine{00040\ \}\ \mbox{\hyperlink{structei__tflite__state__t}{ei\_tflite\_state\_t}};}
+\DoxyCodeLine{00041\ }
+\DoxyCodeLine{00042\ std::map<uint32\_t,\ ei\_tflite\_state\_t*>\ \mbox{\hyperlink{tflite__full_8h_a8d592742eb6381339c788d23b68712fc}{ei\_tflite\_instances}};}
+\DoxyCodeLine{00043\ }
+\DoxyCodeLine{00047\ \textcolor{keyword}{static}\ \mbox{\hyperlink{group__ei__returntypes_gad9580b47a6cd5e74cfc31a03bdfecebe}{EI\_IMPULSE\_ERROR}}\ \mbox{\hyperlink{tflite__full_8h_ade70c8b8e08562c755284449a4aaae57}{get\_interpreter}}(\mbox{\hyperlink{structei__learning__block__config__tflite__graph__t}{ei\_learning\_block\_config\_tflite\_graph\_t}}\ *\mbox{\hyperlink{ei__fill__result__struct_8h_aafcd7d36638d6a564b6edbceef06ea8b}{block\_config}},\ tflite::Interpreter\ **\mbox{\hyperlink{_inference_allocate_tensor_8cpp_a0d8f3bb5211083760f7c593d57adb17d}{interpreter}})\ \{}
+\DoxyCodeLine{00048\ \ \ \ \ \textcolor{comment}{//\ not\ in\ the\ map\ yet...}}
+\DoxyCodeLine{00049\ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{tflite__full_8h_a8d592742eb6381339c788d23b68712fc}{ei\_tflite\_instances}}.count(\mbox{\hyperlink{ei__fill__result__struct_8h_aafcd7d36638d6a564b6edbceef06ea8b}{block\_config}}-\/>\mbox{\hyperlink{structei__learning__block__config__tflite__graph__t_a7c304bc1ccb9ff5e2b8155b5f77c91df}{block\_id}}))\ \{}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structei__config__tflite__graph__t}{ei\_config\_tflite\_graph\_t}}\ *graph\_config\ =\ (\mbox{\hyperlink{structei__config__tflite__graph__t}{ei\_config\_tflite\_graph\_t}}*)\mbox{\hyperlink{ei__fill__result__struct_8h_aafcd7d36638d6a564b6edbceef06ea8b}{block\_config}}-\/>\mbox{\hyperlink{structei__learning__block__config__tflite__graph__t_a42210921fb4db239d6b53c0409f6e5d9}{graph\_config}};}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structei__tflite__state__t}{ei\_tflite\_state\_t}}\ *new\_state\ =\ \textcolor{keyword}{new}\ \mbox{\hyperlink{structei__tflite__state__t}{ei\_tflite\_state\_t}}();}
+\DoxyCodeLine{00052\ }
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ new\_model\ =\ tflite::FlatBufferModel::BuildFromBuffer((\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*)graph\_config-\/>\mbox{\hyperlink{structei__config__tflite__graph__t_adb1b1d255db9be3eb16c0d680ae9de50}{model}},\ graph\_config-\/>\mbox{\hyperlink{structei__config__tflite__graph__t_ac0f014d6d63f118b2dfe9f43c84ebd71}{model\_size}});}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \ \ new\_state-\/>\mbox{\hyperlink{structei__tflite__state__t_a2a718661b2d6a6d38d0fe7d29cef2bb7}{model}}\ =\ std::move(new\_model);}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!new\_state-\/>\mbox{\hyperlink{structei__tflite__state__t_a2a718661b2d6a6d38d0fe7d29cef2bb7}{model}})\ \{}
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}Failed\ to\ build\ TFLite\ model\ from\ buffer\(\backslash\)n"{}});}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{group__ei__returntypes_ggad9580b47a6cd5e74cfc31a03bdfecebeadcc41afc4542dc94f9dcf36d88c1ea31}{EI\_IMPULSE\_TFLITE\_ERROR}};}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00059\ }
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \ \ tflite::ops::builtin::BuiltinOpResolver\ resolver;}
+\DoxyCodeLine{00061\ \textcolor{preprocessor}{\#if\ EI\_CLASSIFIER\_HAS\_TREE\_ENSEMBLE\_CLASSIFIER}}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ resolver.AddCustom(\textcolor{stringliteral}{"{}TreeEnsembleClassifier"{}},}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_1_1ops_1_1custom_a07a3b1e549c28600dbaf71e6fe38f3f7}{tflite::ops::custom::Register\_TREE\_ENSEMBLE\_CLASSIFIER}}());}
+\DoxyCodeLine{00064\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \ \ tflite::InterpreterBuilder\ builder(*new\_state-\/>\mbox{\hyperlink{structei__tflite__state__t_a2a718661b2d6a6d38d0fe7d29cef2bb7}{model}},\ resolver);}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ builder(\&new\_state-\/>\mbox{\hyperlink{structei__tflite__state__t_af2d64469ee7ca0b7755ecf866d9880fc}{interpreter}});}
+\DoxyCodeLine{00067\ }
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!new\_state-\/>\mbox{\hyperlink{structei__tflite__state__t_af2d64469ee7ca0b7755ecf866d9880fc}{interpreter}})\ \{}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}Failed\ to\ construct\ interpreter\(\backslash\)n"{}});}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{group__ei__returntypes_ggad9580b47a6cd5e74cfc31a03bdfecebeadcc41afc4542dc94f9dcf36d88c1ea31}{EI\_IMPULSE\_TFLITE\_ERROR}};}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00072\ }
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (new\_state-\/>\mbox{\hyperlink{structei__tflite__state__t_af2d64469ee7ca0b7755ecf866d9880fc}{interpreter}}-\/>AllocateTensors()\ !=\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361ab25fe210808197f1b6601df8ccdcd699}{kTfLiteOk}})\ \{}
+\DoxyCodeLine{00074\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}AllocateTensors\ failed\(\backslash\)n"{}});}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{group__ei__returntypes_ggad9580b47a6cd5e74cfc31a03bdfecebeadcc41afc4542dc94f9dcf36d88c1ea31}{EI\_IMPULSE\_TFLITE\_ERROR}};}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00077\ }
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ hw\_thread\_count\ =\ (int)std::thread::hardware\_concurrency();}
+\DoxyCodeLine{00079\ \ \ \ \ \ \ \ \ hw\_thread\_count\ -\/=\ 1;\ \textcolor{comment}{//\ leave\ one\ thread\ free\ for\ the\ other\ application}}
+\DoxyCodeLine{00080\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (hw\_thread\_count\ <\ 1)\ \{}
+\DoxyCodeLine{00081\ \ \ \ \ \ \ \ \ \ \ \ \ hw\_thread\_count\ =\ 1;}
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00083\ }
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (new\_state-\/>\mbox{\hyperlink{structei__tflite__state__t_af2d64469ee7ca0b7755ecf866d9880fc}{interpreter}}-\/>SetNumThreads(hw\_thread\_count)\ !=\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361ab25fe210808197f1b6601df8ccdcd699}{kTfLiteOk}})\ \{}
+\DoxyCodeLine{00085\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}SetNumThreads\ failed\(\backslash\)n"{}});}
+\DoxyCodeLine{00086\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{group__ei__returntypes_ggad9580b47a6cd5e74cfc31a03bdfecebeadcc41afc4542dc94f9dcf36d88c1ea31}{EI\_IMPULSE\_TFLITE\_ERROR}};}
+\DoxyCodeLine{00087\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00088\ }
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{tflite__full_8h_a8d592742eb6381339c788d23b68712fc}{ei\_tflite\_instances}}.insert(std::make\_pair(\mbox{\hyperlink{ei__fill__result__struct_8h_aafcd7d36638d6a564b6edbceef06ea8b}{block\_config}}-\/>\mbox{\hyperlink{structei__learning__block__config__tflite__graph__t_a7c304bc1ccb9ff5e2b8155b5f77c91df}{block\_id}},\ new\_state));}
+\DoxyCodeLine{00090\ \ \ \ \ \}}
+\DoxyCodeLine{00091\ }
+\DoxyCodeLine{00092\ \ \ \ \ \textcolor{keyword}{auto}\ tflite\_state\ =\ \mbox{\hyperlink{tflite__full_8h_a8d592742eb6381339c788d23b68712fc}{ei\_tflite\_instances}}[\mbox{\hyperlink{ei__fill__result__struct_8h_aafcd7d36638d6a564b6edbceef06ea8b}{block\_config}}-\/>\mbox{\hyperlink{structei__learning__block__config__tflite__graph__t_a7c304bc1ccb9ff5e2b8155b5f77c91df}{block\_id}}];}
+\DoxyCodeLine{00093\ \ \ \ \ *\mbox{\hyperlink{_inference_allocate_tensor_8cpp_a0d8f3bb5211083760f7c593d57adb17d}{interpreter}}\ =\ tflite\_state-\/>interpreter.get();}
+\DoxyCodeLine{00094\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{ei__fill__result__struct_8h_a2fb43be102b153d659b668ad295aff40}{EI\_IMPULSE\_OK}};}
+\DoxyCodeLine{00095\ \}}
+\DoxyCodeLine{00096\ }
+\DoxyCodeLine{00097\ \textcolor{keyword}{extern}\ \textcolor{stringliteral}{"{}C"{}}\ \mbox{\hyperlink{group__ei__returntypes_gad9580b47a6cd5e74cfc31a03bdfecebe}{EI\_IMPULSE\_ERROR}}\ \mbox{\hyperlink{tflite__full_8h_a85d5688f1dbc536dde02c237f84b5aa0}{run\_nn\_inference\_from\_dsp}}(}
+\DoxyCodeLine{00098\ \ \ \ \ \mbox{\hyperlink{structei__learning__block__config__tflite__graph__t}{ei\_learning\_block\_config\_tflite\_graph\_t}}\ *\mbox{\hyperlink{ei__fill__result__struct_8h_aafcd7d36638d6a564b6edbceef06ea8b}{block\_config}},}
+\DoxyCodeLine{00099\ \ \ \ \ \mbox{\hyperlink{structei__signal__t}{signal\_t}}\ *\mbox{\hyperlink{classei_1_1signal}{signal}},}
+\DoxyCodeLine{00100\ \ \ \ \ \mbox{\hyperlink{structei__matrix}{matrix\_t}}\ *\mbox{\hyperlink{tflite__full_8h_aac4d93b158d42bda5829a01a9c507312}{output\_matrix}})}
+\DoxyCodeLine{00101\ \{}
+\DoxyCodeLine{00102\ \ \ \ \ tflite::Interpreter\ *\mbox{\hyperlink{_inference_allocate_tensor_8cpp_a0d8f3bb5211083760f7c593d57adb17d}{interpreter}};}
+\DoxyCodeLine{00103\ \ \ \ \ \textcolor{keyword}{auto}\ interpreter\_ret\ =\ \mbox{\hyperlink{tflite__full_8h_ade70c8b8e08562c755284449a4aaae57}{get\_interpreter}}(\mbox{\hyperlink{ei__fill__result__struct_8h_aafcd7d36638d6a564b6edbceef06ea8b}{block\_config}},\ \&\mbox{\hyperlink{_inference_allocate_tensor_8cpp_a0d8f3bb5211083760f7c593d57adb17d}{interpreter}});}
+\DoxyCodeLine{00104\ \ \ \ \ \textcolor{keywordflow}{if}\ (interpreter\_ret\ !=\ \mbox{\hyperlink{ei__fill__result__struct_8h_a2fb43be102b153d659b668ad295aff40}{EI\_IMPULSE\_OK}})\ \{}
+\DoxyCodeLine{00105\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ interpreter\_ret;}
+\DoxyCodeLine{00106\ \ \ \ \ \}}
+\DoxyCodeLine{00107\ }
+\DoxyCodeLine{00108\ \ \ \ \ \mbox{\hyperlink{struct_tf_lite_tensor}{TfLiteTensor}}\ *\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src5afb18c45f6346167aa977a363205143_a9cebfb3d6ddd692fbdd268cf4b9ad024}{input}}\ =\ \mbox{\hyperlink{_inference_allocate_tensor_8cpp_a0d8f3bb5211083760f7c593d57adb17d}{interpreter}}-\/>\mbox{\hyperlink{classtflite_1_1_micro_interpreter_ac9046fdf3b601b6cbbcdcd4e28ad165d}{input\_tensor}}(0);}
+\DoxyCodeLine{00109\ \ \ \ \ \mbox{\hyperlink{struct_tf_lite_tensor}{TfLiteTensor}}\ *\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbcd3bbe90c4644d53fde1ce4e312f437_a7a2a916a8059078c2d7a05f46c7126fd}{output}}\ =\ \mbox{\hyperlink{_inference_allocate_tensor_8cpp_a0d8f3bb5211083760f7c593d57adb17d}{interpreter}}-\/>\mbox{\hyperlink{classtflite_1_1_micro_interpreter_a03736f71506229819aa4d7a79947add3}{output\_tensor}}(0);}
+\DoxyCodeLine{00110\ }
+\DoxyCodeLine{00111\ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src5afb18c45f6346167aa977a363205143_a9cebfb3d6ddd692fbdd268cf4b9ad024}{input}})\ \{}
+\DoxyCodeLine{00112\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{group__ei__returntypes_ggad9580b47a6cd5e74cfc31a03bdfecebeaffedb491b7409e8e885e1ab4abebaeeb}{EI\_IMPULSE\_INPUT\_TENSOR\_WAS\_NULL}};}
+\DoxyCodeLine{00113\ \ \ \ \ \}}
+\DoxyCodeLine{00114\ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbcd3bbe90c4644d53fde1ce4e312f437_a7a2a916a8059078c2d7a05f46c7126fd}{output}})\ \{}
+\DoxyCodeLine{00115\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{group__ei__returntypes_ggad9580b47a6cd5e74cfc31a03bdfecebea044ed37f0ac423223909460bad7850b4}{EI\_IMPULSE\_OUTPUT\_TENSOR\_WAS\_NULL}};}
+\DoxyCodeLine{00116\ \ \ \ \ \}}
+\DoxyCodeLine{00117\ }
+\DoxyCodeLine{00118\ \ \ \ \ \textcolor{keyword}{auto}\ input\_res\ =\ \mbox{\hyperlink{tflite__helper_8h_a055a4032becfb6fe674cae7cd44a30e4}{fill\_input\_tensor\_from\_signal}}(\mbox{\hyperlink{classei_1_1signal}{signal}},\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src5afb18c45f6346167aa977a363205143_a9cebfb3d6ddd692fbdd268cf4b9ad024}{input}});}
+\DoxyCodeLine{00119\ \ \ \ \ \textcolor{keywordflow}{if}\ (input\_res\ !=\ \mbox{\hyperlink{ei__fill__result__struct_8h_a2fb43be102b153d659b668ad295aff40}{EI\_IMPULSE\_OK}})\ \{}
+\DoxyCodeLine{00120\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ input\_res;}
+\DoxyCodeLine{00121\ \ \ \ \ \}}
+\DoxyCodeLine{00122\ }
+\DoxyCodeLine{00123\ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{_simple_web_server_8ino_a6e27f49150e9a14580fb313cc2777e00}{status}}\ =\ \mbox{\hyperlink{_inference_allocate_tensor_8cpp_a0d8f3bb5211083760f7c593d57adb17d}{interpreter}}-\/>\mbox{\hyperlink{classtflite_1_1_micro_interpreter_a2d76c06ba8d41944e185c3d330e3d554}{Invoke}}();}
+\DoxyCodeLine{00124\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{_simple_web_server_8ino_a6e27f49150e9a14580fb313cc2777e00}{status}}\ !=\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361ab25fe210808197f1b6601df8ccdcd699}{kTfLiteOk}})\ \{}
+\DoxyCodeLine{00125\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}ERR:\ interpreter-\/>Invoke()\ failed\ with\ \%d\(\backslash\)n"{}},\ \mbox{\hyperlink{_simple_web_server_8ino_a6e27f49150e9a14580fb313cc2777e00}{status}});}
+\DoxyCodeLine{00126\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{group__ei__returntypes_ggad9580b47a6cd5e74cfc31a03bdfecebeadcc41afc4542dc94f9dcf36d88c1ea31}{EI\_IMPULSE\_TFLITE\_ERROR}};}
+\DoxyCodeLine{00127\ \ \ \ \ \}}
+\DoxyCodeLine{00128\ }
+\DoxyCodeLine{00129\ \ \ \ \ \textcolor{keyword}{auto}\ output\_res\ =\ \mbox{\hyperlink{tflite__helper_8h_a9e3b34d1ab6e54f17b2064eb046b0f1c}{fill\_output\_matrix\_from\_tensor}}(\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbcd3bbe90c4644d53fde1ce4e312f437_a7a2a916a8059078c2d7a05f46c7126fd}{output}},\ \mbox{\hyperlink{tflite__full_8h_aac4d93b158d42bda5829a01a9c507312}{output\_matrix}});}
+\DoxyCodeLine{00130\ \ \ \ \ \textcolor{keywordflow}{if}\ (output\_res\ !=\ \mbox{\hyperlink{ei__fill__result__struct_8h_a2fb43be102b153d659b668ad295aff40}{EI\_IMPULSE\_OK}})\ \{}
+\DoxyCodeLine{00131\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ output\_res;}
+\DoxyCodeLine{00132\ \ \ \ \ \}}
+\DoxyCodeLine{00133\ }
+\DoxyCodeLine{00134\ \ \ \ \ \textcolor{comment}{//\ on\ Linux\ we're\ not\ worried\ about\ free'ing\ (for\ now)}}
+\DoxyCodeLine{00135\ }
+\DoxyCodeLine{00136\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{ei__fill__result__struct_8h_a2fb43be102b153d659b668ad295aff40}{EI\_IMPULSE\_OK}};}
+\DoxyCodeLine{00137\ \}}
+\DoxyCodeLine{00138\ }
+\DoxyCodeLine{00139\ \mbox{\hyperlink{group__ei__returntypes_gad9580b47a6cd5e74cfc31a03bdfecebe}{EI\_IMPULSE\_ERROR}}\ \mbox{\hyperlink{tflite__full_8h_a945f35e39a49bfe4e1194edaf89571cd}{run\_nn\_inference}}(}
+\DoxyCodeLine{00140\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structei__impulse}{ei\_impulse\_t}}\ *impulse,}
+\DoxyCodeLine{00141\ \ \ \ \ \mbox{\hyperlink{structei__feature__t}{ei\_feature\_t}}\ *fmatrix,}
+\DoxyCodeLine{00142\ \ \ \ \ uint32\_t\ learn\_block\_index,}
+\DoxyCodeLine{00143\ \ \ \ \ uint32\_t*\ input\_block\_ids,}
+\DoxyCodeLine{00144\ \ \ \ \ uint32\_t\ input\_block\_ids\_size,}
+\DoxyCodeLine{00145\ \ \ \ \ \mbox{\hyperlink{structei__impulse__result__t}{ei\_impulse\_result\_t}}\ *\mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}},}
+\DoxyCodeLine{00146\ \ \ \ \ \textcolor{keywordtype}{void}\ *\mbox{\hyperlink{tflite__full_8h_a3658b236936f6ec57ce82f0fd8cbdabb}{config\_ptr}},}
+\DoxyCodeLine{00147\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{ei__fill__result__struct_8h_a881f62341b5a41a3c5707268bd537be1}{debug}}\ =\ \textcolor{keyword}{false})}
+\DoxyCodeLine{00148\ \{}
+\DoxyCodeLine{00149\ \ \ \ \ \mbox{\hyperlink{structei__learning__block__config__tflite__graph__t}{ei\_learning\_block\_config\_tflite\_graph\_t}}\ *\mbox{\hyperlink{ei__fill__result__struct_8h_aafcd7d36638d6a564b6edbceef06ea8b}{block\_config}}\ =\ (\mbox{\hyperlink{structei__learning__block__config__tflite__graph__t}{ei\_learning\_block\_config\_tflite\_graph\_t}}*)\mbox{\hyperlink{tflite__full_8h_a3658b236936f6ec57ce82f0fd8cbdabb}{config\_ptr}};}
+\DoxyCodeLine{00150\ }
+\DoxyCodeLine{00151\ \ \ \ \ tflite::Interpreter\ *\mbox{\hyperlink{_inference_allocate_tensor_8cpp_a0d8f3bb5211083760f7c593d57adb17d}{interpreter}};}
+\DoxyCodeLine{00152\ \ \ \ \ \textcolor{keyword}{auto}\ interpreter\_ret\ =\ \mbox{\hyperlink{tflite__full_8h_ade70c8b8e08562c755284449a4aaae57}{get\_interpreter}}(\mbox{\hyperlink{ei__fill__result__struct_8h_aafcd7d36638d6a564b6edbceef06ea8b}{block\_config}},\ \&\mbox{\hyperlink{_inference_allocate_tensor_8cpp_a0d8f3bb5211083760f7c593d57adb17d}{interpreter}});}
+\DoxyCodeLine{00153\ \ \ \ \ \textcolor{keywordflow}{if}\ (interpreter\_ret\ !=\ \mbox{\hyperlink{ei__fill__result__struct_8h_a2fb43be102b153d659b668ad295aff40}{EI\_IMPULSE\_OK}})\ \{}
+\DoxyCodeLine{00154\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ interpreter\_ret;}
+\DoxyCodeLine{00155\ \ \ \ \ \}}
+\DoxyCodeLine{00156\ }
+\DoxyCodeLine{00157\ \ \ \ \ \mbox{\hyperlink{struct_tf_lite_tensor}{TfLiteTensor}}\ *\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src5afb18c45f6346167aa977a363205143_a9cebfb3d6ddd692fbdd268cf4b9ad024}{input}}\ =\ \mbox{\hyperlink{_inference_allocate_tensor_8cpp_a0d8f3bb5211083760f7c593d57adb17d}{interpreter}}-\/>\mbox{\hyperlink{classtflite_1_1_micro_interpreter_ac9046fdf3b601b6cbbcdcd4e28ad165d}{input\_tensor}}(0);}
+\DoxyCodeLine{00158\ \ \ \ \ \mbox{\hyperlink{struct_tf_lite_tensor}{TfLiteTensor}}\ *\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbcd3bbe90c4644d53fde1ce4e312f437_a7a2a916a8059078c2d7a05f46c7126fd}{output}}\ =\ \mbox{\hyperlink{_inference_allocate_tensor_8cpp_a0d8f3bb5211083760f7c593d57adb17d}{interpreter}}-\/>\mbox{\hyperlink{classtflite_1_1_micro_interpreter_a03736f71506229819aa4d7a79947add3}{output\_tensor}}(\mbox{\hyperlink{ei__fill__result__struct_8h_aafcd7d36638d6a564b6edbceef06ea8b}{block\_config}}-\/>\mbox{\hyperlink{structei__learning__block__config__tflite__graph__t_ad214dcb2fddb383a745fbfd496c04c65}{output\_data\_tensor}});}
+\DoxyCodeLine{00159\ }
+\DoxyCodeLine{00160\ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src5afb18c45f6346167aa977a363205143_a9cebfb3d6ddd692fbdd268cf4b9ad024}{input}})\ \{}
+\DoxyCodeLine{00161\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{group__ei__returntypes_ggad9580b47a6cd5e74cfc31a03bdfecebeaffedb491b7409e8e885e1ab4abebaeeb}{EI\_IMPULSE\_INPUT\_TENSOR\_WAS\_NULL}};}
+\DoxyCodeLine{00162\ \ \ \ \ \}}
+\DoxyCodeLine{00163\ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbcd3bbe90c4644d53fde1ce4e312f437_a7a2a916a8059078c2d7a05f46c7126fd}{output}})\ \{}
+\DoxyCodeLine{00164\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{group__ei__returntypes_ggad9580b47a6cd5e74cfc31a03bdfecebea044ed37f0ac423223909460bad7850b4}{EI\_IMPULSE\_OUTPUT\_TENSOR\_WAS\_NULL}};}
+\DoxyCodeLine{00165\ \ \ \ \ \}}
+\DoxyCodeLine{00166\ }
+\DoxyCodeLine{00167\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ mtx\_size\ =\ impulse-\/>\mbox{\hyperlink{structei__impulse_aab279e170490f9b5c0c59eff0b6fa484}{dsp\_blocks\_size}}\ +\ impulse-\/>\mbox{\hyperlink{structei__impulse_a686152786fe6f16b174bfecfe01308a9}{learning\_blocks\_size}};}
+\DoxyCodeLine{00168\ \ \ \ \ \textcolor{keyword}{auto}\ input\_res\ =\ \mbox{\hyperlink{tflite__helper_8h_a949571d837470bdf35b395e42078beea}{fill\_input\_tensor\_from\_matrix}}(fmatrix,\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src5afb18c45f6346167aa977a363205143_a9cebfb3d6ddd692fbdd268cf4b9ad024}{input}},\ input\_block\_ids,\ input\_block\_ids\_size,\ mtx\_size);}
+\DoxyCodeLine{00169\ \ \ \ \ \textcolor{keywordflow}{if}\ (input\_res\ !=\ \mbox{\hyperlink{ei__fill__result__struct_8h_a2fb43be102b153d659b668ad295aff40}{EI\_IMPULSE\_OK}})\ \{}
+\DoxyCodeLine{00170\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ input\_res;}
+\DoxyCodeLine{00171\ \ \ \ \ \}}
+\DoxyCodeLine{00172\ }
+\DoxyCodeLine{00173\ \ \ \ \ uint64\_t\ ctx\_start\_us\ =\ \mbox{\hyperlink{group__ei__user__functions_gac9aae7befaa896e21417df1f00518416}{ei\_read\_timer\_us}}();}
+\DoxyCodeLine{00174\ }
+\DoxyCodeLine{00175\ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{_simple_web_server_8ino_a6e27f49150e9a14580fb313cc2777e00}{status}}\ =\ \mbox{\hyperlink{_inference_allocate_tensor_8cpp_a0d8f3bb5211083760f7c593d57adb17d}{interpreter}}-\/>\mbox{\hyperlink{classtflite_1_1_micro_interpreter_a2d76c06ba8d41944e185c3d330e3d554}{Invoke}}();}
+\DoxyCodeLine{00176\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{_simple_web_server_8ino_a6e27f49150e9a14580fb313cc2777e00}{status}}\ !=\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361ab25fe210808197f1b6601df8ccdcd699}{kTfLiteOk}})\ \{}
+\DoxyCodeLine{00177\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}ERR:\ interpreter-\/>Invoke()\ failed\ with\ \%d\(\backslash\)n"{}},\ \mbox{\hyperlink{_simple_web_server_8ino_a6e27f49150e9a14580fb313cc2777e00}{status}});}
+\DoxyCodeLine{00178\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{group__ei__returntypes_ggad9580b47a6cd5e74cfc31a03bdfecebeadcc41afc4542dc94f9dcf36d88c1ea31}{EI\_IMPULSE\_TFLITE\_ERROR}};}
+\DoxyCodeLine{00179\ \ \ \ \ \}}
+\DoxyCodeLine{00180\ }
+\DoxyCodeLine{00181\ \ \ \ \ uint64\_t\ ctx\_end\_us\ =\ \mbox{\hyperlink{group__ei__user__functions_gac9aae7befaa896e21417df1f00518416}{ei\_read\_timer\_us}}();}
+\DoxyCodeLine{00182\ }
+\DoxyCodeLine{00183\ \ \ \ \ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}}-\/>timing.classification\_us\ =\ ctx\_end\_us\ -\/\ ctx\_start\_us;}
+\DoxyCodeLine{00184\ \ \ \ \ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}}-\/>timing.classification\ =\ (int)(\mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}}-\/>timing.classification\_us\ /\ 1000);}
+\DoxyCodeLine{00185\ }
+\DoxyCodeLine{00186\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}}-\/>copy\_output)\ \{}
+\DoxyCodeLine{00187\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ output\_res\ =\ \mbox{\hyperlink{tflite__helper_8h_a9e3b34d1ab6e54f17b2064eb046b0f1c}{fill\_output\_matrix\_from\_tensor}}(\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbcd3bbe90c4644d53fde1ce4e312f437_a7a2a916a8059078c2d7a05f46c7126fd}{output}},\ fmatrix[impulse-\/>\mbox{\hyperlink{structei__impulse_aab279e170490f9b5c0c59eff0b6fa484}{dsp\_blocks\_size}}\ +\ learn\_block\_index].\mbox{\hyperlink{structei__feature__t_a971fb9c93bddb4631925e579f5b88ebf}{matrix}});}
+\DoxyCodeLine{00188\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (output\_res\ !=\ \mbox{\hyperlink{ei__fill__result__struct_8h_a2fb43be102b153d659b668ad295aff40}{EI\_IMPULSE\_OK}})\ \{}
+\DoxyCodeLine{00189\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ output\_res;}
+\DoxyCodeLine{00190\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00191\ \ \ \ \ \}}
+\DoxyCodeLine{00192\ }
+\DoxyCodeLine{00193\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{ei__fill__result__struct_8h_a881f62341b5a41a3c5707268bd537be1}{debug}})\ \{}
+\DoxyCodeLine{00194\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}Predictions\ (time:\ \%d\ ms.):\(\backslash\)n"{}},\ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}}-\/>timing.classification);}
+\DoxyCodeLine{00195\ \ \ \ \ \}}
+\DoxyCodeLine{00196\ }
+\DoxyCodeLine{00197\ \ \ \ \ \mbox{\hyperlink{struct_tf_lite_tensor}{TfLiteTensor}}\ *scores\_tensor\ =\ \mbox{\hyperlink{_inference_allocate_tensor_8cpp_a0d8f3bb5211083760f7c593d57adb17d}{interpreter}}-\/>\mbox{\hyperlink{classtflite_1_1_micro_interpreter_a03736f71506229819aa4d7a79947add3}{output\_tensor}}(\mbox{\hyperlink{ei__fill__result__struct_8h_aafcd7d36638d6a564b6edbceef06ea8b}{block\_config}}-\/>\mbox{\hyperlink{structei__learning__block__config__tflite__graph__t_ae0b9aeb6ba3f5cff189066b442f74fe5}{output\_score\_tensor}});}
+\DoxyCodeLine{00198\ \ \ \ \ \mbox{\hyperlink{struct_tf_lite_tensor}{TfLiteTensor}}\ *labels\_tensor\ =\ \mbox{\hyperlink{_inference_allocate_tensor_8cpp_a0d8f3bb5211083760f7c593d57adb17d}{interpreter}}-\/>\mbox{\hyperlink{classtflite_1_1_micro_interpreter_a03736f71506229819aa4d7a79947add3}{output\_tensor}}(\mbox{\hyperlink{ei__fill__result__struct_8h_aafcd7d36638d6a564b6edbceef06ea8b}{block\_config}}-\/>\mbox{\hyperlink{structei__learning__block__config__tflite__graph__t_adfd75b3b9a09b5284b86bcfeeb942f09}{output\_labels\_tensor}});}
+\DoxyCodeLine{00199\ }
+\DoxyCodeLine{00200\ \ \ \ \ \mbox{\hyperlink{group__ei__returntypes_gad9580b47a6cd5e74cfc31a03bdfecebe}{EI\_IMPULSE\_ERROR}}\ fill\_res\ =\ \mbox{\hyperlink{tflite__helper_8h_ab829a4aca8a64ba97495a817f913e309}{fill\_result\_struct\_from\_output\_tensor\_tflite}}(}
+\DoxyCodeLine{00201\ \ \ \ \ \ \ \ \ impulse,\ \mbox{\hyperlink{ei__fill__result__struct_8h_aafcd7d36638d6a564b6edbceef06ea8b}{block\_config}},\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbcd3bbe90c4644d53fde1ce4e312f437_a7a2a916a8059078c2d7a05f46c7126fd}{output}},\ labels\_tensor,\ scores\_tensor,\ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}},\ \mbox{\hyperlink{ei__fill__result__struct_8h_a881f62341b5a41a3c5707268bd537be1}{debug}});}
+\DoxyCodeLine{00202\ }
+\DoxyCodeLine{00203\ \ \ \ \ \textcolor{keywordflow}{if}\ (fill\_res\ !=\ \mbox{\hyperlink{ei__fill__result__struct_8h_a2fb43be102b153d659b668ad295aff40}{EI\_IMPULSE\_OK}})\ \{}
+\DoxyCodeLine{00204\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ fill\_res;}
+\DoxyCodeLine{00205\ \ \ \ \ \}}
+\DoxyCodeLine{00206\ }
+\DoxyCodeLine{00207\ \ \ \ \ \textcolor{comment}{//\ on\ Linux\ we're\ not\ worried\ about\ free'ing\ (for\ now)}}
+\DoxyCodeLine{00208\ }
+\DoxyCodeLine{00209\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{ei__fill__result__struct_8h_a2fb43be102b153d659b668ad295aff40}{EI\_IMPULSE\_OK}};}
+\DoxyCodeLine{00210\ \}}
+\DoxyCodeLine{00211\ }
+\DoxyCodeLine{00212\ \mbox{\hyperlink{tflite__full_8h_aeeaf5d523ee6a290407328d5e17fa721}{\_\_attribute\_\_}}((unused))\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{engines_8h_a335f8f33ce6e68893a2f4f7915e54cd4}{extract\_tflite\_features}}(\mbox{\hyperlink{structei__signal__t}{signal\_t}}\ *\mbox{\hyperlink{classei_1_1signal}{signal}},\ \mbox{\hyperlink{structei__matrix}{matrix\_t}}\ *\mbox{\hyperlink{tflite__full_8h_aac4d93b158d42bda5829a01a9c507312}{output\_matrix}},\ \textcolor{keywordtype}{void}\ *\mbox{\hyperlink{tflite__full_8h_a3658b236936f6ec57ce82f0fd8cbdabb}{config\_ptr}},\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{float}\ \mbox{\hyperlink{tflite__full_8h_a25c6eab61238d97eb4aaef9fc6d1fa4e}{frequency}})\ \{}
+\DoxyCodeLine{00213\ }
+\DoxyCodeLine{00214\ \ \ \ \ \mbox{\hyperlink{structei__dsp__config__tflite__t}{ei\_dsp\_config\_tflite\_t}}\ *dsp\_config\ =\ (\mbox{\hyperlink{structei__dsp__config__tflite__t}{ei\_dsp\_config\_tflite\_t}}*)\mbox{\hyperlink{tflite__full_8h_a3658b236936f6ec57ce82f0fd8cbdabb}{config\_ptr}};}
+\DoxyCodeLine{00215\ }
+\DoxyCodeLine{00216\ \ \ \ \ \mbox{\hyperlink{structei__config__tflite__graph__t}{ei\_config\_tflite\_graph\_t}}\ \mbox{\hyperlink{tflite__full_8h_a3898ea656a9ba90bf49f93ba3906d1ee}{ei\_config\_tflite\_graph\_0}}\ =\ \{}
+\DoxyCodeLine{00217\ \ \ \ \ \ \ \ \ .implementation\_version\ =\ 1,}
+\DoxyCodeLine{00218\ \ \ \ \ \ \ \ \ .model\ =\ dsp\_config-\/>\mbox{\hyperlink{structei__dsp__config__tflite__t_a123eb13b7717010c84bc6e29a45b573b}{model}},}
+\DoxyCodeLine{00219\ \ \ \ \ \ \ \ \ .model\_size\ =\ dsp\_config-\/>\mbox{\hyperlink{structei__dsp__config__tflite__t_a0990565bb857f0ddf54125a7c27bcf12}{model\_size}},}
+\DoxyCodeLine{00220\ \ \ \ \ \ \ \ \ .arena\_size\ =\ dsp\_config-\/>\mbox{\hyperlink{structei__dsp__config__tflite__t_a1a887092369ac7fba59caaf55788a814}{arena\_size}}}
+\DoxyCodeLine{00221\ \ \ \ \ \};}
+\DoxyCodeLine{00222\ }
+\DoxyCodeLine{00223\ \ \ \ \ \mbox{\hyperlink{structei__learning__block__config__tflite__graph__t}{ei\_learning\_block\_config\_tflite\_graph\_t}}\ \mbox{\hyperlink{tflite__full_8h_ab7daefa6e7828a2d77c57f1b54404881}{ei\_learning\_block\_config}}\ =\ \{}
+\DoxyCodeLine{00224\ \ \ \ \ \ \ \ \ .implementation\_version\ =\ 1,}
+\DoxyCodeLine{00225\ \ \ \ \ \ \ \ \ .classification\_mode\ =\ \mbox{\hyperlink{ei__model__types_8h_a76c13cf6c356590ec9aa183c25b90a5e}{EI\_CLASSIFIER\_CLASSIFICATION\_MODE\_DSP}},}
+\DoxyCodeLine{00226\ \ \ \ \ \ \ \ \ .block\_id\ =\ dsp\_config-\/>\mbox{\hyperlink{structei__dsp__config__tflite__t_a301036544ec7e6b7a09ee37be2ac720d}{block\_id}},}
+\DoxyCodeLine{00227\ \ \ \ \ \ \ \ \ .object\_detection\ =\ \textcolor{keyword}{false},}
+\DoxyCodeLine{00228\ \ \ \ \ \ \ \ \ .object\_detection\_last\_layer\ =\ \mbox{\hyperlink{ei__model__types_8h_a67edebb42ed0ac73b3a4337ae07a281e}{EI\_CLASSIFIER\_LAST\_LAYER\_UNKNOWN}},}
+\DoxyCodeLine{00229\ \ \ \ \ \ \ \ \ .output\_data\_tensor\ =\ 0,}
+\DoxyCodeLine{00230\ \ \ \ \ \ \ \ \ .output\_labels\_tensor\ =\ 255,}
+\DoxyCodeLine{00231\ \ \ \ \ \ \ \ \ .output\_score\_tensor\ =\ 255,}
+\DoxyCodeLine{00232\ \ \ \ \ \ \ \ \ .threshold\ =\ 0,}
+\DoxyCodeLine{00233\ \ \ \ \ \ \ \ \ .quantized\ =\ 0,}
+\DoxyCodeLine{00234\ \ \ \ \ \ \ \ \ .compiled\ =\ 0,}
+\DoxyCodeLine{00235\ \ \ \ \ \ \ \ \ .graph\_config\ =\ \&\mbox{\hyperlink{tflite__full_8h_a3898ea656a9ba90bf49f93ba3906d1ee}{ei\_config\_tflite\_graph\_0}}}
+\DoxyCodeLine{00236\ \ \ \ \ \};}
+\DoxyCodeLine{00237\ }
+\DoxyCodeLine{00238\ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{tflite__full_8h_ab73668665ed1903aab8905ff035a33c5}{x}}\ =\ \mbox{\hyperlink{tflite__full_8h_a85d5688f1dbc536dde02c237f84b5aa0}{run\_nn\_inference\_from\_dsp}}(\&\mbox{\hyperlink{tflite__full_8h_ab7daefa6e7828a2d77c57f1b54404881}{ei\_learning\_block\_config}},\ \mbox{\hyperlink{classei_1_1signal}{signal}},\ \mbox{\hyperlink{tflite__full_8h_aac4d93b158d42bda5829a01a9c507312}{output\_matrix}});}
+\DoxyCodeLine{00239\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{tflite__full_8h_ab73668665ed1903aab8905ff035a33c5}{x}}\ !=\ 0)\ \{}
+\DoxyCodeLine{00240\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{tflite__full_8h_ab73668665ed1903aab8905ff035a33c5}{x}};}
+\DoxyCodeLine{00241\ \ \ \ \ \}}
+\DoxyCodeLine{00242\ }
+\DoxyCodeLine{00243\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{tflite__full_8h_a54eac5b77b39bd93efe5b92bbf779cd8}{EIDSP\_OK}};}
+\DoxyCodeLine{00244\ \}}
+\DoxyCodeLine{00245\ }
+\DoxyCodeLine{00246\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ (EI\_CLASSIFIER\_INFERENCING\_ENGINE\ ==\ EI\_CLASSIFIER\_TFLITE\_FULL)}}
+\DoxyCodeLine{00247\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ \_EI\_CLASSIFIER\_INFERENCING\_ENGINE\_TFLITE\_FULL\_H\_}}
+
+\end{DoxyCode}

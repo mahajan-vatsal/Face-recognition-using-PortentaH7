@@ -1,0 +1,331 @@
+\doxysection{micro\+\_\+allocator.\+h}
+\hypertarget{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2micro_2micro__allocator_8h_source}{}\label{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2micro_2micro__allocator_8h_source}\index{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/arduino-\/examples-\/main/src/tensorflow/lite/micro/micro\_allocator.h@{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/arduino-\/examples-\/main/src/tensorflow/lite/micro/micro\_allocator.h}}
+\mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2micro_2micro__allocator_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{/*\ Copyright\ 2023\ The\ TensorFlow\ Authors.\ All\ Rights\ Reserved.}}
+\DoxyCodeLine{00002\ \textcolor{comment}{}}
+\DoxyCodeLine{00003\ \textcolor{comment}{Licensed\ under\ the\ Apache\ License,\ Version\ 2.0\ (the\ "{}License"{});}}
+\DoxyCodeLine{00004\ \textcolor{comment}{you\ may\ not\ use\ this\ file\ except\ in\ compliance\ with\ the\ License.}}
+\DoxyCodeLine{00005\ \textcolor{comment}{You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{00006\ \textcolor{comment}{}}
+\DoxyCodeLine{00007\ \textcolor{comment}{\ \ \ \ http://www.apache.org/licenses/LICENSE-\/2.0}}
+\DoxyCodeLine{00008\ \textcolor{comment}{}}
+\DoxyCodeLine{00009\ \textcolor{comment}{Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ software}}
+\DoxyCodeLine{00010\ \textcolor{comment}{distributed\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,}}
+\DoxyCodeLine{00011\ \textcolor{comment}{WITHOUT\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,\ either\ express\ or\ implied.}}
+\DoxyCodeLine{00012\ \textcolor{comment}{See\ the\ License\ for\ the\ specific\ language\ governing\ permissions\ and}}
+\DoxyCodeLine{00013\ \textcolor{comment}{limitations\ under\ the\ License.}}
+\DoxyCodeLine{00014\ \textcolor{comment}{==============================================================================*/}}
+\DoxyCodeLine{00015\ \textcolor{preprocessor}{\#ifndef\ TENSORFLOW\_LITE\_MICRO\_MICRO\_ALLOCATOR\_H\_}}
+\DoxyCodeLine{00016\ \textcolor{preprocessor}{\#define\ TENSORFLOW\_LITE\_MICRO\_MICRO\_ALLOCATOR\_H\_}}
+\DoxyCodeLine{00017\ }
+\DoxyCodeLine{00018\ \textcolor{preprocessor}{\#include\ <cstddef>}}
+\DoxyCodeLine{00019\ \textcolor{preprocessor}{\#include\ <cstdint>}}
+\DoxyCodeLine{00020\ }
+\DoxyCodeLine{00021\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/c/common.h"{}}}
+\DoxyCodeLine{00022\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/micro/arena\_allocator/single\_arena\_buffer\_allocator.h"{}}}
+\DoxyCodeLine{00023\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/micro/compatibility.h"{}}}
+\DoxyCodeLine{00024\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/micro/flatbuffer\_utils.h"{}}}
+\DoxyCodeLine{00025\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/micro/memory\_planner/micro\_memory\_planner.h"{}}}
+\DoxyCodeLine{00026\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/micro/tflite\_bridge/flatbuffer\_conversions\_bridge.h"{}}}
+\DoxyCodeLine{00027\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/schema/schema\_generated.h"{}}}
+\DoxyCodeLine{00028\ }
+\DoxyCodeLine{00029\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacetflite}{tflite}}\ \{}
+\DoxyCodeLine{00030\ }
+\DoxyCodeLine{00031\ \textcolor{comment}{//\ TODO(b/199402574):\ rename\ to\ tflite\_internal\ or\ just\ remove\ internal}}
+\DoxyCodeLine{00032\ \textcolor{comment}{//\ namespace.}}
+\DoxyCodeLine{00033\ \textcolor{keyword}{namespace\ }internal\ \{}
+\DoxyCodeLine{00034\ }
+\DoxyCodeLine{00035\ \textcolor{comment}{//\ Sets\ up\ all\ of\ the\ data\ structure\ members\ for\ a\ TfLiteTensor\ based\ on\ the}}
+\DoxyCodeLine{00036\ \textcolor{comment}{//\ contents\ of\ a\ serialized\ tensor\ in\ the\ flatbuffer.}}
+\DoxyCodeLine{00037\ \textcolor{comment}{//\ TODO(b/162311891):\ Drop\ this\ method\ when\ the\ interpreter\ has\ an\ API\ for}}
+\DoxyCodeLine{00038\ \textcolor{comment}{//\ returning\ buffers\ on\ TfLiteEvalTensor.}}
+\DoxyCodeLine{00039\ \mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2core_2c_2c__api__types_8h_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_1_1internal_abb4052f3f3605a78a6d109c228475f90}{InitializeTfLiteTensorFromFlatbuffer}}(}
+\DoxyCodeLine{00040\ \ \ \ \ IPersistentBufferAllocator*\ persistent\_buffer\_allocator,}
+\DoxyCodeLine{00041\ \ \ \ \ INonPersistentBufferAllocator*\ non\_persistent\_buffer\_allocator,}
+\DoxyCodeLine{00042\ \ \ \ \ \textcolor{keywordtype}{bool}\ allocate\_temp,\ \textcolor{keyword}{const}\ tflite::Tensor\&\ flatbuffer\_tensor,}
+\DoxyCodeLine{00043\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classflatbuffers_1_1_vector}{flatbuffers::Vector}}<flatbuffers::Offset<Buffer>>*\ buffers,}
+\DoxyCodeLine{00044\ \ \ \ \ \mbox{\hyperlink{struct_tf_lite_tensor}{TfLiteTensor}}*\ result);}
+\DoxyCodeLine{00045\ }
+\DoxyCodeLine{00046\ \textcolor{comment}{//\ Holds\ placeholder\ information\ for\ a\ scratch\ buffer\ request\ from\ a\ kernel.}}
+\DoxyCodeLine{00047\ \textcolor{comment}{//\ This\ struct\ is\ only\ used\ during\ the\ model\ prepare\ stage.\ Each\ request\ from\ a}}
+\DoxyCodeLine{00048\ \textcolor{comment}{//\ kernel\ is\ stored\ in\ the\ head\ section.\ During\ the\ prepare\ stage,\ the\ head}}
+\DoxyCodeLine{00049\ \textcolor{comment}{//\ section\ will\ at\ least\ hold\ kMaxScratchBuffersPerOp\ number\ of\ requests\ plus}}
+\DoxyCodeLine{00050\ \textcolor{comment}{//\ any\ requests\ from\ previous\ kernel\ requests.}}
+\DoxyCodeLine{00051\ \textcolor{comment}{//}}
+\DoxyCodeLine{00052\ \textcolor{comment}{//\ When\ the\ memory\ plan\ is\ finalized,\ these\ structs\ are\ no\ longer\ used\ in\ favor}}
+\DoxyCodeLine{00053\ \textcolor{comment}{//\ of\ a\ sequential,\ array\ of\ ScratchBufferHandle\ allocations\ in\ the\ tail}}
+\DoxyCodeLine{00054\ \textcolor{comment}{//\ section.\ These\ allocations\ are\ indexed\ by\ the\ request\ API\ defined\ in\ the}}
+\DoxyCodeLine{00055\ \textcolor{comment}{//\ TfLiteContext\ struct.}}
+\DoxyCodeLine{00056\ \textcolor{keyword}{struct\ }ScratchBufferRequest\ \{}
+\DoxyCodeLine{00057\ \ \ \textcolor{comment}{//\ Number\ of\ bytes\ required\ by\ the\ buffer.\ The\ actual\ allocated\ size\ might\ be}}
+\DoxyCodeLine{00058\ \ \ \textcolor{comment}{//\ greater\ than\ \`{}bytes`\ due\ to\ buffer\ alignment.}}
+\DoxyCodeLine{00059\ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{structtflite_1_1internal_1_1_scratch_buffer_request_a6b3bb06d3d8a6951665de7c7d11cbabc}{bytes}};}
+\DoxyCodeLine{00060\ \ \ \textcolor{comment}{//\ Node\ where\ the\ buffer\ is\ allocated\ for.\ This\ provides\ useful\ information\ to}}
+\DoxyCodeLine{00061\ \ \ \textcolor{comment}{//\ determine\ the\ lifetime\ of\ the\ buffer.\ In\ AllocationInfo,\ this\ buffer\ will}}
+\DoxyCodeLine{00062\ \ \ \textcolor{comment}{//\ have\ \`{}before`\ =\ node\_idx\ and\ \`{}after`\ =\ node\_idx.}}
+\DoxyCodeLine{00063\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{structtflite_1_1internal_1_1_scratch_buffer_request_abff04364278f265e9968be3f372d00a7}{node\_idx}};}
+\DoxyCodeLine{00064\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{structtflite_1_1internal_1_1_scratch_buffer_request_a2d9182d71406802899c90d663dc681a0}{subgraph\_idx}};}
+\DoxyCodeLine{00065\ \};}
+\DoxyCodeLine{00066\ }
+\DoxyCodeLine{00067\ \}\ \ \textcolor{comment}{//\ namespace\ internal}}
+\DoxyCodeLine{00068\ }
+\DoxyCodeLine{00069\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structtflite_1_1_node_and_registration}{NodeAndRegistration}}\ \{}
+\DoxyCodeLine{00070\ \ \ \mbox{\hyperlink{struct_tf_lite_node}{TfLiteNode}}\ \mbox{\hyperlink{structtflite_1_1_node_and_registration_a04219fadd2bb40751a09a67a8ffc426a}{node}};}
+\DoxyCodeLine{00071\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_tf_lite_registration}{TfLiteRegistration}}*\ \mbox{\hyperlink{structtflite_1_1_node_and_registration_a49e29e7e93e2de8498074199add54d13}{registration}};}
+\DoxyCodeLine{00072\ \};}
+\DoxyCodeLine{00073\ }
+\DoxyCodeLine{00074\ \textcolor{comment}{//\ Holds\ a\ pointer\ to\ a\ buffer\ for\ a\ scratch\ buffer\ requested\ by\ a\ kernel\ during}}
+\DoxyCodeLine{00075\ \textcolor{comment}{//\ the\ model\ prepare\ stage.\ This\ struct\ is\ allocated\ in-\/place\ and\ allows\ for}}
+\DoxyCodeLine{00076\ \textcolor{comment}{//\ quick\ pointer-\/indexed\ lookup\ for\ speed\ during\ model\ inference.}}
+\DoxyCodeLine{00077\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structtflite_1_1_scratch_buffer_handle}{ScratchBufferHandle}}\ \{}
+\DoxyCodeLine{00078\ \ \ \textcolor{comment}{//\ Pointer\ to\ location\ of\ the\ scratch\ buffer:}}
+\DoxyCodeLine{00079\ \ \ uint8\_t*\ \mbox{\hyperlink{structtflite_1_1_scratch_buffer_handle_a55eeb5a8b0008454c3ad0a49b8dcd694}{data}};}
+\DoxyCodeLine{00080\ \};}
+\DoxyCodeLine{00081\ }
+\DoxyCodeLine{00082\ \textcolor{comment}{//\ Stores\ all\ per-\/subgraph\ allocations.\ This\ includes\ the\ node\ and\ registration}}
+\DoxyCodeLine{00083\ \textcolor{comment}{//\ array,\ and\ tensor\ list\ for\ each\ subgraph.}}
+\DoxyCodeLine{00084\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structtflite_1_1_subgraph_allocations}{SubgraphAllocations}}\ \{}
+\DoxyCodeLine{00085\ \ \ \mbox{\hyperlink{structtflite_1_1_node_and_registration}{NodeAndRegistration}}*\ \mbox{\hyperlink{structtflite_1_1_subgraph_allocations_aa04d95458c77cc66e175bc49cb242fbc}{node\_and\_registrations}};}
+\DoxyCodeLine{00086\ \ \ \mbox{\hyperlink{struct_tf_lite_eval_tensor}{TfLiteEvalTensor}}*\ \mbox{\hyperlink{structtflite_1_1_subgraph_allocations_a3464388baf2c05985e1d62ae1e3e0265}{tensors}};}
+\DoxyCodeLine{00087\ \};}
+\DoxyCodeLine{00088\ }
+\DoxyCodeLine{00089\ \textcolor{comment}{//\ Allocator\ responsible\ for\ allocating\ memory\ for\ all\ intermediate\ tensors}}
+\DoxyCodeLine{00090\ \textcolor{comment}{//\ necessary\ to\ invoke\ a\ model.}}
+\DoxyCodeLine{00091\ \textcolor{comment}{//}}
+\DoxyCodeLine{00092\ \textcolor{comment}{//\ The\ lifetime\ of\ the\ model,\ tensor\ arena\ and\ error\ reporter\ must\ be\ at}}
+\DoxyCodeLine{00093\ \textcolor{comment}{//\ least\ as\ long\ as\ that\ of\ the\ allocator\ object,\ since\ the\ allocator\ needs}}
+\DoxyCodeLine{00094\ \textcolor{comment}{//\ them\ to\ be\ accessible\ during\ its\ entire\ lifetime.}}
+\DoxyCodeLine{00095\ \textcolor{comment}{//}}
+\DoxyCodeLine{00096\ \textcolor{comment}{//\ The\ MicroAllocator\ simply\ plans\ out\ additional\ allocations\ that\ are\ required}}
+\DoxyCodeLine{00097\ \textcolor{comment}{//\ to\ standup\ a\ model\ for\ inference\ in\ TF\ Micro.\ This\ class\ currently\ relies\ on}}
+\DoxyCodeLine{00098\ \textcolor{comment}{//\ an\ additional\ allocator\ -\/\ SingleArenaBufferAllocator\ -\/\ for\ all\ allocations}}
+\DoxyCodeLine{00099\ \textcolor{comment}{//\ from\ an\ arena.\ These\ allocations\ are\ divided\ into\ head\ (non-\/persistent)\ and}}
+\DoxyCodeLine{00100\ \textcolor{comment}{//\ tail\ (persistent)\ regions:}}
+\DoxyCodeLine{00101\ \textcolor{comment}{//}}
+\DoxyCodeLine{00102\ \textcolor{comment}{//\ Memory\ layout\ to\ help\ understand\ how\ it\ works}}
+\DoxyCodeLine{00103\ \textcolor{comment}{//\ This\ information\ could\ change\ in\ the\ future\ version.}}
+\DoxyCodeLine{00104\ \textcolor{comment}{//\ **************\ .memory\_allocator-\/>GetBuffer()}}
+\DoxyCodeLine{00105\ \textcolor{comment}{//\ Tensors/Scratch\ buffers\ (head)}}
+\DoxyCodeLine{00106\ \textcolor{comment}{//\ **************\ .head\_watermark}}
+\DoxyCodeLine{00107\ \textcolor{comment}{//\ unused\ memory}}
+\DoxyCodeLine{00108\ \textcolor{comment}{//\ **************\ .memory\_allocator-\/>GetBuffer()\ +\ -\/>GetMaxBufferSize()}}
+\DoxyCodeLine{00109\ \textcolor{comment}{//\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/\ -\/>GetDataSize()}}
+\DoxyCodeLine{00110\ \textcolor{comment}{//\ persistent\ area\ (tail)}}
+\DoxyCodeLine{00111\ \textcolor{comment}{//\ **************\ .memory\_allocator-\/>GetBuffer()\ +\ -\/>GetMaxBufferSize()}}
+\DoxyCodeLine{00112\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classtflite_1_1_micro_allocator}{MicroAllocator}}\ \{}
+\DoxyCodeLine{00113\ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00114\ \ \ \textcolor{comment}{//\ Creates\ a\ MicroAllocator\ instance\ from\ a\ given\ tensor\ arena.\ This\ arena}}
+\DoxyCodeLine{00115\ \ \ \textcolor{comment}{//\ will\ be\ managed\ by\ the\ created\ instance.\ The\ GreedyMemoryPlanner\ will}}
+\DoxyCodeLine{00116\ \ \ \textcolor{comment}{//\ by\ default\ be\ used\ and\ created\ on\ the\ arena.}}
+\DoxyCodeLine{00117\ \ \ \textcolor{comment}{//\ Note:\ Please\ use\ alignas(16)\ to\ make\ sure\ tensor\_arena\ is\ 16}}
+\DoxyCodeLine{00118\ \ \ \textcolor{comment}{//\ bytes\ aligned,\ otherwise\ some\ head\ room\ will\ be\ wasted.}}
+\DoxyCodeLine{00119\ \ \ \textcolor{comment}{//\ TODO(b/157615197):\ Cleanup\ constructor\ +\ factory\ usage.}}
+\DoxyCodeLine{00120\ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{classtflite_1_1_micro_allocator}{MicroAllocator}}*\ \mbox{\hyperlink{classtflite_1_1_micro_allocator_a48bf21c87345607dcfd2b76c481b6eb5}{Create}}(uint8\_t*\ \mbox{\hyperlink{namespacetflite_ad7380db20a16cb04f096c963d9ade791}{tensor\_arena}},\ \textcolor{keywordtype}{size\_t}\ arena\_size);}
+\DoxyCodeLine{00121\ }
+\DoxyCodeLine{00122\ \ \ \textcolor{comment}{//\ Creates\ a\ MicroAllocator\ instance\ from\ a\ given\ tensor\ arena\ and\ a\ given}}
+\DoxyCodeLine{00123\ \ \ \textcolor{comment}{//\ MemoryPlanner.\ This\ arena\ will\ be\ managed\ by\ the\ created\ instance.\ Note:}}
+\DoxyCodeLine{00124\ \ \ \textcolor{comment}{//\ Please\ use\ alignas(16)\ to\ make\ sure\ tensor\_arena\ is\ 16\ bytes}}
+\DoxyCodeLine{00125\ \ \ \textcolor{comment}{//\ aligned,\ otherwise\ some\ head\ room\ will\ be\ wasted.}}
+\DoxyCodeLine{00126\ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{classtflite_1_1_micro_allocator}{MicroAllocator}}*\ \mbox{\hyperlink{classtflite_1_1_micro_allocator_a48bf21c87345607dcfd2b76c481b6eb5}{Create}}(uint8\_t*\ \mbox{\hyperlink{namespacetflite_ad7380db20a16cb04f096c963d9ade791}{tensor\_arena}},\ \textcolor{keywordtype}{size\_t}\ arena\_size,}
+\DoxyCodeLine{00127\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classtflite_1_1_micro_memory_planner}{MicroMemoryPlanner}}*\ memory\_planner);}
+\DoxyCodeLine{00128\ }
+\DoxyCodeLine{00129\ \ \ \textcolor{comment}{//\ Creates\ a\ MicroAllocator\ instance\ using\ the\ provided}}
+\DoxyCodeLine{00130\ \ \ \textcolor{comment}{//\ SingleArenaBufferAllocator\ instance\ and\ the\ MemoryPlanner.\ This\ allocator}}
+\DoxyCodeLine{00131\ \ \ \textcolor{comment}{//\ instance\ will\ use\ the\ SingleArenaBufferAllocator\ instance\ to\ manage}}
+\DoxyCodeLine{00132\ \ \ \textcolor{comment}{//\ allocations\ internally.}}
+\DoxyCodeLine{00133\ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{classtflite_1_1_micro_allocator}{MicroAllocator}}*\ \mbox{\hyperlink{classtflite_1_1_micro_allocator_a48bf21c87345607dcfd2b76c481b6eb5}{Create}}(\mbox{\hyperlink{classtflite_1_1_single_arena_buffer_allocator}{SingleArenaBufferAllocator}}*\ memory\_allocator,}
+\DoxyCodeLine{00134\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classtflite_1_1_micro_memory_planner}{MicroMemoryPlanner}}*\ memory\_planner);}
+\DoxyCodeLine{00135\ }
+\DoxyCodeLine{00136\ \ \ \textcolor{comment}{//\ Creates\ a\ MicroAllocator\ instance\ using\ the\ provided}}
+\DoxyCodeLine{00137\ \ \ \textcolor{comment}{//\ SingleArenaBufferAllocator\ instance\ and\ the\ MemoryPlanner.\ This\ allocator}}
+\DoxyCodeLine{00138\ \ \ \textcolor{comment}{//\ instance\ will\ use\ the\ SingleArenaBufferAllocator\ instance\ to\ manage}}
+\DoxyCodeLine{00139\ \ \ \textcolor{comment}{//\ allocations\ internally.}}
+\DoxyCodeLine{00140\ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{classtflite_1_1_micro_allocator}{MicroAllocator}}*\ \mbox{\hyperlink{classtflite_1_1_micro_allocator_a48bf21c87345607dcfd2b76c481b6eb5}{Create}}(uint8\_t*\ persistent\_tensor\_arena,}
+\DoxyCodeLine{00141\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ persistent\_arena\_size,}
+\DoxyCodeLine{00142\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ uint8\_t*\ non\_persistent\_tensor\_arena,}
+\DoxyCodeLine{00143\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ non\_persistent\_arena\_size);}
+\DoxyCodeLine{00144\ }
+\DoxyCodeLine{00145\ \ \ \textcolor{comment}{//\ Returns\ the\ fixed\ amount\ of\ memory\ overhead\ of\ MicroAllocator.}}
+\DoxyCodeLine{00146\ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{classtflite_1_1_micro_allocator_a4f9d3a7fb4aaaaf91e6cc97b23a5ea50}{GetDefaultTailUsage}}(\textcolor{keywordtype}{bool}\ is\_memory\_planner\_given);}
+\DoxyCodeLine{00147\ }
+\DoxyCodeLine{00148\ \ \ \textcolor{comment}{//\ Allocates\ internal\ resources\ required\ for\ model\ inference\ for\ each\ subgraph}}
+\DoxyCodeLine{00149\ \ \ \textcolor{comment}{//\ from\ the\ arena.}}
+\DoxyCodeLine{00150\ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{00151\ \ \ \textcolor{comment}{//\ This\ method\ will\ run\ through\ the\ flatbuffer\ data\ supplied\ in\ the\ model\ to}}
+\DoxyCodeLine{00152\ \ \ \textcolor{comment}{//\ properly\ allocate\ tensor,\ node,\ and\ op\ registration\ data.\ This\ method\ is}}
+\DoxyCodeLine{00153\ \ \ \textcolor{comment}{//\ expected\ to\ be\ followed\ with\ a\ call\ to\ FinishModelAllocation()\ \ Returns\ a}}
+\DoxyCodeLine{00154\ \ \ \textcolor{comment}{//\ pointer\ to\ an\ array\ of\ SubgraphAllocations\ (also\ stored\ in\ the\ tail\ of\ the}}
+\DoxyCodeLine{00155\ \ \ \textcolor{comment}{//\ arena)\ where\ each\ index\ corresponds\ to\ a\ different\ subgraph\ in\ the\ model.}}
+\DoxyCodeLine{00156\ \ \ \textcolor{comment}{//\ Return\ value\ is\ nullptr\ if\ the\ allocations\ failed.}}
+\DoxyCodeLine{00157\ \ \ \mbox{\hyperlink{structtflite_1_1_subgraph_allocations}{SubgraphAllocations}}*\ \mbox{\hyperlink{classtflite_1_1_micro_allocator_a9377b0d649a7e61c4e5832af2fa2b51e}{StartModelAllocation}}(\textcolor{keyword}{const}\ Model*\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2model_8h_ae142afd8c2e2c711c1c62440deebe03c}{model}});}
+\DoxyCodeLine{00158\ }
+\DoxyCodeLine{00159\ \ \ \textcolor{comment}{//\ Finish\ allocating\ internal\ resources\ required\ for\ model\ inference.}}
+\DoxyCodeLine{00160\ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{00161\ \ \ \textcolor{comment}{//\ -\/Plan\ the\ memory\ for\ activation\ tensors\ and\ scratch\ buffers.}}
+\DoxyCodeLine{00162\ \ \ \textcolor{comment}{//\ -\/Update\ eval\ tensors\ for\ each\ subgraph\ based\ on\ planned\ offsets.}}
+\DoxyCodeLine{00163\ \ \ \textcolor{comment}{//\ -\/Allocate\ scratch\ buffer\ handles\ array\ and\ update\ based\ on\ planned\ offsets.}}
+\DoxyCodeLine{00164\ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{00165\ \ \ \textcolor{comment}{//\ This\ method\ should\ be\ called\ after\ assigning\ model\ resources}}
+\DoxyCodeLine{00166\ \ \ \textcolor{comment}{//\ in\ StartModelAllocation().\ The\ subgraph\_allocations\ pointer\ should\ be\ the}}
+\DoxyCodeLine{00167\ \ \ \textcolor{comment}{//\ value\ passed\ into\ this\ class\ during\ StartModelAllocation().\ Scratch\ buffer}}
+\DoxyCodeLine{00168\ \ \ \textcolor{comment}{//\ handles\ are\ stored\ in\ the\ out-\/param\ \`{}scratch\_buffer\_handles`\ array\ which\ is}}
+\DoxyCodeLine{00169\ \ \ \textcolor{comment}{//\ allocated\ in\ this\ method.\ This\ value\ will\ be\ used\ in\ \`{}GetScratchBuffer`}}
+\DoxyCodeLine{00170\ \ \ \textcolor{comment}{//\ call\ to\ retrieve\ scratch\ buffers.}}
+\DoxyCodeLine{00171\ \ \ \mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2core_2c_2c__api__types_8h_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_allocator_ac2f623bad24d35f85fa40642b797d90c}{FinishModelAllocation}}(}
+\DoxyCodeLine{00172\ \ \ \ \ \ \ \textcolor{keyword}{const}\ Model*\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2model_8h_ae142afd8c2e2c711c1c62440deebe03c}{model}},\ \mbox{\hyperlink{structtflite_1_1_subgraph_allocations}{SubgraphAllocations}}*\ subgraph\_allocations,}
+\DoxyCodeLine{00173\ \ \ \ \ \ \ \mbox{\hyperlink{structtflite_1_1_scratch_buffer_handle}{ScratchBufferHandle}}**\ scratch\_buffer\_handles);}
+\DoxyCodeLine{00174\ }
+\DoxyCodeLine{00175\ \ \ \textcolor{comment}{//\ Allocates\ a\ TfLiteTensor\ struct\ and\ populates\ the\ returned\ value\ with}}
+\DoxyCodeLine{00176\ \ \ \textcolor{comment}{//\ properties\ from\ the\ model\ flatbuffer.\ This\ struct\ is\ allocated\ from}}
+\DoxyCodeLine{00177\ \ \ \textcolor{comment}{//\ persistent\ arena\ memory\ is\ only\ guaranteed\ for\ the\ lifetime\ of\ the}}
+\DoxyCodeLine{00178\ \ \ \textcolor{comment}{//\ application.\ The\ eval\_tensors\ pointer\ should\ be\ the\ value\ passed\ into\ this}}
+\DoxyCodeLine{00179\ \ \ \textcolor{comment}{//\ class\ during\ StartModelAllocation()\ and\ contains\ the\ source-\/of-\/truth\ for}}
+\DoxyCodeLine{00180\ \ \ \textcolor{comment}{//\ buffers.}}
+\DoxyCodeLine{00181\ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{struct_tf_lite_tensor}{TfLiteTensor}}*\ \mbox{\hyperlink{classtflite_1_1_micro_allocator_aa7666fda6bc9f8aa58ef83426dc0cf51}{AllocatePersistentTfLiteTensor}}(}
+\DoxyCodeLine{00182\ \ \ \ \ \ \ \textcolor{keyword}{const}\ Model*\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2model_8h_ae142afd8c2e2c711c1c62440deebe03c}{model}},\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structtflite_1_1_subgraph_allocations}{SubgraphAllocations}}*\ subgraph\_allocations,}
+\DoxyCodeLine{00183\ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ tensor\_index,\ \textcolor{keywordtype}{int}\ subgraph\_index);}
+\DoxyCodeLine{00184\ }
+\DoxyCodeLine{00185\ \ \ \textcolor{comment}{//\ Allocates\ a\ TfLiteTensor\ struct\ and\ populates\ the\ returned\ value\ with}}
+\DoxyCodeLine{00186\ \ \ \textcolor{comment}{//\ properties\ from\ the\ model\ flatbuffer.\ This\ struct\ is\ allocated\ from}}
+\DoxyCodeLine{00187\ \ \ \textcolor{comment}{//\ temporary\ arena\ memory\ is\ only\ guaranteed\ until\ a\ call\ is\ made\ to}}
+\DoxyCodeLine{00188\ \ \ \textcolor{comment}{//\ ResetTempAllocations().\ Subgraph\_allocaitons\ contains\ the\ array\ of}}
+\DoxyCodeLine{00189\ \ \ \textcolor{comment}{//\ TfLiteEvalTensors.\ If\ the\ newly\ allocated\ temp\ at\ the\ specified\ subgraph}}
+\DoxyCodeLine{00190\ \ \ \textcolor{comment}{//\ and\ tensor\ index\ is\ already\ present\ int\ the\ TfLiteEvalTensor\ array,\ its}}
+\DoxyCodeLine{00191\ \ \ \textcolor{comment}{//\ data\ buffer\ will\ be\ re-\/used.}}
+\DoxyCodeLine{00192\ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{struct_tf_lite_tensor}{TfLiteTensor}}*\ \mbox{\hyperlink{classtflite_1_1_micro_allocator_ac2c43f870c991f19b1f11424a7eae67d}{AllocateTempTfLiteTensor}}(}
+\DoxyCodeLine{00193\ \ \ \ \ \ \ \textcolor{keyword}{const}\ Model*\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2model_8h_ae142afd8c2e2c711c1c62440deebe03c}{model}},\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structtflite_1_1_subgraph_allocations}{SubgraphAllocations}}*\ subgraph\_allocations,}
+\DoxyCodeLine{00194\ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ tensor\_index,\ \textcolor{keywordtype}{int}\ subgraph\_index);}
+\DoxyCodeLine{00195\ }
+\DoxyCodeLine{00196\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classtflite_1_1_micro_allocator_ad1a126c81c56a317b18ede8b91766ccd}{DeallocateTempTfLiteTensor}}(\mbox{\hyperlink{struct_tf_lite_tensor}{TfLiteTensor}}*);}
+\DoxyCodeLine{00197\ }
+\DoxyCodeLine{00198\ \ \ \textcolor{comment}{//\ Resets\ all\ temporary\ allocations.\ This\ method\ should\ be\ called\ after\ a}}
+\DoxyCodeLine{00199\ \ \ \textcolor{comment}{//\ chain\ of\ temp\ allocations\ (e.g.\ chain\ of\ TfLiteTensor\ objects\ via}}
+\DoxyCodeLine{00200\ \ \ \textcolor{comment}{//\ AllocateTfLiteTensor()).}}
+\DoxyCodeLine{00201\ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2core_2c_2c__api__types_8h_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_allocator_ac01b8cd04b67d45acaadd8c77c151832}{ResetTempAllocations}}();}
+\DoxyCodeLine{00202\ }
+\DoxyCodeLine{00203\ \ \ \textcolor{comment}{//\ Returns\ true\ if\ all\ temporary\ buffers\ including\ temp\ TfLiteTensor\ are}}
+\DoxyCodeLine{00204\ \ \ \textcolor{comment}{//\ already\ deallocated.}}
+\DoxyCodeLine{00205\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classtflite_1_1_micro_allocator_a6f008798e5f9ba9fce18bed874ea5bb6}{IsAllTempDeallocated}}();}
+\DoxyCodeLine{00206\ }
+\DoxyCodeLine{00207\ \ \ \textcolor{comment}{//\ Allocates\ persistent\ buffer\ which\ has\ the\ same\ life\ time\ as\ the\ allocator.}}
+\DoxyCodeLine{00208\ \ \ \textcolor{comment}{//\ The\ memory\ is\ immediately\ available\ and\ is\ allocated\ from\ the\ tail\ of\ the}}
+\DoxyCodeLine{00209\ \ \ \textcolor{comment}{//\ arena.}}
+\DoxyCodeLine{00210\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}*\ \mbox{\hyperlink{classtflite_1_1_micro_allocator_a2d4e78e2af91dad34ccd09fb0ce5bd75}{AllocatePersistentBuffer}}(\textcolor{keywordtype}{size\_t}\ bytes);}
+\DoxyCodeLine{00211\ }
+\DoxyCodeLine{00212\ \ \ \textcolor{comment}{//\ Register\ a\ scratch\ buffer\ of\ size\ \`{}bytes`\ for\ Node\ with\ \`{}node\_id`.}}
+\DoxyCodeLine{00213\ \ \ \textcolor{comment}{//\ This\ method\ only\ requests\ a\ buffer\ with\ a\ given\ size\ to\ be\ used\ after\ a}}
+\DoxyCodeLine{00214\ \ \ \textcolor{comment}{//\ model\ has\ finished\ allocation\ via\ FinishModelAllocation().\ All\ requested}}
+\DoxyCodeLine{00215\ \ \ \textcolor{comment}{//\ buffers\ will\ be\ accessible\ by\ the\ out-\/param\ in\ that\ method.}}
+\DoxyCodeLine{00216\ \ \ \mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2core_2c_2c__api__types_8h_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_allocator_a70c8d3d8f2480413dd987a7a55c85928}{RequestScratchBufferInArena}}(\textcolor{keywordtype}{size\_t}\ bytes,\ \textcolor{keywordtype}{int}\ subgraph\_idx,}
+\DoxyCodeLine{00217\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}*\ \mbox{\hyperlink{conv_8cpp_a82de2679c069b1bce97a7d4aeb83cf60}{buffer\_idx}});}
+\DoxyCodeLine{00218\ }
+\DoxyCodeLine{00219\ \ \ \textcolor{comment}{//\ Finish\ allocating\ a\ specific\ NodeAndRegistration\ prepare\ block\ (kernel}}
+\DoxyCodeLine{00220\ \ \ \textcolor{comment}{//\ entry\ for\ a\ model)\ with\ a\ given\ node\ ID.\ This\ call\ ensures\ that\ any\ scratch}}
+\DoxyCodeLine{00221\ \ \ \textcolor{comment}{//\ buffer\ requests\ and\ temporary\ allocations\ are\ handled\ and\ ready\ for\ the}}
+\DoxyCodeLine{00222\ \ \ \textcolor{comment}{//\ next\ node\ prepare\ block.}}
+\DoxyCodeLine{00223\ \ \ \mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2core_2c_2c__api__types_8h_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_allocator_a21077a1c40daf387a92fd96f45847adf}{FinishPrepareNodeAllocations}}(\textcolor{keywordtype}{int}\ node\_id);}
+\DoxyCodeLine{00224\ }
+\DoxyCodeLine{00225\ \ \ \textcolor{comment}{//\ Returns\ the\ arena\ usage\ in\ bytes,\ only\ available\ after}}
+\DoxyCodeLine{00226\ \ \ \textcolor{comment}{//\ \`{}FinishModelAllocation`.\ Otherwise,\ it\ will\ return\ 0.}}
+\DoxyCodeLine{00227\ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{classtflite_1_1_micro_allocator_ae902f60497b0dbc6b62f33d7e593b0af}{used\_bytes}}()\ \textcolor{keyword}{const};}
+\DoxyCodeLine{00228\ }
+\DoxyCodeLine{00229\ \ \ \mbox{\hyperlink{classtflite_1_1_builtin_data_allocator}{TfLiteBridgeBuiltinDataAllocator}}*\ \mbox{\hyperlink{classtflite_1_1_micro_allocator_a35fbb58e368cc8450b925ee325888e0d}{GetBuiltinDataAllocator}}();}
+\DoxyCodeLine{00230\ }
+\DoxyCodeLine{00231\ \ \textcolor{keyword}{protected}:}
+\DoxyCodeLine{00232\ \ \ \mbox{\hyperlink{classtflite_1_1_micro_allocator_a18615b3ce4daf12e3d715e09600366c3}{MicroAllocator}}(\mbox{\hyperlink{classtflite_1_1_single_arena_buffer_allocator}{SingleArenaBufferAllocator}}*\ memory\_allocator,}
+\DoxyCodeLine{00233\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classtflite_1_1_micro_memory_planner}{MicroMemoryPlanner}}*\ memory\_planner);}
+\DoxyCodeLine{00234\ \ \ \mbox{\hyperlink{classtflite_1_1_micro_allocator_a18615b3ce4daf12e3d715e09600366c3}{MicroAllocator}}(\mbox{\hyperlink{classtflite_1_1_i_persistent_buffer_allocator}{IPersistentBufferAllocator}}*\ persistent\_buffer\_allocator,}
+\DoxyCodeLine{00235\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classtflite_1_1_i_non_persistent_buffer_allocator}{INonPersistentBufferAllocator}}*\ non\_persistent\_buffer\_allocator,}
+\DoxyCodeLine{00236\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classtflite_1_1_micro_memory_planner}{MicroMemoryPlanner}}*\ memory\_planner);}
+\DoxyCodeLine{00237\ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{classtflite_1_1_micro_allocator_ac93737929ca6c8ed1fb9638c63bc45c9}{\string~MicroAllocator}}();}
+\DoxyCodeLine{00238\ }
+\DoxyCodeLine{00239\ \ \ \textcolor{comment}{//\ Allocates\ an\ array\ in\ the\ arena\ to\ hold\ pointers\ to\ the\ node\ and}}
+\DoxyCodeLine{00240\ \ \ \textcolor{comment}{//\ registration\ pointers\ required\ to\ represent\ the\ inference\ graph\ of\ the}}
+\DoxyCodeLine{00241\ \ \ \textcolor{comment}{//\ model.}}
+\DoxyCodeLine{00242\ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2core_2c_2c__api__types_8h_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_allocator_ad1907e6c3766db7614ed701ab6443781}{AllocateNodeAndRegistrations}}(}
+\DoxyCodeLine{00243\ \ \ \ \ \ \ \textcolor{keyword}{const}\ Model*\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2model_8h_ae142afd8c2e2c711c1c62440deebe03c}{model}},\ \mbox{\hyperlink{structtflite_1_1_subgraph_allocations}{SubgraphAllocations}}*\ subgraph\_allocations);}
+\DoxyCodeLine{00244\ }
+\DoxyCodeLine{00245\ \ \ \textcolor{comment}{//\ Allocates\ the\ list\ of\ persistent\ TfLiteEvalTensors\ that\ are\ used\ for\ the}}
+\DoxyCodeLine{00246\ \ \ \textcolor{comment}{//\ "{}eval"{}\ phase\ of\ model\ inference.\ These\ structs\ will\ be\ the\ source\ of\ truth}}
+\DoxyCodeLine{00247\ \ \ \textcolor{comment}{//\ for\ all\ tensor\ buffers.}}
+\DoxyCodeLine{00248\ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2core_2c_2c__api__types_8h_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_allocator_ad0c1da29c98679868f08b6eb73b2ac31}{AllocateTfLiteEvalTensors}}(}
+\DoxyCodeLine{00249\ \ \ \ \ \ \ \textcolor{keyword}{const}\ Model*\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2model_8h_ae142afd8c2e2c711c1c62440deebe03c}{model}},\ \mbox{\hyperlink{structtflite_1_1_subgraph_allocations}{SubgraphAllocations}}*\ subgraph\_allocations);}
+\DoxyCodeLine{00250\ }
+\DoxyCodeLine{00251\ \ \ \textcolor{comment}{//\ Allocates\ persistent\ tensor\ buffers\ for\ variable\ tensors\ in\ the\ subgraph.}}
+\DoxyCodeLine{00252\ \ \ \textcolor{comment}{//\ Online\ and\ offline\ variable\ tensors\ are\ handled\ differently\ hence\ the}}
+\DoxyCodeLine{00253\ \ \ \textcolor{comment}{//\ offline\_planner\_offsets\ parameter\ is\ needed.}}
+\DoxyCodeLine{00254\ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2core_2c_2c__api__types_8h_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_allocator_acdb1979353b45ebefb72b4027f88b044}{AllocateVariables}}(}
+\DoxyCodeLine{00255\ \ \ \ \ \ \ \textcolor{keyword}{const}\ SubGraph*\ subgraph,\ \mbox{\hyperlink{struct_tf_lite_eval_tensor}{TfLiteEvalTensor}}*\ eval\_tensors,}
+\DoxyCodeLine{00256\ \ \ \ \ \ \ \textcolor{keyword}{const}\ int32\_t*\ offline\_planner\_offsets);}
+\DoxyCodeLine{00257\ }
+\DoxyCodeLine{00258\ \ \ \textcolor{comment}{//\ Allocate\ and\ return\ a\ persistent\ TfLiteTensor.}}
+\DoxyCodeLine{00259\ \ \ \textcolor{comment}{//\ TODO(b/162311891):\ Drop\ this\ method\ when\ the\ interpreter\ has\ an\ API\ for}}
+\DoxyCodeLine{00260\ \ \ \textcolor{comment}{//\ accessing\ TfLiteEvalTensor\ structs.}}
+\DoxyCodeLine{00261\ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{struct_tf_lite_tensor}{TfLiteTensor}}*\ \mbox{\hyperlink{classtflite_1_1_micro_allocator_a63609aca62f84647bb3df31659947740}{AllocatePersistentTfLiteTensorInternal}}();}
+\DoxyCodeLine{00262\ }
+\DoxyCodeLine{00263\ \ \ \textcolor{comment}{//\ Populates\ a\ TfLiteTensor\ struct\ with\ data\ from\ the\ model\ flatbuffer.\ Any}}
+\DoxyCodeLine{00264\ \ \ \textcolor{comment}{//\ quantization\ data\ is\ allocated\ from\ either\ the\ tail\ (persistent)\ or\ temp}}
+\DoxyCodeLine{00265\ \ \ \textcolor{comment}{//\ sections\ of\ the\ arena\ based\ on\ the\ allocation\ flag.}}
+\DoxyCodeLine{00266\ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2core_2c_2c__api__types_8h_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_allocator_a350a257a1a6586ee7fc9c5d6630c4828}{PopulateTfLiteTensorFromFlatbuffer}}(\textcolor{keyword}{const}\ Model*\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2model_8h_ae142afd8c2e2c711c1c62440deebe03c}{model}},}
+\DoxyCodeLine{00267\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_tf_lite_tensor}{TfLiteTensor}}*\ \mbox{\hyperlink{namespacetensor}{tensor}},}
+\DoxyCodeLine{00268\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ tensor\_index,}
+\DoxyCodeLine{00269\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ subgraph\_idx,}
+\DoxyCodeLine{00270\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ allocate\_temp);}
+\DoxyCodeLine{00271\ }
+\DoxyCodeLine{00272\ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{00273\ \ \ \textcolor{comment}{//\ Commits\ a\ memory\ plan\ for\ all\ non-\/persistent\ buffer\ allocations\ in\ the}}
+\DoxyCodeLine{00274\ \ \ \textcolor{comment}{//\ 'head'\ section\ of\ the\ memory\ arena.\ The\ eval\_tensors\ pointer\ is\ the\ list\ of}}
+\DoxyCodeLine{00275\ \ \ \textcolor{comment}{//\ pre-\/allocated\ TfLiteEvalTensor\ structs\ that\ will\ point\ to\ the\ buffers\ that}}
+\DoxyCodeLine{00276\ \ \ \textcolor{comment}{//\ will\ be\ allocated\ into\ the\ head\ section\ in\ this\ function\ call.\ The}}
+\DoxyCodeLine{00277\ \ \ \textcolor{comment}{//\ scratch\_buffer\_handles\ pointer\ is\ the\ array\ of\ pre-\/allocated}}
+\DoxyCodeLine{00278\ \ \ \textcolor{comment}{//\ ScratchBufferHandle\ structs\ that\ will\ point\ to\ allocated\ buffers\ also\ in}}
+\DoxyCodeLine{00279\ \ \ \textcolor{comment}{//\ the\ head\ section.}}
+\DoxyCodeLine{00280\ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2core_2c_2c__api__types_8h_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_allocator_acf184694546c4c84df8228e426df9600}{CommitStaticMemoryPlan}}(}
+\DoxyCodeLine{00281\ \ \ \ \ \ \ \textcolor{keyword}{const}\ Model*\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2model_8h_ae142afd8c2e2c711c1c62440deebe03c}{model}},\ \mbox{\hyperlink{structtflite_1_1_subgraph_allocations}{SubgraphAllocations}}*\ allocations,}
+\DoxyCodeLine{00282\ \ \ \ \ \ \ \mbox{\hyperlink{structtflite_1_1_scratch_buffer_handle}{ScratchBufferHandle}}*\ scratch\_buffer\_handles);}
+\DoxyCodeLine{00283\ }
+\DoxyCodeLine{00284\ \ \ \textcolor{comment}{//\ Allocates\ an\ array\ of\ ScratchBufferHandle\ structs\ in\ the\ tail\ section\ for\ a}}
+\DoxyCodeLine{00285\ \ \ \textcolor{comment}{//\ given\ number\ of\ handles.}}
+\DoxyCodeLine{00286\ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2core_2c_2c__api__types_8h_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_allocator_a00cc5bee87d2a4f76f9d01b83f3f363e}{AllocateScratchBufferHandles}}(}
+\DoxyCodeLine{00287\ \ \ \ \ \ \ \mbox{\hyperlink{structtflite_1_1_scratch_buffer_handle}{ScratchBufferHandle}}**\ scratch\_buffer\_handles,\ \textcolor{keywordtype}{size\_t}\ handle\_count);}
+\DoxyCodeLine{00288\ }
+\DoxyCodeLine{00289\ \ \ \textcolor{comment}{//\ Clears\ all\ internal\ scratch\ buffer\ request\ counts\ and\ resets\ the\ head\ to}}
+\DoxyCodeLine{00290\ \ \ \textcolor{comment}{//\ prepare\ for\ kernels\ to\ request\ scratch\ buffer\ data\ when\ a\ model\ is}}
+\DoxyCodeLine{00291\ \ \ \textcolor{comment}{//\ preparing.}}
+\DoxyCodeLine{00292\ \ \ \mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2core_2c_2c__api__types_8h_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_allocator_abe35adb1f5f9b43fa6994551df200e74}{InitScratchBufferData}}();}
+\DoxyCodeLine{00293\ }
+\DoxyCodeLine{00294\ \ \ \textcolor{comment}{//\ Returns\ the\ pointer\ for\ the\ array\ of\ ScratchBufferRequest\ allocations\ in}}
+\DoxyCodeLine{00295\ \ \ \textcolor{comment}{//\ the\ head\ section.}}
+\DoxyCodeLine{00296\ \ \ \mbox{\hyperlink{structtflite_1_1internal_1_1_scratch_buffer_request}{internal::ScratchBufferRequest}}*\ \mbox{\hyperlink{classtflite_1_1_micro_allocator_a039c44ee0c3c0186e2ecc47dfa5e44d1}{GetScratchBufferRequests}}();}
+\DoxyCodeLine{00297\ }
+\DoxyCodeLine{00298\ \ \ \textcolor{comment}{//\ A\ simple\ memory\ allocator\ that\ always\ allocate\ from\ the\ arena\ tail\ or\ head.}}
+\DoxyCodeLine{00299\ \ \ \mbox{\hyperlink{classtflite_1_1_i_non_persistent_buffer_allocator}{INonPersistentBufferAllocator}}*\ \mbox{\hyperlink{classtflite_1_1_micro_allocator_a4db1fb548f80128566f4cc29ba23e4c5}{non\_persistent\_buffer\_allocator\_}};}
+\DoxyCodeLine{00300\ \ \ \mbox{\hyperlink{classtflite_1_1_i_persistent_buffer_allocator}{IPersistentBufferAllocator}}*\ \mbox{\hyperlink{classtflite_1_1_micro_allocator_aa1c281070ab76feb8393d82fd83cb25f}{persistent\_buffer\_allocator\_}};}
+\DoxyCodeLine{00301\ }
+\DoxyCodeLine{00302\ \ \ \textcolor{comment}{//\ Allocator\ used\ to\ allocate\ persistent\ builtin\ data.}}
+\DoxyCodeLine{00303\ \ \ \mbox{\hyperlink{classtflite_1_1_builtin_data_allocator}{TfLiteBridgeBuiltinDataAllocator}}*\ \mbox{\hyperlink{classtflite_1_1_micro_allocator_a0ea318f1b441e020320ff8f304b2b0ef}{builtin\_data\_allocator\_}};}
+\DoxyCodeLine{00304\ }
+\DoxyCodeLine{00305\ \ \ \textcolor{comment}{//\ Activation\ buffer\ memory\ planner.}}
+\DoxyCodeLine{00306\ \ \ \mbox{\hyperlink{classtflite_1_1_micro_memory_planner}{MicroMemoryPlanner}}*\ \mbox{\hyperlink{classtflite_1_1_micro_allocator_a7e8df6e9dffd618bff5154ab4f514f22}{memory\_planner\_}};}
+\DoxyCodeLine{00307\ }
+\DoxyCodeLine{00308\ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classtflite_1_1_micro_allocator_ad1b6e94b87087665b8d31a13ca0935fc}{model\_is\_allocating\_}};}
+\DoxyCodeLine{00309\ }
+\DoxyCodeLine{00310\ \ \ \textcolor{comment}{//\ Holds\ the\ number\ of\ ScratchBufferRequest\ instances\ stored\ in\ the\ head}}
+\DoxyCodeLine{00311\ \ \ \textcolor{comment}{//\ section\ when\ a\ model\ is\ allocating.}}
+\DoxyCodeLine{00312\ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{classtflite_1_1_micro_allocator_a3b07d83b82983da85cf3e1c898c432cc}{scratch\_buffer\_request\_count\_}}\ =\ 0;}
+\DoxyCodeLine{00313\ }
+\DoxyCodeLine{00314\ \ \ \textcolor{comment}{//\ Holds\ ScratchBufferRequest\ when\ a\ model\ is\ allocating}}
+\DoxyCodeLine{00315\ \ \ uint8\_t*\ \mbox{\hyperlink{classtflite_1_1_micro_allocator_ab6f1f4d2011b5ddfad623fb1a7997a08}{scratch\_buffer\_head\_}}\ =\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{00316\ }
+\DoxyCodeLine{00317\ \ \ \textcolor{comment}{//\ Holds\ the\ byte\ length\ of\ the\ memory\ plan\ with\ the\ largest\ head\ usage.\ Used}}
+\DoxyCodeLine{00318\ \ \ \textcolor{comment}{//\ to\ ensure\ that\ multi-\/tenant\ allocations\ can\ share\ the\ head\ for\ buffers.}}
+\DoxyCodeLine{00319\ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{classtflite_1_1_micro_allocator_a480f9d019a81f3ce4e140feab70289e7}{max\_head\_buffer\_usage\_}}\ =\ 0;}
+\DoxyCodeLine{00320\ }
+\DoxyCodeLine{00321\ \ \ \mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2micro_2compatibility_8h_a92a34c72cfcc4f6c5bd49086ba082af4}{TF\_LITE\_REMOVE\_VIRTUAL\_DELETE}}}
+\DoxyCodeLine{00322\ \};}
+\DoxyCodeLine{00323\ }
+\DoxyCodeLine{00324\ \}\ \ \textcolor{comment}{//\ namespace\ tflite}}
+\DoxyCodeLine{00325\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ TENSORFLOW\_LITE\_MICRO\_MICRO\_ALLOCATOR\_H\_}}
+
+\end{DoxyCode}

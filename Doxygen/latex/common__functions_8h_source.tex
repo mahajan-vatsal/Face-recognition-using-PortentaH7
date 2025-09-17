@@ -1,0 +1,233 @@
+\doxysection{common\+\_\+functions.\+h}
+\hypertarget{common__functions_8h_source}{}\label{common__functions_8h_source}\index{Face\_Access\_inferencing/src/edge-\/impulse-\/sdk/porting/espressif/ESP-\/NN/src/common/common\_functions.h@{Face\_Access\_inferencing/src/edge-\/impulse-\/sdk/porting/espressif/ESP-\/NN/src/common/common\_functions.h}}
+\mbox{\hyperlink{common__functions_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{//\ Copyright\ 2020-\/2021\ Espressif\ Systems\ (Shanghai)\ PTE\ LTD}}
+\DoxyCodeLine{00002\ \textcolor{comment}{//}}
+\DoxyCodeLine{00003\ \textcolor{comment}{//\ Licensed\ under\ the\ Apache\ License,\ Version\ 2.0\ (the\ "{}License"{});}}
+\DoxyCodeLine{00004\ \textcolor{comment}{//\ you\ may\ not\ use\ this\ file\ except\ in\ compliance\ with\ the\ License.}}
+\DoxyCodeLine{00005\ \textcolor{comment}{//\ You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{00006\ \textcolor{comment}{//}}
+\DoxyCodeLine{00007\ \textcolor{comment}{//\ \ \ \ \ http://www.apache.org/licenses/LICENSE-\/2.0}}
+\DoxyCodeLine{00008\ \textcolor{comment}{//}}
+\DoxyCodeLine{00009\ \textcolor{comment}{//\ Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ software}}
+\DoxyCodeLine{00010\ \textcolor{comment}{//\ distributed\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,}}
+\DoxyCodeLine{00011\ \textcolor{comment}{//\ WITHOUT\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,\ either\ express\ or\ implied.}}
+\DoxyCodeLine{00012\ \textcolor{comment}{//\ See\ the\ License\ for\ the\ specific\ language\ governing\ permissions\ and}}
+\DoxyCodeLine{00013\ \textcolor{comment}{//\ limitations\ under\ the\ License.}}
+\DoxyCodeLine{00014\ }
+\DoxyCodeLine{00015\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{00016\ }
+\DoxyCodeLine{00017\ \textcolor{preprocessor}{\#include\ <stdint.h>}}
+\DoxyCodeLine{00018\ \textcolor{preprocessor}{\#include\ <stdbool.h>}}
+\DoxyCodeLine{00019\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{string_8h}{string.h}}>}}
+\DoxyCodeLine{00020\ }
+\DoxyCodeLine{00025\ \textcolor{preprocessor}{\#define\ \_\_NN\_FORCE\_INLINE\_\_\ \_\_attribute((always\_inline))\ static\ inline}}
+\DoxyCodeLine{00026\ }
+\DoxyCodeLine{00027\ \textcolor{comment}{/*\ min/max\ macros\ */}}
+\DoxyCodeLine{00028\ \textcolor{preprocessor}{\#ifndef\ max}}
+\DoxyCodeLine{00029\ \textcolor{preprocessor}{\#define\ max(a,\ b)\ (\{\ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00030\ \textcolor{preprocessor}{\ \ \ \ \_\_typeof\_\_\ (a)\ \_a\ =\ (a);\ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00031\ \textcolor{preprocessor}{\ \ \ \ \_\_typeof\_\_\ (b)\ \_b\ =\ (b);\ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00032\ \textcolor{preprocessor}{\ \ \ \ \_a\ >\ \_b\ ?\ \_a\ :\ \_b;\ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00033\ \textcolor{preprocessor}{\})}}
+\DoxyCodeLine{00034\ }
+\DoxyCodeLine{00035\ \textcolor{preprocessor}{\#define\ min(a,\ b)\ (\{\ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00036\ \textcolor{preprocessor}{\ \ \ \ \_\_typeof\_\_\ (a)\ \_a\ =\ (a);\ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00037\ \textcolor{preprocessor}{\ \ \ \ \_\_typeof\_\_\ (b)\ \_b\ =\ (b);\ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00038\ \textcolor{preprocessor}{\ \ \ \ \_a\ <\ \_b\ ?\ \_a\ :\ \_b;\ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00039\ \textcolor{preprocessor}{\})}}
+\DoxyCodeLine{00040\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00041\ }
+\DoxyCodeLine{00042\ \mbox{\hyperlink{common__functions_8h_addb44da3552ec49bc088b3175cd8f6a0}{\_\_NN\_FORCE\_INLINE\_\_}}\ int32\_t\ \mbox{\hyperlink{common__functions_8h_a20fe96e12dfe62ed723353bea9d73bc7}{esp\_nn\_clz32}}(uint32\_t\ in)}
+\DoxyCodeLine{00043\ \{}
+\DoxyCodeLine{00044\ \textcolor{preprocessor}{\#if\ CONFIG\_IDF\_TARGET\_ARCH\_XTENSA}}
+\DoxyCodeLine{00045\ \ \ \ \ \_\_asm\_\_\ \textcolor{keyword}{volatile}(\textcolor{stringliteral}{"{}nsau\ \%0,\ \%0"{}}\ :\ \textcolor{stringliteral}{"{}+r"{}}\ (in));}
+\DoxyCodeLine{00046\ \ \ \ \ \textcolor{keywordflow}{return}\ in;}
+\DoxyCodeLine{00047\ \textcolor{preprocessor}{\#elif\ defined(\_\_GNUC\_\_)}}
+\DoxyCodeLine{00048\ \ \ \ \ \textcolor{keywordflow}{return}\ \_\_builtin\_clz(in);}
+\DoxyCodeLine{00049\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00050\ \ \ \ \ int32\_t\ count\ =\ 32;}
+\DoxyCodeLine{00051\ \ \ \ \ uint32\_t\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a6150e0515f7202e2fb518f7206ed97dc}{x}}\ =\ in,\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_aa4f0d3eebc3c443f9be81bf48561a217}{y}}\ =\ in\ >>\ 16;}
+\DoxyCodeLine{00052\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_aa4f0d3eebc3c443f9be81bf48561a217}{y}}\ !=\ 0)\ \{}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ count\ -\/=\ 16;}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a6150e0515f7202e2fb518f7206ed97dc}{x}}\ =\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_aa4f0d3eebc3c443f9be81bf48561a217}{y}};}
+\DoxyCodeLine{00055\ \ \ \ \ \}}
+\DoxyCodeLine{00056\ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_aa4f0d3eebc3c443f9be81bf48561a217}{y}}\ =\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a6150e0515f7202e2fb518f7206ed97dc}{x}}\ >>\ 8;}
+\DoxyCodeLine{00057\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_aa4f0d3eebc3c443f9be81bf48561a217}{y}}\ !=\ 0)\ \{}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \ \ count\ -\/=\ 8;}
+\DoxyCodeLine{00059\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a6150e0515f7202e2fb518f7206ed97dc}{x}}\ =\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_aa4f0d3eebc3c443f9be81bf48561a217}{y}};}
+\DoxyCodeLine{00060\ \ \ \ \ \}}
+\DoxyCodeLine{00061\ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_aa4f0d3eebc3c443f9be81bf48561a217}{y}}\ =\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a6150e0515f7202e2fb518f7206ed97dc}{x}}\ >>\ 4;}
+\DoxyCodeLine{00062\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_aa4f0d3eebc3c443f9be81bf48561a217}{y}}\ !=\ 0)\ \{}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ count\ -\/=\ 4;}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a6150e0515f7202e2fb518f7206ed97dc}{x}}\ =\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_aa4f0d3eebc3c443f9be81bf48561a217}{y}};}
+\DoxyCodeLine{00065\ \ \ \ \ \}}
+\DoxyCodeLine{00066\ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_aa4f0d3eebc3c443f9be81bf48561a217}{y}}\ =\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a6150e0515f7202e2fb518f7206ed97dc}{x}}\ >>\ 2;}
+\DoxyCodeLine{00067\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_aa4f0d3eebc3c443f9be81bf48561a217}{y}}\ !=\ 0)\ \{}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ count\ -\/=\ 2;}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a6150e0515f7202e2fb518f7206ed97dc}{x}}\ =\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_aa4f0d3eebc3c443f9be81bf48561a217}{y}};}
+\DoxyCodeLine{00070\ \ \ \ \ \}}
+\DoxyCodeLine{00071\ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_aa4f0d3eebc3c443f9be81bf48561a217}{y}}\ =\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a6150e0515f7202e2fb518f7206ed97dc}{x}}\ >>\ 1;}
+\DoxyCodeLine{00072\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_aa4f0d3eebc3c443f9be81bf48561a217}{y}}\ !=\ 0)\ \{}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ count\ -\/\ 2;}
+\DoxyCodeLine{00074\ \ \ \ \ \}}
+\DoxyCodeLine{00075\ \ \ \ \ \textcolor{keywordflow}{return}\ count\ -\/\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a6150e0515f7202e2fb518f7206ed97dc}{x}};}
+\DoxyCodeLine{00076\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00077\ \}}
+\DoxyCodeLine{00078\ }
+\DoxyCodeLine{00082\ \mbox{\hyperlink{common__functions_8h_addb44da3552ec49bc088b3175cd8f6a0}{\_\_NN\_FORCE\_INLINE\_\_}}\ int32\_t\ \mbox{\hyperlink{common__functions_8h_a50f35b358d6542ccdda42f2d9b83348c}{esp\_nn\_saturate8}}(int32\_t\ in)}
+\DoxyCodeLine{00083\ \{}
+\DoxyCodeLine{00084\ \textcolor{preprocessor}{\#if\ CONFIG\_IDF\_TARGET\_ARCH\_XTENSA}}
+\DoxyCodeLine{00085\ \ \ \ \ \_\_asm\_\_\ \textcolor{keyword}{volatile}(\textcolor{stringliteral}{"{}clamps\ \%0,\ \%0,\ 7"{}}\ :\ \textcolor{stringliteral}{"{}+a"{}}(in));}
+\DoxyCodeLine{00086\ \ \ \ \ \textcolor{keywordflow}{return}\ in;}
+\DoxyCodeLine{00087\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00088\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{common__functions_8h_affe776513b24d84b39af8ab0930fef7f}{max}}(INT8\_MIN,\ \mbox{\hyperlink{common__functions_8h_ac6afabdc09a49a433ee19d8a9486056d}{min}}(in,\ INT8\_MAX));}
+\DoxyCodeLine{00089\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00090\ \}}
+\DoxyCodeLine{00091\ }
+\DoxyCodeLine{00092\ \mbox{\hyperlink{common__functions_8h_addb44da3552ec49bc088b3175cd8f6a0}{\_\_NN\_FORCE\_INLINE\_\_}}\ int32\_t\ \mbox{\hyperlink{common__functions_8h_a533fed2d7c2670e6675934a991490605}{esp\_nn\_pick\_sat\_high32\_of64}}(int64\_t\ val64)}
+\DoxyCodeLine{00093\ \{}
+\DoxyCodeLine{00094\ \ \ \ \ int32\_t\ sign\ =\ (int32\_t)\ (val64\ >>\ 63);}
+\DoxyCodeLine{00095\ \ \ \ \ int32\_t\ to\_add\ =\ sign\ \&\ ((1ul\ <<\ 31)\ -\/\ 1);}
+\DoxyCodeLine{00096\ \ \ \ \ \textcolor{keywordflow}{return}\ (int32\_t)\ ((int64\_t)\ (val64\ +\ to\_add)\ >>\ 31);}
+\DoxyCodeLine{00097\ \}}
+\DoxyCodeLine{00098\ }
+\DoxyCodeLine{00099\ \mbox{\hyperlink{common__functions_8h_addb44da3552ec49bc088b3175cd8f6a0}{\_\_NN\_FORCE\_INLINE\_\_}}\ int32\_t\ \mbox{\hyperlink{common__functions_8h_a35ee44fcf69a5c90b6d9fc6eaa8b022f}{esp\_nn\_sat\_round\_doubling\_high\_mul}}(int32\_t\ in0,\ int32\_t\ in1)}
+\DoxyCodeLine{00100\ \{}
+\DoxyCodeLine{00101\ \ \ \ \ int32\_t\ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}};}
+\DoxyCodeLine{00102\ \ \ \ \ int64\_t\ in0\_64\ =\ (int64\_t)\ in0;}
+\DoxyCodeLine{00103\ \ \ \ \ \textcolor{keywordtype}{bool}\ overflow\ =\ (in0\ ==\ in1)\ \&\&\ (in0\ ==\ (int32\_t)\ INT32\_MIN);}
+\DoxyCodeLine{00104\ }
+\DoxyCodeLine{00105\ \ \ \ \ \textcolor{comment}{/*\ Nudge\ value\ */}}
+\DoxyCodeLine{00106\ \ \ \ \ int64\_t\ nudge\_val\ =\ 1\ <<\ 30;}
+\DoxyCodeLine{00107\ \ \ \ \ \textcolor{keywordflow}{if}\ ((in0\ <\ 0)\ \string^\ (in1\ <\ 0))\ \{}
+\DoxyCodeLine{00108\ \ \ \ \ \ \ \ \ nudge\_val\ =\ 1\ -\/\ nudge\_val;}
+\DoxyCodeLine{00109\ \ \ \ \ \}}
+\DoxyCodeLine{00110\ }
+\DoxyCodeLine{00111\ \ \ \ \ \textcolor{comment}{/*\ Multiply\ and\ add\ nudge\ */}}
+\DoxyCodeLine{00112\ \ \ \ \ int64\_t\ mult\ =\ in0\_64\ *\ in1\ +\ nudge\_val;}
+\DoxyCodeLine{00113\ }
+\DoxyCodeLine{00114\ \ \ \ \ \textcolor{comment}{/*\ Round\ and\ pickup\ 32\ bits\ */}}
+\DoxyCodeLine{00115\ \ \ \ \ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}}\ =\ \mbox{\hyperlink{common__functions_8h_a533fed2d7c2670e6675934a991490605}{esp\_nn\_pick\_sat\_high32\_of64}}(mult);}
+\DoxyCodeLine{00116\ }
+\DoxyCodeLine{00117\ \ \ \ \ \textcolor{keywordflow}{return}\ overflow\ ?\ INT32\_MAX\ :\ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}};}
+\DoxyCodeLine{00118\ \}}
+\DoxyCodeLine{00119\ }
+\DoxyCodeLine{00126\ \mbox{\hyperlink{common__functions_8h_addb44da3552ec49bc088b3175cd8f6a0}{\_\_NN\_FORCE\_INLINE\_\_}}\ int32\_t\ \mbox{\hyperlink{common__functions_8h_a221aaeee8d5d696b819e2957a3594dd1}{esp\_nn\_div\_by\_power\_of\_two\_fast}}(int32\_t\ val,\ int32\_t\ exponent)}
+\DoxyCodeLine{00127\ \{}
+\DoxyCodeLine{00128\ \ \ \ \ int32\_t\ to\_add\ =\ (1\ <<\ (exponent\ -\/\ 1))\ -\/\ (val\ <\ 0);}
+\DoxyCodeLine{00129\ \ \ \ \ \textcolor{keywordflow}{return}\ (int32\_t)\ ((val\ +\ to\_add)\ >>\ exponent);}
+\DoxyCodeLine{00130\ \}}
+\DoxyCodeLine{00131\ }
+\DoxyCodeLine{00132\ \mbox{\hyperlink{common__functions_8h_addb44da3552ec49bc088b3175cd8f6a0}{\_\_NN\_FORCE\_INLINE\_\_}}\ int32\_t\ \mbox{\hyperlink{common__functions_8h_a75397174061980928d073e1a5ce7fcb3}{esp\_nn\_div\_by\_power\_of\_two}}(int32\_t\ val,\ int32\_t\ exponent)}
+\DoxyCodeLine{00133\ \{}
+\DoxyCodeLine{00134\ \ \ \ \ int32\_t\ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}};}
+\DoxyCodeLine{00135\ }
+\DoxyCodeLine{00136\ \ \ \ \ \textcolor{keyword}{const}\ int32\_t\ \mbox{\hyperlink{wm8960__regs_8h_aa8c909ec5613d6178530fd55e62024c7}{mask}}\ =\ (1\ <<\ exponent)\ -\/\ 1;}
+\DoxyCodeLine{00137\ \ \ \ \ \textcolor{keyword}{const}\ int32\_t\ remainder\ =\ val\ \&\ \mbox{\hyperlink{wm8960__regs_8h_aa8c909ec5613d6178530fd55e62024c7}{mask}};}
+\DoxyCodeLine{00138\ }
+\DoxyCodeLine{00139\ \ \ \ \ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}}\ =\ val\ >>\ exponent;}
+\DoxyCodeLine{00140\ \ \ \ \ int32\_t\ threshold\ =\ (\mbox{\hyperlink{wm8960__regs_8h_aa8c909ec5613d6178530fd55e62024c7}{mask}}\ >>\ 1)\ +\ (\mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}}\ <\ 0);}
+\DoxyCodeLine{00141\ }
+\DoxyCodeLine{00142\ \ \ \ \ \textcolor{keywordflow}{if}\ (remainder\ >\ threshold)\ \{}
+\DoxyCodeLine{00143\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}}\ +=\ 1;}
+\DoxyCodeLine{00144\ \ \ \ \ \}}
+\DoxyCodeLine{00145\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}};}
+\DoxyCodeLine{00146\ \}}
+\DoxyCodeLine{00147\ }
+\DoxyCodeLine{00148\ \mbox{\hyperlink{common__functions_8h_addb44da3552ec49bc088b3175cd8f6a0}{\_\_NN\_FORCE\_INLINE\_\_}}\ int32\_t\ \mbox{\hyperlink{common__functions_8h_a7664ca00c34870474372e3a89d85c34c}{esp\_nn\_multiply\_by\_quantized\_mult}}(int32\_t\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a6150e0515f7202e2fb518f7206ed97dc}{x}},\ int32\_t\ mult,\ int32\_t\ \mbox{\hyperlink{wm8960__regs_8h_ace4e4903c356d90d7a0e7548fc1e8b50}{shift}})}
+\DoxyCodeLine{00149\ \{}
+\DoxyCodeLine{00150\ \ \ \ \ int32\_t\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src07231aa9a2b381aa3c97687e9f0d823d_aba8502090d4b86973c4819d3a60ce19d}{left\_shift}}\ =\ \mbox{\hyperlink{wm8960__regs_8h_ace4e4903c356d90d7a0e7548fc1e8b50}{shift}}\ >\ 0\ ?\ \mbox{\hyperlink{wm8960__regs_8h_ace4e4903c356d90d7a0e7548fc1e8b50}{shift}}\ :\ 0;}
+\DoxyCodeLine{00151\ \ \ \ \ int32\_t\ right\_shift\ =\ \mbox{\hyperlink{wm8960__regs_8h_ace4e4903c356d90d7a0e7548fc1e8b50}{shift}}\ >\ 0\ ?\ 0\ :\ -\/\mbox{\hyperlink{wm8960__regs_8h_ace4e4903c356d90d7a0e7548fc1e8b50}{shift}};}
+\DoxyCodeLine{00152\ \ \ \ \ int32\_t\ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}}\ =\ \mbox{\hyperlink{common__functions_8h_a35ee44fcf69a5c90b6d9fc6eaa8b022f}{esp\_nn\_sat\_round\_doubling\_high\_mul}}(\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a6150e0515f7202e2fb518f7206ed97dc}{x}}\ *\ (1\ <<\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src07231aa9a2b381aa3c97687e9f0d823d_aba8502090d4b86973c4819d3a60ce19d}{left\_shift}}),\ mult);}
+\DoxyCodeLine{00153\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{common__functions_8h_a75397174061980928d073e1a5ce7fcb3}{esp\_nn\_div\_by\_power\_of\_two}}(\mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}},\ right\_shift);}
+\DoxyCodeLine{00154\ \}}
+\DoxyCodeLine{00155\ }
+\DoxyCodeLine{00156\ \mbox{\hyperlink{common__functions_8h_addb44da3552ec49bc088b3175cd8f6a0}{\_\_NN\_FORCE\_INLINE\_\_}}\ int32\_t\ \mbox{\hyperlink{common__functions_8h_aa91c977f372a0d19c17db893477625d0}{esp\_nn\_multiply\_by\_quantized\_mult\_fast}}(int32\_t\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a6150e0515f7202e2fb518f7206ed97dc}{x}},\ int32\_t\ mult,\ int32\_t\ \mbox{\hyperlink{wm8960__regs_8h_ace4e4903c356d90d7a0e7548fc1e8b50}{shift}})}
+\DoxyCodeLine{00157\ \{}
+\DoxyCodeLine{00158\ \ \ \ \ int32\_t\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src07231aa9a2b381aa3c97687e9f0d823d_aba8502090d4b86973c4819d3a60ce19d}{left\_shift}}\ =\ \mbox{\hyperlink{common__functions_8h_affe776513b24d84b39af8ab0930fef7f}{max}}(\mbox{\hyperlink{wm8960__regs_8h_ace4e4903c356d90d7a0e7548fc1e8b50}{shift}},\ 0);}
+\DoxyCodeLine{00159\ \ \ \ \ int32\_t\ right\_shift\ =\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src07231aa9a2b381aa3c97687e9f0d823d_aba8502090d4b86973c4819d3a60ce19d}{left\_shift}}\ -\/\ \mbox{\hyperlink{wm8960__regs_8h_ace4e4903c356d90d7a0e7548fc1e8b50}{shift}};}
+\DoxyCodeLine{00160\ }
+\DoxyCodeLine{00161\ \ \ \ \ int64\_t\ nudge\_val\ =\ 1\ <<\ 30;}
+\DoxyCodeLine{00162\ \ \ \ \ int64\_t\ in0\_64\ =\ (int64\_t)\ (\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_a6150e0515f7202e2fb518f7206ed97dc}{x}}\ <<\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src07231aa9a2b381aa3c97687e9f0d823d_aba8502090d4b86973c4819d3a60ce19d}{left\_shift}});}
+\DoxyCodeLine{00163\ }
+\DoxyCodeLine{00164\ \ \ \ \ \textcolor{comment}{/*\ Multiply\ and\ add\ nudge\ */}}
+\DoxyCodeLine{00165\ \ \ \ \ int64\_t\ mult\_64\ =\ in0\_64\ *\ mult\ +\ nudge\_val;}
+\DoxyCodeLine{00166\ \ \ \ \ int32\_t\ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}}\ =\ (int32\_t)\ (mult\_64\ >>\ 31);}
+\DoxyCodeLine{00167\ \ \ \ \ \textcolor{keywordflow}{if}\ (right\_shift)\ \{}
+\DoxyCodeLine{00168\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}}\ =\ \mbox{\hyperlink{common__functions_8h_a221aaeee8d5d696b819e2957a3594dd1}{esp\_nn\_div\_by\_power\_of\_two\_fast}}(\mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}},\ right\_shift);}
+\DoxyCodeLine{00169\ \ \ \ \ \}}
+\DoxyCodeLine{00170\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}};}
+\DoxyCodeLine{00171\ \}}
+\DoxyCodeLine{00172\ }
+\DoxyCodeLine{00173\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{common__functions_8h_aa01af418b50242ff6cfbff0c5efcbc48}{esp\_nn\_aligned\_s8\_pad\_with\_value}}(\textcolor{keyword}{const}\ int8\_t\ *src,\ int8\_t\ *dst,}
+\DoxyCodeLine{00174\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ uint16\_t\ input\_wd,}
+\DoxyCodeLine{00175\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ uint16\_t\ input\_ht,}
+\DoxyCodeLine{00176\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ uint16\_t\ channels,}
+\DoxyCodeLine{00177\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ int32\_t\ pad\_val,}
+\DoxyCodeLine{00178\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ uint16\_t\ pad\_wd,}
+\DoxyCodeLine{00179\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ uint16\_t\ pad\_ht)}
+\DoxyCodeLine{00180\ \{}
+\DoxyCodeLine{00181\ \ \ \ \ \textcolor{comment}{/*\ memset\ with\ pad\_val\ */}}
+\DoxyCodeLine{00182\ \ \ \ \ memset(dst,\ pad\_val,\ ((input\_wd\ +\ 2\ *\ pad\_wd)\ *\ (input\_ht\ +\ 2\ *\ pad\_ht))\ *\ channels);}
+\DoxyCodeLine{00183\ \ \ \ \ dst\ +=\ (pad\_wd\ +\ input\_wd\ +\ pad\_wd)\ *\ pad\_ht\ *\ channels;}
+\DoxyCodeLine{00184\ }
+\DoxyCodeLine{00185\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ input\_ht;\ i++)\ \{}
+\DoxyCodeLine{00186\ \ \ \ \ \ \ \ \ dst\ +=\ pad\_wd\ *\ channels;}
+\DoxyCodeLine{00187\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ j\ =\ 0;\ j\ <\ input\_wd\ *\ channels;\ j++)\ \{}
+\DoxyCodeLine{00188\ \ \ \ \ \ \ \ \ \ \ \ \ *dst++\ =\ *src++;}
+\DoxyCodeLine{00189\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00190\ \ \ \ \ \ \ \ \ dst\ +=\ pad\_wd\ *\ channels;}
+\DoxyCodeLine{00191\ \ \ \ \ \}}
+\DoxyCodeLine{00192\ \}}
+\DoxyCodeLine{00193\ }
+\DoxyCodeLine{00194\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{common__functions_8h_a8598bb523675644145a98644f2d556c2}{esp\_nn\_aligned\_s8\_pad\_end\_with\_value}}(\textcolor{keyword}{const}\ int8\_t\ *src,\ int8\_t\ *dst,}
+\DoxyCodeLine{00195\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ uint16\_t\ input\_wd,}
+\DoxyCodeLine{00196\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ uint16\_t\ input\_ht,}
+\DoxyCodeLine{00197\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ uint16\_t\ channels,}
+\DoxyCodeLine{00198\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ int32\_t\ pad\_val,}
+\DoxyCodeLine{00199\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ uint16\_t\ pad\_wd,}
+\DoxyCodeLine{00200\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ uint16\_t\ pad\_ht)}
+\DoxyCodeLine{00201\ \{}
+\DoxyCodeLine{00202\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ input\_ht;\ i++)\ \{}
+\DoxyCodeLine{00203\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ j\ =\ 0;\ j\ <\ input\_wd\ *\ channels;\ j++)\ \{}
+\DoxyCodeLine{00204\ \ \ \ \ \ \ \ \ \ \ \ \ *dst++\ =\ *src++;}
+\DoxyCodeLine{00205\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00206\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (pad\_wd)\ \{}
+\DoxyCodeLine{00207\ \ \ \ \ \ \ \ \ \ \ \ \ memset(dst,\ pad\_val,\ pad\_wd\ *\ channels);}
+\DoxyCodeLine{00208\ \ \ \ \ \ \ \ \ \ \ \ \ dst\ +=\ pad\_wd\ *\ channels;}
+\DoxyCodeLine{00209\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00210\ \ \ \ \ \}}
+\DoxyCodeLine{00211\ \ \ \ \ \textcolor{comment}{/*\ pad\ end\ \`{}pad\_ht`\ lines\ at\ end\ */}}
+\DoxyCodeLine{00212\ \ \ \ \ \textcolor{keywordflow}{if}\ (pad\_ht)\ \{}
+\DoxyCodeLine{00213\ \ \ \ \ \ \ \ \ memset(dst,\ pad\_val,\ (input\_wd\ +\ pad\_wd)\ *\ pad\_ht\ *\ channels);}
+\DoxyCodeLine{00214\ \ \ \ \ \}}
+\DoxyCodeLine{00215\ \}}
+\DoxyCodeLine{00216\ }
+\DoxyCodeLine{00225\ \mbox{\hyperlink{common__functions_8h_addb44da3552ec49bc088b3175cd8f6a0}{\_\_NN\_FORCE\_INLINE\_\_}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{common__functions_8h_a913661e90e5bb91d039500bce36e3313}{esp\_nn\_s8\_to\_s16\_with\_offset}}(\textcolor{keyword}{const}\ int8\_t\ *src,\ int16\_t\ *dst,}
+\DoxyCodeLine{00226\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{hello__world__model_8cc_a439227feff9d7f55384e8780cfc2eb82}{size}},\ \textcolor{keyword}{const}\ int32\_t\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcaf138809236f667e9686fdd4aaf17705_aed7ea92f45bd273dde380a45ddced592}{offset}})}
+\DoxyCodeLine{00227\ \{}
+\DoxyCodeLine{00228\ \ \ \ \ \textcolor{keywordtype}{int}\ i\ =\ 0;}
+\DoxyCodeLine{00229\ \ \ \ \ \textcolor{keywordflow}{for}\ (;\ i\ <\ \mbox{\hyperlink{hello__world__model_8cc_a439227feff9d7f55384e8780cfc2eb82}{size}};\ i\ +=\ 2)\ \{}
+\DoxyCodeLine{00230\ \ \ \ \ \ \ \ \ dst[i\ +\ 0]\ =\ src[i\ +\ 0]\ +\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcaf138809236f667e9686fdd4aaf17705_aed7ea92f45bd273dde380a45ddced592}{offset}};}
+\DoxyCodeLine{00231\ \ \ \ \ \ \ \ \ dst[i\ +\ 1]\ =\ src[i\ +\ 1]\ +\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcaf138809236f667e9686fdd4aaf17705_aed7ea92f45bd273dde380a45ddced592}{offset}};}
+\DoxyCodeLine{00232\ \ \ \ \ \}}
+\DoxyCodeLine{00233\ \ \ \ \ \textcolor{keywordflow}{if}(i\ <\ \mbox{\hyperlink{hello__world__model_8cc_a439227feff9d7f55384e8780cfc2eb82}{size}})\ \{}
+\DoxyCodeLine{00234\ \ \ \ \ \ \ \ \ dst[i]\ =\ src[i]\ +\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcaf138809236f667e9686fdd4aaf17705_aed7ea92f45bd273dde380a45ddced592}{offset}};}
+\DoxyCodeLine{00235\ \ \ \ \ \}}
+\DoxyCodeLine{00236\ \}}
+\DoxyCodeLine{00237\ }
+\DoxyCodeLine{00245\ \mbox{\hyperlink{common__functions_8h_addb44da3552ec49bc088b3175cd8f6a0}{\_\_NN\_FORCE\_INLINE\_\_}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{common__functions_8h_ada55968cc547e926901f5fabbce1804a}{esp\_nn\_s8\_to\_s16}}(\textcolor{keyword}{const}\ int8\_t\ *src,\ int16\_t\ *dst,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{hello__world__model_8cc_a439227feff9d7f55384e8780cfc2eb82}{size}})}
+\DoxyCodeLine{00246\ \{}
+\DoxyCodeLine{00247\ \ \ \ \ \textcolor{keywordtype}{int}\ i\ =\ 0;}
+\DoxyCodeLine{00248\ \ \ \ \ \textcolor{keywordflow}{for}\ (;\ i\ <\ \mbox{\hyperlink{hello__world__model_8cc_a439227feff9d7f55384e8780cfc2eb82}{size}};\ i\ +=\ 2)\ \{}
+\DoxyCodeLine{00249\ \ \ \ \ \ \ \ \ dst[i\ +\ 0]\ =\ src[i\ +\ 0];}
+\DoxyCodeLine{00250\ \ \ \ \ \ \ \ \ dst[i\ +\ 1]\ =\ src[i\ +\ 1];}
+\DoxyCodeLine{00251\ \ \ \ \ \}}
+\DoxyCodeLine{00252\ \ \ \ \ \textcolor{keywordflow}{if}(i\ <\ \mbox{\hyperlink{hello__world__model_8cc_a439227feff9d7f55384e8780cfc2eb82}{size}})\ \{}
+\DoxyCodeLine{00253\ \ \ \ \ \ \ \ \ dst[i]\ =\ src[i];}
+\DoxyCodeLine{00254\ \ \ \ \ \}}
+\DoxyCodeLine{00255\ \}}
+
+\end{DoxyCode}

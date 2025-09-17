@@ -1,0 +1,62 @@
+\doxysection{micro\+\_\+tensor\+\_\+utils.\+h}
+\hypertarget{_face___access__inferencing_2src_2edge-impulse-sdk_2tensorflow_2lite_2micro_2kernels_2micro__tensor__utils_8h_source}{}\label{_face___access__inferencing_2src_2edge-impulse-sdk_2tensorflow_2lite_2micro_2kernels_2micro__tensor__utils_8h_source}\index{Face\_Access\_inferencing/src/edge-\/impulse-\/sdk/tensorflow/lite/micro/kernels/micro\_tensor\_utils.h@{Face\_Access\_inferencing/src/edge-\/impulse-\/sdk/tensorflow/lite/micro/kernels/micro\_tensor\_utils.h}}
+\mbox{\hyperlink{_face___access__inferencing_2src_2edge-impulse-sdk_2tensorflow_2lite_2micro_2kernels_2micro__tensor__utils_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{/*\ Copyright\ 2021\ The\ TensorFlow\ Authors.\ All\ Rights\ Reserved.}}
+\DoxyCodeLine{00002\ \textcolor{comment}{}}
+\DoxyCodeLine{00003\ \textcolor{comment}{Licensed\ under\ the\ Apache\ License,\ Version\ 2.0\ (the\ "{}License"{});}}
+\DoxyCodeLine{00004\ \textcolor{comment}{you\ may\ not\ use\ this\ file\ except\ in\ compliance\ with\ the\ License.}}
+\DoxyCodeLine{00005\ \textcolor{comment}{You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{00006\ \textcolor{comment}{}}
+\DoxyCodeLine{00007\ \textcolor{comment}{\ \ \ \ http://www.apache.org/licenses/LICENSE-\/2.0}}
+\DoxyCodeLine{00008\ \textcolor{comment}{}}
+\DoxyCodeLine{00009\ \textcolor{comment}{Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ software}}
+\DoxyCodeLine{00010\ \textcolor{comment}{distributed\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,}}
+\DoxyCodeLine{00011\ \textcolor{comment}{WITHOUT\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,\ either\ express\ or\ implied.}}
+\DoxyCodeLine{00012\ \textcolor{comment}{See\ the\ License\ for\ the\ specific\ language\ governing\ permissions\ and}}
+\DoxyCodeLine{00013\ \textcolor{comment}{limitations\ under\ the\ License.}}
+\DoxyCodeLine{00014\ \textcolor{comment}{==============================================================================*/}}
+\DoxyCodeLine{00015\ }
+\DoxyCodeLine{00016\ \textcolor{comment}{//\ This\ file\ and\ the\ associated\ .cc\ file\ is\ branched\ from}}
+\DoxyCodeLine{00017\ \textcolor{comment}{//\ tensorflow/lite/kernels/internal/reference\_portable\_tensor\_utils*}}
+\DoxyCodeLine{00018\ \textcolor{comment}{//\ TFLM\ needs\ to\ create\ its\ own\ because\ the\ original\ files\ are\ coupled\ with}}
+\DoxyCodeLine{00019\ \textcolor{comment}{//\ the\ tensor\_utils\ module,\ which\ we\ cannot\ reuse\ due\ to\ its\ use\ of\ the}}
+\DoxyCodeLine{00020\ \textcolor{comment}{//\ Eigen\ library.}}
+\DoxyCodeLine{00021\ }
+\DoxyCodeLine{00022\ \textcolor{preprocessor}{\#ifndef\ TENSORFLOW\_LITE\_MICRO\_KERNELS\_MICRO\_TENSOR\_UTILS\_H\_}}
+\DoxyCodeLine{00023\ \textcolor{preprocessor}{\#define\ TENSORFLOW\_LITE\_MICRO\_KERNELS\_MICRO\_TENSOR\_UTILS\_H\_}}
+\DoxyCodeLine{00024\ }
+\DoxyCodeLine{00025\ \textcolor{preprocessor}{\#include\ <algorithm>}}
+\DoxyCodeLine{00026\ \textcolor{preprocessor}{\#include\ <cmath>}}
+\DoxyCodeLine{00027\ \textcolor{preprocessor}{\#include\ <cstdint>}}
+\DoxyCodeLine{00028\ }
+\DoxyCodeLine{00029\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{_face___access__inferencing_2src_2edge-impulse-sdk_2tensorflow_2lite_2c_2builtin__op__data_8h}{edge-\/impulse-\/sdk/tensorflow/lite/c/builtin\_op\_data.h}}"{}}}
+\DoxyCodeLine{00030\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{_face___access__inferencing_2src_2edge-impulse-sdk_2tensorflow_2lite_2c_2common_8h}{edge-\/impulse-\/sdk/tensorflow/lite/c/common.h}}"{}}}
+\DoxyCodeLine{00031\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{_face___access__inferencing_2src_2edge-impulse-sdk_2tensorflow_2lite_2kernels_2internal_2portable__tensor__utils_8h}{edge-\/impulse-\/sdk/tensorflow/lite/kernels/internal/portable\_tensor\_utils.h}}"{}}}
+\DoxyCodeLine{00032\ }
+\DoxyCodeLine{00033\ \textcolor{preprocessor}{\#if\ defined(\_MSC\_VER)}}
+\DoxyCodeLine{00034\ \textcolor{preprocessor}{\#define\ \_\_restrict\_\_\ \_\_restrict}}
+\DoxyCodeLine{00035\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00036\ }
+\DoxyCodeLine{00037\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacetflite}{tflite}}\ \{}
+\DoxyCodeLine{00038\ }
+\DoxyCodeLine{00039\ \textcolor{comment}{//\ Not\ all\ backends\ support\ CpuBackendContext\ usage,\ so\ forward\ declare\ to\ avoid}}
+\DoxyCodeLine{00040\ \textcolor{comment}{//\ pulling\ in\ its\ implementation.}}
+\DoxyCodeLine{00041\ \textcolor{comment}{//\ TODO(b/230666277):\ consider\ removing\ this\ since\ micro\ does\ not\ utilize\ it}}
+\DoxyCodeLine{00042\ \textcolor{keyword}{class\ }CpuBackendContext;}
+\DoxyCodeLine{00043\ }
+\DoxyCodeLine{00044\ \textcolor{comment}{//\ Apply\ sigmoid\ to\ elements\ of\ a\ vector.}}
+\DoxyCodeLine{00045\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_a07f224cf86546627761fa66c42fdffcc}{PortableApplySigmoidToVector}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{float}*\ vector,\ \textcolor{keywordtype}{int}\ v\_size,}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}*\ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}});}
+\DoxyCodeLine{00047\ \textcolor{comment}{//\ Apply\ tanh\ to\ elements\ of\ a\ vector}}
+\DoxyCodeLine{00048\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_aff25fa8fab3b34ab42abdeb2694852a8}{PortableApplyTanhToVector}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{float}*\ vector,\ \textcolor{keywordtype}{int}\ v\_size,\ \textcolor{keywordtype}{float}*\ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}});}
+\DoxyCodeLine{00049\ \textcolor{comment}{//\ Apply\ appropriate\ activation\ function\ to\ elements\ of\ a\ vector.}}
+\DoxyCodeLine{00050\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_a6078cd5bdd95db7049f2880108ce9e84}{PortableApplyActivationToVector}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{float}*\ vector,\ \textcolor{keywordtype}{int}\ v\_size,}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src7f67a4373e2a0d20daf1d1ff4e1f4339_acc9e377dbc009d68bbfa5480d2559565}{TfLiteFusedActivation}}\ \mbox{\hyperlink{l2__pool__2d__test_8cc_a77ea056afd837c816867a0a9887131b6}{activation}},}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}*\ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}});}
+\DoxyCodeLine{00053\ }
+\DoxyCodeLine{00054\ \}\ \ \textcolor{comment}{//\ namespace\ tflite}}
+\DoxyCodeLine{00055\ }
+\DoxyCodeLine{00056\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ TENSORFLOW\_LITE\_MICRO\_KERNELS\_MICRO\_TENSOR\_UTILS\_H\_}}
+
+\end{DoxyCode}

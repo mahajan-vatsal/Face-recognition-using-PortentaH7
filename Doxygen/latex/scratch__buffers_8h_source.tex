@@ -1,0 +1,84 @@
+\doxysection{scratch\+\_\+buffers.\+h}
+\hypertarget{scratch__buffers_8h_source}{}\label{scratch__buffers_8h_source}\index{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/main/tensorflow/lite/micro/kernels/arc\_mli/scratch\_buffers.h@{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/main/tensorflow/lite/micro/kernels/arc\_mli/scratch\_buffers.h}}
+\mbox{\hyperlink{scratch__buffers_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{/*\ Copyright\ 2021\ The\ TensorFlow\ Authors.\ All\ Rights\ Reserved.}}
+\DoxyCodeLine{00002\ \textcolor{comment}{}}
+\DoxyCodeLine{00003\ \textcolor{comment}{Licensed\ under\ the\ Apache\ License,\ Version\ 2.0\ (the\ "{}License"{});}}
+\DoxyCodeLine{00004\ \textcolor{comment}{you\ may\ not\ use\ this\ file\ except\ in\ compliance\ with\ the\ License.}}
+\DoxyCodeLine{00005\ \textcolor{comment}{You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{00006\ \textcolor{comment}{}}
+\DoxyCodeLine{00007\ \textcolor{comment}{\ \ \ \ http://www.apache.org/licenses/LICENSE-\/2.0}}
+\DoxyCodeLine{00008\ \textcolor{comment}{}}
+\DoxyCodeLine{00009\ \textcolor{comment}{Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ software}}
+\DoxyCodeLine{00010\ \textcolor{comment}{distributed\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,}}
+\DoxyCodeLine{00011\ \textcolor{comment}{WITHOUT\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,\ either\ express\ or\ implied.}}
+\DoxyCodeLine{00012\ \textcolor{comment}{See\ the\ License\ for\ the\ specific\ language\ governing\ permissions\ and}}
+\DoxyCodeLine{00013\ \textcolor{comment}{limitations\ under\ the\ License.}}
+\DoxyCodeLine{00014\ \textcolor{comment}{==============================================================================*/}}
+\DoxyCodeLine{00015\ }
+\DoxyCodeLine{00016\ \textcolor{preprocessor}{\#ifndef\ TENSORFLOW\_LITE\_MICRO\_ARC\_SCRATCH\_BUFFERS\_H\_}}
+\DoxyCodeLine{00017\ \textcolor{preprocessor}{\#define\ TENSORFLOW\_LITE\_MICRO\_ARC\_SCRATCH\_BUFFERS\_H\_}}
+\DoxyCodeLine{00018\ }
+\DoxyCodeLine{00019\ \textcolor{preprocessor}{\#include\ "{}mli\_api.h"{}}\ \ \textcolor{comment}{//\ NOLINT}}
+\DoxyCodeLine{00020\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/c/common.h"{}}}
+\DoxyCodeLine{00021\ }
+\DoxyCodeLine{00022\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacetflite}{tflite}}\ \{}
+\DoxyCodeLine{00023\ \textcolor{keyword}{namespace\ }ops\ \{}
+\DoxyCodeLine{00024\ \textcolor{keyword}{namespace\ }micro\ \{}
+\DoxyCodeLine{00025\ }
+\DoxyCodeLine{00026\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1ops_1_1micro_a61eb1c23c7fa5a0b693fe66d11c6a6c8}{init\_arc\_scratch\_buffers}}(\textcolor{keywordtype}{void});}
+\DoxyCodeLine{00027\ \textcolor{keywordtype}{void}*\ \mbox{\hyperlink{namespacetflite_1_1ops_1_1micro_ae90fbae9fc17bdd8149d4d2c2b28c6b7}{get\_arc\_scratch\_buffer}}(\textcolor{keywordtype}{int}\ \mbox{\hyperlink{hello__world__model_8cc_a439227feff9d7f55384e8780cfc2eb82}{size}});\ \ \textcolor{comment}{//\ Function\ to\ assign\ fast\ memory}}
+\DoxyCodeLine{00028\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ from\ one\ of\ 3\ scratch\ buffers.}}
+\DoxyCodeLine{00029\ }
+\DoxyCodeLine{00030\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1ops_1_1micro_a63fe7600be2c6e790564b7336c164ae0}{get\_arc\_scratch\_buffer\_max\_size}}(\textcolor{keywordtype}{int}*\ \mbox{\hyperlink{hello__world__model_8cc_a439227feff9d7f55384e8780cfc2eb82}{size}});}
+\DoxyCodeLine{00031\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1ops_1_1micro_a6a608f7e4be5784a3c5eb4f728d48fc0}{get\_arc\_scratch\_buffer\_two\_max\_sizes}}(\textcolor{keywordtype}{int}*\ size1,\ \textcolor{keywordtype}{int}*\ size2);}
+\DoxyCodeLine{00032\ }
+\DoxyCodeLine{00033\ \textcolor{keyword}{static}\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespacetflite_1_1ops_1_1micro_a3d1073eab1d14a3facb76119175e197c}{inside\_arc\_dccm}}(\textcolor{keywordtype}{void}*\ p)\ \{}
+\DoxyCodeLine{00034\ \textcolor{preprocessor}{\#if\ core\_config\_dccm\_present}}
+\DoxyCodeLine{00035\ \ \ \textcolor{keywordflow}{return}\ ((\textcolor{keywordtype}{unsigned})p\ >=\ core\_config\_dccm\_base)\ \&\&}
+\DoxyCodeLine{00036\ \ \ \ \ \ \ \ \ \ ((unsigned)p\ <\ core\_config\_dccm\_base\ +\ core\_config\_dccm\_size);}
+\DoxyCodeLine{00037\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00038\ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00039\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00040\ \}}
+\DoxyCodeLine{00041\ }
+\DoxyCodeLine{00042\ \textcolor{keyword}{static}\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespacetflite_1_1ops_1_1micro_a334f11128a8fef4ba23938d69fb89f55}{inside\_arc\_xccm}}(\textcolor{keywordtype}{void}*\ p)\ \{}
+\DoxyCodeLine{00043\ \textcolor{preprocessor}{\#if\ core\_config\_xy}}
+\DoxyCodeLine{00044\ \ \ \textcolor{keywordflow}{return}\ ((\textcolor{keywordtype}{unsigned})p\ >=\ core\_config\_xy\_x\_base)\ \&\&}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \ \ \ ((unsigned)p\ <\ core\_config\_xy\_x\_base\ +\ core\_config\_xy\_size);}
+\DoxyCodeLine{00046\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00047\ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00048\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00049\ \}}
+\DoxyCodeLine{00050\ }
+\DoxyCodeLine{00051\ \textcolor{keyword}{static}\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespacetflite_1_1ops_1_1micro_ab0b7ca05ebd9a64b16e4ac48153e6bb0}{inside\_arc\_yccm}}(\textcolor{keywordtype}{void}*\ p)\ \{}
+\DoxyCodeLine{00052\ \textcolor{preprocessor}{\#if\ core\_config\_xy\_size}}
+\DoxyCodeLine{00053\ \ \ \textcolor{keywordflow}{return}\ ((\textcolor{keywordtype}{unsigned})p\ >=\ core\_config\_xy\_y\_base)\ \&\&}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \ \ \ ((unsigned)p\ <\ core\_config\_xy\_y\_base\ +\ core\_config\_xy\_size);}
+\DoxyCodeLine{00055\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00056\ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00057\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00058\ \}}
+\DoxyCodeLine{00059\ }
+\DoxyCodeLine{00060\ \textcolor{keyword}{static}\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespacetflite_1_1ops_1_1micro_a4710c16aa8f80d1d481fad73adcf8667}{inside\_arc\_vccm}}(\textcolor{keywordtype}{void}*\ p)\ \{}
+\DoxyCodeLine{00061\ \textcolor{preprocessor}{\#if\ core\_config\_vec\_mem\_size}}
+\DoxyCodeLine{00062\ \ \ \textcolor{keywordflow}{return}\ ((\textcolor{keywordtype}{unsigned})p\ >=\ core\_config\_vec\_mem\_base)\ \&\&}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \ ((unsigned)p\ <\ core\_config\_vec\_mem\_base\ +\ core\_config\_vec\_mem\_size);}
+\DoxyCodeLine{00064\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00065\ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00066\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00067\ \}}
+\DoxyCodeLine{00068\ }
+\DoxyCodeLine{00069\ \textcolor{keyword}{static}\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespacetflite_1_1ops_1_1micro_adeb48418efc5ac762e2722c909aa8033}{inside\_arc\_ccm}}(\textcolor{keywordtype}{void}*\ p)\ \{}
+\DoxyCodeLine{00070\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacetflite_1_1ops_1_1micro_a3d1073eab1d14a3facb76119175e197c}{inside\_arc\_dccm}}(p)\ ||\ \mbox{\hyperlink{namespacetflite_1_1ops_1_1micro_a334f11128a8fef4ba23938d69fb89f55}{inside\_arc\_xccm}}(p)\ ||\ \mbox{\hyperlink{namespacetflite_1_1ops_1_1micro_ab0b7ca05ebd9a64b16e4ac48153e6bb0}{inside\_arc\_yccm}}(p)\ ||}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_1_1ops_1_1micro_a4710c16aa8f80d1d481fad73adcf8667}{inside\_arc\_vccm}}(p);}
+\DoxyCodeLine{00072\ \}}
+\DoxyCodeLine{00073\ }
+\DoxyCodeLine{00074\ \}\ \ \textcolor{comment}{//\ namespace\ micro}}
+\DoxyCodeLine{00075\ \}\ \ \textcolor{comment}{//\ namespace\ ops}}
+\DoxyCodeLine{00076\ \}\ \ \textcolor{comment}{//\ namespace\ tflite}}
+\DoxyCodeLine{00077\ }
+\DoxyCodeLine{00078\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ TENSORFLOW\_LITE\_MICRO\_ARC\_SCRATCH\_BUFFERS\_H\_}}
+
+\end{DoxyCode}

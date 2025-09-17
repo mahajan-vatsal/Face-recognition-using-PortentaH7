@@ -1,0 +1,5 @@
+var searchData=
+[
+  ['not_5finit_0',['NOT_INIT',['../nano__ble33__sense__fusion_8ino.html#aa461e5e5d0e31d5e42d8ad70cdd268eea9aa925bc1a8429e54310c03c882df4a3',1,'NOT_INIT:&#160;nano_ble33_sense_fusion.ino'],['../nano__ble33__sense__rev2__fusion_8ino.html#aa461e5e5d0e31d5e42d8ad70cdd268eea9aa925bc1a8429e54310c03c882df4a3',1,'NOT_INIT:&#160;nano_ble33_sense_rev2_fusion.ino'],['../rp2040__fusion_8ino.html#aa461e5e5d0e31d5e42d8ad70cdd268eea9aa925bc1a8429e54310c03c882df4a3',1,'NOT_INIT:&#160;rp2040_fusion.ino']]],
+  ['not_5fused_1',['NOT_USED',['../nano__ble33__sense__fusion_8ino.html#aa461e5e5d0e31d5e42d8ad70cdd268eea75c3ed5083592b3dd736ff3e870aadd2',1,'NOT_USED:&#160;nano_ble33_sense_fusion.ino'],['../nano__ble33__sense__rev2__fusion_8ino.html#aa461e5e5d0e31d5e42d8ad70cdd268eea75c3ed5083592b3dd736ff3e870aadd2',1,'NOT_USED:&#160;nano_ble33_sense_rev2_fusion.ino'],['../rp2040__fusion_8ino.html#aa461e5e5d0e31d5e42d8ad70cdd268eea75c3ed5083592b3dd736ff3e870aadd2',1,'NOT_USED:&#160;rp2040_fusion.ino']]]
+];

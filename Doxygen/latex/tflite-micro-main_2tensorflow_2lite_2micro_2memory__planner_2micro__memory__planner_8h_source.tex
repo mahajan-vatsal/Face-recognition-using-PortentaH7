@@ -1,0 +1,101 @@
+\doxysection{micro\+\_\+memory\+\_\+planner.\+h}
+\hypertarget{tflite-micro-main_2tensorflow_2lite_2micro_2memory__planner_2micro__memory__planner_8h_source}{}\label{tflite-micro-main_2tensorflow_2lite_2micro_2memory__planner_2micro__memory__planner_8h_source}\index{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/main/tensorflow/lite/micro/memory\_planner/micro\_memory\_planner.h@{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/main/tensorflow/lite/micro/memory\_planner/micro\_memory\_planner.h}}
+\mbox{\hyperlink{tflite-micro-main_2tensorflow_2lite_2micro_2memory__planner_2micro__memory__planner_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{/*\ Copyright\ 2019\ The\ TensorFlow\ Authors.\ All\ Rights\ Reserved.}}
+\DoxyCodeLine{00002\ \textcolor{comment}{}}
+\DoxyCodeLine{00003\ \textcolor{comment}{Licensed\ under\ the\ Apache\ License,\ Version\ 2.0\ (the\ "{}License"{});}}
+\DoxyCodeLine{00004\ \textcolor{comment}{you\ may\ not\ use\ this\ file\ except\ in\ compliance\ with\ the\ License.}}
+\DoxyCodeLine{00005\ \textcolor{comment}{You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{00006\ \textcolor{comment}{}}
+\DoxyCodeLine{00007\ \textcolor{comment}{\ \ \ \ http://www.apache.org/licenses/LICENSE-\/2.0}}
+\DoxyCodeLine{00008\ \textcolor{comment}{}}
+\DoxyCodeLine{00009\ \textcolor{comment}{Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ software}}
+\DoxyCodeLine{00010\ \textcolor{comment}{distributed\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,}}
+\DoxyCodeLine{00011\ \textcolor{comment}{WITHOUT\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,\ either\ express\ or\ implied.}}
+\DoxyCodeLine{00012\ \textcolor{comment}{See\ the\ License\ for\ the\ specific\ language\ governing\ permissions\ and}}
+\DoxyCodeLine{00013\ \textcolor{comment}{limitations\ under\ the\ License.}}
+\DoxyCodeLine{00014\ \textcolor{comment}{==============================================================================*/}}
+\DoxyCodeLine{00015\ }
+\DoxyCodeLine{00016\ \textcolor{preprocessor}{\#ifndef\ TENSORFLOW\_LITE\_MICRO\_MICRO\_MEMORY\_PLANNER\_MEMORY\_PLANNER\_H\_}}
+\DoxyCodeLine{00017\ \textcolor{preprocessor}{\#define\ TENSORFLOW\_LITE\_MICRO\_MICRO\_MEMORY\_PLANNER\_MEMORY\_PLANNER\_H\_}}
+\DoxyCodeLine{00018\ }
+\DoxyCodeLine{00019\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/c/common.h"{}}}
+\DoxyCodeLine{00020\ }
+\DoxyCodeLine{00021\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacetflite}{tflite}}\ \{}
+\DoxyCodeLine{00022\ }
+\DoxyCodeLine{00023\ \textcolor{comment}{//\ Interface\ class\ for\ planning\ the\ layout\ of\ memory\ buffers\ during\ the}}
+\DoxyCodeLine{00024\ \textcolor{comment}{//\ execution\ of\ a\ graph.}}
+\DoxyCodeLine{00025\ \textcolor{comment}{//\ It's\ designed\ to\ be\ used\ by\ a\ client\ that\ iterates\ in\ any\ order\ through\ the}}
+\DoxyCodeLine{00026\ \textcolor{comment}{//\ buffers\ it\ wants\ to\ lay\ out,\ and\ then\ calls\ the\ getter\ functions\ for}}
+\DoxyCodeLine{00027\ \textcolor{comment}{//\ information\ about\ the\ calculated\ layout.\ For\ example:}}
+\DoxyCodeLine{00028\ \textcolor{comment}{//}}
+\DoxyCodeLine{00029\ \textcolor{comment}{//\ SomeMemoryPlanner\ planner;}}
+\DoxyCodeLine{00030\ \textcolor{comment}{//\ planner.AddBuffer(100,\ 0,\ 1);\ \ //\ Buffer\ 0}}
+\DoxyCodeLine{00031\ \textcolor{comment}{//\ planner.AddBuffer(50,\ 2,\ 3);\ \ \ //\ Buffer\ 1}}
+\DoxyCodeLine{00032\ \textcolor{comment}{//\ planner.AddBuffer(50,\ 2,\ 3);\ \ \ //\ Buffer\ 2}}
+\DoxyCodeLine{00033\ \textcolor{comment}{//}}
+\DoxyCodeLine{00034\ \textcolor{comment}{//\ int\ offset0;}}
+\DoxyCodeLine{00035\ \textcolor{comment}{//\ TF\_EXPECT\_OK(planner.GetOffsetForBuffer(0,\ \&offset0));}}
+\DoxyCodeLine{00036\ \textcolor{comment}{//\ int\ offset1;}}
+\DoxyCodeLine{00037\ \textcolor{comment}{//\ TF\_EXPECT\_OK(planner.GetOffsetForBuffer(1,\ \&offset1));}}
+\DoxyCodeLine{00038\ \textcolor{comment}{//\ int\ offset2;}}
+\DoxyCodeLine{00039\ \textcolor{comment}{//\ TF\_EXPECT\_OK(planner.GetOffsetForBuffer(2,\ \&offset2));}}
+\DoxyCodeLine{00040\ \textcolor{comment}{//\ const\ int\ arena\_size\_needed\ =\ planner.GetMaximumMemorySize();}}
+\DoxyCodeLine{00041\ \textcolor{comment}{//}}
+\DoxyCodeLine{00042\ \textcolor{comment}{//\ The\ goal\ is\ for\ applications\ to\ be\ able\ to\ experiment\ with\ different\ layout}}
+\DoxyCodeLine{00043\ \textcolor{comment}{//\ strategies\ without\ changing\ their\ client\ code,\ by\ swapping\ out\ classes\ that}}
+\DoxyCodeLine{00044\ \textcolor{comment}{//\ implement\ this\ interface.=}}
+\DoxyCodeLine{00045\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classtflite_1_1_micro_memory_planner}{MicroMemoryPlanner}}\ \{}
+\DoxyCodeLine{00046\ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00047\ \ \ \mbox{\hyperlink{classtflite_1_1_micro_memory_planner_aa9a24a8a0a20b78ded8346247341ad92}{MicroMemoryPlanner}}()\ \{\}}
+\DoxyCodeLine{00048\ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{classtflite_1_1_micro_memory_planner_a93e08135c7665465f33ef1b4fff9a3ee}{\string~MicroMemoryPlanner}}()\ \{\}}
+\DoxyCodeLine{00049\ }
+\DoxyCodeLine{00050\ \ \ \textcolor{comment}{//\ Pass\ information\ about\ a\ buffer's\ size\ and\ lifetime\ to\ the\ layout}}
+\DoxyCodeLine{00051\ \ \ \textcolor{comment}{//\ algorithm.\ The\ order\ this\ is\ called\ implicitly\ assigns\ an\ index\ to\ the}}
+\DoxyCodeLine{00052\ \ \ \textcolor{comment}{//\ result,\ so\ the\ buffer\ information\ that's\ passed\ into\ the\ N-\/th\ call\ of}}
+\DoxyCodeLine{00053\ \ \ \textcolor{comment}{//\ this\ method\ will\ be\ used\ as\ the\ buffer\_index\ argument\ to}}
+\DoxyCodeLine{00054\ \ \ \textcolor{comment}{//\ GetOffsetForBuffer().}}
+\DoxyCodeLine{00055\ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2core_2c_2c__api__types_8h_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_memory_planner_a8cd4f97494931f8c9757cdb621012faf}{AddBuffer}}(\textcolor{keywordtype}{int}\ \mbox{\hyperlink{hello__world__model_8cc_a439227feff9d7f55384e8780cfc2eb82}{size}},\ \textcolor{keywordtype}{int}\ first\_time\_used,}
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ last\_time\_used)\ =\ 0;}
+\DoxyCodeLine{00057\ }
+\DoxyCodeLine{00058\ \ \ \textcolor{comment}{//\ Record\ details\ of\ an\ offline\ planned\ buffer\ offset\ we\ want\ to\ place.}}
+\DoxyCodeLine{00059\ \ \ \textcolor{comment}{//\ offline\_offset\ is\ the\ buffer\ offset\ from\ the\ start\ of\ the\ arena.}}
+\DoxyCodeLine{00060\ \ \ \textcolor{comment}{//\ This\ is\ to\ support\ offline\ memory\ planning\ from\ the\ flatbuffer\ metadata.}}
+\DoxyCodeLine{00061\ \ \ \textcolor{comment}{//\ By\ default,\ it\ returns\ an\ error.}}
+\DoxyCodeLine{00062\ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2core_2c_2c__api__types_8h_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_memory_planner_a8b022e37bcc3d4357bf03d08c61c4d3d}{AddBuffer}}(\textcolor{keywordtype}{int}\ \mbox{\hyperlink{hello__world__model_8cc_a439227feff9d7f55384e8780cfc2eb82}{size}},\ \textcolor{keywordtype}{int}\ first\_time\_used,}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ last\_time\_used,\ \textcolor{keywordtype}{int}\ offline\_offset)\ \{}
+\DoxyCodeLine{00064\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2core_2c_2c__api__types_8h_acf79d2fb5fa520303014d1303f1f6361a0bf230cf34a88de9e37834dc127437db}{kTfLiteError}};}
+\DoxyCodeLine{00065\ \ \ \}}
+\DoxyCodeLine{00066\ }
+\DoxyCodeLine{00067\ \ \ \textcolor{comment}{//\ The\ largest\ contiguous\ block\ of\ memory\ that's\ needed\ to\ hold\ the\ layout.}}
+\DoxyCodeLine{00068\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{classtflite_1_1_micro_memory_planner_aa0cfa49490d45375f7fc95c5a422bf44}{GetMaximumMemorySize}}()\ =\ 0;}
+\DoxyCodeLine{00069\ \ \ \textcolor{comment}{//\ How\ many\ buffers\ have\ been\ added\ to\ the\ planner.}}
+\DoxyCodeLine{00070\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{classtflite_1_1_micro_memory_planner_acb68d835e9456b0bde15fadd940077e0}{GetBufferCount}}()\ =\ 0;}
+\DoxyCodeLine{00071\ \ \ \textcolor{comment}{//\ Calculated\ layout\ offset\ for\ the\ N-\/th\ buffer\ added\ to\ the\ planner.}}
+\DoxyCodeLine{00072\ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2core_2c_2c__api__types_8h_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_memory_planner_a7cbbdbc1ca9cec1f77277930894eebc7}{GetOffsetForBuffer}}(\textcolor{keywordtype}{int}\ buffer\_index,\ \textcolor{keywordtype}{int}*\ \mbox{\hyperlink{mirror__pad_8cpp_aed7ea92f45bd273dde380a45ddced592}{offset}})\ =\ 0;}
+\DoxyCodeLine{00073\ }
+\DoxyCodeLine{00074\ \ \ \textcolor{comment}{//\ Provides\ the\ scratch\ buffer\ in\ case\ that\ the\ memory\ planner\ needs\ it.}}
+\DoxyCodeLine{00075\ \ \ \textcolor{comment}{//\ The\ lifetime\ of\ scratch\ buffers\ lifetime\ lasts\ until\ the\ static\ memory\ plan}}
+\DoxyCodeLine{00076\ \ \ \textcolor{comment}{//\ is\ committed.}}
+\DoxyCodeLine{00077\ \ \ \textcolor{comment}{//\ The\ default\ implementation\ is\ for\ the\ memory\ planner\ that\ does\ not\ need}}
+\DoxyCodeLine{00078\ \ \ \textcolor{comment}{//\ scratch\ buffer\ and\ simply\ returns\ ok.}}
+\DoxyCodeLine{00079\ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2core_2c_2c__api__types_8h_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_memory_planner_a11f71d4f597c53b213a41d896ee29072}{Init}}(\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}*\ scratch\_buffer,}
+\DoxyCodeLine{00080\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ scratch\_buffer\_size)\ \{}
+\DoxyCodeLine{00081\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2core_2c_2c__api__types_8h_acf79d2fb5fa520303014d1303f1f6361ab25fe210808197f1b6601df8ccdcd699}{kTfLiteOk}};}
+\DoxyCodeLine{00082\ \ \ \}}
+\DoxyCodeLine{00083\ }
+\DoxyCodeLine{00084\ \ \ \textcolor{comment}{//\ Method\ will\ return\ True\ if\ the\ MicroMemoryPlanner\ preserves\ all\ tensors}}
+\DoxyCodeLine{00085\ \ \ \textcolor{comment}{//\ after\ invocation,\ and\ False\ if\ it\ doesn't.}}
+\DoxyCodeLine{00086\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classtflite_1_1_micro_memory_planner_a9e0dd5044fce5bbf961258e6e6c1fc37}{preserves\_all\_tensors}}()\ \textcolor{keyword}{const}\ =\ 0;}
+\DoxyCodeLine{00087\ }
+\DoxyCodeLine{00088\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classtflite_1_1_micro_memory_planner_ae42c9e3e781c980f1af74178b0068867}{PrintMemoryPlan}}()\ \{}
+\DoxyCodeLine{00089\ \ \ \ \ \textcolor{comment}{//\ Default\ does\ nothing.}}
+\DoxyCodeLine{00090\ \ \ \}}
+\DoxyCodeLine{00091\ \};}
+\DoxyCodeLine{00092\ }
+\DoxyCodeLine{00093\ \}\ \ \textcolor{comment}{//\ namespace\ tflite}}
+\DoxyCodeLine{00094\ }
+\DoxyCodeLine{00095\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ TENSORFLOW\_LITE\_MICRO\_MICRO\_MEMORY\_PLANNER\_MEMORY\_PLANNER\_H\_}}
+
+\end{DoxyCode}

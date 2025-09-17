@@ -1,0 +1,96 @@
+\doxysection{depthwise\+\_\+conv.\+h}
+\hypertarget{tflite-micro-main_2tensorflow_2lite_2micro_2kernels_2depthwise__conv_8h_source}{}\label{tflite-micro-main_2tensorflow_2lite_2micro_2kernels_2depthwise__conv_8h_source}\index{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/main/tensorflow/lite/micro/kernels/depthwise\_conv.h@{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/main/tensorflow/lite/micro/kernels/depthwise\_conv.h}}
+\mbox{\hyperlink{tflite-micro-main_2tensorflow_2lite_2micro_2kernels_2depthwise__conv_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{/*\ Copyright\ 2023\ The\ TensorFlow\ Authors.\ All\ Rights\ Reserved.}}
+\DoxyCodeLine{00002\ \textcolor{comment}{}}
+\DoxyCodeLine{00003\ \textcolor{comment}{Licensed\ under\ the\ Apache\ License,\ Version\ 2.0\ (the\ "{}License"{});}}
+\DoxyCodeLine{00004\ \textcolor{comment}{you\ may\ not\ use\ this\ file\ except\ in\ compliance\ with\ the\ License.}}
+\DoxyCodeLine{00005\ \textcolor{comment}{You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{00006\ \textcolor{comment}{}}
+\DoxyCodeLine{00007\ \textcolor{comment}{\ \ \ \ http://www.apache.org/licenses/LICENSE-\/2.0}}
+\DoxyCodeLine{00008\ \textcolor{comment}{}}
+\DoxyCodeLine{00009\ \textcolor{comment}{Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ software}}
+\DoxyCodeLine{00010\ \textcolor{comment}{distributed\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,}}
+\DoxyCodeLine{00011\ \textcolor{comment}{WITHOUT\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,\ either\ express\ or\ implied.}}
+\DoxyCodeLine{00012\ \textcolor{comment}{See\ the\ License\ for\ the\ specific\ language\ governing\ permissions\ and}}
+\DoxyCodeLine{00013\ \textcolor{comment}{limitations\ under\ the\ License.}}
+\DoxyCodeLine{00014\ \textcolor{comment}{==============================================================================*/}}
+\DoxyCodeLine{00015\ }
+\DoxyCodeLine{00016\ \textcolor{preprocessor}{\#ifndef\ TENSORFLOW\_LITE\_MICRO\_KERNELS\_DEPTHWISE\_CONV\_H\_}}
+\DoxyCodeLine{00017\ \textcolor{preprocessor}{\#define\ TENSORFLOW\_LITE\_MICRO\_KERNELS\_DEPTHWISE\_CONV\_H\_}}
+\DoxyCodeLine{00018\ }
+\DoxyCodeLine{00019\ \textcolor{preprocessor}{\#include\ <cstdint>}}
+\DoxyCodeLine{00020\ }
+\DoxyCodeLine{00021\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/c/builtin\_op\_data.h"{}}}
+\DoxyCodeLine{00022\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/c/common.h"{}}}
+\DoxyCodeLine{00023\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/kernels/internal/types.h"{}}}
+\DoxyCodeLine{00024\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/micro/kernels/conv.h"{}}}
+\DoxyCodeLine{00025\ }
+\DoxyCodeLine{00026\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacetflite}{tflite}}\ \{}
+\DoxyCodeLine{00027\ }
+\DoxyCodeLine{00028\ \textcolor{keyword}{extern}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{namespacetflite_a14a593dd9d68f6f4563407ee1a376db9}{kDepthwiseConvInputTensor}};}
+\DoxyCodeLine{00029\ \textcolor{keyword}{extern}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{namespacetflite_af5c6ff186dc6aaefcb820a0b99c18411}{kDepthwiseConvWeightsTensor}};}
+\DoxyCodeLine{00030\ \textcolor{keyword}{extern}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{namespacetflite_aab71212b239ca5b34d478e2130ace9ba}{kDepthwiseConvBiasTensor}};}
+\DoxyCodeLine{00031\ \textcolor{keyword}{extern}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{namespacetflite_a5fdd641d18f098e1d7ec7cbe03591753}{kDepthwiseConvOutputTensor}};}
+\DoxyCodeLine{00032\ \textcolor{keyword}{extern}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{namespacetflite_ad29b4b9edad5df823c08e3cf4cfbd6b1}{kDepthwiseConvQuantizedDimension}};}
+\DoxyCodeLine{00033\ }
+\DoxyCodeLine{00034\ \textcolor{comment}{//\ Returns\ a\ DepthwiseParams\ struct\ with\ all\ the\ parameters\ needed\ for\ a}}
+\DoxyCodeLine{00035\ \textcolor{comment}{//\ float\ computation.}}
+\DoxyCodeLine{00036\ DepthwiseParams\ \mbox{\hyperlink{namespacetflite_a6bfd2b7b13f8ddf7c3c9ba03cbee855e}{DepthwiseConvParamsFloat}}(}
+\DoxyCodeLine{00037\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_tf_lite_depthwise_conv_params}{TfLiteDepthwiseConvParams}}\&\ \mbox{\hyperlink{comparisons_8cpp_a434686eb00eea897154eb5c3f9364ef7}{params}},\ \textcolor{keyword}{const}\ OpDataConv\&\ \mbox{\hyperlink{hello__world__model_8cc_ace5b7a19a6a24fe7cf2279c70c4d1675}{data}});}
+\DoxyCodeLine{00038\ }
+\DoxyCodeLine{00039\ \textcolor{comment}{//\ Returns\ a\ DepthwiseParams\ struct\ with\ all\ the\ parameters\ needed\ for\ a}}
+\DoxyCodeLine{00040\ \textcolor{comment}{//\ quantized\ computation.}}
+\DoxyCodeLine{00041\ DepthwiseParams\ \mbox{\hyperlink{namespacetflite_a743607a5ae04db3b4f5f98bf60ddaf38}{DepthwiseConvParamsQuantized}}(}
+\DoxyCodeLine{00042\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_tf_lite_depthwise_conv_params}{TfLiteDepthwiseConvParams}}\&\ \mbox{\hyperlink{comparisons_8cpp_a434686eb00eea897154eb5c3f9364ef7}{params}},\ \textcolor{keyword}{const}\ OpDataConv\&\ \mbox{\hyperlink{hello__world__model_8cc_ace5b7a19a6a24fe7cf2279c70c4d1675}{data}});}
+\DoxyCodeLine{00043\ }
+\DoxyCodeLine{00044\ \mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2core_2c_2c__api__types_8h_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_ae6ad6aaf2f4be4c103ede397a8e5551a}{CalculateOpDataDepthwiseConv}}(}
+\DoxyCodeLine{00045\ \ \ \ \ \mbox{\hyperlink{struct_tf_lite_context}{TfLiteContext}}*\ context,\ \mbox{\hyperlink{struct_tf_lite_node}{TfLiteNode}}*\ node,}
+\DoxyCodeLine{00046\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_tf_lite_depthwise_conv_params}{TfLiteDepthwiseConvParams}}\&\ \mbox{\hyperlink{comparisons_8cpp_a434686eb00eea897154eb5c3f9364ef7}{params}},\ \textcolor{keywordtype}{int}\ width,\ \textcolor{keywordtype}{int}\ height,}
+\DoxyCodeLine{00047\ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{l2__pool__2d__test_8cc_accf3b04ce9953ef985675706a9bb3c8a}{filter\_width}},\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{l2__pool__2d__test_8cc_acf238b4af444482dfe40604d694519cc}{filter\_height}},\ \textcolor{keywordtype}{int}\ out\_width,\ \textcolor{keywordtype}{int}\ out\_height,}
+\DoxyCodeLine{00048\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2core_2c_2c__api__types_8h_a8a47ba81bdef28b5c479ee7928a7d123}{TfLiteType}}\ data\_type,\ OpDataConv*\ \mbox{\hyperlink{hello__world__model_8cc_ace5b7a19a6a24fe7cf2279c70c4d1675}{data}});}
+\DoxyCodeLine{00049\ }
+\DoxyCodeLine{00050\ \mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2core_2c_2c__api__types_8h_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_aa20b2426a25c228112554528cb88e3de}{DepthwiseConvPrepare}}(\mbox{\hyperlink{struct_tf_lite_context}{TfLiteContext}}*\ context,\ \mbox{\hyperlink{struct_tf_lite_node}{TfLiteNode}}*\ node);}
+\DoxyCodeLine{00051\ }
+\DoxyCodeLine{00052\ \textcolor{comment}{//\ This\ is\ the\ most\ generic\ TFLMRegistration.\ The\ actual\ supported\ types}}
+\DoxyCodeLine{00053\ \textcolor{comment}{//\ may\ still\ be\ target\ dependent.\ The\ only\ requirement\ is\ that\ every}}
+\DoxyCodeLine{00054\ \textcolor{comment}{//\ implementation\ (reference\ or\ optimized)\ must\ define\ this\ function.}}
+\DoxyCodeLine{00055\ \mbox{\hyperlink{struct_t_f_l_m_registration}{TFLMRegistration}}\ \mbox{\hyperlink{namespacetflite_ab605ba2f020f6278aa4db0ff06d808b1}{Register\_DEPTHWISE\_CONV\_2D}}();}
+\DoxyCodeLine{00056\ }
+\DoxyCodeLine{00057\ \textcolor{preprocessor}{\#if\ defined(CMSIS\_NN)}}
+\DoxyCodeLine{00058\ \textcolor{comment}{//\ Returns\ a\ TFLMRegistration\ struct\ for\ kernel\ variant\ that\ only\ supports}}
+\DoxyCodeLine{00059\ \textcolor{comment}{//\ int8\ activations\ and\ int8\ weights\ and\ uses\ the\ latency\ optimized}}
+\DoxyCodeLine{00060\ \textcolor{comment}{//\ implementations.}}
+\DoxyCodeLine{00061\ \mbox{\hyperlink{struct_t_f_l_m_registration}{TFLMRegistration}}\ \mbox{\hyperlink{namespacetflite_ac0c2511561bd9d9e693f04423d014ac0}{Register\_DEPTHWISE\_CONV\_2D\_INT8}}();}
+\DoxyCodeLine{00062\ }
+\DoxyCodeLine{00063\ \textcolor{comment}{//\ Returns\ a\ TFLMRegistration\ struct\ for\ kernel\ variant\ that\ only\ supports}}
+\DoxyCodeLine{00064\ \textcolor{comment}{//\ int16\ activations\ and\ int8\ weights\ and\ uses\ the\ latency\ optimized}}
+\DoxyCodeLine{00065\ \textcolor{comment}{//\ implementations.}}
+\DoxyCodeLine{00066\ \mbox{\hyperlink{struct_t_f_l_m_registration}{TFLMRegistration}}\ \mbox{\hyperlink{namespacetflite_a1bf73af4a44384ac059a64cbeb5326f6}{Register\_DEPTHWISE\_CONV\_2D\_INT16}}();}
+\DoxyCodeLine{00067\ }
+\DoxyCodeLine{00068\ \textcolor{comment}{//\ Returns\ a\ TFLMRegistration\ struct\ for\ kernel\ variant\ that\ only\ supports}}
+\DoxyCodeLine{00069\ \textcolor{comment}{//\ int8\ activations\ and\ int4\ weights\ and\ uses\ the\ latency\ optimized}}
+\DoxyCodeLine{00070\ \textcolor{comment}{//\ implementations.}}
+\DoxyCodeLine{00071\ \mbox{\hyperlink{struct_t_f_l_m_registration}{TFLMRegistration}}\ \mbox{\hyperlink{namespacetflite_aea6ebd80962047517dcd06ad46f505b6}{Register\_DEPTHWISE\_CONV\_2D\_INT4}}();}
+\DoxyCodeLine{00072\ }
+\DoxyCodeLine{00073\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00074\ \textcolor{keyword}{inline}\ \mbox{\hyperlink{struct_t_f_l_m_registration}{TFLMRegistration}}\ \mbox{\hyperlink{namespacetflite_ac0c2511561bd9d9e693f04423d014ac0}{Register\_DEPTHWISE\_CONV\_2D\_INT8}}()\ \{}
+\DoxyCodeLine{00075\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacetflite_ab605ba2f020f6278aa4db0ff06d808b1}{Register\_DEPTHWISE\_CONV\_2D}}();}
+\DoxyCodeLine{00076\ \}}
+\DoxyCodeLine{00077\ }
+\DoxyCodeLine{00078\ \textcolor{keyword}{inline}\ \mbox{\hyperlink{struct_t_f_l_m_registration}{TFLMRegistration}}\ \mbox{\hyperlink{namespacetflite_a1bf73af4a44384ac059a64cbeb5326f6}{Register\_DEPTHWISE\_CONV\_2D\_INT16}}()\ \{}
+\DoxyCodeLine{00079\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacetflite_ab605ba2f020f6278aa4db0ff06d808b1}{Register\_DEPTHWISE\_CONV\_2D}}();}
+\DoxyCodeLine{00080\ \}}
+\DoxyCodeLine{00081\ }
+\DoxyCodeLine{00082\ \textcolor{keyword}{inline}\ \mbox{\hyperlink{struct_t_f_l_m_registration}{TFLMRegistration}}\ \mbox{\hyperlink{namespacetflite_aea6ebd80962047517dcd06ad46f505b6}{Register\_DEPTHWISE\_CONV\_2D\_INT4}}()\ \{}
+\DoxyCodeLine{00083\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacetflite_ab605ba2f020f6278aa4db0ff06d808b1}{Register\_DEPTHWISE\_CONV\_2D}}();}
+\DoxyCodeLine{00084\ \}}
+\DoxyCodeLine{00085\ }
+\DoxyCodeLine{00086\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00087\ }
+\DoxyCodeLine{00088\ \}\ \ \textcolor{comment}{//\ namespace\ tflite}}
+\DoxyCodeLine{00089\ }
+\DoxyCodeLine{00090\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ TENSORFLOW\_LITE\_MICRO\_KERNELS\_DEPTHWISE\_CONV\_H\_}}
+
+\end{DoxyCode}

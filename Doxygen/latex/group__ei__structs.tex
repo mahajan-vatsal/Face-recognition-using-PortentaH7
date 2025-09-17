@@ -1,0 +1,49 @@
+\doxysection{Structs}
+\hypertarget{group__ei__structs}{}\label{group__ei__structs}\index{Structs@{Structs}}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structei__impulse__result__classification__t}{ei\+\_\+impulse\+\_\+result\+\_\+classification\+\_\+t}}
+\begin{DoxyCompactList}\small\item\em Holds the output of inference, anomaly results, and timing information. \end{DoxyCompactList}\item 
+struct \mbox{\hyperlink{structei__impulse__visual__ad__result__t}{ei\+\_\+impulse\+\_\+visual\+\_\+ad\+\_\+result\+\_\+t}}
+\begin{DoxyCompactList}\small\item\em Holds the output of visual anomaly detection (FOMO-\/\+AD) \end{DoxyCompactList}\item 
+struct \mbox{\hyperlink{structei__impulse__result__bounding__box__t}{ei\+\_\+impulse\+\_\+result\+\_\+bounding\+\_\+box\+\_\+t}}
+\begin{DoxyCompactList}\small\item\em Holds information for a single bounding box. \end{DoxyCompactList}\item 
+struct \mbox{\hyperlink{structei__impulse__result__timing__t}{ei\+\_\+impulse\+\_\+result\+\_\+timing\+\_\+t}}
+\begin{DoxyCompactList}\small\item\em Holds timing information about the processing (DSP) and inference blocks. \end{DoxyCompactList}\item 
+struct \mbox{\hyperlink{structei__impulse__result__hr__t}{ei\+\_\+impulse\+\_\+result\+\_\+hr\+\_\+t}}
+\begin{DoxyCompactList}\small\item\em Holds intermediate results of hr / hrv block. \end{DoxyCompactList}\item 
+struct \mbox{\hyperlink{structei__impulse__result__t}{ei\+\_\+impulse\+\_\+result\+\_\+t}}
+\begin{DoxyCompactList}\small\item\em Holds the output of inference, anomaly results, and timing information. \end{DoxyCompactList}\item 
+struct \mbox{\hyperlink{structei__signal__t}{ei\+\_\+signal\+\_\+t}}
+\begin{DoxyCompactList}\small\item\em Holds the callback pointer for retrieving raw data and the length of data to be retrieved. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef struct \mbox{\hyperlink{structei__signal__t}{ei\+\_\+signal\+\_\+t}} \mbox{\hyperlink{group__ei__structs_gaa11c321d559d65dd1adff6af0edf54e4}{signal\+\_\+t}}
+\begin{DoxyCompactList}\small\item\em Holds the callback pointer for retrieving raw data and the length of data to be retrieved. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Public-\/facing structs for Edge Impulse C++ SDK.
+
+\doxysubsection{Typedef Documentation}
+\Hypertarget{group__ei__structs_gaa11c321d559d65dd1adff6af0edf54e4}\index{Structs@{Structs}!signal\_t@{signal\_t}}
+\index{signal\_t@{signal\_t}!Structs@{Structs}}
+\doxysubsubsection{\texorpdfstring{signal\_t}{signal\_t}}
+{\footnotesize\ttfamily \label{group__ei__structs_gaa11c321d559d65dd1adff6af0edf54e4} 
+typedef struct \mbox{\hyperlink{structei__signal__t}{ei\+\_\+signal\+\_\+t}} \mbox{\hyperlink{group__ei__structs_gaa11c321d559d65dd1adff6af0edf54e4}{signal\+\_\+t}}}
+
+
+
+Holds the callback pointer for retrieving raw data and the length of data to be retrieved. 
+
+Holds the callback function, {\ttfamily \doxylink{ei__run__dsp_8h_a6078b2c139fb5c504fed1a268135c3d4}{get\+\_\+data(size\+\_\+t offset, size\+\_\+t length, float  \texorpdfstring{$\ast$}{*}out\+\_\+ptr)}}. This callback should be implemented by the user and fills the memory location given by {\ttfamily \texorpdfstring{$\ast$}{*}out\+\_\+ptr} with raw features. Features must be flattened to a 1-\/dimensional vector, as described in \href{https://docs.edgeimpulse.com/docs/deploy-your-model-as-a-c-library\#signal-structure}{\texttt{ this guide}}.
+
+{\ttfamily \doxylink{ei__run__dsp_8h_a6078b2c139fb5c504fed1a268135c3d4}{get\+\_\+data()}} may be called multiple times during preprocessing or inference (e.\+g. during execution of \href{https://docs.edgeimpulse.com/reference/run_classifier}{\texttt{ run\+\_\+classifier()}} or \href{https://docs.edgeimpulse.com/reference/run_classifier_continuous}{\texttt{ run\+\_\+classifier\+\_\+continuous()}}). The {\ttfamily offset} argument will update to point to new data, and {\ttfamily length} data must be copied into the location specified by {\ttfamily out\+\_\+ptr}. This scheme allows raw features to be stored in RAM or flash memory and paged in as necessary.
+
+Note that {\ttfamily \doxylink{ei__run__dsp_8h_a6078b2c139fb5c504fed1a268135c3d4}{get\+\_\+data()}} (even after multiple calls during a single execution of {\ttfamily run\+\_\+classifier()} or {\ttfamily \doxylink{group__ei__functions_gacf3414ec2ec4639e982fc966144a02ec}{run\+\_\+classifier\+\_\+continuous()}}) will never request more than a total number of features as given by {\ttfamily total\+\_\+length}.
+
+{\bfseries{Source}}\+: \href{https://github.com/edgeimpulse/inferencing-sdk-cpp/blob/master/dsp/numpy_types.h}{\texttt{ dsp/numpy\+\_\+types.\+h}}
+
+{\bfseries{Example}}\+: \href{https://github.com/edgeimpulse/example-standalone-inferencing/blob/master/source/main.cpp}{\texttt{ standalone inferencing main.\+cpp}} 

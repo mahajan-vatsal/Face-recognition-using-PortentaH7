@@ -1,0 +1,218 @@
+\chapter{Arm(R) Ethos(TM)-\/U core driver}
+\hypertarget{md__face___access__inferencing_2src_2edge-impulse-sdk_2porting_2ethos-core-driver_2_r_e_a_d_m_e}{}\label{md__face___access__inferencing_2src_2edge-impulse-sdk_2porting_2ethos-core-driver_2_r_e_a_d_m_e}\index{Arm(R) Ethos(TM)-\/U core driver@{Arm(R) Ethos(TM)-\/U core driver}}
+\label{md__face___access__inferencing_2src_2edge-impulse-sdk_2porting_2ethos-core-driver_2_r_e_a_d_m_e_autotoc_md394}%
+\Hypertarget{md__face___access__inferencing_2src_2edge-impulse-sdk_2porting_2ethos-core-driver_2_r_e_a_d_m_e_autotoc_md394}%
+
+
+This repository contains a device driver for the Arm(\+R) Ethos(\+TM)-\/U NPU.\hypertarget{md__face___access__inferencing_2src_2edge-impulse-sdk_2porting_2ethos-core-driver_2_r_e_a_d_m_e_autotoc_md395}{}\doxysection{\texorpdfstring{Building}{Building}}\label{md__face___access__inferencing_2src_2edge-impulse-sdk_2porting_2ethos-core-driver_2_r_e_a_d_m_e_autotoc_md395}
+The source code comes with a CMake based build system. The driver is expected to be cross compiled for any of the supported Arm Cortex(\+R)-\/M CPUs, which requires the user to configure the build to match their system configuration.
+
+One such requirement is to define the target CPU, normally by setting {\ttfamily CMAKE\+\_\+\+SYSTEM\+\_\+\+PROCESSOR}. {\bfseries{Note}} that when using the toolchain files provided in \href{https://git.mlplatform.org/ml/ethos-u/ethos-u-core-platform.git}{\texttt{ core\+\_\+platform}}, the variable {\ttfamily TARGET\+\_\+\+CPU} must be used instead of {\ttfamily CMAKE\+\_\+\+SYSTEM\+\_\+\+PROCESSOR}.
+
+Target CPU is specified on the form "{}cortex-\/m$<$nr$>$$<$features$>$"{}, for example\+: "{}cortex-\/m55+nodsp+nofp"{}.
+
+Similarly the target NPU configuration is controlled by setting {\ttfamily ETHOSU\+\_\+\+TARGET\+\_\+\+NPU\+\_\+\+CONFIG}, for example "{}ethos-\/u55-\/128"{}.
+
+The build configuration can be defined either in the toolchain file or by passing options on the command line.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ [bash]}
+\DoxyCodeLine{\$\ cmake\ -\/B\ build\ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ -\/DCMAKE\_TOOLCHAIN\_FILE=<toolchain>\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ -\/DCMAKE\_SYSTEM\_PROCESSOR=cortex-\/m<nr><features>\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ -\/DETHOSU\_TARGET\_NPU\_CONFIG=ethos-\/u<nr>-\/<macs>}
+\DoxyCodeLine{\$\ cmake\ -\/-\/build\ build}
+
+\end{DoxyCode}
+
+
+or when using toolchain files from \href{https://git.mlplatform.org/ml/ethos-u/ethos-u-core-platform.git}{\texttt{ core\+\_\+platform}}
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ [bash]}
+\DoxyCodeLine{\$\ cmake\ -\/B\ build\ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ -\/DCMAKE\_TOOLCHAIN\_FILE=<core\_platform\_toolchain>\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ -\/DTARGET\_CPU=cortex-\/m<nr><features>\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ -\/DETHOSU\_TARGET\_NPU\_CONFIG=ethos-\/u<nr>-\/<macs>}
+\DoxyCodeLine{\$\ cmake\ -\/-\/build\ build}
+
+\end{DoxyCode}
+\hypertarget{md__face___access__inferencing_2src_2edge-impulse-sdk_2porting_2ethos-core-driver_2_r_e_a_d_m_e_autotoc_md396}{}\doxysection{\texorpdfstring{Driver APIs}{Driver APIs}}\label{md__face___access__inferencing_2src_2edge-impulse-sdk_2porting_2ethos-core-driver_2_r_e_a_d_m_e_autotoc_md396}
+The driver APIs are defined in {\ttfamily \doxylink{ethosu__driver_8h}{include/ethosu\+\_\+driver.\+h}} and the related types in {\ttfamily \doxylink{ethosu__types_8h}{include/ethosu\+\_\+types.\+h}}. Inferences can be invoked in two manners\+: synchronously or asynchronously. The two types of invocation can be freely mixed in a single application.\hypertarget{md__face___access__inferencing_2src_2edge-impulse-sdk_2porting_2ethos-core-driver_2_r_e_a_d_m_e_autotoc_md397}{}\doxysubsection{\texorpdfstring{Synchronous invocation}{Synchronous invocation}}\label{md__face___access__inferencing_2src_2edge-impulse-sdk_2porting_2ethos-core-driver_2_r_e_a_d_m_e_autotoc_md397}
+A typical usage of the driver can be the following\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ [C]}
+\DoxyCodeLine{//\ reserve\ a\ driver\ to\ be\ used\ (this\ call\ could\ block\ until\ a\ driver\ is\ available)}
+\DoxyCodeLine{struct\ ethosu\_driver\ *drv\ =\ ethosu\_reserve\_driver();}
+\DoxyCodeLine{...}
+\DoxyCodeLine{//\ run\ one\ or\ more\ inferences}
+\DoxyCodeLine{int\ result\ =\ ethosu\_invoke(drv,}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ custom\_data\_ptr,}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ custom\_data\_size,}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ base\_addr,}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ base\_addr\_size,}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ num\_base\_addr);}
+\DoxyCodeLine{...}
+\DoxyCodeLine{//\ release\ the\ driver\ for\ others\ to\ use}
+\DoxyCodeLine{ethosu\_release\_driver(drv);}
+
+\end{DoxyCode}
+\hypertarget{md__face___access__inferencing_2src_2edge-impulse-sdk_2porting_2ethos-core-driver_2_r_e_a_d_m_e_autotoc_md398}{}\doxysubsection{\texorpdfstring{Asynchronous invocation}{Asynchronous invocation}}\label{md__face___access__inferencing_2src_2edge-impulse-sdk_2porting_2ethos-core-driver_2_r_e_a_d_m_e_autotoc_md398}
+A typical usage of the driver can be the following\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ [C]}
+\DoxyCodeLine{//\ reserve\ a\ driver\ to\ be\ used\ (this\ call\ could\ block\ until\ a\ driver\ is\ available)}
+\DoxyCodeLine{struct\ ethosu\_driver\ *drv\ =\ ethosu\_reserve\_driver();}
+\DoxyCodeLine{...}
+\DoxyCodeLine{//\ run\ one\ or\ more\ inferences}
+\DoxyCodeLine{int\ result\ =\ ethosu\_invoke\_async(drv,}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ custom\_data\_ptr,}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ custom\_data\_size,}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ base\_addr,}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ base\_addr\_size,}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ num\_base\_addr,}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ user\_arg);}
+\DoxyCodeLine{...}
+\DoxyCodeLine{//\ do\ some\ other\ work}
+\DoxyCodeLine{...}
+\DoxyCodeLine{int\ ret;}
+\DoxyCodeLine{do\ \{}
+\DoxyCodeLine{\ \ \ \ //\ true\ =\ blocking,\ false\ =\ non-\/blocking}
+\DoxyCodeLine{\ \ \ \ //\ ret\ >\ 0\ means\ inference\ not\ completed\ (only\ for\ non-\/blocking\ mode)}
+\DoxyCodeLine{\ \ \ \ ret\ =\ ethosu\_wait(drv,\ <true|false>);}
+\DoxyCodeLine{\}\ while(ret\ >\ 0);}
+\DoxyCodeLine{...}
+\DoxyCodeLine{//\ release\ the\ driver\ for\ others\ to\ use}
+\DoxyCodeLine{ethosu\_release\_driver(drv);}
+
+\end{DoxyCode}
+
+
+Note that if {\ttfamily ethosu\+\_\+wait} is invoked from a different thread and concurrently with {\ttfamily ethosu\+\_\+invoke\+\_\+async}, the user is responsible to guarantee that {\ttfamily ethosu\+\_\+wait} is called after a successful completion of {\ttfamily ethosu\+\_\+invoke\+\_\+async}. Otherwise {\ttfamily ethosu\+\_\+wait} might fail and not actually wait for the inference completion.\hypertarget{md__face___access__inferencing_2src_2edge-impulse-sdk_2porting_2ethos-core-driver_2_r_e_a_d_m_e_autotoc_md399}{}\doxysubsection{\texorpdfstring{Driver initialization}{Driver initialization}}\label{md__face___access__inferencing_2src_2edge-impulse-sdk_2porting_2ethos-core-driver_2_r_e_a_d_m_e_autotoc_md399}
+In order to use a driver it first needs to be initialized by calling the {\ttfamily init} function, which will also register the handle in the list of available drivers. A driver can be torn down by using the {\ttfamily deinit} function, which also removes the driver from the list.
+
+The correct mapping is one driver per NPU device. Note that the NPUs must have the same configuration, indeed the NPU configuration can be only one, which is defined at compile time.\hypertarget{md__face___access__inferencing_2src_2edge-impulse-sdk_2porting_2ethos-core-driver_2_r_e_a_d_m_e_autotoc_md400}{}\doxysection{\texorpdfstring{Implementation design}{Implementation design}}\label{md__face___access__inferencing_2src_2edge-impulse-sdk_2porting_2ethos-core-driver_2_r_e_a_d_m_e_autotoc_md400}
+The driver is structured in two main parts\+: the driver, which is responsible to provide an unified API to the user; and the device part, which deals with the details at the hardware level.
+
+In order to do its task the driver needs a device implementation. There could be multiple device implementation for different hardware model and/or configurations. Note that the driver can be compiled to target only one NPU configuration by specializing the device part at compile time.\hypertarget{md__face___access__inferencing_2src_2edge-impulse-sdk_2porting_2ethos-core-driver_2_r_e_a_d_m_e_autotoc_md401}{}\doxysection{\texorpdfstring{Data caching}{Data caching}}\label{md__face___access__inferencing_2src_2edge-impulse-sdk_2porting_2ethos-core-driver_2_r_e_a_d_m_e_autotoc_md401}
+For running the driver on Arm CPUs which are configured with data cache, the cache maintenance functions in the driver are exported with weakly linked symbols that should be overridden. An example implementation using the CMSIS primitives found in cachel1\+\_\+armv7.\+h could be as below\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ [C++]}
+\DoxyCodeLine{extern\ "{}C"{}\ \{}
+\DoxyCodeLine{void\ ethosu\_flush\_dcache(uint32\_t\ *p,\ size\_t\ bytes)\ \{}
+\DoxyCodeLine{\ \ \ \ if\ (p)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ SCB\_CleanDCache\_by\_Addr(p,\ bytes);}
+\DoxyCodeLine{\ \ \ \ else}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ SCB\_CleanDCache();}
+\DoxyCodeLine{\}}
+\DoxyCodeLine{}
+\DoxyCodeLine{void\ ethosu\_invalidate\_dcache(uint32\_t\ *p,\ size\_t\ bytes)\ \{}
+\DoxyCodeLine{\ \ \ \ if\ (p)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ SCB\_InvalidateDCache\_by\_Addr(p,\ bytes);}
+\DoxyCodeLine{\ \ \ \ else}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ SCB\_InvalidateDCache();}
+\DoxyCodeLine{\}}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+\hypertarget{md__face___access__inferencing_2src_2edge-impulse-sdk_2porting_2ethos-core-driver_2_r_e_a_d_m_e_autotoc_md402}{}\doxysection{\texorpdfstring{Mutex and semaphores}{Mutex and semaphores}}\label{md__face___access__inferencing_2src_2edge-impulse-sdk_2porting_2ethos-core-driver_2_r_e_a_d_m_e_autotoc_md402}
+To ensure the correct functionality of the driver mutexes and semaphores are used internally. The default implementations of mutexes and semaphores are designed for a single-\/threaded baremetal environment. Hence for integration in environemnts where multi-\/threading is possible, e.\+g., RTOS, the user is responsible to provide implementation for mutexes and semaphores to be used by the driver.
+
+The mutex and semaphore APIs are defined as weak linked functions that can be overridden by the user. The APIs are the usual ones and described below\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ [C]}
+\DoxyCodeLine{//\ create\ a\ mutex\ by\ returning\ back\ a\ handle}
+\DoxyCodeLine{void\ *ethosu\_mutex\_create(void);}
+\DoxyCodeLine{//\ lock\ the\ given\ mutex}
+\DoxyCodeLine{void\ ethosu\_mutex\_lock(void\ *mutex);}
+\DoxyCodeLine{//\ unlock\ the\ given\ mutex}
+\DoxyCodeLine{void\ ethosu\_mutex\_unlock(void\ *mutex);}
+\DoxyCodeLine{}
+\DoxyCodeLine{//\ create\ a\ (binary)\ semaphore\ by\ returning\ back\ a\ handle}
+\DoxyCodeLine{void\ *ethosu\_semaphore\_create(void);}
+\DoxyCodeLine{//\ take\ from\ the\ given\ semaphore}
+\DoxyCodeLine{void\ ethosu\_semaphore\_take(void\ *sem);}
+\DoxyCodeLine{//\ give\ from\ the\ given\ semaphore}
+\DoxyCodeLine{void\ ethosu\_semaphore\_give(void\ *sem);}
+
+\end{DoxyCode}
+\hypertarget{md__face___access__inferencing_2src_2edge-impulse-sdk_2porting_2ethos-core-driver_2_r_e_a_d_m_e_autotoc_md403}{}\doxysection{\texorpdfstring{Begin/\+End inference callbacks}{Begin/\+End inference callbacks}}\label{md__face___access__inferencing_2src_2edge-impulse-sdk_2porting_2ethos-core-driver_2_r_e_a_d_m_e_autotoc_md403}
+The driver provide weak linked functions as hooks to receive callbacks whenever an inference begins and ends. The user can override such functions when needed. To avoid memory leaks, any allocations done in the \doxylink{ethosu__driver_8h_a04b34ee5d2328ecdfc7d464761f6cb7f}{ethosu\+\_\+inference\+\_\+begin()} must be balanced by a corresponding free of the memory in the \doxylink{ethosu__driver_8h_abe0e7014df596c89393c3bce70c4ee0c}{ethosu\+\_\+inference\+\_\+end()} callback.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ [C]}
+\DoxyCodeLine{void\ ethosu\_inference\_begin(struct\ ethosu\_driver\ *drv,\ void\ *user\_arg);}
+\DoxyCodeLine{void\ ethosu\_inference\_end(struct\ ethosu\_driver\ *drv,\ void\ *user\_arg);}
+
+\end{DoxyCode}
+
+
+Note that the {\ttfamily void \texorpdfstring{$\ast$}{*}user\+\_\+arg} pointer passed to invoke() function is the same pointer passed to the \doxylink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcdc91c794b43404000e39f72876c1c287_ab463972f482e3713c94bb345650694b7}{begin()} and \doxylink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcdc91c794b43404000e39f72876c1c287_a4415abf9861e3883a31d588f3909eba9}{end()} callbacks. For example\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ [C]}
+\DoxyCodeLine{void\ my\_function()\ \{}
+\DoxyCodeLine{\ \ \ \ ...}
+\DoxyCodeLine{\ \ \ \ struct\ my\_data\ data\ =\ \{...\};}
+\DoxyCodeLine{\ \ \ \ int\ result\ =\ int\ ethosu\_invoke\_v3(drv,}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ custom\_data\_ptr,}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ custom\_data\_size,}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ base\_addr,}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ base\_addr\_size,}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ num\_base\_addr,}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (void\ *)\&data);}
+\DoxyCodeLine{\ \ \ \ ....}
+\DoxyCodeLine{\}}
+\DoxyCodeLine{}
+\DoxyCodeLine{void\ ethosu\_inference\_begin(struct\ ethosu\_driver\ *drv,\ void\ *user\_arg)\ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ struct\ my\_data\ *data\ =\ (struct\ my\_data*)\ user\_arg;}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ //\ use\ drv\ and\ data\ here}
+\DoxyCodeLine{\}}
+\DoxyCodeLine{}
+\DoxyCodeLine{void\ ethosu\_inference\_end(struct\ ethosu\_driver\ *drv,\ void\ *user\_arg)\ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ struct\ my\_data\ *data\ =\ (struct\ my\_data*)\ user\_arg;}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ //\ use\ drv\ and\ data\ here}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+\hypertarget{md__face___access__inferencing_2src_2edge-impulse-sdk_2porting_2ethos-core-driver_2_r_e_a_d_m_e_autotoc_md404}{}\doxysection{\texorpdfstring{License}{License}}\label{md__face___access__inferencing_2src_2edge-impulse-sdk_2porting_2ethos-core-driver_2_r_e_a_d_m_e_autotoc_md404}
+The Arm Ethos-\/U core driver is provided under an Apache-\/2.\+0 license. Please see \href{LICENSE.txt}{\texttt{ LICENSE.\+txt}} for more information.\hypertarget{md__face___access__inferencing_2src_2edge-impulse-sdk_2porting_2ethos-core-driver_2_r_e_a_d_m_e_autotoc_md405}{}\doxysection{\texorpdfstring{Contributions}{Contributions}}\label{md__face___access__inferencing_2src_2edge-impulse-sdk_2porting_2ethos-core-driver_2_r_e_a_d_m_e_autotoc_md405}
+The Arm Ethos-\/U project welcomes contributions under the Apache-\/2.\+0 license.
+
+Before we can accept your contribution, you need to certify its origin and give us your permission. For this process we use the Developer Certificate of Origin (DCO) V1.\+1 (\href{https://developercertificate.org}{\texttt{ https\+://developercertificate.\+org}}).
+
+To indicate that you agree to the terms of the DCO, you "{}sign off"{} your contribution by adding a line with your name and e-\/mail address to every git commit message. You must use your real name, no pseudonyms or anonymous contributions are accepted. If there are more than one contributor, everyone adds their name and e-\/mail to the commit message.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ []}
+\DoxyCodeLine{Author:\ John\ Doe\ \(\backslash\)<john.doe@example.org\(\backslash\)>}
+\DoxyCodeLine{Date:\ \ \ Mon\ Feb\ 29\ 12:12:12\ 2016\ +0000}
+\DoxyCodeLine{}
+\DoxyCodeLine{Title\ of\ the\ commit}
+\DoxyCodeLine{}
+\DoxyCodeLine{Short\ description\ of\ the\ change.}
+\DoxyCodeLine{}
+\DoxyCodeLine{Signed-\/off-\/by:\ John\ Doe\ john.doe@example.org}
+\DoxyCodeLine{Signed-\/off-\/by:\ Foo\ Bar\ foo.bar@example.org}
+
+\end{DoxyCode}
+
+
+The contributions will be code reviewed by Arm before they can be accepted into the repository.
+
+In order to submit a contribution push your patch to {\ttfamily ssh\+://\texorpdfstring{$<$}{<}GITHUB\+\_\+\+USER\+\_\+\+ID\texorpdfstring{$>$}{>}@review.\+mlplatform.\+org\+:29418/ml/ethos-\/u/ethos-\/u-\/core-\/driver}. To do this you will need to sign-\/in to \href{https://review.mlplatform.org}{\texttt{ review.\+mlplatform.\+org}} using a Git\+Hub account and add your SSH key under your settings. If there is a problem adding the SSH key make sure there is a valid email address in the Email Addresses field.\hypertarget{md__face___access__inferencing_2src_2edge-impulse-sdk_2porting_2ethos-core-driver_2_r_e_a_d_m_e_autotoc_md406}{}\doxysection{\texorpdfstring{Security}{Security}}\label{md__face___access__inferencing_2src_2edge-impulse-sdk_2porting_2ethos-core-driver_2_r_e_a_d_m_e_autotoc_md406}
+Please see \doxysectlink{md__face___access__inferencing_2src_2edge-impulse-sdk_2porting_2ethos-core-driver_2_s_e_c_u_r_i_t_y}{Security}{0}.\hypertarget{md__face___access__inferencing_2src_2edge-impulse-sdk_2porting_2ethos-core-driver_2_r_e_a_d_m_e_autotoc_md407}{}\doxysection{\texorpdfstring{Trademark notice}{Trademark notice}}\label{md__face___access__inferencing_2src_2edge-impulse-sdk_2porting_2ethos-core-driver_2_r_e_a_d_m_e_autotoc_md407}
+Arm, Cortex and Ethos are registered trademarks of Arm Limited (or its subsidiaries) in the US and/or elsewhere. 

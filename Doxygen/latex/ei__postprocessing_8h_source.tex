@@ -1,0 +1,130 @@
+\doxysection{ei\+\_\+postprocessing.\+h}
+\hypertarget{ei__postprocessing_8h_source}{}\label{ei__postprocessing_8h_source}\index{Face\_Access\_inferencing/src/edge-\/impulse-\/sdk/classifier/postprocessing/ei\_postprocessing.h@{Face\_Access\_inferencing/src/edge-\/impulse-\/sdk/classifier/postprocessing/ei\_postprocessing.h}}
+\mbox{\hyperlink{ei__postprocessing_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{00002\ \textcolor{comment}{\ *\ Copyright\ (c)\ 2022\ EdgeImpulse\ Inc.}}
+\DoxyCodeLine{00003\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00004\ \textcolor{comment}{\ *\ Licensed\ under\ the\ Apache\ License,\ Version\ 2.0\ (the\ "{}License"{});}}
+\DoxyCodeLine{00005\ \textcolor{comment}{\ *\ you\ may\ not\ use\ this\ file\ except\ in\ compliance\ with\ the\ License.}}
+\DoxyCodeLine{00006\ \textcolor{comment}{\ *\ You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{00007\ \textcolor{comment}{\ *\ http://www.apache.org/licenses/LICENSE-\/2.0}}
+\DoxyCodeLine{00008\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00009\ \textcolor{comment}{\ *\ Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,}}
+\DoxyCodeLine{00010\ \textcolor{comment}{\ *\ software\ distributed\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS}}
+\DoxyCodeLine{00011\ \textcolor{comment}{\ *\ IS"{}\ BASIS,\ WITHOUT\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,\ either}}
+\DoxyCodeLine{00012\ \textcolor{comment}{\ *\ express\ or\ implied.\ See\ the\ License\ for\ the\ specific\ language}}
+\DoxyCodeLine{00013\ \textcolor{comment}{\ *\ governing\ permissions\ and\ limitations\ under\ the\ License.}}
+\DoxyCodeLine{00014\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00015\ \textcolor{comment}{\ *\ SPDX-\/License-\/Identifier:\ Apache-\/2.0}}
+\DoxyCodeLine{00016\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{00017\ }
+\DoxyCodeLine{00018\ \textcolor{preprocessor}{\#ifndef\ EI\_POSTPROCESSING\_H}}
+\DoxyCodeLine{00019\ \textcolor{preprocessor}{\#define\ EI\_POSTPROCESSING\_H}}
+\DoxyCodeLine{00020\ }
+\DoxyCodeLine{00021\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{ei__model__types_8h}{edge-\/impulse-\/sdk/classifier/ei\_model\_types.h}}"{}}}
+\DoxyCodeLine{00022\ }
+\DoxyCodeLine{00023\ \textcolor{preprocessor}{\#if\ EI\_CLASSIFIER\_CALIBRATION\_ENABLED}}
+\DoxyCodeLine{00024\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{ei__performance__calibration_8h}{edge-\/impulse-\/sdk/classifier/postprocessing/ei\_performance\_calibration.h}}"{}}}
+\DoxyCodeLine{00025\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00026\ }
+\DoxyCodeLine{00027\ \textcolor{preprocessor}{\#if\ EI\_CLASSIFIER\_OBJECT\_TRACKING\_ENABLED}}
+\DoxyCodeLine{00028\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{ei__object__tracking_8h}{edge-\/impulse-\/sdk/classifier/postprocessing/ei\_object\_tracking.h}}"{}}}
+\DoxyCodeLine{00029\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00030\ }
+\DoxyCodeLine{00031\ \textcolor{preprocessor}{\#if\ EI\_CLASSIFIER\_OBJECT\_COUNTING\_ENABLED}}
+\DoxyCodeLine{00032\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{ei__object__tracking_8h}{edge-\/impulse-\/sdk/classifier/postprocessing/ei\_object\_tracking.h}}"{}}}
+\DoxyCodeLine{00033\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{ei__object__counting_8h}{edge-\/impulse-\/sdk/classifier/postprocessing/ei\_object\_counting.h}}"{}}}
+\DoxyCodeLine{00034\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00035\ }
+\DoxyCodeLine{00036\ \textcolor{keyword}{extern}\ \textcolor{stringliteral}{"{}C"{}}\ \mbox{\hyperlink{group__ei__returntypes_gad9580b47a6cd5e74cfc31a03bdfecebe}{EI\_IMPULSE\_ERROR}}\ \mbox{\hyperlink{ei__postprocessing_8h_abac21dfff4314f4c7fab5330bd9223fb}{init\_postprocessing}}(\mbox{\hyperlink{classei__impulse__handle__t}{ei\_impulse\_handle\_t}}\ *\mbox{\hyperlink{ei__run__dsp_8h_a701ab73428c38eac35ba17226b628ffa}{handle}})\ \{}
+\DoxyCodeLine{00037\ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{ei__run__dsp_8h_a701ab73428c38eac35ba17226b628ffa}{handle}})\ \{}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{group__ei__returntypes_ggad9580b47a6cd5e74cfc31a03bdfecebead0236d7fea5da8a0c29305ab2394fa56}{EI\_IMPULSE\_OUT\_OF\_MEMORY}};}
+\DoxyCodeLine{00039\ \ \ \ \ \}}
+\DoxyCodeLine{00040\ \ \ \ \ \textcolor{keyword}{auto}\ impulse\ =\ \mbox{\hyperlink{ei__run__dsp_8h_a701ab73428c38eac35ba17226b628ffa}{handle}}-\/>impulse;}
+\DoxyCodeLine{00041\ \ \ \ \ \mbox{\hyperlink{ei__run__dsp_8h_a701ab73428c38eac35ba17226b628ffa}{handle}}-\/>post\_processing\_state\ =\ (\textcolor{keywordtype}{void}\ **)\mbox{\hyperlink{group__ei__user__functions_ga71ecca5661ac4434a709c88e4c39b4aa}{ei\_malloc}}(impulse-\/>postprocessing\_blocks\_size\ *\ \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{void}\ *));}
+\DoxyCodeLine{00042\ }
+\DoxyCodeLine{00043\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ impulse-\/>postprocessing\_blocks\_size;\ i++)\ \{}
+\DoxyCodeLine{00044\ }
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group__ei__returntypes_gad9580b47a6cd5e74cfc31a03bdfecebe}{EI\_IMPULSE\_ERROR}}\ res\ =\ impulse-\/>postprocessing\_blocks[i].init\_fn(\mbox{\hyperlink{ei__run__dsp_8h_a701ab73428c38eac35ba17226b628ffa}{handle}},\ \&\mbox{\hyperlink{ei__run__dsp_8h_a701ab73428c38eac35ba17226b628ffa}{handle}}-\/>post\_processing\_state[i],\ impulse-\/>postprocessing\_blocks[i].config);}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (res\ !=\ \mbox{\hyperlink{ei__fill__result__struct_8h_a2fb43be102b153d659b668ad295aff40}{EI\_IMPULSE\_OK}})\ \{}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ res;}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00049\ \ \ \ \ \}}
+\DoxyCodeLine{00050\ }
+\DoxyCodeLine{00051\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{ei__fill__result__struct_8h_a2fb43be102b153d659b668ad295aff40}{EI\_IMPULSE\_OK}};}
+\DoxyCodeLine{00052\ \}}
+\DoxyCodeLine{00053\ }
+\DoxyCodeLine{00054\ \textcolor{keyword}{extern}\ \textcolor{stringliteral}{"{}C"{}}\ \mbox{\hyperlink{group__ei__returntypes_gad9580b47a6cd5e74cfc31a03bdfecebe}{EI\_IMPULSE\_ERROR}}\ \mbox{\hyperlink{ei__postprocessing_8h_a7e1108b39243b7f4ce313f92072cc2cf}{deinit\_postprocessing}}(\mbox{\hyperlink{classei__impulse__handle__t}{ei\_impulse\_handle\_t}}\ *\mbox{\hyperlink{ei__run__dsp_8h_a701ab73428c38eac35ba17226b628ffa}{handle}})\ \{}
+\DoxyCodeLine{00055\ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{ei__run__dsp_8h_a701ab73428c38eac35ba17226b628ffa}{handle}})\ \{}
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{group__ei__returntypes_ggad9580b47a6cd5e74cfc31a03bdfecebead0236d7fea5da8a0c29305ab2394fa56}{EI\_IMPULSE\_OUT\_OF\_MEMORY}};}
+\DoxyCodeLine{00057\ \ \ \ \ \}}
+\DoxyCodeLine{00058\ \ \ \ \ \textcolor{keyword}{auto}\ impulse\ =\ \mbox{\hyperlink{ei__run__dsp_8h_a701ab73428c38eac35ba17226b628ffa}{handle}}-\/>impulse;}
+\DoxyCodeLine{00059\ }
+\DoxyCodeLine{00060\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ impulse-\/>postprocessing\_blocks\_size;\ i++)\ \{}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}*\ \mbox{\hyperlink{ethosu55__interface_8h_adc6e5733fc3c22f0a7b2914188c49c90}{state}}\ =\ NULL;}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{ei__run__dsp_8h_a701ab73428c38eac35ba17226b628ffa}{handle}}-\/>post\_processing\_state\ !=\ NULL)\ \{}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ethosu55__interface_8h_adc6e5733fc3c22f0a7b2914188c49c90}{state}}\ =\ \mbox{\hyperlink{ei__run__dsp_8h_a701ab73428c38eac35ba17226b628ffa}{handle}}-\/>post\_processing\_state[i];}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00065\ }
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group__ei__returntypes_gad9580b47a6cd5e74cfc31a03bdfecebe}{EI\_IMPULSE\_ERROR}}\ res\ =\ impulse-\/>postprocessing\_blocks[i].deinit\_fn(\mbox{\hyperlink{ethosu55__interface_8h_adc6e5733fc3c22f0a7b2914188c49c90}{state}},\ impulse-\/>postprocessing\_blocks[i].config);}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (res\ !=\ \mbox{\hyperlink{ei__fill__result__struct_8h_a2fb43be102b153d659b668ad295aff40}{EI\_IMPULSE\_OK}})\ \{}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ res;}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00070\ \ \ \ \ \}}
+\DoxyCodeLine{00071\ \ \ \ \ \mbox{\hyperlink{group__ei__user__functions_ga7a6a70833407ff1870c12396ce2c4aa3}{ei\_free}}(\mbox{\hyperlink{ei__run__dsp_8h_a701ab73428c38eac35ba17226b628ffa}{handle}}-\/>post\_processing\_state);}
+\DoxyCodeLine{00072\ \ \ \ \ \mbox{\hyperlink{ei__run__dsp_8h_a701ab73428c38eac35ba17226b628ffa}{handle}}-\/>post\_processing\_state\ =\ NULL;}
+\DoxyCodeLine{00073\ }
+\DoxyCodeLine{00074\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{ei__fill__result__struct_8h_a2fb43be102b153d659b668ad295aff40}{EI\_IMPULSE\_OK}};}
+\DoxyCodeLine{00075\ \}}
+\DoxyCodeLine{00076\ }
+\DoxyCodeLine{00077\ \textcolor{keyword}{extern}\ \textcolor{stringliteral}{"{}C"{}}\ \mbox{\hyperlink{group__ei__returntypes_gad9580b47a6cd5e74cfc31a03bdfecebe}{EI\_IMPULSE\_ERROR}}\ \mbox{\hyperlink{ei__postprocessing_8h_a1546cb6136f3db1bcdc6a571b1da79f6}{run\_postprocessing}}(\mbox{\hyperlink{classei__impulse__handle__t}{ei\_impulse\_handle\_t}}\ *\mbox{\hyperlink{ei__run__dsp_8h_a701ab73428c38eac35ba17226b628ffa}{handle}},}
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structei__impulse__result__t}{ei\_impulse\_result\_t}}\ *\mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}})\ \{}
+\DoxyCodeLine{00079\ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{ei__run__dsp_8h_a701ab73428c38eac35ba17226b628ffa}{handle}})\ \{}
+\DoxyCodeLine{00080\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{group__ei__returntypes_ggad9580b47a6cd5e74cfc31a03bdfecebead0236d7fea5da8a0c29305ab2394fa56}{EI\_IMPULSE\_OUT\_OF\_MEMORY}};}
+\DoxyCodeLine{00081\ \ \ \ \ \}}
+\DoxyCodeLine{00082\ \ \ \ \ \textcolor{keyword}{auto}\ impulse\ =\ \mbox{\hyperlink{ei__run__dsp_8h_a701ab73428c38eac35ba17226b628ffa}{handle}}-\/>impulse;}
+\DoxyCodeLine{00083\ }
+\DoxyCodeLine{00084\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ impulse-\/>postprocessing\_blocks\_size;\ i++)\ \{}
+\DoxyCodeLine{00085\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}*\ \mbox{\hyperlink{ethosu55__interface_8h_adc6e5733fc3c22f0a7b2914188c49c90}{state}}\ =\ NULL;}
+\DoxyCodeLine{00086\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{ei__run__dsp_8h_a701ab73428c38eac35ba17226b628ffa}{handle}}-\/>post\_processing\_state\ !=\ NULL)\ \{}
+\DoxyCodeLine{00087\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ethosu55__interface_8h_adc6e5733fc3c22f0a7b2914188c49c90}{state}}\ =\ \mbox{\hyperlink{ei__run__dsp_8h_a701ab73428c38eac35ba17226b628ffa}{handle}}-\/>post\_processing\_state[i];}
+\DoxyCodeLine{00088\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00089\ }
+\DoxyCodeLine{00090\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group__ei__returntypes_gad9580b47a6cd5e74cfc31a03bdfecebe}{EI\_IMPULSE\_ERROR}}\ res\ =\ impulse-\/>postprocessing\_blocks[i].postprocess\_fn(\mbox{\hyperlink{ei__run__dsp_8h_a701ab73428c38eac35ba17226b628ffa}{handle}},}
+\DoxyCodeLine{00091\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}},}
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ impulse-\/>postprocessing\_blocks[i].config,}
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ethosu55__interface_8h_adc6e5733fc3c22f0a7b2914188c49c90}{state}});}
+\DoxyCodeLine{00094\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (res\ !=\ \mbox{\hyperlink{ei__fill__result__struct_8h_a2fb43be102b153d659b668ad295aff40}{EI\_IMPULSE\_OK}})\ \{}
+\DoxyCodeLine{00095\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ res;}
+\DoxyCodeLine{00096\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00097\ \ \ \ \ \}}
+\DoxyCodeLine{00098\ }
+\DoxyCodeLine{00099\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{ei__fill__result__struct_8h_a2fb43be102b153d659b668ad295aff40}{EI\_IMPULSE\_OK}};}
+\DoxyCodeLine{00100\ \}}
+\DoxyCodeLine{00101\ }
+\DoxyCodeLine{00102\ \textcolor{keyword}{extern}\ \textcolor{stringliteral}{"{}C"{}}\ \mbox{\hyperlink{group__ei__returntypes_gad9580b47a6cd5e74cfc31a03bdfecebe}{EI\_IMPULSE\_ERROR}}\ \mbox{\hyperlink{ei__postprocessing_8h_a08885b944c49cda3aa5eb45127940bd7}{display\_postprocessing}}(\mbox{\hyperlink{classei__impulse__handle__t}{ei\_impulse\_handle\_t}}\ *\mbox{\hyperlink{ei__run__dsp_8h_a701ab73428c38eac35ba17226b628ffa}{handle}},}
+\DoxyCodeLine{00103\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structei__impulse__result__t}{ei\_impulse\_result\_t}}\ *\mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}})\ \{}
+\DoxyCodeLine{00104\ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{ei__run__dsp_8h_a701ab73428c38eac35ba17226b628ffa}{handle}})\ \{}
+\DoxyCodeLine{00105\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{group__ei__returntypes_ggad9580b47a6cd5e74cfc31a03bdfecebead0236d7fea5da8a0c29305ab2394fa56}{EI\_IMPULSE\_OUT\_OF\_MEMORY}};}
+\DoxyCodeLine{00106\ \ \ \ \ \}}
+\DoxyCodeLine{00107\ \ \ \ \ \textcolor{keyword}{auto}\ impulse\ =\ \mbox{\hyperlink{ei__run__dsp_8h_a701ab73428c38eac35ba17226b628ffa}{handle}}-\/>impulse;}
+\DoxyCodeLine{00108\ }
+\DoxyCodeLine{00109\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ impulse-\/>postprocessing\_blocks\_size;\ i++)\ \{}
+\DoxyCodeLine{00110\ }
+\DoxyCodeLine{00111\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (impulse-\/>postprocessing\_blocks[i].display\_fn\ ==\ \textcolor{keyword}{nullptr})\ \{}
+\DoxyCodeLine{00112\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{continue};}
+\DoxyCodeLine{00113\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00114\ }
+\DoxyCodeLine{00115\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group__ei__returntypes_gad9580b47a6cd5e74cfc31a03bdfecebe}{EI\_IMPULSE\_ERROR}}\ res\ =\ impulse-\/>postprocessing\_blocks[i].display\_fn(\mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}},\ impulse-\/>postprocessing\_blocks[i].config);}
+\DoxyCodeLine{00116\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (res\ !=\ \mbox{\hyperlink{ei__fill__result__struct_8h_a2fb43be102b153d659b668ad295aff40}{EI\_IMPULSE\_OK}})\ \{}
+\DoxyCodeLine{00117\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ res;}
+\DoxyCodeLine{00118\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00119\ \ \ \ \ \}}
+\DoxyCodeLine{00120\ }
+\DoxyCodeLine{00121\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{ei__fill__result__struct_8h_a2fb43be102b153d659b668ad295aff40}{EI\_IMPULSE\_OK}};}
+\DoxyCodeLine{00122\ \}}
+\DoxyCodeLine{00123\ }
+\DoxyCodeLine{00124\ \textcolor{preprocessor}{\#endif}}
+
+\end{DoxyCode}

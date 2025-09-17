@@ -1,0 +1,209 @@
+\doxysection{instrumentation.\+h}
+\hypertarget{_face___access__inferencing_2src_2edge-impulse-sdk_2third__party_2ruy_2ruy_2profiler_2instrumentation_8h_source}{}\label{_face___access__inferencing_2src_2edge-impulse-sdk_2third__party_2ruy_2ruy_2profiler_2instrumentation_8h_source}\index{Face\_Access\_inferencing/src/edge-\/impulse-\/sdk/third\_party/ruy/ruy/profiler/instrumentation.h@{Face\_Access\_inferencing/src/edge-\/impulse-\/sdk/third\_party/ruy/ruy/profiler/instrumentation.h}}
+\mbox{\hyperlink{_face___access__inferencing_2src_2edge-impulse-sdk_2third__party_2ruy_2ruy_2profiler_2instrumentation_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{/*\ Copyright\ 2020\ Google\ LLC.\ All\ Rights\ Reserved.}}
+\DoxyCodeLine{00002\ \textcolor{comment}{}}
+\DoxyCodeLine{00003\ \textcolor{comment}{Licensed\ under\ the\ Apache\ License,\ Version\ 2.0\ (the\ "{}License"{});}}
+\DoxyCodeLine{00004\ \textcolor{comment}{you\ may\ not\ use\ this\ file\ except\ in\ compliance\ with\ the\ License.}}
+\DoxyCodeLine{00005\ \textcolor{comment}{You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{00006\ \textcolor{comment}{}}
+\DoxyCodeLine{00007\ \textcolor{comment}{\ \ \ \ http://www.apache.org/licenses/LICENSE-\/2.0}}
+\DoxyCodeLine{00008\ \textcolor{comment}{}}
+\DoxyCodeLine{00009\ \textcolor{comment}{Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ software}}
+\DoxyCodeLine{00010\ \textcolor{comment}{distributed\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,}}
+\DoxyCodeLine{00011\ \textcolor{comment}{WITHOUT\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,\ either\ express\ or\ implied.}}
+\DoxyCodeLine{00012\ \textcolor{comment}{See\ the\ License\ for\ the\ specific\ language\ governing\ permissions\ and}}
+\DoxyCodeLine{00013\ \textcolor{comment}{limitations\ under\ the\ License.}}
+\DoxyCodeLine{00014\ \textcolor{comment}{==============================================================================*/}}
+\DoxyCodeLine{00015\ }
+\DoxyCodeLine{00016\ \textcolor{preprocessor}{\#ifndef\ RUY\_RUY\_PROFILER\_INSTRUMENTATION\_H\_}}
+\DoxyCodeLine{00017\ \textcolor{preprocessor}{\#define\ RUY\_RUY\_PROFILER\_INSTRUMENTATION\_H\_}}
+\DoxyCodeLine{00018\ }
+\DoxyCodeLine{00019\ \textcolor{preprocessor}{\#ifdef\ RUY\_PROFILER}}
+\DoxyCodeLine{00020\ \textcolor{preprocessor}{\#include\ <cstdio>}}
+\DoxyCodeLine{00021\ \textcolor{preprocessor}{\#include\ <mutex>}}
+\DoxyCodeLine{00022\ \textcolor{preprocessor}{\#include\ <vector>}}
+\DoxyCodeLine{00023\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00024\ }
+\DoxyCodeLine{00025\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespaceruy}{ruy}}\ \{}
+\DoxyCodeLine{00026\ \textcolor{keyword}{namespace\ }profiler\ \{}
+\DoxyCodeLine{00027\ }
+\DoxyCodeLine{00028\ \textcolor{preprocessor}{\#ifdef\ RUY\_PROFILER}}
+\DoxyCodeLine{00029\ }
+\DoxyCodeLine{00030\ \textcolor{comment}{//\ A\ label\ is\ how\ a\ code\ scope\ is\ annotated\ to\ appear\ in\ profiles.}}
+\DoxyCodeLine{00031\ \textcolor{comment}{//\ The\ stacks\ that\ are\ sampled\ by\ the\ profiler\ are\ stacks\ of\ such\ labels.}}
+\DoxyCodeLine{00032\ \textcolor{comment}{//\ A\ label\ consists\ of\ a\ literal\ string,\ plus\ optional\ integer\ arguments.}}
+\DoxyCodeLine{00033\ \textcolor{keyword}{class\ }Label\ \{}
+\DoxyCodeLine{00034\ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00035\ \ \ Label()\ \{\}}
+\DoxyCodeLine{00036\ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}...\ Args>}
+\DoxyCodeLine{00037\ \ \ \textcolor{keyword}{explicit}\ Label(Args...\ args)\ \{}
+\DoxyCodeLine{00038\ \ \ \ \ Set(\mbox{\hyperlink{namespacecheck__tflite__files_ae0a3e9cb8fdc69292f78727c66e6b92e}{args}}...);}
+\DoxyCodeLine{00039\ \ \ \}}
+\DoxyCodeLine{00040\ \ \ \textcolor{keywordtype}{void}\ Set(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ format)\ \{}
+\DoxyCodeLine{00041\ \ \ \ \ format\_\ =\ \mbox{\hyperlink{namespacecalibrate_ae7b40e62af5ed3c300dbace4b34b48c3}{format}};}
+\DoxyCodeLine{00042\ \ \ \ \ args\_count\_\ =\ 0;}
+\DoxyCodeLine{00043\ \ \ \}}
+\DoxyCodeLine{00044\ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}...\ Args>}
+\DoxyCodeLine{00045\ \ \ \textcolor{keywordtype}{void}\ Set(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ format,\ Args...\ args)\ \{}
+\DoxyCodeLine{00046\ \ \ \ \ format\_\ =\ \mbox{\hyperlink{namespacecalibrate_ae7b40e62af5ed3c300dbace4b34b48c3}{format}};}
+\DoxyCodeLine{00047\ \ \ \ \ args\_count\_\ =\ \textcolor{keyword}{sizeof}...(args);}
+\DoxyCodeLine{00048\ \ \ \ \ SetArgs(0,\ \mbox{\hyperlink{namespacecheck__tflite__files_ae0a3e9cb8fdc69292f78727c66e6b92e}{args}}...);}
+\DoxyCodeLine{00049\ \ \ \}}
+\DoxyCodeLine{00050\ }
+\DoxyCodeLine{00051\ \ \ \textcolor{keywordtype}{void}\ operator=(\textcolor{keyword}{const}\ Label\&\ other);}
+\DoxyCodeLine{00052\ }
+\DoxyCodeLine{00053\ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespacetflite_ae896614fc0b8e5d0864411da15627353}{operator==}}(\textcolor{keyword}{const}\ Label\&\ other)\ \textcolor{keyword}{const};}
+\DoxyCodeLine{00054\ }
+\DoxyCodeLine{00055\ \ \ std::string\ Formatted()\ \textcolor{keyword}{const};}
+\DoxyCodeLine{00056\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \mbox{\hyperlink{namespacecalibrate_ae7b40e62af5ed3c300dbace4b34b48c3}{format}}()\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ format\_;\ \}}
+\DoxyCodeLine{00057\ }
+\DoxyCodeLine{00058\ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{00059\ \ \ \textcolor{keywordtype}{void}\ SetArgs(\textcolor{keywordtype}{int}\ position,\ \textcolor{keywordtype}{int}\ arg0)\ \{\ args\_[position]\ =\ arg0;\ \}}
+\DoxyCodeLine{00060\ }
+\DoxyCodeLine{00061\ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}...\ Args>}
+\DoxyCodeLine{00062\ \ \ \textcolor{keywordtype}{void}\ SetArgs(\textcolor{keywordtype}{int}\ position,\ \textcolor{keywordtype}{int}\ arg0,\ Args...\ args)\ \{}
+\DoxyCodeLine{00063\ \ \ \ \ SetArgs(position,\ arg0);}
+\DoxyCodeLine{00064\ \ \ \ \ SetArgs(position\ +\ 1,\ \mbox{\hyperlink{namespacecheck__tflite__files_ae0a3e9cb8fdc69292f78727c66e6b92e}{args}}...);}
+\DoxyCodeLine{00065\ \ \ \}}
+\DoxyCodeLine{00066\ }
+\DoxyCodeLine{00067\ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{int}\ kMaxArgs\ =\ 4;}
+\DoxyCodeLine{00068\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ format\_\ =\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{00069\ \ \ \textcolor{keywordtype}{int}\ args\_count\_\ =\ 0;}
+\DoxyCodeLine{00070\ \ \ \textcolor{keywordtype}{int}\ args\_[kMaxArgs];}
+\DoxyCodeLine{00071\ \};}
+\DoxyCodeLine{00072\ }
+\DoxyCodeLine{00073\ \textcolor{keyword}{namespace\ }detail\ \{}
+\DoxyCodeLine{00074\ }
+\DoxyCodeLine{00075\ \textcolor{comment}{//\ Forward-\/declaration,\ see\ class\ ThreadStack\ below.}}
+\DoxyCodeLine{00076\ \textcolor{keyword}{class\ }ThreadStack;}
+\DoxyCodeLine{00077\ }
+\DoxyCodeLine{00078\ \textcolor{keywordtype}{bool}\&\ GlobalIsProfilerRunning();}
+\DoxyCodeLine{00079\ }
+\DoxyCodeLine{00080\ \textcolor{comment}{//\ Returns\ the\ global\ vector\ of\ pointers\ to\ all\ stacks,\ there\ being\ one\ stack}}
+\DoxyCodeLine{00081\ \textcolor{comment}{//\ per\ thread\ executing\ instrumented\ code.}}
+\DoxyCodeLine{00082\ std::vector<ThreadStack*>*\ GlobalAllThreadStacks();}
+\DoxyCodeLine{00083\ }
+\DoxyCodeLine{00084\ \textcolor{comment}{//\ Returns\ the\ mutex\ to\ be\ locked\ around\ any\ access\ to\ GlobalAllThreadStacks().}}
+\DoxyCodeLine{00085\ std::mutex*\ GlobalsMutex();}
+\DoxyCodeLine{00086\ }
+\DoxyCodeLine{00087\ \textcolor{comment}{//\ Returns\ the\ thread-\/local\ stack,\ specific\ to\ the\ current\ thread.}}
+\DoxyCodeLine{00088\ ThreadStack*\ ThreadLocalThreadStack();}
+\DoxyCodeLine{00089\ }
+\DoxyCodeLine{00090\ \textcolor{comment}{//\ This\ 'stack'\ is\ what\ may\ be\ more\ appropriately\ called\ a\ 'pseudostack':}}
+\DoxyCodeLine{00091\ \textcolor{comment}{//\ It\ contains\ Label\ entries\ that\ are\ 'manually'\ entered\ by\ instrumentation}}
+\DoxyCodeLine{00092\ \textcolor{comment}{//\ code.\ It's\ unrelated\ to\ real\ call\ stacks.}}
+\DoxyCodeLine{00093\ \textcolor{keyword}{struct\ }Stack\ \{}
+\DoxyCodeLine{00094\ \ \ std::uint32\_t\ \textcolor{keywordtype}{id}\ =\ 0;}
+\DoxyCodeLine{00095\ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{int}\ kMaxSize\ =\ 64;}
+\DoxyCodeLine{00096\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{hello__world__model_8cc_a439227feff9d7f55384e8780cfc2eb82}{size}}\ =\ 0;}
+\DoxyCodeLine{00097\ \ \ Label\ \mbox{\hyperlink{ei__fill__result__struct_8h_ab36422f9ce90634e6563fb1f2905fb93}{labels}}[kMaxSize];}
+\DoxyCodeLine{00098\ \};}
+\DoxyCodeLine{00099\ }
+\DoxyCodeLine{00100\ \textcolor{comment}{//\ Returns\ the\ buffer\ byte\ size\ required\ by\ CopyToSample.}}
+\DoxyCodeLine{00101\ \textcolor{keywordtype}{int}\ GetBufferSize(\textcolor{keyword}{const}\ Stack\&\ stack);}
+\DoxyCodeLine{00102\ }
+\DoxyCodeLine{00103\ \textcolor{comment}{//\ Copies\ this\ Stack\ into\ a\ byte\ buffer,\ called\ a\ 'sample'.}}
+\DoxyCodeLine{00104\ \textcolor{keywordtype}{void}\ CopyToBuffer(\textcolor{keyword}{const}\ Stack\&\ stack,\ \textcolor{keywordtype}{char}*\ dst);}
+\DoxyCodeLine{00105\ }
+\DoxyCodeLine{00106\ \textcolor{comment}{//\ Populates\ this\ Stack\ from\ an\ existing\ sample\ buffer,\ typically}}
+\DoxyCodeLine{00107\ \textcolor{comment}{//\ produced\ by\ CopyToSample.}}
+\DoxyCodeLine{00108\ \textcolor{keywordtype}{void}\ ReadFromBuffer(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ src,\ Stack*\ stack);}
+\DoxyCodeLine{00109\ }
+\DoxyCodeLine{00110\ \textcolor{comment}{//\ ThreadStack\ is\ meant\ to\ be\ used\ as\ a\ thread-\/local\ singleton,\ assigning\ to}}
+\DoxyCodeLine{00111\ \textcolor{comment}{//\ each\ thread\ a\ Stack\ object\ holding\ its\ pseudo-\/stack\ of\ profile\ labels,}}
+\DoxyCodeLine{00112\ \textcolor{comment}{//\ plus\ a\ mutex\ allowing\ to\ synchronize\ accesses\ to\ this\ pseudo-\/stack\ between}}
+\DoxyCodeLine{00113\ \textcolor{comment}{//\ this\ thread\ and\ a\ possible\ profiler\ thread\ sampling\ it.}}
+\DoxyCodeLine{00114\ \textcolor{keyword}{class\ }ThreadStack\ \{}
+\DoxyCodeLine{00115\ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00116\ \ \ ThreadStack();}
+\DoxyCodeLine{00117\ \ \ \string~ThreadStack();}
+\DoxyCodeLine{00118\ }
+\DoxyCodeLine{00119\ \ \ \textcolor{keyword}{const}\ Stack\&\ stack()\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ stack\_;\ \}}
+\DoxyCodeLine{00120\ }
+\DoxyCodeLine{00121\ \ \ \textcolor{comment}{//\ Returns\ the\ mutex\ to\ lock\ around\ any\ access\ to\ this\ stack.\ Each\ stack\ is}}
+\DoxyCodeLine{00122\ \ \ \textcolor{comment}{//\ accessed\ by\ potentially\ two\ threads:\ the\ thread\ that\ it\ belongs\ to}}
+\DoxyCodeLine{00123\ \ \ \textcolor{comment}{//\ (which\ calls\ Push\ and\ Pop)\ and\ the\ profiler\ thread\ during\ profiling}}
+\DoxyCodeLine{00124\ \ \ \textcolor{comment}{//\ (which\ calls\ CopyToSample).}}
+\DoxyCodeLine{00125\ \ \ std::mutex\&\ Mutex()\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ mutex\_;\ \}}
+\DoxyCodeLine{00126\ }
+\DoxyCodeLine{00127\ \ \ \textcolor{comment}{//\ Pushes\ a\ new\ label\ on\ the\ top\ of\ this\ Stack.}}
+\DoxyCodeLine{00128\ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}...\ Args>}
+\DoxyCodeLine{00129\ \ \ \textcolor{keywordtype}{void}\ Push(Args...\ args)\ \{}
+\DoxyCodeLine{00130\ \ \ \ \ \textcolor{comment}{//\ This\ mutex\ locking\ is\ needed\ to\ guard\ against\ race\ conditions\ as\ both}}
+\DoxyCodeLine{00131\ \ \ \ \ \textcolor{comment}{//\ the\ current\ thread\ and\ the\ profiler\ thread\ may\ be\ concurrently\ accessing}}
+\DoxyCodeLine{00132\ \ \ \ \ \textcolor{comment}{//\ this\ stack.\ In\ addition\ to\ that,\ this\ mutex\ locking\ also\ serves\ the\ other}}
+\DoxyCodeLine{00133\ \ \ \ \ \textcolor{comment}{//\ purpose\ of\ acting\ as\ a\ barrier\ (of\ compiler\ code\ reordering,\ of\ runtime}}
+\DoxyCodeLine{00134\ \ \ \ \ \textcolor{comment}{//\ CPU\ instruction\ reordering,\ and\ of\ memory\ access\ reordering),\ which}}
+\DoxyCodeLine{00135\ \ \ \ \ \textcolor{comment}{//\ gives\ a\ measure\ of\ correctness\ to\ this\ profiler.\ The\ downside\ is\ some}}
+\DoxyCodeLine{00136\ \ \ \ \ \textcolor{comment}{//\ latency.\ As\ this\ lock\ will\ be\ uncontended\ most\ of\ the\ times,\ the\ cost}}
+\DoxyCodeLine{00137\ \ \ \ \ \textcolor{comment}{//\ should\ be\ roughly\ that\ of\ an\ sequentially-\/consistent\ atomic\ access,}}
+\DoxyCodeLine{00138\ \ \ \ \ \textcolor{comment}{//\ comparable\ to\ an\ access\ to\ the\ level\ of\ CPU\ data\ cache\ that\ is\ shared}}
+\DoxyCodeLine{00139\ \ \ \ \ \textcolor{comment}{//\ among\ all\ cores,\ typically\ 60\ cycles\ on\ current\ ARM\ CPUs,\ plus\ side}}
+\DoxyCodeLine{00140\ \ \ \ \ \textcolor{comment}{//\ effects\ from\ barrier\ instructions.}}
+\DoxyCodeLine{00141\ \ \ \ \ std::lock\_guard<std::mutex>\ lock(mutex\_);}
+\DoxyCodeLine{00142\ \ \ \ \ \textcolor{comment}{//\ Avoid\ overrunning\ the\ stack,\ even\ in\ 'release'\ builds.\ This\ profiling}}
+\DoxyCodeLine{00143\ \ \ \ \ \textcolor{comment}{//\ instrumentation\ code\ should\ not\ ship\ in\ release\ builds\ anyway,\ the}}
+\DoxyCodeLine{00144\ \ \ \ \ \textcolor{comment}{//\ overhead\ of\ this\ check\ is\ negligible,\ and\ overrunning\ a\ stack\ array\ would}}
+\DoxyCodeLine{00145\ \ \ \ \ \textcolor{comment}{//\ be\ bad.}}
+\DoxyCodeLine{00146\ \ \ \ \ \textcolor{keywordflow}{if}\ (stack\_.size\ >=\ Stack::kMaxSize)\ \{}
+\DoxyCodeLine{00147\ \ \ \ \ \ \ abort();}
+\DoxyCodeLine{00148\ \ \ \ \ \}}
+\DoxyCodeLine{00149\ \ \ \ \ stack\_.labels[stack\_.size++].Set(\mbox{\hyperlink{namespacecheck__tflite__files_ae0a3e9cb8fdc69292f78727c66e6b92e}{args}}...);}
+\DoxyCodeLine{00150\ \ \ \}}
+\DoxyCodeLine{00151\ }
+\DoxyCodeLine{00152\ \ \ \textcolor{comment}{//\ Pops\ the\ top-\/most\ label\ from\ this\ Stack.}}
+\DoxyCodeLine{00153\ \ \ \textcolor{keywordtype}{void}\ Pop()\ \{}
+\DoxyCodeLine{00154\ \ \ \ \ \textcolor{comment}{//\ See\ the\ comment\ in\ Push\ about\ this\ lock.\ While\ it\ would\ be\ tempting\ to}}
+\DoxyCodeLine{00155\ \ \ \ \ \textcolor{comment}{//\ try\ to\ remove\ this\ lock\ and\ just\ atomically\ decrement\ size\_\ with\ a}}
+\DoxyCodeLine{00156\ \ \ \ \ \textcolor{comment}{//\ store-\/release,\ that\ would\ not\ necessarily\ be\ a\ substitute\ for\ all\ of\ the}}
+\DoxyCodeLine{00157\ \ \ \ \ \textcolor{comment}{//\ purposes\ that\ this\ lock\ serves,\ or\ if\ it\ was\ done\ carefully\ to\ serve\ all}}
+\DoxyCodeLine{00158\ \ \ \ \ \textcolor{comment}{//\ of\ the\ same\ purposes,\ then\ that\ wouldn't\ be\ faster\ than\ this\ (mostly}}
+\DoxyCodeLine{00159\ \ \ \ \ \textcolor{comment}{//\ uncontended)\ lock.}}
+\DoxyCodeLine{00160\ \ \ \ \ std::lock\_guard<std::mutex>\ lock(mutex\_);}
+\DoxyCodeLine{00161\ \ \ \ \ stack\_.size-\/-\/;}
+\DoxyCodeLine{00162\ \ \ \}}
+\DoxyCodeLine{00163\ }
+\DoxyCodeLine{00164\ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{00165\ \ \ \textcolor{keyword}{mutable}\ std::mutex\ mutex\_;}
+\DoxyCodeLine{00166\ \ \ Stack\ stack\_;}
+\DoxyCodeLine{00167\ \};}
+\DoxyCodeLine{00168\ }
+\DoxyCodeLine{00169\ \}\ \ \textcolor{comment}{//\ namespace\ detail}}
+\DoxyCodeLine{00170\ }
+\DoxyCodeLine{00171\ \textcolor{comment}{//\ RAII\ user-\/facing\ way\ to\ construct\ Labels\ associated\ with\ their\ life\ scope}}
+\DoxyCodeLine{00172\ \textcolor{comment}{//\ and\ get\ them\ pushed\ to\ /\ popped\ from\ the\ current\ thread\ stack.}}
+\DoxyCodeLine{00173\ \textcolor{keyword}{class\ }ScopeLabel\ \{}
+\DoxyCodeLine{00174\ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00175\ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}...\ Args>}
+\DoxyCodeLine{00176\ \ \ \mbox{\hyperlink{classruy_1_1profiler_1_1_scope_label_af98ec6595418e55520942b3773735bad}{ScopeLabel}}(Args...\ args)\ :\ thread\_stack\_(detail::ThreadLocalThreadStack())\ \{}
+\DoxyCodeLine{00177\ \ \ \ \ thread\_stack\_-\/>Push(\mbox{\hyperlink{namespacecheck__tflite__files_ae0a3e9cb8fdc69292f78727c66e6b92e}{args}}...);}
+\DoxyCodeLine{00178\ \ \ \}}
+\DoxyCodeLine{00179\ }
+\DoxyCodeLine{00180\ \ \ \mbox{\hyperlink{classruy_1_1profiler_1_1_scope_label_a2022fde84a7503ebeb460c49465584ce}{\string~ScopeLabel}}()\ \{\ thread\_stack\_-\/>Pop();\ \}}
+\DoxyCodeLine{00181\ }
+\DoxyCodeLine{00182\ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{00183\ \ \ detail::ThreadStack*\ thread\_stack\_;}
+\DoxyCodeLine{00184\ \};}
+\DoxyCodeLine{00185\ }
+\DoxyCodeLine{00186\ \textcolor{preprocessor}{\#else\ \ }\textcolor{comment}{//\ no\ RUY\_PROFILER}}
+\DoxyCodeLine{00187\ }
+\DoxyCodeLine{00188\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classruy_1_1profiler_1_1_scope_label}{ScopeLabel}}\ \{}
+\DoxyCodeLine{00189\ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00190\ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}...\ Args>}
+\DoxyCodeLine{00191\ \ \ \textcolor{keyword}{explicit}\ \mbox{\hyperlink{classruy_1_1profiler_1_1_scope_label_af98ec6595418e55520942b3773735bad}{ScopeLabel}}(Args...)\ \{\}}
+\DoxyCodeLine{00192\ }
+\DoxyCodeLine{00193\ \ \ \textcolor{comment}{//\ This\ destructor\ is\ needed\ to\ consistently\ silence\ clang's\ -\/Wunused-\/variable}}
+\DoxyCodeLine{00194\ \ \ \textcolor{comment}{//\ which\ seems\ to\ trigger\ semi-\/randomly.}}
+\DoxyCodeLine{00195\ \ \ \mbox{\hyperlink{classruy_1_1profiler_1_1_scope_label_a2022fde84a7503ebeb460c49465584ce}{\string~ScopeLabel}}()\ \{\}}
+\DoxyCodeLine{00196\ \};}
+\DoxyCodeLine{00197\ }
+\DoxyCodeLine{00198\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00199\ }
+\DoxyCodeLine{00200\ \}\ \ \textcolor{comment}{//\ namespace\ profiler}}
+\DoxyCodeLine{00201\ \}\ \ \textcolor{comment}{//\ namespace\ ruy}}
+\DoxyCodeLine{00202\ }
+\DoxyCodeLine{00203\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ RUY\_RUY\_PROFILER\_INSTRUMENTATION\_H\_}}
+
+\end{DoxyCode}

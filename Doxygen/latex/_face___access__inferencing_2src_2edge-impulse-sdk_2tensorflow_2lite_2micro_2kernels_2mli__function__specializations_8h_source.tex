@@ -1,0 +1,151 @@
+\doxysection{mli\+\_\+function\+\_\+specializations.\+h}
+\hypertarget{_face___access__inferencing_2src_2edge-impulse-sdk_2tensorflow_2lite_2micro_2kernels_2mli__function__specializations_8h_source}{}\label{_face___access__inferencing_2src_2edge-impulse-sdk_2tensorflow_2lite_2micro_2kernels_2mli__function__specializations_8h_source}\index{Face\_Access\_inferencing/src/edge-\/impulse-\/sdk/tensorflow/lite/micro/kernels/mli\_function\_specializations.h@{Face\_Access\_inferencing/src/edge-\/impulse-\/sdk/tensorflow/lite/micro/kernels/mli\_function\_specializations.h}}
+\mbox{\hyperlink{_face___access__inferencing_2src_2edge-impulse-sdk_2tensorflow_2lite_2micro_2kernels_2mli__function__specializations_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{//\ Patched\ by\ Edge\ Impulse\ to\ include\ reference\ and\ hardware-\/accelerated\ kernels}}
+\DoxyCodeLine{00002\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{ei__classifier__config_8h}{../../../../classifier/ei\_classifier\_config.h}}"{}}}
+\DoxyCodeLine{00003\ \textcolor{preprocessor}{\#if\ EI\_CLASSIFIER\_TFLITE\_ENABLE\_ARC\ ==\ 1}}
+\DoxyCodeLine{00004\ \textcolor{comment}{/*\ Copyright\ 2021\ The\ TensorFlow\ Authors.\ All\ Rights\ Reserved.}}
+\DoxyCodeLine{00005\ \textcolor{comment}{}}
+\DoxyCodeLine{00006\ \textcolor{comment}{Licensed\ under\ the\ Apache\ License,\ Version\ 2.0\ (the\ "{}License"{});}}
+\DoxyCodeLine{00007\ \textcolor{comment}{you\ may\ not\ use\ this\ file\ except\ in\ compliance\ with\ the\ License.}}
+\DoxyCodeLine{00008\ \textcolor{comment}{You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{00009\ \textcolor{comment}{}}
+\DoxyCodeLine{00010\ \textcolor{comment}{\ \ \ \ http://www.apache.org/licenses/LICENSE-\/2.0}}
+\DoxyCodeLine{00011\ \textcolor{comment}{}}
+\DoxyCodeLine{00012\ \textcolor{comment}{Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ software}}
+\DoxyCodeLine{00013\ \textcolor{comment}{distributed\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,}}
+\DoxyCodeLine{00014\ \textcolor{comment}{WITHOUT\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,\ either\ express\ or\ implied.}}
+\DoxyCodeLine{00015\ \textcolor{comment}{See\ the\ License\ for\ the\ specific\ language\ governing\ permissions\ and}}
+\DoxyCodeLine{00016\ \textcolor{comment}{limitations\ under\ the\ License.}}
+\DoxyCodeLine{00017\ \textcolor{comment}{==============================================================================*/}}
+\DoxyCodeLine{00018\ }
+\DoxyCodeLine{00019\ \textcolor{preprocessor}{\#include\ "{}mli\_api.h"{}}\ \ \textcolor{comment}{//\ NOLINT}}
+\DoxyCodeLine{00020\ }
+\DoxyCodeLine{00021\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacetflite}{tflite}}\ \{}
+\DoxyCodeLine{00022\ }
+\DoxyCodeLine{00023\ \textcolor{comment}{//\ Convolution\ specialized\ function.}}
+\DoxyCodeLine{00024\ \textcolor{keyword}{typedef}\ mli\_status\ (*\mbox{\hyperlink{namespacetflite_a84d1af01a7a622193f8b0052aa18241a}{conv\_func\_ptr}})(\textcolor{keyword}{const}\ mli\_tensor*\ \textcolor{comment}{/*in*/},}
+\DoxyCodeLine{00025\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ mli\_tensor*\ \textcolor{comment}{/*weights*/},}
+\DoxyCodeLine{00026\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ mli\_tensor*\ \textcolor{comment}{/*bias*/},}
+\DoxyCodeLine{00027\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ mli\_conv2d\_cfg*\ \textcolor{comment}{/*cfg*/},}
+\DoxyCodeLine{00028\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ mli\_tensor*\ \textcolor{comment}{/*out*/});}
+\DoxyCodeLine{00029\ }
+\DoxyCodeLine{00030\ \textcolor{preprocessor}{\#ifdef\ MLI\_2\_0}}
+\DoxyCodeLine{00031\ \mbox{\hyperlink{namespacetflite_a84d1af01a7a622193f8b0052aa18241a}{conv\_func\_ptr}}\ \mbox{\hyperlink{namespacetflite_a287894951cbe1d79a095c9939c27ce05}{\_\_attribute\_\_}}((weak))}
+\DoxyCodeLine{00032\ mli\_krn\_conv2d\_hwcn(\textcolor{keyword}{const}\ mli\_tensor*\ weights)\ \{}
+\DoxyCodeLine{00033\ \ \ \textcolor{keywordtype}{int}\ filter\_w\ =\ weights-\/>shape[KRNL\_W\_DIM\_HWCN];}
+\DoxyCodeLine{00034\ \ \ \textcolor{keywordtype}{int}\ filter\_h\ =\ weights-\/>shape[KRNL\_H\_DIM\_HWCN];}
+\DoxyCodeLine{00035\ }
+\DoxyCodeLine{00036\ \ \ \textcolor{keywordflow}{if}\ (filter\_w\ ==\ 1\ \&\&\ filter\_h\ ==\ 1)\ \{}
+\DoxyCodeLine{00037\ \ \ \ \ \textcolor{keywordflow}{return}\ mli\_krn\_conv2d\_hwcn\_sa8\_sa8\_sa32\_k1x1;}
+\DoxyCodeLine{00038\ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (filter\_w\ ==\ 3\ \&\&\ filter\_h\ ==\ 3)\ \{}
+\DoxyCodeLine{00039\ \ \ \ \ \textcolor{keywordflow}{return}\ mli\_krn\_conv2d\_hwcn\_sa8\_sa8\_sa32\_k3x3;}
+\DoxyCodeLine{00040\ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (filter\_w\ ==\ 5\ \&\&\ filter\_h\ ==\ 5)\ \{}
+\DoxyCodeLine{00041\ \ \ \ \ \textcolor{keywordflow}{return}\ mli\_krn\_conv2d\_hwcn\_sa8\_sa8\_sa32\_k5x5;}
+\DoxyCodeLine{00042\ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00043\ \ \ \ \ \textcolor{keywordflow}{return}\ mli\_krn\_conv2d\_hwcn\_sa8\_sa8\_sa32;}
+\DoxyCodeLine{00044\ \ \ \}}
+\DoxyCodeLine{00045\ \}}
+\DoxyCodeLine{00046\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00047\ \mbox{\hyperlink{namespacetflite_a84d1af01a7a622193f8b0052aa18241a}{conv\_func\_ptr}}\ \mbox{\hyperlink{namespacetflite_a287894951cbe1d79a095c9939c27ce05}{\_\_attribute\_\_}}((weak))}
+\DoxyCodeLine{00048\ mli\_krn\_conv2d\_hwcn(\textcolor{keyword}{const}\ mli\_tensor*\ weights,\ \textcolor{keyword}{const}\ mli\_conv2d\_cfg*\ \mbox{\hyperlink{namespacetflite_af2a5275d63bc41057c38310898b8a01b}{cfg}})\ \{}
+\DoxyCodeLine{00049\ \ \ \textcolor{keywordflow}{return}\ mli\_krn\_conv2d\_nhwc\_sa8\_sa8\_sa32;}
+\DoxyCodeLine{00050\ \}}
+\DoxyCodeLine{00051\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00052\ }
+\DoxyCodeLine{00053\ \textcolor{comment}{//\ Depthwise\ convolution\ specialized\ function.}}
+\DoxyCodeLine{00054\ \textcolor{keyword}{typedef}\ mli\_status\ (*\mbox{\hyperlink{namespacetflite_a6e8f2856bd3d8d032eab104150ac317d}{depthwise\_func\_ptr}})(\textcolor{keyword}{const}\ mli\_tensor*\ \textcolor{comment}{/*in*/},}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ mli\_tensor*\ \textcolor{comment}{/*weights*/},}
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ mli\_tensor*\ \textcolor{comment}{/*bias*/},}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ mli\_conv2d\_cfg*\ \textcolor{comment}{/*cfg*/},}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ mli\_tensor*\ \textcolor{comment}{/*out*/});}
+\DoxyCodeLine{00059\ }
+\DoxyCodeLine{00060\ \textcolor{preprocessor}{\#ifdef\ MLI\_2\_0}}
+\DoxyCodeLine{00061\ \mbox{\hyperlink{namespacetflite_a6e8f2856bd3d8d032eab104150ac317d}{depthwise\_func\_ptr}}\ \mbox{\hyperlink{namespacetflite_a287894951cbe1d79a095c9939c27ce05}{\_\_attribute\_\_}}((weak))}
+\DoxyCodeLine{00062\ mli\_krn\_depthwise\_conv2d(\textcolor{keyword}{const}\ mli\_tensor*\ weights)\ \{}
+\DoxyCodeLine{00063\ \ \ \textcolor{keywordtype}{int}\ filter\_w\ =\ weights-\/>shape[KRNL\_DW\_W\_DIM\_HW1N];}
+\DoxyCodeLine{00064\ \ \ \textcolor{keywordtype}{int}\ filter\_h\ =\ weights-\/>shape[KRNL\_DW\_H\_DIM\_HW1N];}
+\DoxyCodeLine{00065\ }
+\DoxyCodeLine{00066\ \ \ \textcolor{keywordflow}{if}\ (filter\_w\ ==\ 3\ \&\&\ filter\_h\ ==\ 3)\ \{}
+\DoxyCodeLine{00067\ \ \ \ \ \textcolor{keywordflow}{return}\ mli\_krn\_depthwise\_conv2d\_hwcn\_sa8\_sa8\_sa32\_k3x3;}
+\DoxyCodeLine{00068\ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (filter\_w\ ==\ 5\ \&\&\ filter\_h\ ==\ 5)\ \{}
+\DoxyCodeLine{00069\ \ \ \ \ \textcolor{keywordflow}{return}\ mli\_krn\_depthwise\_conv2d\_hwcn\_sa8\_sa8\_sa32\_k5x5;}
+\DoxyCodeLine{00070\ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00071\ \ \ \ \ \textcolor{keywordflow}{return}\ mli\_krn\_depthwise\_conv2d\_hwcn\_sa8\_sa8\_sa32;}
+\DoxyCodeLine{00072\ \ \ \}}
+\DoxyCodeLine{00073\ \}}
+\DoxyCodeLine{00074\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00075\ \mbox{\hyperlink{namespacetflite_a6e8f2856bd3d8d032eab104150ac317d}{depthwise\_func\_ptr}}\ \mbox{\hyperlink{namespacetflite_a287894951cbe1d79a095c9939c27ce05}{\_\_attribute\_\_}}((weak))}
+\DoxyCodeLine{00076\ mli\_krn\_depthwise\_conv2d(\textcolor{keyword}{const}\ mli\_tensor*\ weights,\ \textcolor{keyword}{const}\ mli\_conv2d\_cfg*\ \mbox{\hyperlink{namespacetflite_af2a5275d63bc41057c38310898b8a01b}{cfg}})\ \{}
+\DoxyCodeLine{00077\ \ \ \textcolor{keywordflow}{return}\ mli\_krn\_depthwise\_conv2d\_hwcn\_sa8\_sa8\_sa32;}
+\DoxyCodeLine{00078\ \}}
+\DoxyCodeLine{00079\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00080\ }
+\DoxyCodeLine{00081\ \textcolor{preprocessor}{\#ifdef\ MLI\_2\_0}}
+\DoxyCodeLine{00082\ \mbox{\hyperlink{namespacetflite_a6e8f2856bd3d8d032eab104150ac317d}{depthwise\_func\_ptr}}\ \mbox{\hyperlink{namespacetflite_a287894951cbe1d79a095c9939c27ce05}{\_\_attribute\_\_}}((weak))}
+\DoxyCodeLine{00083\ mli\_krn\_group\_conv2d(\textcolor{keyword}{const}\ mli\_tensor*\ weights)\ \{}
+\DoxyCodeLine{00084\ \ \ \textcolor{keywordtype}{int}\ filter\_w\ =\ weights-\/>shape[KRNL\_DW\_W\_DIM\_HW1N];}
+\DoxyCodeLine{00085\ \ \ \textcolor{keywordtype}{int}\ filter\_h\ =\ weights-\/>shape[KRNL\_DW\_H\_DIM\_HW1N];}
+\DoxyCodeLine{00086\ }
+\DoxyCodeLine{00087\ \ \ \textcolor{keywordflow}{if}\ (filter\_w\ ==\ 3\ \&\&\ filter\_h\ ==\ 3)\ \{}
+\DoxyCodeLine{00088\ \ \ \ \ \textcolor{keywordflow}{return}\ mli\_krn\_group\_conv2d\_hwcn\_sa8\_sa8\_sa32\_k3x3;}
+\DoxyCodeLine{00089\ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (filter\_w\ ==\ 5\ \&\&\ filter\_h\ ==\ 5)\ \{}
+\DoxyCodeLine{00090\ \ \ \ \ \textcolor{keywordflow}{return}\ mli\_krn\_group\_conv2d\_hwcn\_sa8\_sa8\_sa32\_k5x5;}
+\DoxyCodeLine{00091\ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00092\ \ \ \ \ \textcolor{keywordflow}{return}\ mli\_krn\_group\_conv2d\_hwcn\_sa8\_sa8\_sa32;}
+\DoxyCodeLine{00093\ \ \ \}}
+\DoxyCodeLine{00094\ \}}
+\DoxyCodeLine{00095\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00096\ }
+\DoxyCodeLine{00097\ \textcolor{comment}{//\ Pooling\ specialized\ functions.}}
+\DoxyCodeLine{00098\ \textcolor{keyword}{typedef}\ mli\_status\ (*\mbox{\hyperlink{namespacetflite_ae650366e94c11fed7042c285966bc7fa}{pooling\_func\_ptr}})(\textcolor{keyword}{const}\ mli\_tensor*\ \textcolor{comment}{/*in*/},}
+\DoxyCodeLine{00099\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ mli\_pool\_cfg*\ \textcolor{comment}{/*cfg*/},}
+\DoxyCodeLine{00100\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ mli\_tensor*\ \textcolor{comment}{/*out*/});}
+\DoxyCodeLine{00101\ }
+\DoxyCodeLine{00102\ \textcolor{preprocessor}{\#ifdef\ MLI\_2\_0}}
+\DoxyCodeLine{00103\ \mbox{\hyperlink{namespacetflite_ae650366e94c11fed7042c285966bc7fa}{pooling\_func\_ptr}}\ \mbox{\hyperlink{namespacetflite_a287894951cbe1d79a095c9939c27ce05}{\_\_attribute\_\_}}((weak))}
+\DoxyCodeLine{00104\ mli\_krn\_avepool(\textcolor{keyword}{const}\ mli\_pool\_cfg*\ \mbox{\hyperlink{namespacetflite_af2a5275d63bc41057c38310898b8a01b}{cfg}})\ \{}
+\DoxyCodeLine{00105\ \ \ \textcolor{keywordtype}{int}\ filter\_w\ =\ \mbox{\hyperlink{namespacetflite_af2a5275d63bc41057c38310898b8a01b}{cfg}}-\/>kernel\_width;}
+\DoxyCodeLine{00106\ \ \ \textcolor{keywordtype}{int}\ filter\_h\ =\ \mbox{\hyperlink{namespacetflite_af2a5275d63bc41057c38310898b8a01b}{cfg}}-\/>kernel\_height;}
+\DoxyCodeLine{00107\ }
+\DoxyCodeLine{00108\ \ \ \textcolor{keywordflow}{if}\ (filter\_w\ ==\ 2\ \&\&\ filter\_h\ ==\ 2)\ \{}
+\DoxyCodeLine{00109\ \ \ \ \ \textcolor{keywordflow}{return}\ mli\_krn\_avepool\_hwc\_sa8\_k2x2;}
+\DoxyCodeLine{00110\ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (filter\_w\ ==\ 3\ \&\&\ filter\_h\ ==\ 3)\ \{}
+\DoxyCodeLine{00111\ \ \ \ \ \textcolor{keywordflow}{return}\ mli\_krn\_avepool\_hwc\_sa8\_k3x3;}
+\DoxyCodeLine{00112\ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00113\ \ \ \ \ \textcolor{keywordflow}{return}\ mli\_krn\_avepool\_hwc\_sa8;}
+\DoxyCodeLine{00114\ \ \ \}}
+\DoxyCodeLine{00115\ \}}
+\DoxyCodeLine{00116\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00117\ \mbox{\hyperlink{namespacetflite_ae650366e94c11fed7042c285966bc7fa}{pooling\_func\_ptr}}\ \mbox{\hyperlink{namespacetflite_a287894951cbe1d79a095c9939c27ce05}{\_\_attribute\_\_}}((weak))}
+\DoxyCodeLine{00118\ mli\_krn\_avepool(\textcolor{keyword}{const}\ mli\_pool\_cfg*\ \mbox{\hyperlink{namespacetflite_af2a5275d63bc41057c38310898b8a01b}{cfg}})\ \{}
+\DoxyCodeLine{00119\ \ \ \textcolor{keywordflow}{return}\ mli\_krn\_avepool\_hwc\_sa8;}
+\DoxyCodeLine{00120\ \}}
+\DoxyCodeLine{00121\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00122\ }
+\DoxyCodeLine{00123\ \textcolor{preprocessor}{\#ifdef\ MLI\_2\_0}}
+\DoxyCodeLine{00124\ \mbox{\hyperlink{namespacetflite_ae650366e94c11fed7042c285966bc7fa}{pooling\_func\_ptr}}\ \mbox{\hyperlink{namespacetflite_a287894951cbe1d79a095c9939c27ce05}{\_\_attribute\_\_}}((weak))}
+\DoxyCodeLine{00125\ mli\_krn\_maxpool(\textcolor{keyword}{const}\ mli\_pool\_cfg*\ \mbox{\hyperlink{namespacetflite_af2a5275d63bc41057c38310898b8a01b}{cfg}})\ \{}
+\DoxyCodeLine{00126\ \ \ \textcolor{keywordtype}{int}\ filter\_w\ =\ \mbox{\hyperlink{namespacetflite_af2a5275d63bc41057c38310898b8a01b}{cfg}}-\/>kernel\_width;}
+\DoxyCodeLine{00127\ \ \ \textcolor{keywordtype}{int}\ filter\_h\ =\ \mbox{\hyperlink{namespacetflite_af2a5275d63bc41057c38310898b8a01b}{cfg}}-\/>kernel\_height;}
+\DoxyCodeLine{00128\ }
+\DoxyCodeLine{00129\ \ \ \textcolor{keywordflow}{if}\ (filter\_w\ ==\ 2\ \&\&\ filter\_h\ ==\ 2)\ \{}
+\DoxyCodeLine{00130\ \ \ \ \ \textcolor{keywordflow}{return}\ mli\_krn\_maxpool\_hwc\_sa8\_k2x2;}
+\DoxyCodeLine{00131\ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (filter\_w\ ==\ 3\ \&\&\ filter\_h\ ==\ 3)\ \{}
+\DoxyCodeLine{00132\ \ \ \ \ \textcolor{keywordflow}{return}\ mli\_krn\_maxpool\_hwc\_sa8\_k3x3;}
+\DoxyCodeLine{00133\ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00134\ \ \ \ \ \textcolor{keywordflow}{return}\ mli\_krn\_maxpool\_hwc\_sa8;}
+\DoxyCodeLine{00135\ \ \ \}}
+\DoxyCodeLine{00136\ \}}
+\DoxyCodeLine{00137\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00138\ \mbox{\hyperlink{namespacetflite_ae650366e94c11fed7042c285966bc7fa}{pooling\_func\_ptr}}\ \mbox{\hyperlink{namespacetflite_a287894951cbe1d79a095c9939c27ce05}{\_\_attribute\_\_}}((weak))}
+\DoxyCodeLine{00139\ mli\_krn\_maxpool(\textcolor{keyword}{const}\ mli\_pool\_cfg*\ \mbox{\hyperlink{namespacetflite_af2a5275d63bc41057c38310898b8a01b}{cfg}})\ \{}
+\DoxyCodeLine{00140\ \ \ \textcolor{keywordflow}{return}\ mli\_krn\_maxpool\_hwc\_sa8;}
+\DoxyCodeLine{00141\ \}}
+\DoxyCodeLine{00142\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00143\ }
+\DoxyCodeLine{00144\ \}\ \ \textcolor{comment}{//\ namespace\ tflite}}
+\DoxyCodeLine{00145\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ EI\_CLASSIFIER\_TFLITE\_ENABLE\_ARC\ ==\ 1}}
+
+\end{DoxyCode}

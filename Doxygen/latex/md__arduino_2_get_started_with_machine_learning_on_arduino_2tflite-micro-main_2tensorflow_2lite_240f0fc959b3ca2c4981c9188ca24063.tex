@@ -1,0 +1,173 @@
+\chapter{README}
+\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_240f0fc959b3ca2c4981c9188ca24063}{}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_240f0fc959b3ca2c4981c9188ca24063}\index{README@{README}}
+\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_240f0fc959b3ca2c4981c9188ca24063_autotoc_md270}{}\doxysection{\texorpdfstring{Micro Speech Example}{Micro Speech Example}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_240f0fc959b3ca2c4981c9188ca24063_autotoc_md270}
+This example shows how to run inference using Tensor\+Flow Lite Micro (TFLM) on two models for wake-\/word recognition. The first model is an audio preprocessor that generates spectrogram data from raw audio samples. The second is the Micro Speech model, a less than 20 kB model that can recognize 2 keywords, "{}yes"{} and "{}no"{}, from speech data. The Micro Speech model takes the spectrogram data as input and produces category probabilities.\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_240f0fc959b3ca2c4981c9188ca24063_autotoc_md271}{}\doxysubsection{\texorpdfstring{Table of contents}{Table of contents}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_240f0fc959b3ca2c4981c9188ca24063_autotoc_md271}
+
+\begin{DoxyItemize}
+\item Audio Preprocessor
+\item Micro Speech Model Architecture
+\item Run the C++ tests on a development machine
+\item Run the evaluate.py script on a development machine
+\item Run the evaluate\+\_\+test.py script on a development machine
+\item Converting models or audio samples to C++
+\item Train your own model
+\end{DoxyItemize}\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_240f0fc959b3ca2c4981c9188ca24063_autotoc_md272}{}\doxysubsection{\texorpdfstring{Audio Preprocessor}{Audio Preprocessor}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_240f0fc959b3ca2c4981c9188ca24063_autotoc_md272}
+The Audio Preprocessor model converts raw audio samples into a spectrographic feature. Audio samples are input to the model in windowed frames, each window overlapping the previous. When sufficient features have been accumulated, those features can be provided as input to the Micro Speech model.
+
+This model provides a replication of the legacy preprocessing used during training of the Micro Speech model. For additional information on audio preprocessing during training, please refer to the \href{train/README.md\#preprocessing-speech-input}{\texttt{ training README}} documentation.
+
+Audio Preprocessing models providing {\ttfamily int8} and {\ttfamily float32} output, ready for use with the Micro Speech model, are provided in the \href{models/}{\texttt{ models}} directory. These models expect the audio input to conform to\+:
+\begin{DoxyItemize}
+\item 30ms window frame
+\item 20ms window stride
+\item 16KHz sample rate
+\item 16-\/bit signed PCM data
+\item single channel (mono)
+\end{DoxyItemize}\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_240f0fc959b3ca2c4981c9188ca24063_autotoc_md273}{}\doxysubsubsection{\texorpdfstring{Model Architecture}{Model Architecture}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_240f0fc959b3ca2c4981c9188ca24063_autotoc_md273}
+This model consists primarily of \href{https://github.com/tensorflow/tflite-micro/blob/main/python/tflite_micro/signal}{\texttt{ Signal Library}} operations. The library is a set of Python methods, and bindings to {\ttfamily C++} library code. To allow for use with the {\ttfamily TFLM Micro\+Interpreter}, a set of \href{https://github.com/tensorflow/tflite-micro/blob/main/signal/micro/kernels}{\texttt{ Signal Library kernels}} is also provided.
+
+The \href{audio_preprocessor.py}{\texttt{ audio\+\_\+preprocessor.\+py}} script provides a complete example of how to use the {\ttfamily Signal Library} within your own Python application. This script has support for Tensor\+Flow eager-\/execution mode, graph-\/execution mode, and {\ttfamily TFLM Micro\+Interpreter} inference operations.
+
+\href{images/audio_preprocessor_int8.png}{\texttt{ }}
+
+{\itshape This image was derived from visualizing the \textquotesingle{}models/audio\+\_\+preprocessor\+\_\+int8.\+tflite\textquotesingle{} file in \href{https://github.com/lutzroeder/netron}{\texttt{ Netron}}}
+
+Each of the steps performed by the model are outlined as follows\+: 1) Audio frame input with shape {\ttfamily (1, 480)} 1) Apply {\ttfamily Hann Window} smoothing using {\ttfamily Signal\+Window} 1) Reshape tensor to match the input of {\ttfamily Signal\+Fft\+Auto\+Scale} 1) Rescale tensor data using {\ttfamily Signal\+Fft\+Auto\+Scale} and calculate one of the input parameters to {\ttfamily Signal\+Filter\+Bank\+Square\+Root} 1) Compute FFT using {\ttfamily Signal\+Rfft} 1) Compute power spectrum using {\ttfamily Signal\+Energy}. The tensor data is only updated for elements between {\ttfamily \mbox{[}start\+\_\+index, end\+\_\+index)}. 1) The {\ttfamily Cast}, {\ttfamily Strided\+Slice}, and {\ttfamily Concatenation} operations are used to fill the tensor data with zeros, for elements outside of {\ttfamily \mbox{[}start\+\_\+index, end\+\_\+index)} 1) Compress the power spectrum tensor data into just 40 channels (frequency bands) using {\ttfamily Signal\+Filter\+Bank} 1) Scale down the tensor data using {\ttfamily Signal\+Filter\+Bank\+Square\+Root} 1) Apply noise reduction using {\ttfamily Signal\+Filter\+Bank\+Spectral\+Subtraction} 1) Apply gain control using {\ttfamily Signal\+PCAN} 1) Scale down the tensor data using {\ttfamily Signal\+Filter\+Bank\+Log} 1) The remaining operations perform additional legacy down-\/scaling and convert the tensor data to {\ttfamily int8} 1) Model output has shape {\ttfamily (40,)}\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_240f0fc959b3ca2c4981c9188ca24063_autotoc_md274}{}\doxysubsubsection{\texorpdfstring{The {\ttfamily Feature\+Params} Python Class}{The {\ttfamily Feature\+Params} Python Class}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_240f0fc959b3ca2c4981c9188ca24063_autotoc_md274}
+The {\ttfamily Feature\+Params} class is located within the \href{audio_preprocessor.py\#L260}{\texttt{ audio\+\_\+preprocessor.\+py}} script. This class allows for custom configuration of the {\ttfamily Audio\+Preprocessor} class. Parameters such as sample rate, window size, window stride, number of output channels, and many more can be configured. The parameters to be changed must be set during class instantiation, and are frozen thereafter. The defaults for {\ttfamily Feature\+Params} match those of the legacy audio preprocessing used during Micro Speech model training.\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_240f0fc959b3ca2c4981c9188ca24063_autotoc_md275}{}\doxysubsubsection{\texorpdfstring{The {\ttfamily Audio\+Preprocessor} Python Class}{The {\ttfamily Audio\+Preprocessor} Python Class}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_240f0fc959b3ca2c4981c9188ca24063_autotoc_md275}
+The {\ttfamily Audio\+Preprocessor} class in the \href{audio_preprocessor.py\#L338}{\texttt{ audio\+\_\+preprocessor.\+py}} script provides easy to use convenience methods for creating and using an audio preprocessing model. This class is configured through use of a {\ttfamily Feature\+Params} object, allowing some flexibility in how the audio preprocessing model works.
+
+A short summary of the available methods and properties\+:
+\begin{DoxyItemize}
+\item {\ttfamily load\+\_\+samples}\+: load audio samples from a {\ttfamily WAV} format file and prepare the samples for use by other {\ttfamily Audio\+Preprocessor} methods
+\item {\ttfamily samples}\+: tensor containing previously loaded audio samples
+\item {\ttfamily params}\+: the {\ttfamily Feature\+Params} object the class was instantiated with
+\item {\ttfamily generate\+\_\+feature}\+: generate a single feature using Tensor\+Flow eager-\/execution
+\item {\ttfamily generate\+\_\+feature\+\_\+using\+\_\+graph}\+: generate a single feature using Tensor\+Flow graph-\/execution
+\item {\ttfamily generate\+\_\+feature\+\_\+using\+\_\+tflm}\+: generate a single feature using the {\ttfamily TFLM Micro\+Interpreter}
+\item {\ttfamily reset\+\_\+tflm}\+: reset the internal state of the {\ttfamily TFLM Micro\+Interpreter} and the {\ttfamily Signal Library} operations
+\item {\ttfamily generate\+\_\+tflite\+\_\+file}\+: create a {\ttfamily .tflite} format file for the preprocessor model
+\end{DoxyItemize}\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_240f0fc959b3ca2c4981c9188ca24063_autotoc_md276}{}\doxysubsubsection{\texorpdfstring{Run the audio\+\_\+preprocessor.\+py script on a development machine}{Run the audio\+\_\+preprocessor.\+py script on a development machine}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_240f0fc959b3ca2c4981c9188ca24063_autotoc_md276}
+The \href{audio_preprocessor.py\#L532}{\texttt{ audio\+\_\+preprocessor.\+py}} script generates a {\ttfamily .tflite} file for the preprocessing model, ready for use with the Micro Speech model.
+
+To generate a {\ttfamily .tflite} model file with {\ttfamily int8} output\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{bazel\ build\ tensorflow/lite/micro/examples/micro\_speech:audio\_preprocessor}
+\DoxyCodeLine{bazel-\/bin/tensorflow/lite/micro/examples/micro\_speech/audio\_preprocessor\ -\/-\/output\_type=int8}
+
+\end{DoxyCode}
+
+
+To generate a {\ttfamily .tflite} model file with {\ttfamily float32} output\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{bazel\ build\ tensorflow/lite/micro/examples/micro\_speech:audio\_preprocessor}
+\DoxyCodeLine{bazel-\/bin/tensorflow/lite/micro/examples/micro\_speech/audio\_preprocessor\ -\/-\/output\_type=float32}
+
+\end{DoxyCode}
+\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_240f0fc959b3ca2c4981c9188ca24063_autotoc_md277}{}\doxysubsubsection{\texorpdfstring{Run the audio\+\_\+preprocessor\+\_\+test.\+py script on a development machine}{Run the audio\+\_\+preprocessor\+\_\+test.\+py script on a development machine}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_240f0fc959b3ca2c4981c9188ca24063_autotoc_md277}
+The \href{audio_preprocessor_test.py}{\texttt{ audio\+\_\+preprocessor\+\_\+test.\+py}} script performs several tests to ensure correct inference operations occur across all execution modes. The tests are\+:
+\begin{DoxyItemize}
+\item cross-\/check inference results between eager, graph, and {\ttfamily TFLM Micro\+Interpreter} execution modes
+\item check the {\ttfamily yes} and {\ttfamily no} 30ms samples in the \href{testdata/}{\texttt{ testdata}} directory for correct generation of the feature tensor
+\item compare the preprocessor {\ttfamily int8} model against the same model in the \href{models/}{\texttt{ models}} directory
+\item compare the preprocessor {\ttfamily float32} model against the same model in the \href{models/}{\texttt{ models}} directory
+\end{DoxyItemize}
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{bazel\ build\ tensorflow/lite/micro/examples/micro\_speech:audio\_preprocessor\_test}
+\DoxyCodeLine{bazel-\/bin/tensorflow/lite/micro/examples/micro\_speech/audio\_preprocessor\_test}
+
+\end{DoxyCode}
+\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_240f0fc959b3ca2c4981c9188ca24063_autotoc_md278}{}\doxysubsection{\texorpdfstring{Micro Speech Model Architecture}{Micro Speech Model Architecture}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_240f0fc959b3ca2c4981c9188ca24063_autotoc_md278}
+This is a simple model comprised of a Convolutional 2D layer, a Fully Connected Layer or a Mat\+Mul Layer (output\+: logits) and a Softmax layer (output\+: probabilities) as shown below. Refer to the \href{https://github.com/tensorflow/tensorflow/blob/master/tensorflow/examples/speech_commands/models.py\#L673}{\texttt{ {\ttfamily tiny\+\_\+conv}}} model architecture. The output probabilities are in four categories\+: {\ttfamily silence}, {\ttfamily unknown}, {\ttfamily yes}, {\ttfamily no}.
+
+The input to the model is 49 spectrographic features, each feature consisting of 40 channels of data. The features are generated by the Audio Preprocessor model. For more information, please see the \href{train/README.md\#preprocessing-speech-input}{\texttt{ training README}} documentation.
+
+\href{images/micro_speech_quantized.png}{\texttt{ }}
+
+{\itshape This image was derived from visualizing the \textquotesingle{}models/micro\+\_\+speech\+\_\+quantized.\+tflite\textquotesingle{} file in \href{https://github.com/lutzroeder/netron}{\texttt{ Netron}}}\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_240f0fc959b3ca2c4981c9188ca24063_autotoc_md279}{}\doxysubsection{\texorpdfstring{Run the C++ tests on a development machine}{Run the C++ tests on a development machine}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_240f0fc959b3ca2c4981c9188ca24063_autotoc_md279}
+To compile and test this example on a desktop Linux or mac\+OS machine, download the \href{https://github.com/tensorflow/tflite-micro}{\texttt{ TFLM source code}}. Then switch into the source directory from a terminal using the {\ttfamily cd} command.
+
+Compile and run a native binary using Bazel\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{bazel\ run\ tensorflow/lite/micro/examples/micro\_speech:micro\_speech\_test}
+
+\end{DoxyCode}
+
+
+For a native binary using {\ttfamily make}, run the following command\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{make\ -\/f\ tensorflow/lite/micro/tools/make/Makefile\ test\_micro\_speech\_test}
+
+\end{DoxyCode}
+
+
+For an Arm Cortex-\/\+M0 binary running in the QEMU emulator\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{make\ -\/f\ tensorflow/lite/micro/tools/make/Makefile\ TARGET=cortex\_m\_qemu\ TARGET\_ARCH=cortex-\/m0\ OPTIMIZED\_KERNEL\_DIR=cmsis\_nn\ BUILD\_TYPE=default\ test\_micro\_speech\_test}
+
+\end{DoxyCode}
+
+
+This will take a few minutes, and downloads frameworks the code uses like \href{https://developer.arm.com/embedded/cmsis}{\texttt{ CMSIS}} and \href{https://google.github.io/flatbuffers/}{\texttt{ flatbuffers}}. Once that process has finished, you should see a series of files get compiled, followed by some logging output from a test, which should conclude with {\ttfamily \texorpdfstring{$\sim$}{\string~}\texorpdfstring{$\sim$}{\string~}\texorpdfstring{$\sim$}{\string~}\+ALL TESTS PASSED\texorpdfstring{$\sim$}{\string~}\texorpdfstring{$\sim$}{\string~}\texorpdfstring{$\sim$}{\string~}}.
+
+If you see this, it means that a small program has been built and executed that loads the trained Tensor\+Flow Lite model, runs some example inputs through it, and got the expected outputs.
+
+To understand how TFLM does this, you can look at the source in the \href{micro_speech_test.cc}{\texttt{ micro\+\_\+speech\+\_\+test.\+cc}} file. It\textquotesingle{}s a fairly small amount of code that executes the following steps\+: 1) Create a {\ttfamily TFLM Micro\+Interpreter} with a handle to the Audio Preprocessor model that has been compiled into the program 1) Repeatedly execute inference operations using {\ttfamily Micro\+Interpreter\+::invoke}, with audio samples as input, and spectrogram features as output 1) Create a new {\ttfamily TFLM Micro\+Interpreter} with a handle to the Micro Speech model that has been compiled into the program 1) Execute a single inference operation using {\ttfamily Micro\+Interpreter\+::invoke}, with the spectrogram features as input, and category probabilities as output 1) Check the largest category probability for a match with the speech sample label.\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_240f0fc959b3ca2c4981c9188ca24063_autotoc_md280}{}\doxysubsection{\texorpdfstring{Run the evaluate.\+py script on a development machine}{Run the evaluate.\+py script on a development machine}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_240f0fc959b3ca2c4981c9188ca24063_autotoc_md280}
+The \href{evaluate.py\#L166}{\texttt{ evaluate.\+py}} script predicts the category of a single audio sample given by the {\ttfamily sample\+\_\+path} argument. The output consists of the predictions for the accumulated spectrogram features across (at most) 49 audio sample window frames.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{bazel\ build\ tensorflow/lite/micro/examples/micro\_speech:evaluate}
+\DoxyCodeLine{bazel-\/bin/tensorflow/lite/micro/examples/micro\_speech/evaluate\ -\/-\/sample\_path=tensorflow/lite/micro/examples/micro\_speech/testdata/no\_1000ms.wav}
+
+\end{DoxyCode}
+
+
+The output looks like this\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{Frame\ \#0:\ [0.0000,\ 0.0273,\ 0.0312,\ 0.9414]}
+\DoxyCodeLine{Frame\ \#1:\ [0.0000,\ 0.0273,\ 0.0312,\ 0.9414]}
+\DoxyCodeLine{Frame\ \#2:\ [0.0000,\ 0.0273,\ 0.0312,\ 0.9414]}
+\DoxyCodeLine{Frame\ \#3:\ [0.0000,\ 0.0273,\ 0.0273,\ 0.9414]}
+\DoxyCodeLine{Frame\ \#4:\ [0.0000,\ 0.0273,\ 0.0273,\ 0.9414]}
+\DoxyCodeLine{Frame\ \#5:\ [0.0000,\ 0.0273,\ 0.0273,\ 0.9414]}
+\DoxyCodeLine{Frame\ \#6:\ [0.0000,\ 0.0273,\ 0.0273,\ 0.9453]}
+\DoxyCodeLine{Frame\ \#7:\ [0.0000,\ 0.0273,\ 0.0273,\ 0.9453]}
+\DoxyCodeLine{Frame\ \#8:\ [0.0000,\ 0.0273,\ 0.0273,\ 0.9453]}
+\DoxyCodeLine{}
+\DoxyCodeLine{...}
+\DoxyCodeLine{}
+\DoxyCodeLine{Frame\ \#40:\ [0.0000,\ 0.0312,\ 0.0000,\ 0.9648]}
+\DoxyCodeLine{Frame\ \#41:\ [0.0000,\ 0.0273,\ 0.0000,\ 0.9727]}
+\DoxyCodeLine{Frame\ \#42:\ [0.0000,\ 0.0312,\ 0.0000,\ 0.9688]}
+\DoxyCodeLine{Frame\ \#43:\ [0.0000,\ 0.0273,\ 0.0000,\ 0.9727]}
+\DoxyCodeLine{Frame\ \#44:\ [0.0000,\ 0.0273,\ 0.0000,\ 0.9727]}
+\DoxyCodeLine{Frame\ \#45:\ [0.0000,\ 0.0352,\ 0.0000,\ 0.9648]}
+\DoxyCodeLine{Frame\ \#46:\ [0.0000,\ 0.0391,\ 0.0000,\ 0.9609]}
+\DoxyCodeLine{Frame\ \#47:\ [0.0000,\ 0.0469,\ 0.0000,\ 0.9531]}
+\DoxyCodeLine{Frame\ \#48:\ [0.0000,\ 0.0547,\ 0.0000,\ 0.9453]}
+\DoxyCodeLine{Model\ predicts\ the\ audio\ sample\ as\ <no>\ with\ probability\ 0.95}
+
+\end{DoxyCode}
+\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_240f0fc959b3ca2c4981c9188ca24063_autotoc_md281}{}\doxysubsection{\texorpdfstring{Run the evaluate\+\_\+test.\+py script on a development machine}{Run the evaluate\+\_\+test.\+py script on a development machine}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_240f0fc959b3ca2c4981c9188ca24063_autotoc_md281}
+The \href{evaluate_test.py}{\texttt{ evaluate\+\_\+test.\+py}} script verifies the combination of the Audio Preprocessor model and the Micro Speech model to generate correct inference results. Four audio samples from the \href{testdata/}{\texttt{ testdata}} directory are used as input to the Audio Preprocessor model. The Audio Preprocessor model is tested with both {\ttfamily int8} and {\ttfamily float32} outputs. The results of the audio preprocessing are then used to check predictions by the Micro Speech model.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{bazel\ build\ tensorflow/lite/micro/examples/micro\_speech:evaluate\_test}
+\DoxyCodeLine{bazel-\/bin/tensorflow/lite/micro/examples/micro\_speech/evaluate\_test}
+
+\end{DoxyCode}
+\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_240f0fc959b3ca2c4981c9188ca24063_autotoc_md282}{}\doxysubsection{\texorpdfstring{Converting models or audio samples to C++}{Converting models or audio samples to C++}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_240f0fc959b3ca2c4981c9188ca24063_autotoc_md282}
+A tool is available to convert your custom model or audio samples into {\ttfamily C++} data structures that you can then use in your own wake-\/word application. Keep in mind that audio samples for use with Audio Preprocessor and Micro Speech models must be 1000ms in length, 16-\/bit PCM samples, and single channel (mono). The tool can be found here\+: \href{../../tools/generate_cc_arrays.py}{\texttt{ generate\+\_\+cc\+\_\+arrays.\+py}}
+
+The following commands show how to use the tool\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{bazel\ build\ tensorflow/lite/micro/tools:generate\_cc\_arrays}
+\DoxyCodeLine{bazel-\/bin/tensorflow/lite/micro/tools/generate\_cc\_arrays\ /tmp/data.cc\ path\_to\_custom\_sample.wav}
+\DoxyCodeLine{bazel-\/bin/tensorflow/lite/micro/tools/generate\_cc\_arrays\ /tmp/header.h\ path\_to\_custom\_sample.wav}
+
+\end{DoxyCode}
+\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_240f0fc959b3ca2c4981c9188ca24063_autotoc_md283}{}\doxysubsection{\texorpdfstring{Train your own model}{Train your own model}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_240f0fc959b3ca2c4981c9188ca24063_autotoc_md283}
+So far you have used an existing trained model to run inference on microcontrollers. If you wish to train your own model, follow the instructions given in the \doxysectlink{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_6a55a41b5fb6ca08272abc21546efeaa}{train}{0} directory. 

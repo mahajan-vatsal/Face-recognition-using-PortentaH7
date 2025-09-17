@@ -1,0 +1,653 @@
+\doxysection{builtin\+\_\+op\+\_\+data.\+h}
+\hypertarget{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_2core_2c_2builtin__op__data_8h_source}{}\label{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_2core_2c_2builtin__op__data_8h_source}\index{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/main/tensorflow/lite/core/c/builtin\_op\_data.h@{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/main/tensorflow/lite/core/c/builtin\_op\_data.h}}
+\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_2core_2c_2builtin__op__data_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{/*\ Copyright\ 2017\ The\ TensorFlow\ Authors.\ All\ Rights\ Reserved.}}
+\DoxyCodeLine{00002\ \textcolor{comment}{}}
+\DoxyCodeLine{00003\ \textcolor{comment}{Licensed\ under\ the\ Apache\ License,\ Version\ 2.0\ (the\ "{}License"{});}}
+\DoxyCodeLine{00004\ \textcolor{comment}{you\ may\ not\ use\ this\ file\ except\ in\ compliance\ with\ the\ License.}}
+\DoxyCodeLine{00005\ \textcolor{comment}{You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{00006\ \textcolor{comment}{}}
+\DoxyCodeLine{00007\ \textcolor{comment}{\ \ \ \ http://www.apache.org/licenses/LICENSE-\/2.0}}
+\DoxyCodeLine{00008\ \textcolor{comment}{}}
+\DoxyCodeLine{00009\ \textcolor{comment}{Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ software}}
+\DoxyCodeLine{00010\ \textcolor{comment}{distributed\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,}}
+\DoxyCodeLine{00011\ \textcolor{comment}{WITHOUT\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,\ either\ express\ or\ implied.}}
+\DoxyCodeLine{00012\ \textcolor{comment}{See\ the\ License\ for\ the\ specific\ language\ governing\ permissions\ and}}
+\DoxyCodeLine{00013\ \textcolor{comment}{limitations\ under\ the\ License.}}
+\DoxyCodeLine{00014\ \textcolor{comment}{==============================================================================*/}}
+\DoxyCodeLine{00020\ \textcolor{preprocessor}{\#ifndef\ TENSORFLOW\_LITE\_CORE\_C\_BUILTIN\_OP\_DATA\_H\_}}
+\DoxyCodeLine{00021\ \textcolor{preprocessor}{\#define\ TENSORFLOW\_LITE\_CORE\_C\_BUILTIN\_OP\_DATA\_H\_}}
+\DoxyCodeLine{00022\ }
+\DoxyCodeLine{00023\ \textcolor{preprocessor}{\#include\ <stdbool.h>}}
+\DoxyCodeLine{00024\ \textcolor{preprocessor}{\#include\ <stdint.h>}}
+\DoxyCodeLine{00025\ }
+\DoxyCodeLine{00026\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/core/c/common.h"{}}}
+\DoxyCodeLine{00027\ }
+\DoxyCodeLine{00028\ \textcolor{preprocessor}{\#ifdef\ \_\_cplusplus}}
+\DoxyCodeLine{00029\ \textcolor{keyword}{extern}\ \textcolor{stringliteral}{"{}C"{}}\ \{}
+\DoxyCodeLine{00030\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ \_\_cplusplus}}
+\DoxyCodeLine{00031\ }
+\DoxyCodeLine{00032\ \textcolor{comment}{//\ TfLiteReshapeParams\ can't\ have\ dynamic\ data\ so\ we\ fix\ the\ maximum\ possible}}
+\DoxyCodeLine{00033\ \textcolor{comment}{//\ number\ of\ dimensions.}}
+\DoxyCodeLine{00034\ \textcolor{preprocessor}{\#define\ TFLITE\_RESHAPE\_PARAMS\_MAX\_DIMENSION\_COUNT\ 8}}
+\DoxyCodeLine{00035\ \textcolor{preprocessor}{\#define\ TFLITE\_STABLEHLO\_SCATTER\_PARAMS\_MAX\_DIMENSION\_COUNT\ 8}}
+\DoxyCodeLine{00036\ \textcolor{preprocessor}{\#define\ TFLITE\_STABLEHLO\_GATHER\_PARAMS\_MAX\_DIMENSION\_COUNT\ 8}}
+\DoxyCodeLine{00037\ \textcolor{preprocessor}{\#define\ TFLITE\_STABLEHLO\_REDUCE\_WINDOW\_PARAMS\_MAX\_DIMENSION\_COUNT\ 8}}
+\DoxyCodeLine{00038\ \textcolor{preprocessor}{\#define\ TFLITE\_STABLEHLO\_PAD\_PARAMS\_MAX\_DIMENSION\_COUNT\ 8}}
+\DoxyCodeLine{00039\ }
+\DoxyCodeLine{00040\ \textcolor{comment}{//\ TODO(aselle):\ Consider\ using\ "{}if\ this\ then\ that"{}\ for\ testing.}}
+\DoxyCodeLine{00041\ }
+\DoxyCodeLine{00042\ \textcolor{comment}{//\ Useful\ placeholder\ to\ put\ in\ otherwise\ empty\ structs\ to\ avoid\ size\ warnings.}}
+\DoxyCodeLine{00043\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\{}
+\DoxyCodeLine{00044\ \ \ \textcolor{keywordtype}{char}\ dummy;}
+\DoxyCodeLine{00045\ \}\ \mbox{\hyperlink{struct_empty_struct_placeholder}{EmptyStructPlaceholder}};}
+\DoxyCodeLine{00046\ }
+\DoxyCodeLine{00047\ \textcolor{comment}{//\ IMPORTANT:\ All\ new\ members\ of\ structs\ must\ be\ added\ at\ the\ end\ to\ ensure}}
+\DoxyCodeLine{00048\ \textcolor{comment}{//\ backwards\ compatibility.}}
+\DoxyCodeLine{00049\ }
+\DoxyCodeLine{00050\ \textcolor{comment}{//\ Possible\ padding\ types\ (for\ convolutions)}}
+\DoxyCodeLine{00051\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{enum}\ \{}
+\DoxyCodeLine{00052\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src7f67a4373e2a0d20daf1d1ff4e1f4339_a3fc860f917e2acc94e750df4e1626c3ba1c57a67923ceb0c67692f43c66ffa8ef}{kTfLitePaddingUnknown}}\ =\ 0,}
+\DoxyCodeLine{00053\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src7f67a4373e2a0d20daf1d1ff4e1f4339_a3fc860f917e2acc94e750df4e1626c3bae0a2f50af1d5c61fa150525b1e60ff42}{kTfLitePaddingSame}},}
+\DoxyCodeLine{00054\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src7f67a4373e2a0d20daf1d1ff4e1f4339_a3fc860f917e2acc94e750df4e1626c3baed3130c1738b5b7d9e42db87696a7bc7}{kTfLitePaddingValid}},}
+\DoxyCodeLine{00055\ \}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src7f67a4373e2a0d20daf1d1ff4e1f4339_a3fc860f917e2acc94e750df4e1626c3b}{TfLitePadding}};}
+\DoxyCodeLine{00056\ }
+\DoxyCodeLine{00057\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{enum}\ \{}
+\DoxyCodeLine{00058\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src7f67a4373e2a0d20daf1d1ff4e1f4339_a76107e030cdf070bf76ab4798fc9871aa34bdf5f7e3ed73ce5517cd7040fa1d90}{kTfLiteMirrorPaddingUnknown}}\ =\ 0,}
+\DoxyCodeLine{00059\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src7f67a4373e2a0d20daf1d1ff4e1f4339_a76107e030cdf070bf76ab4798fc9871aab2b7287919f773f13dcdd78f3f058399}{kTfLiteMirrorPaddingReflect}},}
+\DoxyCodeLine{00060\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src7f67a4373e2a0d20daf1d1ff4e1f4339_a76107e030cdf070bf76ab4798fc9871aa47a861b4783549e2495103c2a2bafe5f}{kTfLiteMirrorPaddingSymmetric}},}
+\DoxyCodeLine{00061\ \}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src7f67a4373e2a0d20daf1d1ff4e1f4339_a76107e030cdf070bf76ab4798fc9871a}{TfLiteMirrorPaddingMode}};}
+\DoxyCodeLine{00062\ }
+\DoxyCodeLine{00063\ \textcolor{comment}{//\ TODO(b/130259536):\ We\ should\ move\ this\ out\ of\ builtin\_op\_data.}}
+\DoxyCodeLine{00064\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\{}
+\DoxyCodeLine{00065\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{ei__fill__result__struct_8h_a62b225ba7c5226f6e6e923a28c1db968}{width}};}
+\DoxyCodeLine{00066\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{ei__fill__result__struct_8h_aac5ab54ba2532a0b0cf671ad2baf9715}{height}};}
+\DoxyCodeLine{00067\ \ \ \textcolor{keywordtype}{int}\ width\_offset;}
+\DoxyCodeLine{00068\ \ \ \textcolor{keywordtype}{int}\ height\_offset;}
+\DoxyCodeLine{00069\ \}\ \mbox{\hyperlink{struct_tf_lite_padding_values}{TfLitePaddingValues}};}
+\DoxyCodeLine{00070\ }
+\DoxyCodeLine{00071\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\{}
+\DoxyCodeLine{00072\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src7f67a4373e2a0d20daf1d1ff4e1f4339_a76107e030cdf070bf76ab4798fc9871a}{TfLiteMirrorPaddingMode}}\ mode;}
+\DoxyCodeLine{00073\ \}\ \mbox{\hyperlink{struct_tf_lite_mirror_padding_params}{TfLiteMirrorPaddingParams}};}
+\DoxyCodeLine{00074\ }
+\DoxyCodeLine{00075\ \textcolor{comment}{//\ Possible\ fused\ activation\ functions.}}
+\DoxyCodeLine{00076\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{enum}\ \{}
+\DoxyCodeLine{00077\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src7f67a4373e2a0d20daf1d1ff4e1f4339_acc9e377dbc009d68bbfa5480d2559565a681c59b3a97ac99be2f9d43db5a8a51a}{kTfLiteActNone}}\ =\ 0,}
+\DoxyCodeLine{00078\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src7f67a4373e2a0d20daf1d1ff4e1f4339_acc9e377dbc009d68bbfa5480d2559565aa8815bb5cba3bda48d71be3f1937b8c6}{kTfLiteActRelu}},}
+\DoxyCodeLine{00079\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src7f67a4373e2a0d20daf1d1ff4e1f4339_acc9e377dbc009d68bbfa5480d2559565a40a3d22af1e8b06897c7d1dfeef55fa2}{kTfLiteActReluN1To1}},\ \ \textcolor{comment}{//\ min(max(-\/1,\ x),\ 1)}}
+\DoxyCodeLine{00080\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src7f67a4373e2a0d20daf1d1ff4e1f4339_acc9e377dbc009d68bbfa5480d2559565a1aed6f8547fd238e52d0d87f633fc371}{kTfLiteActRelu6}},\ \ \ \ \ \ \textcolor{comment}{//\ min(max(0,\ x),\ 6)}}
+\DoxyCodeLine{00081\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src7f67a4373e2a0d20daf1d1ff4e1f4339_acc9e377dbc009d68bbfa5480d2559565a7e8b7d2496b796e132239ab5dea5835d}{kTfLiteActTanh}},}
+\DoxyCodeLine{00082\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src7f67a4373e2a0d20daf1d1ff4e1f4339_acc9e377dbc009d68bbfa5480d2559565a3623b833887225a271e2b50b463ac09f}{kTfLiteActSignBit}},}
+\DoxyCodeLine{00083\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src7f67a4373e2a0d20daf1d1ff4e1f4339_acc9e377dbc009d68bbfa5480d2559565ad6bc4e430896a61a0b2f789ba5e8d4ba}{kTfLiteActSigmoid}},}
+\DoxyCodeLine{00084\ \}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src7f67a4373e2a0d20daf1d1ff4e1f4339_acc9e377dbc009d68bbfa5480d2559565}{TfLiteFusedActivation}};}
+\DoxyCodeLine{00085\ }
+\DoxyCodeLine{00086\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\{}
+\DoxyCodeLine{00087\ \ \ \textcolor{comment}{//\ Parameters\ for\ CONV\_2D\ version\ 1.}}
+\DoxyCodeLine{00088\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src7f67a4373e2a0d20daf1d1ff4e1f4339_a3fc860f917e2acc94e750df4e1626c3b}{TfLitePadding}}\ \mbox{\hyperlink{arc__mli_2conv_8cc_ad870e8457a2c13cdb2d9a3566118bb4e}{padding}};}
+\DoxyCodeLine{00089\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{l2__pool__2d__test_8cc_adcfa78f07b43a1901221a34ea1e82cd9}{stride\_width}};}
+\DoxyCodeLine{00090\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{l2__pool__2d__test_8cc_a2448e5c60032b597583b86bfcb69e21d}{stride\_height}};}
+\DoxyCodeLine{00091\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src7f67a4373e2a0d20daf1d1ff4e1f4339_acc9e377dbc009d68bbfa5480d2559565}{TfLiteFusedActivation}}\ \mbox{\hyperlink{l2__pool__2d__test_8cc_a77ea056afd837c816867a0a9887131b6}{activation}};}
+\DoxyCodeLine{00092\ }
+\DoxyCodeLine{00093\ \ \ \textcolor{comment}{//\ Parameters\ for\ CONV\_2D\ version\ 2.}}
+\DoxyCodeLine{00094\ \ \ \textcolor{comment}{//\ Note:\ Version\ 2\ supports\ dilation\ values\ not\ equal\ to\ 1.}}
+\DoxyCodeLine{00095\ \ \ \textcolor{keywordtype}{int}\ dilation\_width\_factor;}
+\DoxyCodeLine{00096\ \ \ \textcolor{keywordtype}{int}\ dilation\_height\_factor;}
+\DoxyCodeLine{00097\ }
+\DoxyCodeLine{00098\ \ \ \textcolor{comment}{//\ Parameters\ for\ CONV\_2D\ version\ 7\ or\ above.}}
+\DoxyCodeLine{00099\ \ \ \textcolor{comment}{//\ Used\ to\ determine\ the\ default\ value\ for\ the\ quantized\ bias.}}
+\DoxyCodeLine{00100\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_a8a47ba81bdef28b5c479ee7928a7d123}{TfLiteType}}\ \mbox{\hyperlink{struct_tf_lite_conv_params_a2aecf2ed0ba8bff1cb0898eee9829e72}{quantized\_bias\_type}};}
+\DoxyCodeLine{00101\ \}\ \mbox{\hyperlink{struct_tf_lite_conv_params}{TfLiteConvParams}};}
+\DoxyCodeLine{00102\ }
+\DoxyCodeLine{00103\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\{}
+\DoxyCodeLine{00104\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src7f67a4373e2a0d20daf1d1ff4e1f4339_a3fc860f917e2acc94e750df4e1626c3b}{TfLitePadding}}\ \mbox{\hyperlink{arc__mli_2conv_8cc_ad870e8457a2c13cdb2d9a3566118bb4e}{padding}};}
+\DoxyCodeLine{00105\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{l2__pool__2d__test_8cc_adcfa78f07b43a1901221a34ea1e82cd9}{stride\_width}};}
+\DoxyCodeLine{00106\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{l2__pool__2d__test_8cc_a2448e5c60032b597583b86bfcb69e21d}{stride\_height}};}
+\DoxyCodeLine{00107\ \ \ \textcolor{keywordtype}{int}\ stride\_depth;}
+\DoxyCodeLine{00108\ \ \ \textcolor{keywordtype}{int}\ dilation\_width\_factor;}
+\DoxyCodeLine{00109\ \ \ \textcolor{keywordtype}{int}\ dilation\_height\_factor;}
+\DoxyCodeLine{00110\ \ \ \textcolor{keywordtype}{int}\ dilation\_depth\_factor;}
+\DoxyCodeLine{00111\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src7f67a4373e2a0d20daf1d1ff4e1f4339_acc9e377dbc009d68bbfa5480d2559565}{TfLiteFusedActivation}}\ \mbox{\hyperlink{l2__pool__2d__test_8cc_a77ea056afd837c816867a0a9887131b6}{activation}};}
+\DoxyCodeLine{00112\ \}\ \mbox{\hyperlink{struct_tf_lite_conv3_d_params}{TfLiteConv3DParams}};}
+\DoxyCodeLine{00113\ }
+\DoxyCodeLine{00114\ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{struct_tf_lite_conv3_d_params}{TfLiteConv3DParams}}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src7f67a4373e2a0d20daf1d1ff4e1f4339_ae7738a7222feb6ebdc883f1b755dff54}{TfLiteConv3DTransposeParams}};}
+\DoxyCodeLine{00115\ }
+\DoxyCodeLine{00116\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\{}
+\DoxyCodeLine{00117\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src7f67a4373e2a0d20daf1d1ff4e1f4339_a3fc860f917e2acc94e750df4e1626c3b}{TfLitePadding}}\ \mbox{\hyperlink{arc__mli_2conv_8cc_ad870e8457a2c13cdb2d9a3566118bb4e}{padding}};}
+\DoxyCodeLine{00118\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{l2__pool__2d__test_8cc_adcfa78f07b43a1901221a34ea1e82cd9}{stride\_width}};}
+\DoxyCodeLine{00119\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{l2__pool__2d__test_8cc_a2448e5c60032b597583b86bfcb69e21d}{stride\_height}};}
+\DoxyCodeLine{00120\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{l2__pool__2d__test_8cc_accf3b04ce9953ef985675706a9bb3c8a}{filter\_width}};}
+\DoxyCodeLine{00121\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{l2__pool__2d__test_8cc_acf238b4af444482dfe40604d694519cc}{filter\_height}};}
+\DoxyCodeLine{00122\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src7f67a4373e2a0d20daf1d1ff4e1f4339_acc9e377dbc009d68bbfa5480d2559565}{TfLiteFusedActivation}}\ \mbox{\hyperlink{l2__pool__2d__test_8cc_a77ea056afd837c816867a0a9887131b6}{activation}};}
+\DoxyCodeLine{00123\ \ \ \textcolor{keyword}{struct\ }\{}
+\DoxyCodeLine{00124\ \ \ \ \ \mbox{\hyperlink{struct_tf_lite_padding_values}{TfLitePaddingValues}}\ \mbox{\hyperlink{arc__mli_2conv_8cc_ad870e8457a2c13cdb2d9a3566118bb4e}{padding}};}
+\DoxyCodeLine{00125\ \ \ \}\ computed;}
+\DoxyCodeLine{00126\ \}\ \mbox{\hyperlink{struct_tf_lite_pool_params}{TfLitePoolParams}};}
+\DoxyCodeLine{00127\ }
+\DoxyCodeLine{00128\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\{}
+\DoxyCodeLine{00129\ \ \ \textcolor{comment}{//\ Parameters\ for\ DepthwiseConv\ version\ 1\ or\ above.}}
+\DoxyCodeLine{00130\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src7f67a4373e2a0d20daf1d1ff4e1f4339_a3fc860f917e2acc94e750df4e1626c3b}{TfLitePadding}}\ \mbox{\hyperlink{arc__mli_2conv_8cc_ad870e8457a2c13cdb2d9a3566118bb4e}{padding}};}
+\DoxyCodeLine{00131\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{l2__pool__2d__test_8cc_adcfa78f07b43a1901221a34ea1e82cd9}{stride\_width}};}
+\DoxyCodeLine{00132\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{l2__pool__2d__test_8cc_a2448e5c60032b597583b86bfcb69e21d}{stride\_height}};}
+\DoxyCodeLine{00133\ \ \ \textcolor{comment}{//\ \`{}depth\_multiplier`\ is\ redundant.\ It's\ used\ by\ CPU\ kernels\ in}}
+\DoxyCodeLine{00134\ \ \ \textcolor{comment}{//\ TensorFlow\ 2.0\ or\ below,\ but\ ignored\ in\ versions\ above.}}
+\DoxyCodeLine{00135\ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{00136\ \ \ \textcolor{comment}{//\ The\ information\ can\ be\ deduced\ from\ the\ shape\ of\ input\ and\ the\ shape\ of}}
+\DoxyCodeLine{00137\ \ \ \textcolor{comment}{//\ weights.\ Since\ the\ TFLiteConverter\ toolchain\ doesn't\ support\ partially}}
+\DoxyCodeLine{00138\ \ \ \textcolor{comment}{//\ specified\ shapes,\ relying\ on\ \`{}depth\_multiplier`\ stops\ us\ from\ supporting}}
+\DoxyCodeLine{00139\ \ \ \textcolor{comment}{//\ graphs\ with\ dynamic\ shape\ tensors.}}
+\DoxyCodeLine{00140\ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{00141\ \ \ \textcolor{comment}{//\ Note:\ Some\ of\ the\ delegates\ (e.g.\ NNAPI,\ GPU)\ are\ still\ relying\ on\ this}}
+\DoxyCodeLine{00142\ \ \ \textcolor{comment}{//\ field.}}
+\DoxyCodeLine{00143\ \ \ \textcolor{keywordtype}{int}\ depth\_multiplier;}
+\DoxyCodeLine{00144\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src7f67a4373e2a0d20daf1d1ff4e1f4339_acc9e377dbc009d68bbfa5480d2559565}{TfLiteFusedActivation}}\ \mbox{\hyperlink{l2__pool__2d__test_8cc_a77ea056afd837c816867a0a9887131b6}{activation}};}
+\DoxyCodeLine{00145\ \ \ \textcolor{comment}{//\ Parameters\ for\ DepthwiseConv\ version\ 2\ or\ above.}}
+\DoxyCodeLine{00146\ \ \ \textcolor{keywordtype}{int}\ dilation\_width\_factor;}
+\DoxyCodeLine{00147\ \ \ \textcolor{keywordtype}{int}\ dilation\_height\_factor;}
+\DoxyCodeLine{00148\ \}\ \mbox{\hyperlink{struct_tf_lite_depthwise_conv_params}{TfLiteDepthwiseConvParams}};}
+\DoxyCodeLine{00149\ }
+\DoxyCodeLine{00150\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\{}
+\DoxyCodeLine{00151\ \ \ \textcolor{keywordtype}{int}\ rank;}
+\DoxyCodeLine{00152\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src7f67a4373e2a0d20daf1d1ff4e1f4339_acc9e377dbc009d68bbfa5480d2559565}{TfLiteFusedActivation}}\ \mbox{\hyperlink{l2__pool__2d__test_8cc_a77ea056afd837c816867a0a9887131b6}{activation}};}
+\DoxyCodeLine{00153\ }
+\DoxyCodeLine{00154\ \ \ \textcolor{comment}{//\ Parameter\ for\ SVDF\ version\ 4.}}
+\DoxyCodeLine{00155\ \ \ \textcolor{keywordtype}{bool}\ asymmetric\_quantize\_inputs;}
+\DoxyCodeLine{00156\ \}\ \mbox{\hyperlink{struct_tf_lite_s_v_d_f_params}{TfLiteSVDFParams}};}
+\DoxyCodeLine{00157\ }
+\DoxyCodeLine{00158\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\{}
+\DoxyCodeLine{00159\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src7f67a4373e2a0d20daf1d1ff4e1f4339_acc9e377dbc009d68bbfa5480d2559565}{TfLiteFusedActivation}}\ \mbox{\hyperlink{l2__pool__2d__test_8cc_a77ea056afd837c816867a0a9887131b6}{activation}};}
+\DoxyCodeLine{00160\ }
+\DoxyCodeLine{00161\ \ \ \textcolor{comment}{//\ Parameter\ for\ RNN\ version\ 3.}}
+\DoxyCodeLine{00162\ \ \ \textcolor{keywordtype}{bool}\ asymmetric\_quantize\_inputs;}
+\DoxyCodeLine{00163\ \}\ \mbox{\hyperlink{struct_tf_lite_r_n_n_params}{TfLiteRNNParams}};}
+\DoxyCodeLine{00164\ }
+\DoxyCodeLine{00165\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\{}
+\DoxyCodeLine{00166\ \ \ \textcolor{keywordtype}{bool}\ time\_major;}
+\DoxyCodeLine{00167\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src7f67a4373e2a0d20daf1d1ff4e1f4339_acc9e377dbc009d68bbfa5480d2559565}{TfLiteFusedActivation}}\ \mbox{\hyperlink{l2__pool__2d__test_8cc_a77ea056afd837c816867a0a9887131b6}{activation}};}
+\DoxyCodeLine{00168\ }
+\DoxyCodeLine{00169\ \ \ \textcolor{comment}{//\ Parameter\ for\ Sequence\ RNN\ version\ 3.}}
+\DoxyCodeLine{00170\ \ \ \textcolor{keywordtype}{bool}\ asymmetric\_quantize\_inputs;}
+\DoxyCodeLine{00171\ \}\ \mbox{\hyperlink{struct_tf_lite_sequence_r_n_n_params}{TfLiteSequenceRNNParams}};}
+\DoxyCodeLine{00172\ }
+\DoxyCodeLine{00173\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\{}
+\DoxyCodeLine{00174\ \ \ \textcolor{keywordtype}{bool}\ time\_major;}
+\DoxyCodeLine{00175\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src7f67a4373e2a0d20daf1d1ff4e1f4339_acc9e377dbc009d68bbfa5480d2559565}{TfLiteFusedActivation}}\ \mbox{\hyperlink{l2__pool__2d__test_8cc_a77ea056afd837c816867a0a9887131b6}{activation}};}
+\DoxyCodeLine{00176\ \ \ \textcolor{keywordtype}{bool}\ merge\_outputs;}
+\DoxyCodeLine{00177\ }
+\DoxyCodeLine{00178\ \ \ \textcolor{comment}{//\ Parameter\ for\ Bidirectional\ RNN\ version\ 3.}}
+\DoxyCodeLine{00179\ \ \ \textcolor{keywordtype}{bool}\ asymmetric\_quantize\_inputs;}
+\DoxyCodeLine{00180\ \}\ \mbox{\hyperlink{struct_tf_lite_bidirectional_sequence_r_n_n_params}{TfLiteBidirectionalSequenceRNNParams}};}
+\DoxyCodeLine{00181\ }
+\DoxyCodeLine{00182\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{enum}\ \{}
+\DoxyCodeLine{00183\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src7f67a4373e2a0d20daf1d1ff4e1f4339_a734f796ce322781b460d42d7c660c695aa1ae75c2bcb7359f3feb69554998d16a}{kTfLiteFullyConnectedWeightsFormatDefault}}\ =\ 0,}
+\DoxyCodeLine{00184\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src7f67a4373e2a0d20daf1d1ff4e1f4339_a734f796ce322781b460d42d7c660c695aac395478cf15649ceffdd319b1de7bd6}{kTfLiteFullyConnectedWeightsFormatShuffled4x16Int8}}\ =\ 1,}
+\DoxyCodeLine{00185\ \}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src7f67a4373e2a0d20daf1d1ff4e1f4339_a734f796ce322781b460d42d7c660c695}{TfLiteFullyConnectedWeightsFormat}};}
+\DoxyCodeLine{00186\ }
+\DoxyCodeLine{00187\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\{}
+\DoxyCodeLine{00188\ \ \ \textcolor{comment}{//\ Parameters\ for\ FullyConnected\ version\ 1\ or\ above.}}
+\DoxyCodeLine{00189\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src7f67a4373e2a0d20daf1d1ff4e1f4339_acc9e377dbc009d68bbfa5480d2559565}{TfLiteFusedActivation}}\ \mbox{\hyperlink{l2__pool__2d__test_8cc_a77ea056afd837c816867a0a9887131b6}{activation}};}
+\DoxyCodeLine{00190\ }
+\DoxyCodeLine{00191\ \ \ \textcolor{comment}{//\ Parameters\ for\ FullyConnected\ version\ 2\ or\ above.}}
+\DoxyCodeLine{00192\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src7f67a4373e2a0d20daf1d1ff4e1f4339_a734f796ce322781b460d42d7c660c695}{TfLiteFullyConnectedWeightsFormat}}\ weights\_format;}
+\DoxyCodeLine{00193\ }
+\DoxyCodeLine{00194\ \ \ \textcolor{comment}{//\ Parameters\ for\ FullyConnected\ version\ 5\ or\ above.}}
+\DoxyCodeLine{00195\ \ \ \textcolor{comment}{//\ If\ set\ to\ true,\ then\ the\ number\ of\ dimensions\ in\ the\ input\ and\ the\ output}}
+\DoxyCodeLine{00196\ \ \ \textcolor{comment}{//\ tensors\ are\ the\ same.\ Furthermore,\ all\ but\ the\ last\ dimension\ of\ the\ input}}
+\DoxyCodeLine{00197\ \ \ \textcolor{comment}{//\ and\ output\ shapes\ will\ be\ equal.}}
+\DoxyCodeLine{00198\ \ \ \textcolor{keywordtype}{bool}\ keep\_num\_dims;}
+\DoxyCodeLine{00199\ }
+\DoxyCodeLine{00200\ \ \ \textcolor{comment}{//\ Parameters\ for\ FullyConnected\ version\ 7\ or\ above.}}
+\DoxyCodeLine{00201\ \ \ \textcolor{comment}{//\ If\ set\ to\ true\ and\ the\ weights\ are\ quantized,\ then\ non\ constant\ inputs}}
+\DoxyCodeLine{00202\ \ \ \textcolor{comment}{//\ are\ quantized\ at\ evaluation\ time\ with\ asymmetric\ quantization.}}
+\DoxyCodeLine{00203\ \ \ \textcolor{keywordtype}{bool}\ asymmetric\_quantize\_inputs;}
+\DoxyCodeLine{00204\ }
+\DoxyCodeLine{00205\ \ \ \textcolor{comment}{//\ Parameters\ for\ FullyConnected\ version\ 10\ or\ above.}}
+\DoxyCodeLine{00206\ \ \ \textcolor{comment}{//\ Used\ to\ determine\ the\ default\ value\ for\ the\ quantized\ bias.}}
+\DoxyCodeLine{00207\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_a8a47ba81bdef28b5c479ee7928a7d123}{TfLiteType}}\ \mbox{\hyperlink{struct_tf_lite_fully_connected_params_a4ef5a043dc1da8a1be44d964bb894680}{quantized\_bias\_type}};}
+\DoxyCodeLine{00208\ \}\ \mbox{\hyperlink{struct_tf_lite_fully_connected_params}{TfLiteFullyConnectedParams}};}
+\DoxyCodeLine{00209\ }
+\DoxyCodeLine{00210\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{enum}\ \{}
+\DoxyCodeLine{00211\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src7f67a4373e2a0d20daf1d1ff4e1f4339_a5514738f4f02ba8795258d0fa84f7980a5a3fd0180e50c6288b9d93fb58f13154}{kTfLiteLshProjectionUnknown}}\ =\ 0,}
+\DoxyCodeLine{00212\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src7f67a4373e2a0d20daf1d1ff4e1f4339_a5514738f4f02ba8795258d0fa84f7980a045a54ababda4b3d8e0e81a37da326a1}{kTfLiteLshProjectionSparse}}\ =\ 1,}
+\DoxyCodeLine{00213\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src7f67a4373e2a0d20daf1d1ff4e1f4339_a5514738f4f02ba8795258d0fa84f7980ae36b298cb03f16b8b5dfc719646ea056}{kTfLiteLshProjectionDense}}\ =\ 2,}
+\DoxyCodeLine{00214\ \}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src7f67a4373e2a0d20daf1d1ff4e1f4339_a5514738f4f02ba8795258d0fa84f7980}{TfLiteLSHProjectionType}};}
+\DoxyCodeLine{00215\ }
+\DoxyCodeLine{00216\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\{}
+\DoxyCodeLine{00217\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src7f67a4373e2a0d20daf1d1ff4e1f4339_a5514738f4f02ba8795258d0fa84f7980}{TfLiteLSHProjectionType}}\ \mbox{\hyperlink{micro_2kernels_2overlap__add_8cc_a231b67310ea6e901bd0df1bded3963cf}{type}};}
+\DoxyCodeLine{00218\ \}\ \mbox{\hyperlink{struct_tf_lite_l_s_h_projection_params}{TfLiteLSHProjectionParams}};}
+\DoxyCodeLine{00219\ }
+\DoxyCodeLine{00220\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\{}
+\DoxyCodeLine{00221\ \ \ \textcolor{keywordtype}{float}\ beta;}
+\DoxyCodeLine{00222\ \}\ \mbox{\hyperlink{struct_tf_lite_softmax_params}{TfLiteSoftmaxParams}};}
+\DoxyCodeLine{00223\ }
+\DoxyCodeLine{00224\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\{}
+\DoxyCodeLine{00225\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{cumsum__test_8cc_a195d3f5576f1c8b039cff255b07a3aee}{axis}};}
+\DoxyCodeLine{00226\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src7f67a4373e2a0d20daf1d1ff4e1f4339_acc9e377dbc009d68bbfa5480d2559565}{TfLiteFusedActivation}}\ \mbox{\hyperlink{l2__pool__2d__test_8cc_a77ea056afd837c816867a0a9887131b6}{activation}};}
+\DoxyCodeLine{00227\ \}\ \mbox{\hyperlink{struct_tf_lite_concatenation_params}{TfLiteConcatenationParams}};}
+\DoxyCodeLine{00228\ }
+\DoxyCodeLine{00229\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\{}
+\DoxyCodeLine{00230\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src7f67a4373e2a0d20daf1d1ff4e1f4339_acc9e377dbc009d68bbfa5480d2559565}{TfLiteFusedActivation}}\ \mbox{\hyperlink{l2__pool__2d__test_8cc_a77ea056afd837c816867a0a9887131b6}{activation}};}
+\DoxyCodeLine{00231\ \ \ \textcolor{comment}{//\ Parameter\ added\ for\ the\ version\ 4.}}
+\DoxyCodeLine{00232\ \ \ \textcolor{keywordtype}{bool}\ pot\_scale\_int16;}
+\DoxyCodeLine{00233\ \}\ \mbox{\hyperlink{struct_tf_lite_add_params}{TfLiteAddParams}};}
+\DoxyCodeLine{00234\ }
+\DoxyCodeLine{00235\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\{}
+\DoxyCodeLine{00236\ \ \ \mbox{\hyperlink{struct_empty_struct_placeholder}{EmptyStructPlaceholder}}\ placeholder;}
+\DoxyCodeLine{00237\ \}\ \mbox{\hyperlink{struct_tf_lite_space_to_batch_n_d_params}{TfLiteSpaceToBatchNDParams}};}
+\DoxyCodeLine{00238\ }
+\DoxyCodeLine{00239\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\{}
+\DoxyCodeLine{00240\ \ \ \mbox{\hyperlink{struct_empty_struct_placeholder}{EmptyStructPlaceholder}}\ placeholder;}
+\DoxyCodeLine{00241\ \}\ \mbox{\hyperlink{struct_tf_lite_batch_to_space_n_d_params}{TfLiteBatchToSpaceNDParams}};}
+\DoxyCodeLine{00242\ }
+\DoxyCodeLine{00243\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\{}
+\DoxyCodeLine{00244\ \ \ \textcolor{keywordtype}{bool}\ adj\_x;}
+\DoxyCodeLine{00245\ \ \ \textcolor{keywordtype}{bool}\ adj\_y;}
+\DoxyCodeLine{00246\ \ \ \textcolor{comment}{//\ Parameters\ for\ BatchMatMul\ version\ 4\ or\ above.}}
+\DoxyCodeLine{00247\ \ \ \textcolor{comment}{//\ If\ set\ to\ true\ and\ the\ weights\ are\ quantized,\ then\ non\ constant\ inputs}}
+\DoxyCodeLine{00248\ \ \ \textcolor{comment}{//\ are\ quantized\ at\ evaluation\ time\ with\ asymmetric\ quantization.}}
+\DoxyCodeLine{00249\ \ \ \textcolor{keywordtype}{bool}\ asymmetric\_quantize\_inputs;}
+\DoxyCodeLine{00250\ \}\ \mbox{\hyperlink{struct_tf_lite_batch_mat_mul_params}{TfLiteBatchMatMulParams}};}
+\DoxyCodeLine{00251\ }
+\DoxyCodeLine{00252\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\{}
+\DoxyCodeLine{00253\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src7f67a4373e2a0d20daf1d1ff4e1f4339_acc9e377dbc009d68bbfa5480d2559565}{TfLiteFusedActivation}}\ \mbox{\hyperlink{l2__pool__2d__test_8cc_a77ea056afd837c816867a0a9887131b6}{activation}};}
+\DoxyCodeLine{00254\ \}\ \mbox{\hyperlink{struct_tf_lite_mul_params}{TfLiteMulParams}};}
+\DoxyCodeLine{00255\ }
+\DoxyCodeLine{00256\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\{}
+\DoxyCodeLine{00257\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src7f67a4373e2a0d20daf1d1ff4e1f4339_acc9e377dbc009d68bbfa5480d2559565}{TfLiteFusedActivation}}\ \mbox{\hyperlink{l2__pool__2d__test_8cc_a77ea056afd837c816867a0a9887131b6}{activation}};}
+\DoxyCodeLine{00258\ \ \ \textcolor{comment}{//\ Parameter\ added\ for\ the\ version\ 5.}}
+\DoxyCodeLine{00259\ \ \ \textcolor{keywordtype}{bool}\ pot\_scale\_int16;}
+\DoxyCodeLine{00260\ \}\ \mbox{\hyperlink{struct_tf_lite_sub_params}{TfLiteSubParams}};}
+\DoxyCodeLine{00261\ }
+\DoxyCodeLine{00262\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\{}
+\DoxyCodeLine{00263\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src7f67a4373e2a0d20daf1d1ff4e1f4339_acc9e377dbc009d68bbfa5480d2559565}{TfLiteFusedActivation}}\ \mbox{\hyperlink{l2__pool__2d__test_8cc_a77ea056afd837c816867a0a9887131b6}{activation}};}
+\DoxyCodeLine{00264\ \}\ \mbox{\hyperlink{struct_tf_lite_div_params}{TfLiteDivParams}};}
+\DoxyCodeLine{00265\ }
+\DoxyCodeLine{00266\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\{}
+\DoxyCodeLine{00267\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src7f67a4373e2a0d20daf1d1ff4e1f4339_acc9e377dbc009d68bbfa5480d2559565}{TfLiteFusedActivation}}\ \mbox{\hyperlink{l2__pool__2d__test_8cc_a77ea056afd837c816867a0a9887131b6}{activation}};}
+\DoxyCodeLine{00268\ \}\ \mbox{\hyperlink{struct_tf_lite_l2_norm_params}{TfLiteL2NormParams}};}
+\DoxyCodeLine{00269\ }
+\DoxyCodeLine{00270\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\{}
+\DoxyCodeLine{00271\ \ \ \textcolor{keywordtype}{int}\ radius;}
+\DoxyCodeLine{00272\ \ \ \textcolor{keywordtype}{float}\ bias;}
+\DoxyCodeLine{00273\ \ \ \textcolor{keywordtype}{float}\ \mbox{\hyperlink{leaky__relu__test_8cc_ab1551d8043c2aa4410fb7dbb1fe3be7b}{alpha}};}
+\DoxyCodeLine{00274\ \ \ \textcolor{keywordtype}{float}\ beta;}
+\DoxyCodeLine{00275\ \}\ \mbox{\hyperlink{struct_tf_lite_local_response_norm_params}{TfLiteLocalResponseNormParams}};}
+\DoxyCodeLine{00276\ }
+\DoxyCodeLine{00277\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{enum}\ \{}
+\DoxyCodeLine{00278\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src7f67a4373e2a0d20daf1d1ff4e1f4339_a04df0cf481f06f6bbec1566aeaad5293aea7f1b06cf598042e9dca83674a23c57}{kTfLiteLSTMFullKernel}}\ =\ 0,}
+\DoxyCodeLine{00279\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src7f67a4373e2a0d20daf1d1ff4e1f4339_a04df0cf481f06f6bbec1566aeaad5293a3d5a18c0b770bd163b10db1b2c883bb3}{kTfLiteLSTMBasicKernel}}}
+\DoxyCodeLine{00280\ \}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src7f67a4373e2a0d20daf1d1ff4e1f4339_a04df0cf481f06f6bbec1566aeaad5293}{TfLiteLSTMKernelType}};}
+\DoxyCodeLine{00281\ }
+\DoxyCodeLine{00282\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\{}
+\DoxyCodeLine{00283\ \ \ \textcolor{comment}{//\ Parameters\ for\ LSTM\ version\ 1.}}
+\DoxyCodeLine{00284\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src7f67a4373e2a0d20daf1d1ff4e1f4339_acc9e377dbc009d68bbfa5480d2559565}{TfLiteFusedActivation}}\ \mbox{\hyperlink{l2__pool__2d__test_8cc_a77ea056afd837c816867a0a9887131b6}{activation}};}
+\DoxyCodeLine{00285\ \ \ \textcolor{keywordtype}{float}\ cell\_clip;}
+\DoxyCodeLine{00286\ \ \ \textcolor{keywordtype}{float}\ proj\_clip;}
+\DoxyCodeLine{00287\ }
+\DoxyCodeLine{00288\ \ \ \textcolor{comment}{//\ Parameters\ for\ LSTM\ version\ 2.}}
+\DoxyCodeLine{00289\ \ \ \textcolor{comment}{//\ kTfLiteLSTMBasicKernel\ is\ only\ supported\ in\ version\ 2\ or\ above.}}
+\DoxyCodeLine{00290\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src7f67a4373e2a0d20daf1d1ff4e1f4339_a04df0cf481f06f6bbec1566aeaad5293}{TfLiteLSTMKernelType}}\ kernel\_type;}
+\DoxyCodeLine{00291\ }
+\DoxyCodeLine{00292\ \ \ \textcolor{comment}{//\ Parameters\ for\ LSTM\ version\ 4.}}
+\DoxyCodeLine{00293\ \ \ \textcolor{keywordtype}{bool}\ asymmetric\_quantize\_inputs;}
+\DoxyCodeLine{00294\ \}\ \mbox{\hyperlink{struct_tf_lite_l_s_t_m_params}{TfLiteLSTMParams}};}
+\DoxyCodeLine{00295\ }
+\DoxyCodeLine{00296\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\{}
+\DoxyCodeLine{00297\ \ \ \textcolor{comment}{//\ Parameters\ needed\ for\ the\ underlying\ LSTM.}}
+\DoxyCodeLine{00298\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src7f67a4373e2a0d20daf1d1ff4e1f4339_acc9e377dbc009d68bbfa5480d2559565}{TfLiteFusedActivation}}\ \mbox{\hyperlink{l2__pool__2d__test_8cc_a77ea056afd837c816867a0a9887131b6}{activation}};}
+\DoxyCodeLine{00299\ \ \ \textcolor{keywordtype}{float}\ cell\_clip;}
+\DoxyCodeLine{00300\ \ \ \textcolor{keywordtype}{float}\ proj\_clip;}
+\DoxyCodeLine{00301\ }
+\DoxyCodeLine{00302\ \ \ \textcolor{comment}{//\ If\ set\ to\ true\ then\ the\ first\ dimension\ is\ time,\ otherwise\ batch.}}
+\DoxyCodeLine{00303\ \ \ \textcolor{keywordtype}{bool}\ time\_major;}
+\DoxyCodeLine{00304\ }
+\DoxyCodeLine{00305\ \ \ \textcolor{comment}{//\ Parameter\ for\ unidirectional\ sequence\ RNN\ version\ 3.}}
+\DoxyCodeLine{00306\ \ \ \textcolor{keywordtype}{bool}\ asymmetric\_quantize\_inputs;}
+\DoxyCodeLine{00307\ }
+\DoxyCodeLine{00308\ \ \ \textcolor{comment}{//\ Parameter\ for\ unidirectional\ sequence\ RNN\ version\ 4.}}
+\DoxyCodeLine{00309\ \ \ \textcolor{keywordtype}{bool}\ diagonal\_recurrent\_tensors;}
+\DoxyCodeLine{00310\ \}\ \mbox{\hyperlink{struct_tf_lite_unidirectional_sequence_l_s_t_m_params}{TfLiteUnidirectionalSequenceLSTMParams}};}
+\DoxyCodeLine{00311\ }
+\DoxyCodeLine{00312\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\{}
+\DoxyCodeLine{00313\ \ \ \textcolor{comment}{//\ Parameters\ supported\ by\ version\ 1:}}
+\DoxyCodeLine{00314\ \ \ \textcolor{comment}{//\ Parameters\ inherited\ for\ the\ LSTM\ kernel.}}
+\DoxyCodeLine{00315\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src7f67a4373e2a0d20daf1d1ff4e1f4339_acc9e377dbc009d68bbfa5480d2559565}{TfLiteFusedActivation}}\ \mbox{\hyperlink{l2__pool__2d__test_8cc_a77ea056afd837c816867a0a9887131b6}{activation}};}
+\DoxyCodeLine{00316\ \ \ \textcolor{keywordtype}{float}\ cell\_clip;}
+\DoxyCodeLine{00317\ \ \ \textcolor{keywordtype}{float}\ proj\_clip;}
+\DoxyCodeLine{00318\ }
+\DoxyCodeLine{00319\ \ \ \textcolor{comment}{//\ If\ true,\ store\ the\ outputs\ of\ both\ directions\ in\ the\ first\ output.}}
+\DoxyCodeLine{00320\ \ \ \textcolor{keywordtype}{bool}\ merge\_outputs;}
+\DoxyCodeLine{00321\ }
+\DoxyCodeLine{00322\ \ \ \textcolor{comment}{//\ Parameters\ supported\ by\ version\ 2:}}
+\DoxyCodeLine{00323\ \ \ \textcolor{comment}{//\ If\ set\ to\ true\ then\ the\ first\ dimension\ is\ time,\ otherwise\ batch.}}
+\DoxyCodeLine{00324\ \ \ \textcolor{keywordtype}{bool}\ time\_major;}
+\DoxyCodeLine{00325\ }
+\DoxyCodeLine{00326\ \ \ \textcolor{comment}{//\ Parameters\ supported\ by\ version\ 3:}}
+\DoxyCodeLine{00327\ \ \ \textcolor{comment}{//\ If\ set\ to\ true,\ then\ hybrid\ ops\ use\ asymmetric\ quantization\ for\ inputs.}}
+\DoxyCodeLine{00328\ \ \ \textcolor{keywordtype}{bool}\ asymmetric\_quantize\_inputs;}
+\DoxyCodeLine{00329\ \}\ \mbox{\hyperlink{struct_tf_lite_bidirectional_sequence_l_s_t_m_params}{TfLiteBidirectionalSequenceLSTMParams}};}
+\DoxyCodeLine{00330\ }
+\DoxyCodeLine{00331\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\{}
+\DoxyCodeLine{00332\ \ \ \textcolor{keywordtype}{bool}\ align\_corners;}
+\DoxyCodeLine{00333\ \ \ \textcolor{comment}{//\ half\_pixel\_centers\ assumes\ pixels\ are\ of\ half\ the\ actual\ dimensions,\ and}}
+\DoxyCodeLine{00334\ \ \ \textcolor{comment}{//\ yields\ more\ accurate\ resizes.\ Corresponds\ to\ the\ same\ argument\ for\ the}}
+\DoxyCodeLine{00335\ \ \ \textcolor{comment}{//\ original\ TensorFlow\ op\ in\ TF2.0.}}
+\DoxyCodeLine{00336\ \ \ \textcolor{keywordtype}{bool}\ half\_pixel\_centers;}
+\DoxyCodeLine{00337\ \}\ \mbox{\hyperlink{struct_tf_lite_resize_bilinear_params}{TfLiteResizeBilinearParams}};}
+\DoxyCodeLine{00338\ }
+\DoxyCodeLine{00339\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\{}
+\DoxyCodeLine{00340\ \ \ \textcolor{keywordtype}{bool}\ align\_corners;}
+\DoxyCodeLine{00341\ \ \ \textcolor{keywordtype}{bool}\ half\_pixel\_centers;}
+\DoxyCodeLine{00342\ \}\ \mbox{\hyperlink{struct_tf_lite_resize_nearest_neighbor_params}{TfLiteResizeNearestNeighborParams}};}
+\DoxyCodeLine{00343\ }
+\DoxyCodeLine{00344\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\{}
+\DoxyCodeLine{00345\ \ \ \mbox{\hyperlink{struct_empty_struct_placeholder}{EmptyStructPlaceholder}}\ placeholder;}
+\DoxyCodeLine{00346\ \}\ \mbox{\hyperlink{struct_tf_lite_pad_params}{TfLitePadParams}};}
+\DoxyCodeLine{00347\ }
+\DoxyCodeLine{00348\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\{}
+\DoxyCodeLine{00349\ \ \ \mbox{\hyperlink{struct_empty_struct_placeholder}{EmptyStructPlaceholder}}\ placeholder;}
+\DoxyCodeLine{00350\ \}\ \mbox{\hyperlink{struct_tf_lite_pad_v2_params}{TfLitePadV2Params}};}
+\DoxyCodeLine{00351\ }
+\DoxyCodeLine{00352\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\{}
+\DoxyCodeLine{00353\ \ \ \textcolor{comment}{//\ These\ fields\ are\ only\ used\ in\ old\ models\ for\ backward\ compatibility.}}
+\DoxyCodeLine{00354\ \ \ \textcolor{comment}{//\ In\ the\ current\ implementation,\ we\ use\ the\ 2nd\ input\ of\ the\ op\ as\ the\ shape,}}
+\DoxyCodeLine{00355\ \ \ \textcolor{comment}{//\ and\ these\ fields\ are\ unused.}}
+\DoxyCodeLine{00356\ \ \ int32\_t\ shape[\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src7f67a4373e2a0d20daf1d1ff4e1f4339_a6262352b18546b4f2c0caa8d7ff49ca7}{TFLITE\_RESHAPE\_PARAMS\_MAX\_DIMENSION\_COUNT}}];}
+\DoxyCodeLine{00357\ \ \ \textcolor{keywordtype}{int}\ num\_dimensions;}
+\DoxyCodeLine{00358\ \}\ \mbox{\hyperlink{struct_tf_lite_reshape_params}{TfLiteReshapeParams}};}
+\DoxyCodeLine{00359\ }
+\DoxyCodeLine{00360\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\{}
+\DoxyCodeLine{00361\ \ \ \textcolor{keywordtype}{int}\ ngram\_size;}
+\DoxyCodeLine{00362\ \ \ \textcolor{keywordtype}{int}\ max\_skip\_size;}
+\DoxyCodeLine{00363\ \ \ \textcolor{keywordtype}{bool}\ include\_all\_ngrams;}
+\DoxyCodeLine{00364\ \}\ \mbox{\hyperlink{struct_tf_lite_skip_gram_params}{TfLiteSkipGramParams}};}
+\DoxyCodeLine{00365\ }
+\DoxyCodeLine{00366\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\{}
+\DoxyCodeLine{00367\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{depth__to__space__test_8cc_a70b27761c7d0bd5cd90f4fe47e569b94}{block\_size}};}
+\DoxyCodeLine{00368\ \}\ \mbox{\hyperlink{struct_tf_lite_space_to_depth_params}{TfLiteSpaceToDepthParams}};}
+\DoxyCodeLine{00369\ }
+\DoxyCodeLine{00370\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\{}
+\DoxyCodeLine{00371\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{depth__to__space__test_8cc_a70b27761c7d0bd5cd90f4fe47e569b94}{block\_size}};}
+\DoxyCodeLine{00372\ \}\ \mbox{\hyperlink{struct_tf_lite_depth_to_space_params}{TfLiteDepthToSpaceParams}};}
+\DoxyCodeLine{00373\ }
+\DoxyCodeLine{00374\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\{}
+\DoxyCodeLine{00375\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_a8a47ba81bdef28b5c479ee7928a7d123}{TfLiteType}}\ in\_data\_type;}
+\DoxyCodeLine{00376\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_a8a47ba81bdef28b5c479ee7928a7d123}{TfLiteType}}\ out\_data\_type;}
+\DoxyCodeLine{00377\ \}\ \mbox{\hyperlink{struct_tf_lite_cast_params}{TfLiteCastParams}};}
+\DoxyCodeLine{00378\ }
+\DoxyCodeLine{00379\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{enum}\ \{}
+\DoxyCodeLine{00380\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src7f67a4373e2a0d20daf1d1ff4e1f4339_a68740b835d949cbf24bea66b155b7b4aaa4e8a77fd9a6bb97392d86960dcc44da}{kTfLiteCombinerTypeSum}}\ =\ 0,}
+\DoxyCodeLine{00381\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src7f67a4373e2a0d20daf1d1ff4e1f4339_a68740b835d949cbf24bea66b155b7b4aad5c918000d63b0070b600843d47236e8}{kTfLiteCombinerTypeMean}}\ =\ 1,}
+\DoxyCodeLine{00382\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src7f67a4373e2a0d20daf1d1ff4e1f4339_a68740b835d949cbf24bea66b155b7b4aa9d6992200db60d8983689a36bb8c19d9}{kTfLiteCombinerTypeSqrtn}}\ =\ 2,}
+\DoxyCodeLine{00383\ \}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src7f67a4373e2a0d20daf1d1ff4e1f4339_a68740b835d949cbf24bea66b155b7b4a}{TfLiteCombinerType}};}
+\DoxyCodeLine{00384\ }
+\DoxyCodeLine{00385\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\{}
+\DoxyCodeLine{00386\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src7f67a4373e2a0d20daf1d1ff4e1f4339_a68740b835d949cbf24bea66b155b7b4a}{TfLiteCombinerType}}\ combiner;}
+\DoxyCodeLine{00387\ \}\ \mbox{\hyperlink{struct_tf_lite_embedding_lookup_sparse_params}{TfLiteEmbeddingLookupSparseParams}};}
+\DoxyCodeLine{00388\ }
+\DoxyCodeLine{00389\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\{}
+\DoxyCodeLine{00390\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{cumsum__test_8cc_a195d3f5576f1c8b039cff255b07a3aee}{axis}};}
+\DoxyCodeLine{00391\ \ \ \textcolor{keywordtype}{int}\ batch\_dims;}
+\DoxyCodeLine{00392\ \}\ \mbox{\hyperlink{struct_tf_lite_gather_params}{TfLiteGatherParams}};}
+\DoxyCodeLine{00393\ }
+\DoxyCodeLine{00394\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\{}
+\DoxyCodeLine{00395\ \ \ \mbox{\hyperlink{struct_empty_struct_placeholder}{EmptyStructPlaceholder}}\ placeholder;}
+\DoxyCodeLine{00396\ \}\ \mbox{\hyperlink{struct_tf_lite_transpose_params}{TfLiteTransposeParams}};}
+\DoxyCodeLine{00397\ }
+\DoxyCodeLine{00398\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\{}
+\DoxyCodeLine{00399\ \ \ \textcolor{keywordtype}{bool}\ keep\_dims;}
+\DoxyCodeLine{00400\ \}\ \mbox{\hyperlink{struct_tf_lite_reducer_params}{TfLiteReducerParams}};}
+\DoxyCodeLine{00401\ }
+\DoxyCodeLine{00402\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\{}
+\DoxyCodeLine{00403\ \ \ \textcolor{keywordtype}{int}\ num\_splits;}
+\DoxyCodeLine{00404\ \}\ \mbox{\hyperlink{struct_tf_lite_split_params}{TfLiteSplitParams}};}
+\DoxyCodeLine{00405\ }
+\DoxyCodeLine{00406\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\{}
+\DoxyCodeLine{00407\ \ \ \textcolor{keywordtype}{int}\ num\_splits;}
+\DoxyCodeLine{00408\ \}\ \mbox{\hyperlink{struct_tf_lite_split_v_params}{TfLiteSplitVParams}};}
+\DoxyCodeLine{00409\ }
+\DoxyCodeLine{00410\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\{}
+\DoxyCodeLine{00411\ \ \ \textcolor{comment}{//\ TODO(ahentz):\ We\ can't\ have\ dynamic\ data\ in\ this\ struct,\ at\ least\ not\ yet.}}
+\DoxyCodeLine{00412\ \ \ \textcolor{comment}{//\ For\ now\ we\ will\ fix\ the\ maximum\ possible\ number\ of\ dimensions.}}
+\DoxyCodeLine{00413\ \ \ int32\_t\ squeeze\_dims[8];}
+\DoxyCodeLine{00414\ \ \ \textcolor{keywordtype}{int}\ num\_squeeze\_dims;}
+\DoxyCodeLine{00415\ \}\ \mbox{\hyperlink{struct_tf_lite_squeeze_params}{TfLiteSqueezeParams}};}
+\DoxyCodeLine{00416\ }
+\DoxyCodeLine{00417\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\{}
+\DoxyCodeLine{00418\ \ \ \textcolor{keywordtype}{int}\ begin\_mask;}
+\DoxyCodeLine{00419\ \ \ \textcolor{keywordtype}{int}\ end\_mask;}
+\DoxyCodeLine{00420\ \ \ \textcolor{keywordtype}{int}\ ellipsis\_mask;}
+\DoxyCodeLine{00421\ \ \ \textcolor{keywordtype}{int}\ new\_axis\_mask;}
+\DoxyCodeLine{00422\ \ \ \textcolor{keywordtype}{int}\ shrink\_axis\_mask;}
+\DoxyCodeLine{00423\ }
+\DoxyCodeLine{00424\ \ \ \textcolor{comment}{//\ Parameters\ supported\ by\ version\ 8:}}
+\DoxyCodeLine{00425\ \ \ \textcolor{comment}{//\ If\ true,\ then\ the\ end\ tensor\ is\ an\ offset\ of\ the\ begin\ tensor.}}
+\DoxyCodeLine{00426\ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{struct_tf_lite_strided_slice_params_afab5263551518a83141a7dac4d4e1f0a}{offset}};}
+\DoxyCodeLine{00427\ \}\ \mbox{\hyperlink{struct_tf_lite_strided_slice_params}{TfLiteStridedSliceParams}};}
+\DoxyCodeLine{00428\ }
+\DoxyCodeLine{00429\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\{}
+\DoxyCodeLine{00430\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_a8a47ba81bdef28b5c479ee7928a7d123}{TfLiteType}}\ output\_type;}
+\DoxyCodeLine{00431\ \}\ \mbox{\hyperlink{struct_tf_lite_arg_max_params}{TfLiteArgMaxParams}};}
+\DoxyCodeLine{00432\ }
+\DoxyCodeLine{00433\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\{}
+\DoxyCodeLine{00434\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_a8a47ba81bdef28b5c479ee7928a7d123}{TfLiteType}}\ output\_type;}
+\DoxyCodeLine{00435\ \}\ \mbox{\hyperlink{struct_tf_lite_arg_min_params}{TfLiteArgMinParams}};}
+\DoxyCodeLine{00436\ }
+\DoxyCodeLine{00437\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\{}
+\DoxyCodeLine{00438\ \ \ \textcolor{comment}{//\ Parameters\ supported\ by\ version\ 1:}}
+\DoxyCodeLine{00439\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src7f67a4373e2a0d20daf1d1ff4e1f4339_a3fc860f917e2acc94e750df4e1626c3b}{TfLitePadding}}\ \mbox{\hyperlink{arc__mli_2conv_8cc_ad870e8457a2c13cdb2d9a3566118bb4e}{padding}};}
+\DoxyCodeLine{00440\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{l2__pool__2d__test_8cc_adcfa78f07b43a1901221a34ea1e82cd9}{stride\_width}};}
+\DoxyCodeLine{00441\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{l2__pool__2d__test_8cc_a2448e5c60032b597583b86bfcb69e21d}{stride\_height}};}
+\DoxyCodeLine{00442\ }
+\DoxyCodeLine{00443\ \ \ \textcolor{comment}{//\ Parameters\ supported\ by\ version\ 4:}}
+\DoxyCodeLine{00444\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src7f67a4373e2a0d20daf1d1ff4e1f4339_acc9e377dbc009d68bbfa5480d2559565}{TfLiteFusedActivation}}\ \mbox{\hyperlink{l2__pool__2d__test_8cc_a77ea056afd837c816867a0a9887131b6}{activation}};}
+\DoxyCodeLine{00445\ }
+\DoxyCodeLine{00446\ \ \ \textcolor{comment}{//\ Parameters\ for\ TransposeConv\ version\ 5\ or\ above.}}
+\DoxyCodeLine{00447\ \ \ \textcolor{comment}{//\ Used\ to\ determine\ the\ default\ value\ for\ the\ quantized\ bias.}}
+\DoxyCodeLine{00448\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_a8a47ba81bdef28b5c479ee7928a7d123}{TfLiteType}}\ \mbox{\hyperlink{struct_tf_lite_transpose_conv_params_a17485566e1f4dd7b2fbffafe7a2093e0}{quantized\_bias\_type}};}
+\DoxyCodeLine{00449\ \}\ \mbox{\hyperlink{struct_tf_lite_transpose_conv_params}{TfLiteTransposeConvParams}};}
+\DoxyCodeLine{00450\ }
+\DoxyCodeLine{00451\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\{}
+\DoxyCodeLine{00452\ \ \ \textcolor{keywordtype}{bool}\ validate\_indices;}
+\DoxyCodeLine{00453\ \}\ \mbox{\hyperlink{struct_tf_lite_sparse_to_dense_params}{TfLiteSparseToDenseParams}};}
+\DoxyCodeLine{00454\ }
+\DoxyCodeLine{00455\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\{}
+\DoxyCodeLine{00456\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_a8a47ba81bdef28b5c479ee7928a7d123}{TfLiteType}}\ out\_type;}
+\DoxyCodeLine{00457\ \}\ \mbox{\hyperlink{struct_tf_lite_shape_params}{TfLiteShapeParams}};}
+\DoxyCodeLine{00458\ }
+\DoxyCodeLine{00459\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\{}
+\DoxyCodeLine{00460\ \ \ \mbox{\hyperlink{struct_empty_struct_placeholder}{EmptyStructPlaceholder}}\ placeholder;}
+\DoxyCodeLine{00461\ \}\ \mbox{\hyperlink{struct_tf_lite_rank_params}{TfLiteRankParams}};}
+\DoxyCodeLine{00462\ }
+\DoxyCodeLine{00463\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\{}
+\DoxyCodeLine{00464\ \ \ \textcolor{comment}{//\ Parameters\ supported\ by\ version\ 1:}}
+\DoxyCodeLine{00465\ \ \ \textcolor{keywordtype}{float}\ \mbox{\hyperlink{common__functions_8h_ac6afabdc09a49a433ee19d8a9486056d}{min}};}
+\DoxyCodeLine{00466\ \ \ \textcolor{keywordtype}{float}\ \mbox{\hyperlink{common__functions_8h_affe776513b24d84b39af8ab0930fef7f}{max}};}
+\DoxyCodeLine{00467\ \ \ \textcolor{keywordtype}{int}\ num\_bits;}
+\DoxyCodeLine{00468\ }
+\DoxyCodeLine{00469\ \ \ \textcolor{comment}{//\ Parameters\ supported\ by\ version\ 2:}}
+\DoxyCodeLine{00470\ \ \ \textcolor{keywordtype}{bool}\ narrow\_range;}
+\DoxyCodeLine{00471\ \}\ \mbox{\hyperlink{struct_tf_lite_fake_quant_params}{TfLiteFakeQuantParams}};}
+\DoxyCodeLine{00472\ }
+\DoxyCodeLine{00473\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\{}
+\DoxyCodeLine{00474\ \ \ \textcolor{keywordtype}{int}\ values\_count;}
+\DoxyCodeLine{00475\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{cumsum__test_8cc_a195d3f5576f1c8b039cff255b07a3aee}{axis}};}
+\DoxyCodeLine{00476\ \}\ \mbox{\hyperlink{struct_tf_lite_pack_params}{TfLitePackParams}};}
+\DoxyCodeLine{00477\ }
+\DoxyCodeLine{00478\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\{}
+\DoxyCodeLine{00479\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{cumsum__test_8cc_a195d3f5576f1c8b039cff255b07a3aee}{axis}};}
+\DoxyCodeLine{00480\ \}\ \mbox{\hyperlink{struct_tf_lite_one_hot_params}{TfLiteOneHotParams}};}
+\DoxyCodeLine{00481\ }
+\DoxyCodeLine{00482\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\{}
+\DoxyCodeLine{00483\ \ \ \textcolor{keywordtype}{int}\ num;}
+\DoxyCodeLine{00484\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{cumsum__test_8cc_a195d3f5576f1c8b039cff255b07a3aee}{axis}};}
+\DoxyCodeLine{00485\ \}\ \mbox{\hyperlink{struct_tf_lite_unpack_params}{TfLiteUnpackParams}};}
+\DoxyCodeLine{00486\ }
+\DoxyCodeLine{00487\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\{}
+\DoxyCodeLine{00488\ \ \ \textcolor{keywordtype}{float}\ \mbox{\hyperlink{leaky__relu__test_8cc_ab1551d8043c2aa4410fb7dbb1fe3be7b}{alpha}};}
+\DoxyCodeLine{00489\ \}\ \mbox{\hyperlink{struct_tf_lite_leaky_relu_params}{TfLiteLeakyReluParams}};}
+\DoxyCodeLine{00490\ }
+\DoxyCodeLine{00491\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\{}
+\DoxyCodeLine{00492\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_a8a47ba81bdef28b5c479ee7928a7d123}{TfLiteType}}\ index\_out\_type;}
+\DoxyCodeLine{00493\ \}\ \mbox{\hyperlink{struct_tf_lite_unique_params}{TfLiteUniqueParams}};}
+\DoxyCodeLine{00494\ }
+\DoxyCodeLine{00495\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\{}
+\DoxyCodeLine{00496\ \ \ \textcolor{keywordtype}{int}\ seq\_dim;}
+\DoxyCodeLine{00497\ \ \ \textcolor{keywordtype}{int}\ batch\_dim;}
+\DoxyCodeLine{00498\ \}\ \mbox{\hyperlink{struct_tf_lite_reverse_sequence_params}{TfLiteReverseSequenceParams}};}
+\DoxyCodeLine{00499\ }
+\DoxyCodeLine{00500\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\{}
+\DoxyCodeLine{00501\ \ \ \mbox{\hyperlink{struct_empty_struct_placeholder}{EmptyStructPlaceholder}}\ placeholder;}
+\DoxyCodeLine{00502\ \}\ \mbox{\hyperlink{struct_tf_lite_matrix_diag_params}{TfLiteMatrixDiagParams}};}
+\DoxyCodeLine{00503\ }
+\DoxyCodeLine{00504\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\{}
+\DoxyCodeLine{00505\ \ \ \mbox{\hyperlink{struct_empty_struct_placeholder}{EmptyStructPlaceholder}}\ placeholder;}
+\DoxyCodeLine{00506\ \}\ \mbox{\hyperlink{struct_tf_lite_matrix_set_diag_params}{TfLiteMatrixSetDiagParams}};}
+\DoxyCodeLine{00507\ }
+\DoxyCodeLine{00508\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\{}
+\DoxyCodeLine{00509\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src10bd2bbdd226c15c9083078e49faa60e_adce1f29137562fce2b76ddaedf6f0b1f}{then\_subgraph\_index}};}
+\DoxyCodeLine{00510\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src10bd2bbdd226c15c9083078e49faa60e_aa397a6e06ce3613a636491e9f068b860}{else\_subgraph\_index}};}
+\DoxyCodeLine{00511\ \}\ \mbox{\hyperlink{struct_tf_lite_if_params}{TfLiteIfParams}};}
+\DoxyCodeLine{00512\ }
+\DoxyCodeLine{00513\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\{}
+\DoxyCodeLine{00514\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src599f826f784b183f95e34a32b51189c3_a0fbc59e295ffe550c6c7e185add6a4e2}{cond\_subgraph\_index}};}
+\DoxyCodeLine{00515\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src599f826f784b183f95e34a32b51189c3_a421aa0e3765751b1986b2430206ab8ea}{body\_subgraph\_index}};}
+\DoxyCodeLine{00516\ \}\ \mbox{\hyperlink{struct_tf_lite_while_params}{TfLiteWhileParams}};}
+\DoxyCodeLine{00517\ }
+\DoxyCodeLine{00518\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\{}
+\DoxyCodeLine{00519\ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{cumsum__test_8cc_a123ab21256237bd7a895a114add1c78c}{exclusive}};}
+\DoxyCodeLine{00520\ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{cumsum__test_8cc_a455cbdac659b075dec33e2da705aaa20}{reverse}};}
+\DoxyCodeLine{00521\ \}\ \mbox{\hyperlink{struct_tf_lite_cumsum_params}{TfLiteCumsumParams}};}
+\DoxyCodeLine{00522\ }
+\DoxyCodeLine{00523\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\{}
+\DoxyCodeLine{00524\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src42b1df81f2b50474ab4cfce7e83e647b_a17891ac2bff426ee66140c87aa078993}{init\_subgraph\_index}};}
+\DoxyCodeLine{00525\ \}\ \mbox{\hyperlink{struct_tf_lite_call_once_params}{TfLiteCallOnceParams}};}
+\DoxyCodeLine{00526\ }
+\DoxyCodeLine{00527\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\{}
+\DoxyCodeLine{00528\ \ \ \textcolor{keywordtype}{int}\ table\_id;}
+\DoxyCodeLine{00529\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_a8a47ba81bdef28b5c479ee7928a7d123}{TfLiteType}}\ key\_dtype;}
+\DoxyCodeLine{00530\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_a8a47ba81bdef28b5c479ee7928a7d123}{TfLiteType}}\ value\_dtype;}
+\DoxyCodeLine{00531\ \}\ \mbox{\hyperlink{struct_tf_lite_hashtable_params}{TfLiteHashtableParams}};}
+\DoxyCodeLine{00532\ }
+\DoxyCodeLine{00533\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\{}
+\DoxyCodeLine{00534\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ container;}
+\DoxyCodeLine{00535\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ shared\_name;}
+\DoxyCodeLine{00536\ \}\ \mbox{\hyperlink{struct_tf_lite_var_handle_params}{TfLiteVarHandleParams}};}
+\DoxyCodeLine{00537\ }
+\DoxyCodeLine{00538\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\{}
+\DoxyCodeLine{00539\ \ \ \textcolor{keywordtype}{int}\ seed;}
+\DoxyCodeLine{00540\ \ \ \textcolor{keywordtype}{int}\ seed2;}
+\DoxyCodeLine{00541\ \}\ \mbox{\hyperlink{struct_tf_lite_random_params}{TfLiteRandomParams}};}
+\DoxyCodeLine{00542\ }
+\DoxyCodeLine{00543\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\{}
+\DoxyCodeLine{00544\ \ \ \textcolor{keywordtype}{int}\ num\_boundaries;}
+\DoxyCodeLine{00545\ \ \ \textcolor{comment}{//\ This\ points\ to\ the\ memory\ stored\ in\ the\ model\ (flatbuffer),}}
+\DoxyCodeLine{00546\ \ \ \textcolor{comment}{//\ and\ is\ not\ owned.}}
+\DoxyCodeLine{00547\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{float}*\ boundaries;}
+\DoxyCodeLine{00548\ \}\ \mbox{\hyperlink{struct_tf_lite_bucketize_params}{TfLiteBucketizeParams}};}
+\DoxyCodeLine{00549\ }
+\DoxyCodeLine{00550\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\{}
+\DoxyCodeLine{00551\ \ \ \textcolor{keywordtype}{bool}\ approximate;}
+\DoxyCodeLine{00552\ \}\ \mbox{\hyperlink{struct_tf_lite_gelu_params}{TfLiteGeluParams}};}
+\DoxyCodeLine{00553\ }
+\DoxyCodeLine{00554\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\{}
+\DoxyCodeLine{00555\ \ \ int64\_t\ \mbox{\hyperlink{struct_tf_lite_stablehlo_concatenate_params_af266db186c3152ab1e5d78dfaa2b41bf}{dimension}};}
+\DoxyCodeLine{00556\ \}\ \mbox{\hyperlink{struct_tf_lite_stablehlo_concatenate_params}{TfLiteStablehloConcatenateParams}};}
+\DoxyCodeLine{00557\ }
+\DoxyCodeLine{00558\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\{}
+\DoxyCodeLine{00559\ \ \ \textcolor{comment}{//\ See\ the\ stablehlo\ spec\ for\ the\ explanation\ of\ the\ attributes:}}
+\DoxyCodeLine{00560\ \ \ \textcolor{comment}{//\ https://github.com/openxla/stablehlo/blob/main/docs/spec.md\#scatter}}
+\DoxyCodeLine{00561\ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{struct_tf_lite_stablehlo_scatter_params_a3fb296c457c04743b7a39fa210e19eb5}{indices\_are\_sorted}};}
+\DoxyCodeLine{00562\ \ \ int64\_t}
+\DoxyCodeLine{00563\ \ \ \ \ \ \ update\_window\_dims[\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_2core_2c_2builtin__op__data_8h_a9036b2233eacbe238fd3efcc77982e4d}{TFLITE\_STABLEHLO\_SCATTER\_PARAMS\_MAX\_DIMENSION\_COUNT}}];}
+\DoxyCodeLine{00564\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{struct_tf_lite_stablehlo_scatter_params_afd917af1f889fc400b842b40bdc65cb4}{num\_update\_window\_dims}};}
+\DoxyCodeLine{00565\ \ \ int64\_t}
+\DoxyCodeLine{00566\ \ \ \ \ \ \ inserted\_window\_dims[\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_2core_2c_2builtin__op__data_8h_a9036b2233eacbe238fd3efcc77982e4d}{TFLITE\_STABLEHLO\_SCATTER\_PARAMS\_MAX\_DIMENSION\_COUNT}}];}
+\DoxyCodeLine{00567\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{struct_tf_lite_stablehlo_scatter_params_a4a15fd90db427d081f2d335e626e5f63}{num\_inserted\_window\_dims}};}
+\DoxyCodeLine{00568\ \ \ int64\_t\ scatter\_dims\_to\_operand\_dims}
+\DoxyCodeLine{00569\ \ \ \ \ \ \ [\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_2core_2c_2builtin__op__data_8h_a9036b2233eacbe238fd3efcc77982e4d}{TFLITE\_STABLEHLO\_SCATTER\_PARAMS\_MAX\_DIMENSION\_COUNT}}];}
+\DoxyCodeLine{00570\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{struct_tf_lite_stablehlo_scatter_params_a1d697f205a8db4d7f73d01a5fdee642a}{num\_scatter\_dims\_to\_operand\_dims}};}
+\DoxyCodeLine{00571\ \ \ int64\_t\ \mbox{\hyperlink{struct_tf_lite_stablehlo_scatter_params_a13c2fc59fc7b1b6fec1021203f47e8d8}{index\_vector\_dim}};}
+\DoxyCodeLine{00572\ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{struct_tf_lite_stablehlo_scatter_params_a92729010c0ac1934153ce492f56b8b16}{unique\_indices}};}
+\DoxyCodeLine{00573\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{struct_tf_lite_stablehlo_scatter_params_a0b439ac06005e9f78824a5c312ea3f6d}{update\_computation\_subgraph\_index}};}
+\DoxyCodeLine{00574\ \}\ \mbox{\hyperlink{struct_tf_lite_stablehlo_scatter_params}{TfLiteStablehloScatterParams}};}
+\DoxyCodeLine{00575\ }
+\DoxyCodeLine{00576\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{enum}\ \{}
+\DoxyCodeLine{00577\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_2core_2c_2builtin__op__data_8h_ad74db92690ad6cd4d12b054317f23815ace1390c69e84cfe304cc41fa1cc09057}{kTfLiteRngAlgorithmUnknown}}\ =\ 0,}
+\DoxyCodeLine{00578\ \ \ \textcolor{comment}{//\ An\ algorithm\ auto-\/selected\ by\ the\ system\ according\ to\ device\ type.}}
+\DoxyCodeLine{00579\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_2core_2c_2builtin__op__data_8h_ad74db92690ad6cd4d12b054317f23815aacddbfc88a082c9caa6392dfa8f3c15b}{kTfLiteRngAlgorithmDefault}},}
+\DoxyCodeLine{00580\ \ \ \textcolor{comment}{//\ The\ Philox\ algorithm,\ as\ described\ in\ paper}}
+\DoxyCodeLine{00581\ \ \ \textcolor{comment}{//\ ['Parallel\ Random\ Numbers:\ As\ Easy\ as\ 1,\ 2,\ 3']}}
+\DoxyCodeLine{00582\ \ \ \textcolor{comment}{//\ (https://www.thesalmons.org/john/random123/papers/random123sc11.pdf)}}
+\DoxyCodeLine{00583\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_2core_2c_2builtin__op__data_8h_ad74db92690ad6cd4d12b054317f23815a743836ef330c1f019b44f7ee626709a1}{kTfLiteRngAlgorithmPhilox}},}
+\DoxyCodeLine{00584\ \ \ \textcolor{comment}{//\ The\ ThreeFry\ algorithm,\ as\ described\ in\ paper}}
+\DoxyCodeLine{00585\ \ \ \textcolor{comment}{//\ ['Parallel\ Random\ Numbers:\ As\ Easy\ as\ 1,\ 2,\ 3']}}
+\DoxyCodeLine{00586\ \ \ \textcolor{comment}{//\ (https://www.thesalmons.org/john/random123/papers/random123sc11.pdf)}}
+\DoxyCodeLine{00587\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_2core_2c_2builtin__op__data_8h_ad74db92690ad6cd4d12b054317f23815a9de7fdc9e811356e3071a69b3e5ae74e}{kTfLiteRngAlgorithmThreefry}},}
+\DoxyCodeLine{00588\ \}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_2core_2c_2builtin__op__data_8h_ad74db92690ad6cd4d12b054317f23815}{TfLiteRngAlgorithm}};}
+\DoxyCodeLine{00589\ }
+\DoxyCodeLine{00590\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\{}
+\DoxyCodeLine{00591\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_2core_2c_2builtin__op__data_8h_ad74db92690ad6cd4d12b054317f23815}{TfLiteRngAlgorithm}}\ \mbox{\hyperlink{struct_tf_lite_stablehlo_rng_bit_generator_params_ae717e3c9d4668e84678d603c7eba4819}{algorithm}};}
+\DoxyCodeLine{00592\ \}\ \mbox{\hyperlink{struct_tf_lite_stablehlo_rng_bit_generator_params}{TfLiteStablehloRngBitGeneratorParams}};}
+\DoxyCodeLine{00593\ }
+\DoxyCodeLine{00594\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\{}
+\DoxyCodeLine{00595\ \ \ \textcolor{comment}{//\ See\ the\ stablehlo\ spec\ for\ the\ explanation\ of\ the\ attributes:}}
+\DoxyCodeLine{00596\ \ \ \textcolor{comment}{//\ https://github.com/openxla/stablehlo/blob/main/docs/spec.md\#gather}}
+\DoxyCodeLine{00597\ \ \ int64\_t\ offset\_dims[\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_2core_2c_2builtin__op__data_8h_a333c4f7164fbe486d065ad5a5d1938d0}{TFLITE\_STABLEHLO\_GATHER\_PARAMS\_MAX\_DIMENSION\_COUNT}}];}
+\DoxyCodeLine{00598\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{struct_tf_lite_stablehlo_gather_params_a0bbcbe30bf9d6233f1f7116f9946f8cc}{num\_offset\_dims}};}
+\DoxyCodeLine{00599\ \ \ int64\_t}
+\DoxyCodeLine{00600\ \ \ \ \ \ \ collapsed\_slice\_dims[\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_2core_2c_2builtin__op__data_8h_a333c4f7164fbe486d065ad5a5d1938d0}{TFLITE\_STABLEHLO\_GATHER\_PARAMS\_MAX\_DIMENSION\_COUNT}}];}
+\DoxyCodeLine{00601\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{struct_tf_lite_stablehlo_gather_params_a53e41524e3e666b7d1d4c745fdf88cfe}{num\_collapsed\_slice\_dims}};}
+\DoxyCodeLine{00602\ \ \ int64\_t\ start\_index\_map[\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_2core_2c_2builtin__op__data_8h_a333c4f7164fbe486d065ad5a5d1938d0}{TFLITE\_STABLEHLO\_GATHER\_PARAMS\_MAX\_DIMENSION\_COUNT}}];}
+\DoxyCodeLine{00603\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{struct_tf_lite_stablehlo_gather_params_a45c2156d4e40e4021c138cf109079e1f}{num\_start\_index\_map}};}
+\DoxyCodeLine{00604\ \ \ int64\_t\ \mbox{\hyperlink{struct_tf_lite_stablehlo_gather_params_a330eaf83151cf686ebea9a72ba7b366c}{index\_vector\_dim}};}
+\DoxyCodeLine{00605\ \ \ int64\_t\ slice\_sizes[\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_2core_2c_2builtin__op__data_8h_a333c4f7164fbe486d065ad5a5d1938d0}{TFLITE\_STABLEHLO\_GATHER\_PARAMS\_MAX\_DIMENSION\_COUNT}}];}
+\DoxyCodeLine{00606\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{struct_tf_lite_stablehlo_gather_params_a84c48de596af41d2cc2323f92babb869}{num\_slice\_sizes}};}
+\DoxyCodeLine{00607\ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{struct_tf_lite_stablehlo_gather_params_ac03c445e959e25365552f6ae631cedb0}{indices\_are\_sorted}};}
+\DoxyCodeLine{00608\ \}\ \mbox{\hyperlink{struct_tf_lite_stablehlo_gather_params}{TfLiteStablehloGatherParams}};}
+\DoxyCodeLine{00609\ }
+\DoxyCodeLine{00610\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\{}
+\DoxyCodeLine{00611\ \ \ \textcolor{comment}{//\ See\ the\ stablehlo\ spec\ for\ the\ explanation\ of\ the\ attributes:}}
+\DoxyCodeLine{00612\ \ \ \textcolor{comment}{//\ https://github.com/openxla/stablehlo/blob/main/docs/spec.md\#reduce\_window}}
+\DoxyCodeLine{00613\ \ \ int64\_t\ window\_dimensions}
+\DoxyCodeLine{00614\ \ \ \ \ \ \ [\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_2core_2c_2builtin__op__data_8h_a6c53637677f3e37c0fd9f03f56e84e37}{TFLITE\_STABLEHLO\_REDUCE\_WINDOW\_PARAMS\_MAX\_DIMENSION\_COUNT}}];}
+\DoxyCodeLine{00615\ \ \ int64\_t}
+\DoxyCodeLine{00616\ \ \ \ \ \ \ window\_strides[\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_2core_2c_2builtin__op__data_8h_a6c53637677f3e37c0fd9f03f56e84e37}{TFLITE\_STABLEHLO\_REDUCE\_WINDOW\_PARAMS\_MAX\_DIMENSION\_COUNT}}];}
+\DoxyCodeLine{00617\ \ \ int64\_t}
+\DoxyCodeLine{00618\ \ \ \ \ \ \ base\_dilations[\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_2core_2c_2builtin__op__data_8h_a6c53637677f3e37c0fd9f03f56e84e37}{TFLITE\_STABLEHLO\_REDUCE\_WINDOW\_PARAMS\_MAX\_DIMENSION\_COUNT}}];}
+\DoxyCodeLine{00619\ \ \ int64\_t\ window\_dilations}
+\DoxyCodeLine{00620\ \ \ \ \ \ \ [\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_2core_2c_2builtin__op__data_8h_a6c53637677f3e37c0fd9f03f56e84e37}{TFLITE\_STABLEHLO\_REDUCE\_WINDOW\_PARAMS\_MAX\_DIMENSION\_COUNT}}];}
+\DoxyCodeLine{00621\ \ \ int64\_t}
+\DoxyCodeLine{00622\ \ \ \ \ \ \ \mbox{\hyperlink{arc__mli_2conv_8cc_ad870e8457a2c13cdb2d9a3566118bb4e}{padding}}[2\ *\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_2core_2c_2builtin__op__data_8h_a6c53637677f3e37c0fd9f03f56e84e37}{TFLITE\_STABLEHLO\_REDUCE\_WINDOW\_PARAMS\_MAX\_DIMENSION\_COUNT}}];}
+\DoxyCodeLine{00623\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{struct_tf_lite_stablehlo_reduce_window_params_aa40ae7813febaa076ea92ed8dc5ea4f9}{body\_subgraph\_index}};}
+\DoxyCodeLine{00624\ \}\ \mbox{\hyperlink{struct_tf_lite_stablehlo_reduce_window_params}{TfLiteStablehloReduceWindowParams}};}
+\DoxyCodeLine{00625\ }
+\DoxyCodeLine{00626\ \textcolor{keyword}{enum}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_2core_2c_2builtin__op__data_8h_a1f4f8852abeb349a2f0c216face95888}{TfLiteReduceWindowFunction}}\ \{}
+\DoxyCodeLine{00627\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_2core_2c_2builtin__op__data_8h_a1f4f8852abeb349a2f0c216face95888a8128a848b6e2f3612a3363346cccea52}{TfLiteReduceWindowFunctionUnsupported}},}
+\DoxyCodeLine{00628\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_2core_2c_2builtin__op__data_8h_a1f4f8852abeb349a2f0c216face95888ac1bf6c27344453ba1ea00bce009af242}{TfLiteReduceWindowFunctionAdd}},}
+\DoxyCodeLine{00629\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_2core_2c_2builtin__op__data_8h_a1f4f8852abeb349a2f0c216face95888af5f2fdb38b51f3934ece94f6b9f5331e}{TfLiteReduceWindowFunctionMul}},}
+\DoxyCodeLine{00630\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_2core_2c_2builtin__op__data_8h_a1f4f8852abeb349a2f0c216face95888ab4f030ccea96f20b479f26a7fde1b25c}{TfLiteReduceWindowFunctionMin}},}
+\DoxyCodeLine{00631\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_2core_2c_2builtin__op__data_8h_a1f4f8852abeb349a2f0c216face95888ace88962195c99d1268dc96a3532424c8}{TfLiteReduceWindowFunctionMax}},}
+\DoxyCodeLine{00632\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_2core_2c_2builtin__op__data_8h_a1f4f8852abeb349a2f0c216face95888a6f82062ba7e08f8321038b9be8a4811a}{TfLiteReduceWindowFunctionAll}},}
+\DoxyCodeLine{00633\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_2core_2c_2builtin__op__data_8h_a1f4f8852abeb349a2f0c216face95888a0d4938440370c7ad395ff16bbb6e5b9f}{TfLiteReduceWindowFunctionAny}}}
+\DoxyCodeLine{00634\ \};}
+\DoxyCodeLine{00635\ }
+\DoxyCodeLine{00636\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\{}
+\DoxyCodeLine{00637\ \ \ \textcolor{keyword}{enum}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_2core_2c_2builtin__op__data_8h_a1f4f8852abeb349a2f0c216face95888}{TfLiteReduceWindowFunction}}\ \mbox{\hyperlink{struct_tf_lite_reduce_window_params_a280dc0f8ce64a56da809783180844da9}{reduce\_function}};}
+\DoxyCodeLine{00638\ \}\ \mbox{\hyperlink{struct_tf_lite_reduce_window_params}{TfLiteReduceWindowParams}};}
+\DoxyCodeLine{00639\ }
+\DoxyCodeLine{00640\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\{}
+\DoxyCodeLine{00641\ \ \ \textcolor{comment}{//\ See\ the\ stablehlo\ spec\ for\ the\ explanation\ of\ the\ attributes:}}
+\DoxyCodeLine{00642\ \ \ \textcolor{comment}{//\ https://github.com/openxla/stablehlo/blob/main/docs/spec.md\#pad}}
+\DoxyCodeLine{00643\ \ \ int64\_t\ edge\_padding\_low[\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_2core_2c_2builtin__op__data_8h_ae46ab581c9de779247cb7aa68d956d46}{TFLITE\_STABLEHLO\_PAD\_PARAMS\_MAX\_DIMENSION\_COUNT}}];}
+\DoxyCodeLine{00644\ \ \ int64\_t\ edge\_padding\_high[\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_2core_2c_2builtin__op__data_8h_ae46ab581c9de779247cb7aa68d956d46}{TFLITE\_STABLEHLO\_PAD\_PARAMS\_MAX\_DIMENSION\_COUNT}}];}
+\DoxyCodeLine{00645\ \ \ int64\_t\ interior\_padding[\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_2core_2c_2builtin__op__data_8h_ae46ab581c9de779247cb7aa68d956d46}{TFLITE\_STABLEHLO\_PAD\_PARAMS\_MAX\_DIMENSION\_COUNT}}];}
+\DoxyCodeLine{00646\ \}\ \mbox{\hyperlink{struct_tf_lite_stablehlo_pad_params}{TfLiteStablehloPadParams}};}
+\DoxyCodeLine{00647\ }
+\DoxyCodeLine{00648\ \textcolor{preprocessor}{\#ifdef\ \_\_cplusplus}}
+\DoxyCodeLine{00649\ \}\ \ \textcolor{comment}{//\ extern\ "{}C"{}}}
+\DoxyCodeLine{00650\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ \_\_cplusplus}}
+\DoxyCodeLine{00651\ }
+\DoxyCodeLine{00652\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ TENSORFLOW\_LITE\_CORE\_C\_BUILTIN\_OP\_DATA\_H\_}}
+
+\end{DoxyCode}

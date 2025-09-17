@@ -1,0 +1,633 @@
+\doxysection{micro\+\_\+mutable\+\_\+op\+\_\+resolver.\+h}
+\hypertarget{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src531a9912bf2dbdb5fbd25d32bf89fc0a_source}{}\label{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src531a9912bf2dbdb5fbd25d32bf89fc0a_source}\index{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/arduino-\/examples-\/main/src/tensorflow/lite/micro/micro\_mutable\_op\_resolver.h@{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/arduino-\/examples-\/main/src/tensorflow/lite/micro/micro\_mutable\_op\_resolver.h}}
+\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src531a9912bf2dbdb5fbd25d32bf89fc0a}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{/*\ Copyright\ 2023\ The\ TensorFlow\ Authors.\ All\ Rights\ Reserved.}}
+\DoxyCodeLine{00002\ \textcolor{comment}{}}
+\DoxyCodeLine{00003\ \textcolor{comment}{Licensed\ under\ the\ Apache\ License,\ Version\ 2.0\ (the\ "{}License"{});}}
+\DoxyCodeLine{00004\ \textcolor{comment}{you\ may\ not\ use\ this\ file\ except\ in\ compliance\ with\ the\ License.}}
+\DoxyCodeLine{00005\ \textcolor{comment}{You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{00006\ \textcolor{comment}{}}
+\DoxyCodeLine{00007\ \textcolor{comment}{\ \ \ \ http://www.apache.org/licenses/LICENSE-\/2.0}}
+\DoxyCodeLine{00008\ \textcolor{comment}{}}
+\DoxyCodeLine{00009\ \textcolor{comment}{Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ software}}
+\DoxyCodeLine{00010\ \textcolor{comment}{distributed\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,}}
+\DoxyCodeLine{00011\ \textcolor{comment}{WITHOUT\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,\ either\ express\ or\ implied.}}
+\DoxyCodeLine{00012\ \textcolor{comment}{See\ the\ License\ for\ the\ specific\ language\ governing\ permissions\ and}}
+\DoxyCodeLine{00013\ \textcolor{comment}{limitations\ under\ the\ License.}}
+\DoxyCodeLine{00014\ \textcolor{comment}{==============================================================================*/}}
+\DoxyCodeLine{00015\ \textcolor{preprocessor}{\#ifndef\ TENSORFLOW\_LITE\_MICRO\_MICRO\_MUTABLE\_OP\_RESOLVER\_H\_}}
+\DoxyCodeLine{00016\ \textcolor{preprocessor}{\#define\ TENSORFLOW\_LITE\_MICRO\_MICRO\_MUTABLE\_OP\_RESOLVER\_H\_}}
+\DoxyCodeLine{00017\ }
+\DoxyCodeLine{00018\ \textcolor{preprocessor}{\#include\ <cstdio>}}
+\DoxyCodeLine{00019\ \textcolor{preprocessor}{\#include\ <cstring>}}
+\DoxyCodeLine{00020\ }
+\DoxyCodeLine{00021\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/c/common.h"{}}}
+\DoxyCodeLine{00022\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/core/api/flatbuffer\_conversions.h"{}}}
+\DoxyCodeLine{00023\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/kernels/internal/compatibility.h"{}}}
+\DoxyCodeLine{00024\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/kernels/op\_macros.h"{}}}
+\DoxyCodeLine{00025\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/micro/compatibility.h"{}}}
+\DoxyCodeLine{00026\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/micro/kernels/add.h"{}}}
+\DoxyCodeLine{00027\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/micro/kernels/conv.h"{}}}
+\DoxyCodeLine{00028\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/micro/kernels/depthwise\_conv.h"{}}}
+\DoxyCodeLine{00029\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/micro/kernels/ethosu.h"{}}}
+\DoxyCodeLine{00030\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/micro/kernels/fully\_connected.h"{}}}
+\DoxyCodeLine{00031\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/micro/kernels/micro\_ops.h"{}}}
+\DoxyCodeLine{00032\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/micro/kernels/pooling.h"{}}}
+\DoxyCodeLine{00033\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/micro/kernels/reduce.h"{}}}
+\DoxyCodeLine{00034\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/micro/kernels/softmax.h"{}}}
+\DoxyCodeLine{00035\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/micro/micro\_log.h"{}}}
+\DoxyCodeLine{00036\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/micro/micro\_op\_resolver.h"{}}}
+\DoxyCodeLine{00037\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/schema/schema\_generated.h"{}}}
+\DoxyCodeLine{00038\ }
+\DoxyCodeLine{00039\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacetflite}{tflite}}\ \{}
+\DoxyCodeLine{00040\ \mbox{\hyperlink{struct_tf_lite_registration}{TfLiteRegistration}}*\ \mbox{\hyperlink{namespacetflite_a5c0768c3af0aab6e6e196354daa3f0c5}{Register\_DETECTION\_POSTPROCESS}}();}
+\DoxyCodeLine{00041\ }
+\DoxyCodeLine{00042\ \textcolor{keyword}{template}\ <\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ tOpCount>}
+\DoxyCodeLine{00043\ \textcolor{keyword}{class\ }MicroMutableOpResolver\ :\ \textcolor{keyword}{public}\ MicroOpResolver\ \{}
+\DoxyCodeLine{00044\ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00045\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src336b24cffab807348972c47c46f8de00_a92a34c72cfcc4f6c5bd49086ba082af4}{TF\_LITE\_REMOVE\_VIRTUAL\_DELETE}}}
+\DoxyCodeLine{00046\ }
+\DoxyCodeLine{00047\ \ \ \textcolor{keyword}{explicit}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_afa8cdca21c08a0dfae917976f6a7acec}{MicroMutableOpResolver}}()\ \{\}}
+\DoxyCodeLine{00048\ }
+\DoxyCodeLine{00049\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_tf_lite_registration}{TfLiteRegistration}}*\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_acb83c60ea0c37e43d8f456100dac4815}{FindOp}}(\mbox{\hyperlink{namespacetflite_ab29efbedf49bccb2d2259fd931ba06ac}{tflite::BuiltinOperator}}\ op)\textcolor{keyword}{\ const\ override\ }\{}
+\DoxyCodeLine{00050\ \ \ \ \ \textcolor{keywordflow}{if}\ (op\ ==\ \mbox{\hyperlink{namespacetflite_ab29efbedf49bccb2d2259fd931ba06acab34eb6c3ffe79bc6ee64874f90e89901}{BuiltinOperator\_CUSTOM}})\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{00051\ }
+\DoxyCodeLine{00052\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a78e4ca5b323a7187bb307c3c5934ed4c}{registrations\_len\_}};\ ++i)\ \{}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_tf_lite_registration}{TfLiteRegistration}}\&\ registration\ =\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_ad11449031bd31bd341a995eaed322dde}{registrations\_}}[i];}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (registration.\mbox{\hyperlink{struct_tf_lite_registration_a1a87f0c20fb23deaa745c25a4e84a08f}{builtin\_code}}\ ==\ op)\ \{}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \&registration;}
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00057\ \ \ \ \ \}}
+\DoxyCodeLine{00058\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{00059\ \ \ \}}
+\DoxyCodeLine{00060\ }
+\DoxyCodeLine{00061\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_tf_lite_registration}{TfLiteRegistration}}*\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a7ab0d487654bc3063e2000326aa96225}{FindOp}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ op)\textcolor{keyword}{\ const\ override\ }\{}
+\DoxyCodeLine{00062\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a78e4ca5b323a7187bb307c3c5934ed4c}{registrations\_len\_}};\ ++i)\ \{}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_tf_lite_registration}{TfLiteRegistration}}\&\ registration\ =\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_ad11449031bd31bd341a995eaed322dde}{registrations\_}}[i];}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ ((registration.\mbox{\hyperlink{struct_tf_lite_registration_a1a87f0c20fb23deaa745c25a4e84a08f}{builtin\_code}}\ ==\ \mbox{\hyperlink{namespacetflite_ab29efbedf49bccb2d2259fd931ba06acab34eb6c3ffe79bc6ee64874f90e89901}{BuiltinOperator\_CUSTOM}})\ \&\&}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \ \ \ \ (strcmp(registration.\mbox{\hyperlink{struct_tf_lite_registration_a0358e2079858a652d39043674cc511f8}{custom\_name}},\ op)\ ==\ 0))\ \{}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \&registration;}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00068\ \ \ \ \ \}}
+\DoxyCodeLine{00069\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{00070\ \ \ \}}
+\DoxyCodeLine{00071\ }
+\DoxyCodeLine{00072\ \ \ \mbox{\hyperlink{namespacetflite_a6d04c6368d560b2eac8b896bccc64975}{TfLiteBridgeBuiltinParseFunction}}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_aa15bd154c8bf8a1206fe8bc97d5870b7}{GetOpDataParser}}(}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_ab29efbedf49bccb2d2259fd931ba06ac}{BuiltinOperator}}\ op)\textcolor{keyword}{\ const\ override\ }\{}
+\DoxyCodeLine{00074\ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src82599f02174ce2f1c2fd003f3eee8b73_aae1ef2f661f926fac4c1555e46d4c704}{TFLITE\_DCHECK}}(\mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a6c7d96443623418c923f7b80180feab8}{num\_buitin\_ops\_}}\ <=\ tOpCount);}
+\DoxyCodeLine{00075\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a6c7d96443623418c923f7b80180feab8}{num\_buitin\_ops\_}};\ ++i)\ \{}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a163d55d66a31b4e24ebbcc4c27ac247b}{builtin\_codes\_}}[i]\ ==\ op)\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a0146194491eaa7fb4f10c5494f5958ee}{builtin\_parsers\_}}[i];}
+\DoxyCodeLine{00077\ \ \ \ \ \}}
+\DoxyCodeLine{00078\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{00079\ \ \ \}}
+\DoxyCodeLine{00080\ }
+\DoxyCodeLine{00081\ \ \ \textcolor{comment}{//\ Registers\ a\ Custom\ Operator\ with\ the\ MicroOpResolver.}}
+\DoxyCodeLine{00082\ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{00083\ \ \ \textcolor{comment}{//\ Only\ the\ first\ call\ for\ a\ given\ name\ will\ be\ successful.\ i.e.\ if\ this}}
+\DoxyCodeLine{00084\ \ \ \textcolor{comment}{//\ function\ is\ called\ again\ for\ a\ previously\ added\ Custom\ Operator,\ the}}
+\DoxyCodeLine{00085\ \ \ \textcolor{comment}{//\ MicroOpResolver\ will\ be\ unchanged\ and\ this\ function\ will\ return}}
+\DoxyCodeLine{00086\ \ \ \textcolor{comment}{//\ kTfLiteError.}}
+\DoxyCodeLine{00087\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_aff56340f323d4353a5a97c431ea49f12}{AddCustom}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ name,\ \mbox{\hyperlink{struct_tf_lite_registration}{TfLiteRegistration}}*\ registration)\ \{}
+\DoxyCodeLine{00088\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a78e4ca5b323a7187bb307c3c5934ed4c}{registrations\_len\_}}\ >=\ tOpCount)\ \{}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \mbox{\hyperlink{_face___access__inferencing_2src_2edge-impulse-sdk_2tensorflow_2lite_2micro_2micro__log_8h_ab9bf491b4a37b06ba732fd7de6b04cb2}{MicroPrintf}}(}
+\DoxyCodeLine{00090\ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Couldn't\ register\ custom\ op\ '\%s',\ resolver\ size\ is\ too"{}}}
+\DoxyCodeLine{00091\ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}small\ (\%d)"{}},}
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \ \ \ \ name,\ tOpCount);}
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361a0bf230cf34a88de9e37834dc127437db}{kTfLiteError}};}
+\DoxyCodeLine{00094\ \ \ \ \ \}}
+\DoxyCodeLine{00095\ }
+\DoxyCodeLine{00096\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_acb83c60ea0c37e43d8f456100dac4815}{FindOp}}(name)\ !=\ \textcolor{keyword}{nullptr})\ \{}
+\DoxyCodeLine{00097\ \ \ \ \ \ \ \mbox{\hyperlink{_face___access__inferencing_2src_2edge-impulse-sdk_2tensorflow_2lite_2micro_2micro__log_8h_ab9bf491b4a37b06ba732fd7de6b04cb2}{MicroPrintf}}(\textcolor{stringliteral}{"{}Calling\ AddCustom\ for\ the\ same\ op\ more\ than\ once\ "{}});}
+\DoxyCodeLine{00098\ \ \ \ \ \ \ \mbox{\hyperlink{_face___access__inferencing_2src_2edge-impulse-sdk_2tensorflow_2lite_2micro_2micro__log_8h_ab9bf491b4a37b06ba732fd7de6b04cb2}{MicroPrintf}}(\textcolor{stringliteral}{"{}is\ not\ supported\ (Op:\ \%s)."{}},\ name);}
+\DoxyCodeLine{00099\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361a0bf230cf34a88de9e37834dc127437db}{kTfLiteError}};}
+\DoxyCodeLine{00100\ \ \ \ \ \}}
+\DoxyCodeLine{00101\ }
+\DoxyCodeLine{00102\ \ \ \ \ \mbox{\hyperlink{struct_tf_lite_registration}{TfLiteRegistration}}*\ new\_registration\ =\ \&\mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_ad11449031bd31bd341a995eaed322dde}{registrations\_}}[\mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a78e4ca5b323a7187bb307c3c5934ed4c}{registrations\_len\_}}];}
+\DoxyCodeLine{00103\ \ \ \ \ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a78e4ca5b323a7187bb307c3c5934ed4c}{registrations\_len\_}}\ +=\ 1;}
+\DoxyCodeLine{00104\ }
+\DoxyCodeLine{00105\ \ \ \ \ *new\_registration\ =\ *registration;}
+\DoxyCodeLine{00106\ \ \ \ \ new\_registration-\/>\mbox{\hyperlink{struct_tf_lite_registration_a1a87f0c20fb23deaa745c25a4e84a08f}{builtin\_code}}\ =\ \mbox{\hyperlink{namespacetflite_ab29efbedf49bccb2d2259fd931ba06acab34eb6c3ffe79bc6ee64874f90e89901}{BuiltinOperator\_CUSTOM}};}
+\DoxyCodeLine{00107\ \ \ \ \ new\_registration-\/>\mbox{\hyperlink{struct_tf_lite_registration_a0358e2079858a652d39043674cc511f8}{custom\_name}}\ =\ name;}
+\DoxyCodeLine{00108\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361ab25fe210808197f1b6601df8ccdcd699}{kTfLiteOk}};}
+\DoxyCodeLine{00109\ \ \ \}}
+\DoxyCodeLine{00110\ }
+\DoxyCodeLine{00111\ \ \ \textcolor{comment}{//\ The\ Add*\ functions\ below\ add\ the\ various\ Builtin\ operators\ to\ the}}
+\DoxyCodeLine{00112\ \ \ \textcolor{comment}{//\ MicroMutableOpResolver\ object.}}
+\DoxyCodeLine{00113\ }
+\DoxyCodeLine{00114\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_afebdbf26fea74f79a751d46f95d90cdb}{AddAbs}}()\ \{}
+\DoxyCodeLine{00115\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a658298961ba1a7c1651a290563095048}{AddBuiltin}}(\mbox{\hyperlink{namespacetflite_ab29efbedf49bccb2d2259fd931ba06acac49a479300c0863a93803668cac3ca20}{BuiltinOperator\_ABS}},\ \mbox{\hyperlink{namespacetflite_1_1ops_1_1micro_a5a39c91583ec90e370d7856b1076a486}{tflite::ops::micro::Register\_ABS}}(),}
+\DoxyCodeLine{00116\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_a133fc926093d88b5edf528502ce6bbe9}{ParseAbs}});}
+\DoxyCodeLine{00117\ \ \ \}}
+\DoxyCodeLine{00118\ }
+\DoxyCodeLine{00119\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a87e2fd58d38e0b1b3d663ad2606d1cc2}{AddAdd}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{struct_tf_lite_registration}{TfLiteRegistration}}\&\ registration\ =\ \mbox{\hyperlink{namespacetflite_afc97d0be7aeb3900e91626b2cc03609b}{Register\_ADD}}())\ \{}
+\DoxyCodeLine{00120\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a658298961ba1a7c1651a290563095048}{AddBuiltin}}(\mbox{\hyperlink{namespacetflite_ab29efbedf49bccb2d2259fd931ba06acab1380233f2d6e5e4f558965c8ad55655}{BuiltinOperator\_ADD}},\ registration,\ \mbox{\hyperlink{namespacetflite_a954eee0d973eae243741c5451db0a6d6}{ParseAdd}});}
+\DoxyCodeLine{00121\ \ \ \}}
+\DoxyCodeLine{00122\ }
+\DoxyCodeLine{00123\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_acf9a791dc8180532509197c6b8331c69}{AddAddN}}()\ \{}
+\DoxyCodeLine{00124\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a658298961ba1a7c1651a290563095048}{AddBuiltin}}(\mbox{\hyperlink{namespacetflite_ab29efbedf49bccb2d2259fd931ba06aca3d8f00bbf25322d3346d08e85960d2cd}{BuiltinOperator\_ADD\_N}},\ \mbox{\hyperlink{namespacetflite_a1a6f369dc6d2828e7800d2dca4ecb405}{tflite::Register\_ADD\_N}}(),}
+\DoxyCodeLine{00125\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_ad6905373175d4f2e5f4cae4abe3c874b}{ParseAddN}});}
+\DoxyCodeLine{00126\ \ \ \}}
+\DoxyCodeLine{00127\ }
+\DoxyCodeLine{00128\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a5dffefb89a1513721b5b8cc8834eb8de}{AddArgMax}}()\ \{}
+\DoxyCodeLine{00129\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a658298961ba1a7c1651a290563095048}{AddBuiltin}}(\mbox{\hyperlink{namespacetflite_ab29efbedf49bccb2d2259fd931ba06aca9dde8faeacedf74e97ad661ebd111036}{BuiltinOperator\_ARG\_MAX}},\ \mbox{\hyperlink{namespacetflite_a49f03d3de9732e655a515e3a7a0ebc21}{Register\_ARG\_MAX}}(),\ \mbox{\hyperlink{namespacetflite_a182660d2655697970cc90b8f8450c965}{ParseArgMax}});}
+\DoxyCodeLine{00130\ \ \ \}}
+\DoxyCodeLine{00131\ }
+\DoxyCodeLine{00132\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a247d57ab6029d187ec31089331004be2}{AddArgMin}}()\ \{}
+\DoxyCodeLine{00133\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a658298961ba1a7c1651a290563095048}{AddBuiltin}}(\mbox{\hyperlink{namespacetflite_ab29efbedf49bccb2d2259fd931ba06aca46bc8c9709b542e9ebcbd0098a337247}{BuiltinOperator\_ARG\_MIN}},\ \mbox{\hyperlink{namespacetflite_ac191dbc17fa95402620acbbba731aa5d}{Register\_ARG\_MIN}}(),\ \mbox{\hyperlink{namespacetflite_a59b71d37c1f1ec9ed7ad896e758fe5c8}{ParseArgMin}});}
+\DoxyCodeLine{00134\ \ \ \}}
+\DoxyCodeLine{00135\ }
+\DoxyCodeLine{00136\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a5bb3df6a5b7cab722c056c324d6acda5}{AddAssignVariable}}()\ \{}
+\DoxyCodeLine{00137\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a658298961ba1a7c1651a290563095048}{AddBuiltin}}(\mbox{\hyperlink{namespacetflite_ab29efbedf49bccb2d2259fd931ba06aca4564c221b424a399f0933ac8556f788e}{BuiltinOperator\_ASSIGN\_VARIABLE}},}
+\DoxyCodeLine{00138\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_a50837862b097da75d29fb6f4eca36a9c}{tflite::Register\_ASSIGN\_VARIABLE}}(),\ \mbox{\hyperlink{namespacetflite_a460200ae858298de48104b32aa92abb3}{ParseAssignVariable}});}
+\DoxyCodeLine{00139\ \ \ \}}
+\DoxyCodeLine{00140\ }
+\DoxyCodeLine{00141\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_af5b5381d3584749b9840730863b73879}{AddAveragePool2D}}(}
+\DoxyCodeLine{00142\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_tf_lite_registration}{TfLiteRegistration}}\&\ registration\ =\ \mbox{\hyperlink{namespacetflite_a4ef9fbf1dd9a6bbd015506ce30ea0741}{Register\_AVERAGE\_POOL\_2D}}())\ \{}
+\DoxyCodeLine{00143\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a658298961ba1a7c1651a290563095048}{AddBuiltin}}(\mbox{\hyperlink{namespacetflite_ab29efbedf49bccb2d2259fd931ba06aca7ef73f3ab4af7400b125f7056c8055e7}{BuiltinOperator\_AVERAGE\_POOL\_2D}},\ registration,\ \mbox{\hyperlink{namespacetflite_aa6a0d85db4ca64a478622bb2b428371f}{ParsePool}});}
+\DoxyCodeLine{00144\ \ \ \}}
+\DoxyCodeLine{00145\ }
+\DoxyCodeLine{00146\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_ac77c7bbe176bc49beb9c55dbcda4b656}{AddBatchToSpaceNd}}()\ \{}
+\DoxyCodeLine{00147\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a658298961ba1a7c1651a290563095048}{AddBuiltin}}(\mbox{\hyperlink{namespacetflite_ab29efbedf49bccb2d2259fd931ba06acac56cb6cd1572bffe34dc82e1ceef8be8}{BuiltinOperator\_BATCH\_TO\_SPACE\_ND}},}
+\DoxyCodeLine{00148\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_aa30b426f7890f5ef880b1bf6a2f11564}{Register\_BATCH\_TO\_SPACE\_ND}}(),\ \mbox{\hyperlink{namespacetflite_ab65aa8c56defb4b5b806c03f11781698}{ParseBatchToSpaceNd}});}
+\DoxyCodeLine{00149\ \ \ \}}
+\DoxyCodeLine{00150\ }
+\DoxyCodeLine{00151\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a20f4d437aae402a13d8061f0ca32fcae}{AddBroadcastArgs}}()\ \{}
+\DoxyCodeLine{00152\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a658298961ba1a7c1651a290563095048}{AddBuiltin}}(\mbox{\hyperlink{namespacetflite_ab29efbedf49bccb2d2259fd931ba06aca4255c666a595dd761333b53bec90c8b9}{BuiltinOperator\_BROADCAST\_ARGS}},\ \mbox{\hyperlink{namespacetflite_a0609c7f317b66ca05fda0557c1ba55f7}{Register\_BROADCAST\_ARGS}}(),}
+\DoxyCodeLine{00153\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_a57b09b3f6ddd611f8140e16341ed526f}{ParseBroadcastArgs}});}
+\DoxyCodeLine{00154\ \ \ \}}
+\DoxyCodeLine{00155\ }
+\DoxyCodeLine{00156\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a1617a54c859593cd9b05d78fad94870d}{AddBroadcastTo}}()\ \{}
+\DoxyCodeLine{00157\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a658298961ba1a7c1651a290563095048}{AddBuiltin}}(\mbox{\hyperlink{namespacetflite_ab29efbedf49bccb2d2259fd931ba06aca2ea2d527dfaea852111fcc29c102c341}{BuiltinOperator\_BROADCAST\_TO}},\ \mbox{\hyperlink{namespacetflite_abc2117460a572bca2c8ac53330c779f6}{Register\_BROADCAST\_TO}}(),}
+\DoxyCodeLine{00158\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_a31ec75ccd1dddcece054ef8a2b5173fc}{ParseBroadcastTo}});}
+\DoxyCodeLine{00159\ \ \ \}}
+\DoxyCodeLine{00160\ }
+\DoxyCodeLine{00161\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a7d3f4af4637b5065fa8f4cb655691c1f}{AddCallOnce}}()\ \{}
+\DoxyCodeLine{00162\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a658298961ba1a7c1651a290563095048}{AddBuiltin}}(\mbox{\hyperlink{namespacetflite_ab29efbedf49bccb2d2259fd931ba06aca0e7ec0f1f8f522f9e64485ebe4fb6bb9}{BuiltinOperator\_CALL\_ONCE}},\ \mbox{\hyperlink{namespacetflite_a621fcdb95d41b096e0adec68cdd8ae39}{Register\_CALL\_ONCE}}(),}
+\DoxyCodeLine{00163\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_a549678b6188728cad5f70742d05e36a6}{ParseCallOnce}});}
+\DoxyCodeLine{00164\ \ \ \}}
+\DoxyCodeLine{00165\ }
+\DoxyCodeLine{00166\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_abf619718d2e37c6dc00ec9468d2d082a}{AddCast}}()\ \{}
+\DoxyCodeLine{00167\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a658298961ba1a7c1651a290563095048}{AddBuiltin}}(\mbox{\hyperlink{namespacetflite_ab29efbedf49bccb2d2259fd931ba06acadd89ab6861de875e810e3f765d61d50b}{BuiltinOperator\_CAST}},\ \mbox{\hyperlink{namespacetflite_a35d63cbfab71b10c116bddee19db7c89}{Register\_CAST}}(),\ \mbox{\hyperlink{namespacetflite_aeb6794f2206b51b34fb682ca01e6ccf5}{ParseCast}});}
+\DoxyCodeLine{00168\ \ \ \}}
+\DoxyCodeLine{00169\ }
+\DoxyCodeLine{00170\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a31b400be521928470a5e117bcce1b443}{AddCeil}}()\ \{}
+\DoxyCodeLine{00171\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a658298961ba1a7c1651a290563095048}{AddBuiltin}}(\mbox{\hyperlink{namespacetflite_ab29efbedf49bccb2d2259fd931ba06aca646a996e8c69618dff5ba7f106642224}{BuiltinOperator\_CEIL}},\ \mbox{\hyperlink{namespacetflite_ac2b1ce826a258e41eef04f7b7968f87c}{Register\_CEIL}}(),\ \mbox{\hyperlink{namespacetflite_a7884eb1c04f2de97d0bcac94e0ca885b}{ParseCeil}});}
+\DoxyCodeLine{00172\ \ \ \}}
+\DoxyCodeLine{00173\ }
+\DoxyCodeLine{00174\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a0362333c1c8e0485fe99692fb081e473}{AddCircularBuffer}}()\ \{}
+\DoxyCodeLine{00175\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_aff56340f323d4353a5a97c431ea49f12}{AddCustom}}(\textcolor{stringliteral}{"{}CIRCULAR\_BUFFER"{}},\ \mbox{\hyperlink{namespacetflite_a1c8575f612a73749065abad0d4a55ab9}{tflite::Register\_CIRCULAR\_BUFFER}}());}
+\DoxyCodeLine{00176\ \ \ \}}
+\DoxyCodeLine{00177\ }
+\DoxyCodeLine{00178\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a1cd68f6345a13f83ebf5aac0aa1a9e35}{AddConcatenation}}()\ \{}
+\DoxyCodeLine{00179\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a658298961ba1a7c1651a290563095048}{AddBuiltin}}(\mbox{\hyperlink{namespacetflite_ab29efbedf49bccb2d2259fd931ba06aca52c7eaa005b783bf62d7ea2d3161f2d2}{BuiltinOperator\_CONCATENATION}},\ \mbox{\hyperlink{namespacetflite_a2544a9202ef5fb8330a3a7908efb5772}{Register\_CONCATENATION}}(),}
+\DoxyCodeLine{00180\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_af819e5e84c5938dc717f9199f4677c4c}{ParseConcatenation}});}
+\DoxyCodeLine{00181\ \ \ \}}
+\DoxyCodeLine{00182\ }
+\DoxyCodeLine{00183\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a943df3be31b1ed596aa3efbbfb16baff}{AddConv2D}}(}
+\DoxyCodeLine{00184\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_tf_lite_registration}{TfLiteRegistration}}\&\ registration\ =\ \mbox{\hyperlink{namespacetflite_a0a04ef19c5130d41acc31df1695b8af0}{Register\_CONV\_2D}}())\ \{}
+\DoxyCodeLine{00185\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a658298961ba1a7c1651a290563095048}{AddBuiltin}}(\mbox{\hyperlink{namespacetflite_ab29efbedf49bccb2d2259fd931ba06aca97bd198baa0c15905b40f63bc0ae7f58}{BuiltinOperator\_CONV\_2D}},\ registration,\ \mbox{\hyperlink{namespacetflite_a1e9b00b14c9db6861eb4aa112aceaff9}{ParseConv2D}});}
+\DoxyCodeLine{00186\ \ \ \}}
+\DoxyCodeLine{00187\ }
+\DoxyCodeLine{00188\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a53269477847197ce56888bb4bfacfd36}{AddCos}}()\ \{}
+\DoxyCodeLine{00189\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a658298961ba1a7c1651a290563095048}{AddBuiltin}}(\mbox{\hyperlink{namespacetflite_ab29efbedf49bccb2d2259fd931ba06aca79ffc6009bc1dd9d11d184db457b89b0}{BuiltinOperator\_COS}},\ \mbox{\hyperlink{namespacetflite_1_1ops_1_1micro_ab6f6591b23ab5aa6acf3bea0b8e6e64e}{tflite::ops::micro::Register\_COS}}(),}
+\DoxyCodeLine{00190\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_a3616729916c9295b10e68f89d272fd80}{ParseCos}});}
+\DoxyCodeLine{00191\ \ \ \}}
+\DoxyCodeLine{00192\ }
+\DoxyCodeLine{00193\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a71eed64f3105e895a07004a831131148}{AddCumSum}}()\ \{}
+\DoxyCodeLine{00194\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a658298961ba1a7c1651a290563095048}{AddBuiltin}}(\mbox{\hyperlink{namespacetflite_ab29efbedf49bccb2d2259fd931ba06aca472f7b79edae79b9fa5b9444d52d7ba8}{BuiltinOperator\_CUMSUM}},\ \mbox{\hyperlink{namespacetflite_a5f01b5a05d0ac4e060a819d9b7352527}{tflite::Register\_CUMSUM}}(),}
+\DoxyCodeLine{00195\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_a2c64f4c3f3b1c4fd9615e381c6259a18}{ParseCumsum}});}
+\DoxyCodeLine{00196\ \ \ \}}
+\DoxyCodeLine{00197\ }
+\DoxyCodeLine{00198\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a5e22d2253edbe9577a1019414a3cb0dd}{AddDepthToSpace}}()\ \{}
+\DoxyCodeLine{00199\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a658298961ba1a7c1651a290563095048}{AddBuiltin}}(\mbox{\hyperlink{namespacetflite_ab29efbedf49bccb2d2259fd931ba06aca553b39414018f80817b0e0179e1c15b1}{BuiltinOperator\_DEPTH\_TO\_SPACE}},}
+\DoxyCodeLine{00200\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_a0a144bb95346a7d836a5f86e86870e0b}{tflite::Register\_DEPTH\_TO\_SPACE}}(),\ \mbox{\hyperlink{namespacetflite_a1045639ecf83257c69eff636bdc6f226}{ParseDepthToSpace}});}
+\DoxyCodeLine{00201\ \ \ \}}
+\DoxyCodeLine{00202\ }
+\DoxyCodeLine{00203\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a5ab260b224c8db8b8d945a0d4babf26c}{AddDepthwiseConv2D}}(}
+\DoxyCodeLine{00204\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_tf_lite_registration}{TfLiteRegistration}}\&\ registration\ =\ \mbox{\hyperlink{namespacetflite_abcd895600f06c8f35dac9058772e056a}{Register\_DEPTHWISE\_CONV\_2D}}())\ \{}
+\DoxyCodeLine{00205\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a658298961ba1a7c1651a290563095048}{AddBuiltin}}(\mbox{\hyperlink{namespacetflite_ab29efbedf49bccb2d2259fd931ba06acab88aff3df46bedd22d49feaeb2e445c6}{BuiltinOperator\_DEPTHWISE\_CONV\_2D}},\ registration,}
+\DoxyCodeLine{00206\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_ad9ae3645f30037393f52376cafb39e30}{ParseDepthwiseConv2D}});}
+\DoxyCodeLine{00207\ \ \ \}}
+\DoxyCodeLine{00208\ }
+\DoxyCodeLine{00209\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_acb8f8684225812fa0902786c7bf1e29f}{AddDequantize}}()\ \{}
+\DoxyCodeLine{00210\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a658298961ba1a7c1651a290563095048}{AddBuiltin}}(\mbox{\hyperlink{namespacetflite_ab29efbedf49bccb2d2259fd931ba06aca4a681b86a46b55288d3f8df3a2fb44a3}{BuiltinOperator\_DEQUANTIZE}},\ \mbox{\hyperlink{namespacetflite_ac4c25478b0943be7dab3269fdfee921b}{tflite::Register\_DEQUANTIZE}}(),}
+\DoxyCodeLine{00211\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_a94c589ceb55eeea06bd7f51ed8896d07}{ParseDequantize}});}
+\DoxyCodeLine{00212\ \ \ \}}
+\DoxyCodeLine{00213\ }
+\DoxyCodeLine{00214\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a315ac47c7b6b59da555d5e06ef2e18f2}{AddDetectionPostprocess}}()\ \{}
+\DoxyCodeLine{00215\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_aff56340f323d4353a5a97c431ea49f12}{AddCustom}}(\textcolor{stringliteral}{"{}TFLite\_Detection\_PostProcess"{}},}
+\DoxyCodeLine{00216\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_a5c0768c3af0aab6e6e196354daa3f0c5}{tflite::Register\_DETECTION\_POSTPROCESS}}());}
+\DoxyCodeLine{00217\ \ \ \}}
+\DoxyCodeLine{00218\ }
+\DoxyCodeLine{00219\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_aca13422e5a772c0d4684dfe7aa7daac5}{AddDiv}}()\ \{}
+\DoxyCodeLine{00220\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a658298961ba1a7c1651a290563095048}{AddBuiltin}}(\mbox{\hyperlink{namespacetflite_ab29efbedf49bccb2d2259fd931ba06aca68a29a3dadab6c69bdac437f457823af}{BuiltinOperator\_DIV}},\ \mbox{\hyperlink{namespacetflite_a6f54d481d24e0a514ddb77f899709f9c}{tflite::Register\_DIV}}(),\ \mbox{\hyperlink{namespacetflite_a24dc4828a3a4b456bd62dffbff5b4f80}{ParseDiv}});}
+\DoxyCodeLine{00221\ \ \ \}}
+\DoxyCodeLine{00222\ }
+\DoxyCodeLine{00223\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a3633a2f266f51ad883b88d80b8f9f345}{AddElu}}()\ \{}
+\DoxyCodeLine{00224\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a658298961ba1a7c1651a290563095048}{AddBuiltin}}(\mbox{\hyperlink{namespacetflite_ab29efbedf49bccb2d2259fd931ba06aca101ab3dce68cb35e4d2fbc4e088d7960}{BuiltinOperator\_ELU}},\ \mbox{\hyperlink{namespacetflite_a7bc2db09b3ad2a70d9d59a5acb24ebec}{tflite::Register\_ELU}}(),\ \mbox{\hyperlink{namespacetflite_ac988f377b09e6ffc0d7ad155f0a15499}{ParseElu}});}
+\DoxyCodeLine{00225\ \ \ \}}
+\DoxyCodeLine{00226\ }
+\DoxyCodeLine{00227\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a6c8b26efbd840cf117f85e28f51067de}{AddEqual}}()\ \{}
+\DoxyCodeLine{00228\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a658298961ba1a7c1651a290563095048}{AddBuiltin}}(\mbox{\hyperlink{namespacetflite_ab29efbedf49bccb2d2259fd931ba06aca27097fa75e76abcf2c5202fdc09b3577}{BuiltinOperator\_EQUAL}},\ \mbox{\hyperlink{namespacetflite_af3c054b6827046990220d0137dd88a20}{Register\_EQUAL}}(),\ \mbox{\hyperlink{namespacetflite_af130b4f610181a67b5e4c1976be35610}{ParseEqual}});}
+\DoxyCodeLine{00229\ \ \ \}}
+\DoxyCodeLine{00230\ }
+\DoxyCodeLine{00231\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a49cde60a9ed0c2e588e91f6be96184ac}{AddEthosU}}()\ \{}
+\DoxyCodeLine{00232\ \ \ \ \ \mbox{\hyperlink{struct_tf_lite_registration}{TfLiteRegistration}}*\ registration\ =\ \mbox{\hyperlink{namespacetflite_ade76a414d4dc135ccf54c34c9841f163}{tflite::Register\_ETHOSU}}();}
+\DoxyCodeLine{00233\ \ \ \ \ \textcolor{keywordflow}{if}\ (registration)\ \{}
+\DoxyCodeLine{00234\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_aff56340f323d4353a5a97c431ea49f12}{AddCustom}}(\mbox{\hyperlink{namespacetflite_afd7054b3d42463d6f74efe28ef0ea257}{tflite::GetString\_ETHOSU}}(),\ registration);}
+\DoxyCodeLine{00235\ \ \ \ \ \}}
+\DoxyCodeLine{00236\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361ab25fe210808197f1b6601df8ccdcd699}{kTfLiteOk}};}
+\DoxyCodeLine{00237\ \ \ \}}
+\DoxyCodeLine{00238\ }
+\DoxyCodeLine{00239\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a2d39db514abfe6ae92d44f0f5d1299b6}{AddExp}}()\ \{}
+\DoxyCodeLine{00240\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a658298961ba1a7c1651a290563095048}{AddBuiltin}}(\mbox{\hyperlink{namespacetflite_ab29efbedf49bccb2d2259fd931ba06acae31d1d63a63d50c9501d7b4094f5fbe7}{BuiltinOperator\_EXP}},\ \mbox{\hyperlink{namespacetflite_a0d3562b62b6ca1b1f7503f8ff81fdb4c}{Register\_EXP}}(),\ \mbox{\hyperlink{namespacetflite_a669ae36a98270aa65ddf2a441be3a248}{ParseExp}});}
+\DoxyCodeLine{00241\ \ \ \}}
+\DoxyCodeLine{00242\ }
+\DoxyCodeLine{00243\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a755d910d550fb84a2fdf53f0a3e463a0}{AddExpandDims}}()\ \{}
+\DoxyCodeLine{00244\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a658298961ba1a7c1651a290563095048}{AddBuiltin}}(\mbox{\hyperlink{namespacetflite_ab29efbedf49bccb2d2259fd931ba06aca2b9ec5e93e67b9f44f792b9b2ef9ac02}{BuiltinOperator\_EXPAND\_DIMS}},\ \mbox{\hyperlink{namespacetflite_a39a0b846c186cec2ccea9cbb26f236af}{Register\_EXPAND\_DIMS}}(),}
+\DoxyCodeLine{00245\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_a9cbb774b2d3e48ff51fb7c91c4b79137}{ParseExpandDims}});}
+\DoxyCodeLine{00246\ \ \ \}}
+\DoxyCodeLine{00247\ }
+\DoxyCodeLine{00248\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_aacbbe9c9705f729812b1efcdaab90e4a}{AddFill}}()\ \{}
+\DoxyCodeLine{00249\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a658298961ba1a7c1651a290563095048}{AddBuiltin}}(\mbox{\hyperlink{namespacetflite_ab29efbedf49bccb2d2259fd931ba06aca919b637b9dd4397228259ec246b0a362}{BuiltinOperator\_FILL}},\ \mbox{\hyperlink{namespacetflite_a7678363c0cfd0e7ac9c7c06dbf64119d}{tflite::Register\_FILL}}(),\ \mbox{\hyperlink{namespacetflite_a3c6d21d700f668653befe6c1f81cbe65}{ParseFill}});}
+\DoxyCodeLine{00250\ \ \ \}}
+\DoxyCodeLine{00251\ }
+\DoxyCodeLine{00252\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a6c30b8552cdd8b8d89975234ea5f5859}{AddFloor}}()\ \{}
+\DoxyCodeLine{00253\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a658298961ba1a7c1651a290563095048}{AddBuiltin}}(\mbox{\hyperlink{namespacetflite_ab29efbedf49bccb2d2259fd931ba06aca2d43f7f807485b80ab1fb1afce7d4e41}{BuiltinOperator\_FLOOR}},\ \mbox{\hyperlink{namespacetflite_a01df2e66bc36f9daae16881b6b87927b}{Register\_FLOOR}}(),\ \mbox{\hyperlink{namespacetflite_a1a0b9d9cfc7fd813a416ba186a1ee8cc}{ParseFloor}});}
+\DoxyCodeLine{00254\ \ \ \}}
+\DoxyCodeLine{00255\ }
+\DoxyCodeLine{00256\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_acd6ea4d94596fa28ee46b7b392b0275a}{AddFloorDiv}}()\ \{}
+\DoxyCodeLine{00257\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a658298961ba1a7c1651a290563095048}{AddBuiltin}}(\mbox{\hyperlink{namespacetflite_ab29efbedf49bccb2d2259fd931ba06acaa5c4192b66d05ff16a3d137ad39023ba}{BuiltinOperator\_FLOOR\_DIV}},\ \mbox{\hyperlink{namespacetflite_a3469c26d11e5b2d7a741e2bda4e3e391}{tflite::Register\_FLOOR\_DIV}}(),}
+\DoxyCodeLine{00258\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_a5b68437408ad0eb6c3108bd73e3d30fb}{ParseFloorDiv}});}
+\DoxyCodeLine{00259\ \ \ \}}
+\DoxyCodeLine{00260\ }
+\DoxyCodeLine{00261\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_aa2fa2b84d7dc8fa9fdd14857b610f48f}{AddFloorMod}}()\ \{}
+\DoxyCodeLine{00262\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a658298961ba1a7c1651a290563095048}{AddBuiltin}}(\mbox{\hyperlink{namespacetflite_ab29efbedf49bccb2d2259fd931ba06acaa51ce145a7d3b3a96dcf858e72703415}{BuiltinOperator\_FLOOR\_MOD}},\ \mbox{\hyperlink{namespacetflite_aed5a7d07c9138fd96dd18d37e8c20bfa}{tflite::Register\_FLOOR\_MOD}}(),}
+\DoxyCodeLine{00263\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_ac46cd5b7a7f1f3886ee3ffc978ae9591}{ParseFloorMod}});}
+\DoxyCodeLine{00264\ \ \ \}}
+\DoxyCodeLine{00265\ }
+\DoxyCodeLine{00266\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a25c26a14215424ff65785d5d9466bdae}{AddFullyConnected}}(}
+\DoxyCodeLine{00267\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_tf_lite_registration}{TfLiteRegistration}}\&\ registration\ =\ \mbox{\hyperlink{namespacetflite_a39158ab45a7dc88427df33dcd031232b}{Register\_FULLY\_CONNECTED}}())\ \{}
+\DoxyCodeLine{00268\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a658298961ba1a7c1651a290563095048}{AddBuiltin}}(\mbox{\hyperlink{namespacetflite_ab29efbedf49bccb2d2259fd931ba06acabbbe0bcf7f00c83ee525c32851c5c4dd}{BuiltinOperator\_FULLY\_CONNECTED}},\ registration,}
+\DoxyCodeLine{00269\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_a6898d65e334274b56c15f28797876e8d}{ParseFullyConnected}});}
+\DoxyCodeLine{00270\ \ \ \}}
+\DoxyCodeLine{00271\ }
+\DoxyCodeLine{00272\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a7d4fb4f3dee609460caeedc0860d7bac}{AddGather}}()\ \{}
+\DoxyCodeLine{00273\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a658298961ba1a7c1651a290563095048}{AddBuiltin}}(\mbox{\hyperlink{namespacetflite_ab29efbedf49bccb2d2259fd931ba06acaf21eb9f9969a5527cc33c1a0dee67b32}{BuiltinOperator\_GATHER}},\ \mbox{\hyperlink{namespacetflite_aac3656f5fd5734a3592d971ea0c9134d}{tflite::Register\_GATHER}}(),}
+\DoxyCodeLine{00274\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_af32c2e87d19394b6bf3b0613c5aed914}{ParseGather}});}
+\DoxyCodeLine{00275\ \ \ \}}
+\DoxyCodeLine{00276\ }
+\DoxyCodeLine{00277\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_aa45e0dd340c233c7e6cb409389948228}{AddGatherNd}}()\ \{}
+\DoxyCodeLine{00278\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a658298961ba1a7c1651a290563095048}{AddBuiltin}}(\mbox{\hyperlink{namespacetflite_ab29efbedf49bccb2d2259fd931ba06aca2736abbf937200b26793113e268d263e}{BuiltinOperator\_GATHER\_ND}},\ \mbox{\hyperlink{namespacetflite_acf0cccdcd20a93a9cd6a1cdc20f7c47b}{tflite::Register\_GATHER\_ND}}(),}
+\DoxyCodeLine{00279\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_a76d7786af54d3047a9239b1100de2935}{ParseGatherNd}});}
+\DoxyCodeLine{00280\ \ \ \}}
+\DoxyCodeLine{00281\ }
+\DoxyCodeLine{00282\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a22459bc1123942932bfef01945948ea5}{AddGreater}}()\ \{}
+\DoxyCodeLine{00283\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a658298961ba1a7c1651a290563095048}{AddBuiltin}}(\mbox{\hyperlink{namespacetflite_ab29efbedf49bccb2d2259fd931ba06acaf3839a60c8dffe5765bf52975b43fc76}{BuiltinOperator\_GREATER}},\ \mbox{\hyperlink{namespacetflite_a2021eb7dd5b0f06494306777764efae6}{Register\_GREATER}}(),}
+\DoxyCodeLine{00284\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_a2601eee31ed27603dcd59fb2815b2ec3}{ParseGreater}});}
+\DoxyCodeLine{00285\ \ \ \}}
+\DoxyCodeLine{00286\ }
+\DoxyCodeLine{00287\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a3785f9ac1cc8257ec71b50c05a1447ff}{AddGreaterEqual}}()\ \{}
+\DoxyCodeLine{00288\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a658298961ba1a7c1651a290563095048}{AddBuiltin}}(\mbox{\hyperlink{namespacetflite_ab29efbedf49bccb2d2259fd931ba06aca0eb9baf898808e82dbbbc155135c45f6}{BuiltinOperator\_GREATER\_EQUAL}},\ \mbox{\hyperlink{namespacetflite_ab551d4a4c75bd393140cbbfe7f9cd0c5}{Register\_GREATER\_EQUAL}}(),}
+\DoxyCodeLine{00289\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_af3c07a4e7c9345c516e8b10435cdf49e}{ParseGreaterEqual}});}
+\DoxyCodeLine{00290\ \ \ \}}
+\DoxyCodeLine{00291\ }
+\DoxyCodeLine{00292\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_af507a134b17900b08f491c9425df8ef0}{AddHardSwish}}()\ \{}
+\DoxyCodeLine{00293\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a658298961ba1a7c1651a290563095048}{AddBuiltin}}(\mbox{\hyperlink{namespacetflite_ab29efbedf49bccb2d2259fd931ba06aca32754e08373135a3d68f39bfa675ea9c}{BuiltinOperator\_HARD\_SWISH}},\ \mbox{\hyperlink{namespacetflite_a42fa8ff8affbcf1581b2dee73b63557d}{tflite::Register\_HARD\_SWISH}}(),}
+\DoxyCodeLine{00294\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_a23c55f6877c3f9c0932199137709f9fa}{ParseHardSwish}});}
+\DoxyCodeLine{00295\ \ \ \}}
+\DoxyCodeLine{00296\ }
+\DoxyCodeLine{00297\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a910609471ee895c87926077bd2ef2584}{AddIf}}()\ \{}
+\DoxyCodeLine{00298\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a658298961ba1a7c1651a290563095048}{AddBuiltin}}(\mbox{\hyperlink{namespacetflite_ab29efbedf49bccb2d2259fd931ba06aca18346d6e621ad163b84821e397a62564}{BuiltinOperator\_IF}},\ \mbox{\hyperlink{namespacetflite_a44948118a8db8f480416118740217cfb}{tflite::Register\_IF}}(),\ \mbox{\hyperlink{namespacetflite_a85229733d7faa59cd4a87f315bc7b950}{ParseIf}});}
+\DoxyCodeLine{00299\ \ \ \}}
+\DoxyCodeLine{00300\ }
+\DoxyCodeLine{00301\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_adb174b56f0cf0ad458c26af131908934}{AddL2Normalization}}()\ \{}
+\DoxyCodeLine{00302\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a658298961ba1a7c1651a290563095048}{AddBuiltin}}(\mbox{\hyperlink{namespacetflite_ab29efbedf49bccb2d2259fd931ba06acaf3155727992e62ebaaf0f66ac49e680c}{BuiltinOperator\_L2\_NORMALIZATION}},}
+\DoxyCodeLine{00303\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_a79492b6aca35188677019857064a61f3}{Register\_L2\_NORMALIZATION}}(),\ \mbox{\hyperlink{namespacetflite_a1e6a37a2168c72268aeda9e908d69d83}{ParseL2Normalization}});}
+\DoxyCodeLine{00304\ \ \ \}}
+\DoxyCodeLine{00305\ }
+\DoxyCodeLine{00306\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a53121516cc7e42388f9dcb874bd81dce}{AddL2Pool2D}}()\ \{}
+\DoxyCodeLine{00307\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a658298961ba1a7c1651a290563095048}{AddBuiltin}}(\mbox{\hyperlink{namespacetflite_ab29efbedf49bccb2d2259fd931ba06acad65b7b1afd6ba5da4d079ca90b25501d}{BuiltinOperator\_L2\_POOL\_2D}},\ \mbox{\hyperlink{namespacetflite_a3c86b54d8229de90d973422d749b0db3}{tflite::Register\_L2\_POOL\_2D}}(),}
+\DoxyCodeLine{00308\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_aa6a0d85db4ca64a478622bb2b428371f}{ParsePool}});}
+\DoxyCodeLine{00309\ \ \ \}}
+\DoxyCodeLine{00310\ }
+\DoxyCodeLine{00311\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a9a5a81ff886b7618250c504f7cf2a8e3}{AddLeakyRelu}}()\ \{}
+\DoxyCodeLine{00312\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a658298961ba1a7c1651a290563095048}{AddBuiltin}}(\mbox{\hyperlink{namespacetflite_ab29efbedf49bccb2d2259fd931ba06aca4bc10ed8c94c2be506be36f8672e3c67}{BuiltinOperator\_LEAKY\_RELU}},\ \mbox{\hyperlink{namespacetflite_a8179f65e560be294fc142a9c385fd832}{tflite::Register\_LEAKY\_RELU}}(),}
+\DoxyCodeLine{00313\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_aea53435c08b6fc5969d0bc8e41b24985}{ParseLeakyRelu}});}
+\DoxyCodeLine{00314\ \ \ \}}
+\DoxyCodeLine{00315\ }
+\DoxyCodeLine{00316\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_adffccaef19b22f5b9e2c147a06a6a810}{AddLess}}()\ \{}
+\DoxyCodeLine{00317\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a658298961ba1a7c1651a290563095048}{AddBuiltin}}(\mbox{\hyperlink{namespacetflite_ab29efbedf49bccb2d2259fd931ba06acafe02bb57d98f7002509f73565c24bf16}{BuiltinOperator\_LESS}},\ \mbox{\hyperlink{namespacetflite_a94ff013d544303c0d2618d9342bda9c0}{Register\_LESS}}(),\ \mbox{\hyperlink{namespacetflite_a839b6260212bffd78d7fc91eeefffc84}{ParseLess}});}
+\DoxyCodeLine{00318\ \ \ \}}
+\DoxyCodeLine{00319\ }
+\DoxyCodeLine{00320\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_abaab9495903439c1b025db58e74bd344}{AddLessEqual}}()\ \{}
+\DoxyCodeLine{00321\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a658298961ba1a7c1651a290563095048}{AddBuiltin}}(\mbox{\hyperlink{namespacetflite_ab29efbedf49bccb2d2259fd931ba06acab13473fa80e445c00ab6132b183afaec}{BuiltinOperator\_LESS\_EQUAL}},\ \mbox{\hyperlink{namespacetflite_abd9da2c61f175e646a9e0f2e16a1ded7}{Register\_LESS\_EQUAL}}(),}
+\DoxyCodeLine{00322\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_a68c9b511af5bfefb75c9f0f79a8ce60e}{ParseLessEqual}});}
+\DoxyCodeLine{00323\ \ \ \}}
+\DoxyCodeLine{00324\ }
+\DoxyCodeLine{00325\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_ae6166f7a49552ddcd045ff891d8adf00}{AddLog}}()\ \{}
+\DoxyCodeLine{00326\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a658298961ba1a7c1651a290563095048}{AddBuiltin}}(\mbox{\hyperlink{namespacetflite_ab29efbedf49bccb2d2259fd931ba06aca5e3b4176401a76bd9e1f0a15693d4e86}{BuiltinOperator\_LOG}},\ \mbox{\hyperlink{namespacetflite_1_1ops_1_1micro_aedbf6366837b0be643f5a4c35e291b20}{tflite::ops::micro::Register\_LOG}}(),}
+\DoxyCodeLine{00327\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_ab8f1a3746557bf30da076bafc73f8670}{ParseLog}});}
+\DoxyCodeLine{00328\ \ \ \}}
+\DoxyCodeLine{00329\ }
+\DoxyCodeLine{00330\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a1dcf4d4f01df72595faed8686bd1843f}{AddLogicalAnd}}()\ \{}
+\DoxyCodeLine{00331\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a658298961ba1a7c1651a290563095048}{AddBuiltin}}(\mbox{\hyperlink{namespacetflite_ab29efbedf49bccb2d2259fd931ba06aca0601516b2f2bf85c25e3bc48c14e3d35}{BuiltinOperator\_LOGICAL\_AND}},}
+\DoxyCodeLine{00332\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_ae04b8fb6780ebc753e89f2b46669d86f}{tflite::Register\_LOGICAL\_AND}}(),\ \mbox{\hyperlink{namespacetflite_aa1d0374d561babc17bce7f58081c83cb}{ParseLogicalAnd}});}
+\DoxyCodeLine{00333\ \ \ \}}
+\DoxyCodeLine{00334\ }
+\DoxyCodeLine{00335\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_ad119b136eaad90cf50ec4c8a66e61f59}{AddLogicalNot}}()\ \{}
+\DoxyCodeLine{00336\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a658298961ba1a7c1651a290563095048}{AddBuiltin}}(\mbox{\hyperlink{namespacetflite_ab29efbedf49bccb2d2259fd931ba06acab55344ffe3107539610dbbdb205d7358}{BuiltinOperator\_LOGICAL\_NOT}},}
+\DoxyCodeLine{00337\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_1_1ops_1_1micro_ac18afda01a9848fd7dad804a3aae0ef7}{tflite::ops::micro::Register\_LOGICAL\_NOT}}(),}
+\DoxyCodeLine{00338\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_a3972430fffdd068e9d8eb223c13e1797}{ParseLogicalNot}});}
+\DoxyCodeLine{00339\ \ \ \}}
+\DoxyCodeLine{00340\ }
+\DoxyCodeLine{00341\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a325af879f9790705eced6a3c6b5fef6d}{AddLogicalOr}}()\ \{}
+\DoxyCodeLine{00342\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a658298961ba1a7c1651a290563095048}{AddBuiltin}}(\mbox{\hyperlink{namespacetflite_ab29efbedf49bccb2d2259fd931ba06acac205f9f48d0035884e254f357564ecbe}{BuiltinOperator\_LOGICAL\_OR}},\ \mbox{\hyperlink{namespacetflite_a8dc73f21da9acd25c9002177428fbcba}{tflite::Register\_LOGICAL\_OR}}(),}
+\DoxyCodeLine{00343\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_a15c5092732ea1569c361aadb0926e3c0}{ParseLogicalOr}});}
+\DoxyCodeLine{00344\ \ \ \}}
+\DoxyCodeLine{00345\ }
+\DoxyCodeLine{00346\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a217a00f3e672333bd9f896bfc5207148}{AddLogistic}}()\ \{}
+\DoxyCodeLine{00347\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a658298961ba1a7c1651a290563095048}{AddBuiltin}}(\mbox{\hyperlink{namespacetflite_ab29efbedf49bccb2d2259fd931ba06aca162f9f49768786dc269f89ea758fd29b}{BuiltinOperator\_LOGISTIC}},\ \mbox{\hyperlink{namespacetflite_a4e64ad921449a03ce8a2839ca34728df}{tflite::Register\_LOGISTIC}}(),}
+\DoxyCodeLine{00348\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_a7c28747f6eae7aafbf0538890d18e9da}{ParseLogistic}});}
+\DoxyCodeLine{00349\ \ \ \}}
+\DoxyCodeLine{00350\ }
+\DoxyCodeLine{00351\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a3b98113558454071f614e7d3b503be94}{AddLogSoftmax}}()\ \{}
+\DoxyCodeLine{00352\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a658298961ba1a7c1651a290563095048}{AddBuiltin}}(\mbox{\hyperlink{namespacetflite_ab29efbedf49bccb2d2259fd931ba06acaf1c2d9d9ce9b01faba153a9956d4ef19}{BuiltinOperator\_LOG\_SOFTMAX}},}
+\DoxyCodeLine{00353\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_a98de4d9f977ca941e3d6f3b923318d39}{tflite::Register\_LOG\_SOFTMAX}}(),\ \mbox{\hyperlink{namespacetflite_af178d59bdf70b7943e8bb4397df5c963}{ParseLogSoftmax}});}
+\DoxyCodeLine{00354\ \ \ \}}
+\DoxyCodeLine{00355\ }
+\DoxyCodeLine{00356\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a36d7d2de9ce65e515e540f34491755e1}{AddMaximum}}()\ \{}
+\DoxyCodeLine{00357\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a658298961ba1a7c1651a290563095048}{AddBuiltin}}(\mbox{\hyperlink{namespacetflite_ab29efbedf49bccb2d2259fd931ba06aca0ccdee492fe8d9d51661bd70b4cb3860}{BuiltinOperator\_MAXIMUM}},\ \mbox{\hyperlink{namespacetflite_a989d7cc9c76939cfc42e695027be889e}{Register\_MAXIMUM}}(),}
+\DoxyCodeLine{00358\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_a4c7adca98756c0c039dcd478f9b0bca7}{ParseMaximum}});}
+\DoxyCodeLine{00359\ \ \ \}}
+\DoxyCodeLine{00360\ }
+\DoxyCodeLine{00361\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a81f86d19dfff6c9caaae5ccf8b364800}{AddMaxPool2D}}(}
+\DoxyCodeLine{00362\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_tf_lite_registration}{TfLiteRegistration}}\&\ registration\ =\ \mbox{\hyperlink{namespacetflite_ae4e04f2be392d563c91e6a3e047c1264}{Register\_MAX\_POOL\_2D}}())\ \{}
+\DoxyCodeLine{00363\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a658298961ba1a7c1651a290563095048}{AddBuiltin}}(\mbox{\hyperlink{namespacetflite_ab29efbedf49bccb2d2259fd931ba06acad09ce1a2d113b82fecf44262fb635c3b}{BuiltinOperator\_MAX\_POOL\_2D}},\ registration,\ \mbox{\hyperlink{namespacetflite_aa6a0d85db4ca64a478622bb2b428371f}{ParsePool}});}
+\DoxyCodeLine{00364\ \ \ \}}
+\DoxyCodeLine{00365\ }
+\DoxyCodeLine{00366\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a1dc43ac82d0c59ec4ec06a6aeef32cae}{AddMirrorPad}}()\ \{}
+\DoxyCodeLine{00367\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a658298961ba1a7c1651a290563095048}{AddBuiltin}}(\mbox{\hyperlink{namespacetflite_ab29efbedf49bccb2d2259fd931ba06acad31c069f2e7e15d33c14733b90956f86}{BuiltinOperator\_MIRROR\_PAD}},\ \mbox{\hyperlink{namespacetflite_af458cd596c27f395e9fa3d873bfaab08}{tflite::Register\_MIRROR\_PAD}}(),}
+\DoxyCodeLine{00368\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_ad85373b2995fb7524f3fcd362b978e27}{ParseMirrorPad}});}
+\DoxyCodeLine{00369\ \ \ \}}
+\DoxyCodeLine{00370\ }
+\DoxyCodeLine{00371\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_aabc5c48704d4915a9401d662068c434d}{AddMean}}()\ \{}
+\DoxyCodeLine{00372\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a658298961ba1a7c1651a290563095048}{AddBuiltin}}(\mbox{\hyperlink{namespacetflite_ab29efbedf49bccb2d2259fd931ba06aca837ce536b8a3582b5c97b8896fe0da82}{BuiltinOperator\_MEAN}},\ \mbox{\hyperlink{namespacetflite_ad916cc4500b5583e0744dcc9c54b7c26}{Register\_MEAN}}(),\ \mbox{\hyperlink{namespacetflite_ab2000f9bbef67669673169c3126b2e03}{ParseReducer}});}
+\DoxyCodeLine{00373\ \ \ \}}
+\DoxyCodeLine{00374\ }
+\DoxyCodeLine{00375\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_aa752e14fe023bcaff3a81889395dc20e}{AddMinimum}}()\ \{}
+\DoxyCodeLine{00376\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a658298961ba1a7c1651a290563095048}{AddBuiltin}}(\mbox{\hyperlink{namespacetflite_ab29efbedf49bccb2d2259fd931ba06acaab5a76e74a84edf0ad1110e131210565}{BuiltinOperator\_MINIMUM}},\ \mbox{\hyperlink{namespacetflite_aabcb6736dcda6e254da7566042b739ec}{Register\_MINIMUM}}(),}
+\DoxyCodeLine{00377\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_a5360e6a4b927db659e317f736dc66318}{ParseMinimum}});}
+\DoxyCodeLine{00378\ \ \ \}}
+\DoxyCodeLine{00379\ }
+\DoxyCodeLine{00380\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a67a370eb2ddaf68952a3a4c40d2fde50}{AddMul}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{struct_tf_lite_registration}{TfLiteRegistration}}\&\ registration\ =\ \mbox{\hyperlink{namespacetflite_ad9bf24e4662157ed8e2963f342ba80e4}{Register\_MUL}}())\ \{}
+\DoxyCodeLine{00381\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a658298961ba1a7c1651a290563095048}{AddBuiltin}}(\mbox{\hyperlink{namespacetflite_ab29efbedf49bccb2d2259fd931ba06aca621ce7b439ff55b5ca74a0e4254fc527}{BuiltinOperator\_MUL}},\ registration,\ \mbox{\hyperlink{namespacetflite_a56ca1687708a1edd7f9e8f6e9859ae44}{ParseMul}});}
+\DoxyCodeLine{00382\ \ \ \}}
+\DoxyCodeLine{00383\ }
+\DoxyCodeLine{00384\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a6a0bc1c7668b7dc727dacc18aa3c9453}{AddNeg}}()\ \{}
+\DoxyCodeLine{00385\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a658298961ba1a7c1651a290563095048}{AddBuiltin}}(\mbox{\hyperlink{namespacetflite_ab29efbedf49bccb2d2259fd931ba06aca3fa46353c384708c1e0aabcbe57025b3}{BuiltinOperator\_NEG}},\ \mbox{\hyperlink{namespacetflite_a2c2d59080e02d60c09d737f5d0fc15f9}{Register\_NEG}}(),\ \mbox{\hyperlink{namespacetflite_a4a8526336bd6756a250002de5f421801}{ParseNeg}});}
+\DoxyCodeLine{00386\ \ \ \}}
+\DoxyCodeLine{00387\ }
+\DoxyCodeLine{00388\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a2f1d838209a3da71ff27ef614511c848}{AddNotEqual}}()\ \{}
+\DoxyCodeLine{00389\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a658298961ba1a7c1651a290563095048}{AddBuiltin}}(\mbox{\hyperlink{namespacetflite_ab29efbedf49bccb2d2259fd931ba06acab553ea194e4506ffeb449262b9ccfef2}{BuiltinOperator\_NOT\_EQUAL}},\ \mbox{\hyperlink{namespacetflite_a3b778127d6ed89b91e9e101c1a9d0420}{Register\_NOT\_EQUAL}}(),}
+\DoxyCodeLine{00390\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_a539176ecf4b25895ee132b322a0d4d08}{ParseNotEqual}});}
+\DoxyCodeLine{00391\ \ \ \}}
+\DoxyCodeLine{00392\ }
+\DoxyCodeLine{00393\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_ac3378b5534046c1a3f85d034e8d1fee1}{AddPack}}()\ \{}
+\DoxyCodeLine{00394\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a658298961ba1a7c1651a290563095048}{AddBuiltin}}(\mbox{\hyperlink{namespacetflite_ab29efbedf49bccb2d2259fd931ba06aca0fd0bbd8c0425bf72760e5329ae36ebd}{BuiltinOperator\_PACK}},\ \mbox{\hyperlink{namespacetflite_afb05404a97fdc810d5ca822a469bb984}{Register\_PACK}}(),\ \mbox{\hyperlink{namespacetflite_ae66feb674d6b63d157af5a186ddad569}{ParsePack}});}
+\DoxyCodeLine{00395\ \ \ \}}
+\DoxyCodeLine{00396\ }
+\DoxyCodeLine{00397\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a37278ed053237b76d6eaeab4ea92bc53}{AddPad}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{struct_tf_lite_registration}{TfLiteRegistration}}\&\ registration\ =\ \mbox{\hyperlink{namespacetflite_ae3891eadbc75146530c05cb70cad86ed}{Register\_PAD}}())\ \{}
+\DoxyCodeLine{00398\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a658298961ba1a7c1651a290563095048}{AddBuiltin}}(\mbox{\hyperlink{namespacetflite_ab29efbedf49bccb2d2259fd931ba06aca88f739e8c4e90602e2c3fa54bb867bff}{BuiltinOperator\_PAD}},\ registration,\ \mbox{\hyperlink{namespacetflite_ae3a660c8a6724bee5a0b76a59ca018f5}{ParsePad}});}
+\DoxyCodeLine{00399\ \ \ \}}
+\DoxyCodeLine{00400\ }
+\DoxyCodeLine{00401\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a87d8f6d8f10ad1380e280e77696ca68c}{AddPadV2}}()\ \{}
+\DoxyCodeLine{00402\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a658298961ba1a7c1651a290563095048}{AddBuiltin}}(\mbox{\hyperlink{namespacetflite_ab29efbedf49bccb2d2259fd931ba06aca0acc0232f8664e4a5e6bb653e4479538}{BuiltinOperator\_PADV2}},\ \mbox{\hyperlink{namespacetflite_a0f479292b159ad58d30e508ae51ac29f}{Register\_PADV2}}(),\ \mbox{\hyperlink{namespacetflite_abc9417e163461d5891834498d0e31e12}{ParsePadV2}});}
+\DoxyCodeLine{00403\ \ \ \}}
+\DoxyCodeLine{00404\ }
+\DoxyCodeLine{00405\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a09243aec694ada9a8dd5df051558c74a}{AddPrelu}}()\ \{}
+\DoxyCodeLine{00406\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a658298961ba1a7c1651a290563095048}{AddBuiltin}}(\mbox{\hyperlink{namespacetflite_ab29efbedf49bccb2d2259fd931ba06acad6c8db68d6adf90facfe9438b7b744cf}{BuiltinOperator\_PRELU}},\ \mbox{\hyperlink{namespacetflite_ad484bdd33e76db88413a96fde3749e9e}{tflite::Register\_PRELU}}(),}
+\DoxyCodeLine{00407\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_ae7913a724a1262a1d69a66cdb2cb8086}{ParsePrelu}});}
+\DoxyCodeLine{00408\ \ \ \}}
+\DoxyCodeLine{00409\ }
+\DoxyCodeLine{00410\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a413f87e85a162189855edaac006e7408}{AddQuantize}}()\ \{}
+\DoxyCodeLine{00411\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a658298961ba1a7c1651a290563095048}{AddBuiltin}}(\mbox{\hyperlink{namespacetflite_ab29efbedf49bccb2d2259fd931ba06acab936d833b001164ae4280a8296b1c2ef}{BuiltinOperator\_QUANTIZE}},\ \mbox{\hyperlink{namespacetflite_a7c5940f57d580ebe44356819e9dbf53e}{Register\_QUANTIZE}}(),}
+\DoxyCodeLine{00412\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_ac669492768feec3b7da9f198be107a8f}{ParseQuantize}});}
+\DoxyCodeLine{00413\ \ \ \}}
+\DoxyCodeLine{00414\ }
+\DoxyCodeLine{00415\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_ae8bdb36c03df5fac2269402984066491}{AddReadVariable}}()\ \{}
+\DoxyCodeLine{00416\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a658298961ba1a7c1651a290563095048}{AddBuiltin}}(\mbox{\hyperlink{namespacetflite_ab29efbedf49bccb2d2259fd931ba06aca0c8fd8ae92cb17100c1af8465a9a0f94}{BuiltinOperator\_READ\_VARIABLE}},}
+\DoxyCodeLine{00417\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_a241541ecfe024789be3eadf6211906c7}{tflite::Register\_READ\_VARIABLE}}(),\ \mbox{\hyperlink{namespacetflite_a696ed0401c5d2b27dd038d713cbb5f87}{ParseReadVariable}});}
+\DoxyCodeLine{00418\ \ \ \}}
+\DoxyCodeLine{00419\ }
+\DoxyCodeLine{00420\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a541f9f3aed2f110d78a11482fafcc880}{AddReduceMax}}()\ \{}
+\DoxyCodeLine{00421\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a658298961ba1a7c1651a290563095048}{AddBuiltin}}(\mbox{\hyperlink{namespacetflite_ab29efbedf49bccb2d2259fd931ba06aca50813350ed80d47233d2ed223d28e369}{BuiltinOperator\_REDUCE\_MAX}},\ \mbox{\hyperlink{namespacetflite_aeb8c11008437e9bd7d0a8869db96dff8}{Register\_REDUCE\_MAX}}(),}
+\DoxyCodeLine{00422\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_ab2000f9bbef67669673169c3126b2e03}{ParseReducer}});}
+\DoxyCodeLine{00423\ \ \ \}}
+\DoxyCodeLine{00424\ }
+\DoxyCodeLine{00425\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a87d6048003f02c0a5fa962ff35d79c33}{AddRelu}}()\ \{}
+\DoxyCodeLine{00426\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a658298961ba1a7c1651a290563095048}{AddBuiltin}}(\mbox{\hyperlink{namespacetflite_ab29efbedf49bccb2d2259fd931ba06aca4e8484d10dac99582c49ec2bf1cd93df}{BuiltinOperator\_RELU}},\ \mbox{\hyperlink{namespacetflite_a0154a0455346c6ff6cd323b97aa72c04}{tflite::Register\_RELU}}(),\ \mbox{\hyperlink{namespacetflite_ab2a601df8abd2247155d646d6d04f3f6}{ParseRelu}});}
+\DoxyCodeLine{00427\ \ \ \}}
+\DoxyCodeLine{00428\ }
+\DoxyCodeLine{00429\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a62a59fc43b153df42a770070b714495b}{AddRelu6}}()\ \{}
+\DoxyCodeLine{00430\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a658298961ba1a7c1651a290563095048}{AddBuiltin}}(\mbox{\hyperlink{namespacetflite_ab29efbedf49bccb2d2259fd931ba06acae6b7637e3d80f72d68df4786caf8f568}{BuiltinOperator\_RELU6}},\ \mbox{\hyperlink{namespacetflite_a2fe16adc056f24ff011507d4b9841523}{tflite::Register\_RELU6}}(),}
+\DoxyCodeLine{00431\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_a93e133ecbb6809b4df383671cf93511a}{ParseRelu6}});}
+\DoxyCodeLine{00432\ \ \ \}}
+\DoxyCodeLine{00433\ }
+\DoxyCodeLine{00434\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_aab3822a934543ff1cc17745a678f3278}{AddReshape}}()\ \{}
+\DoxyCodeLine{00435\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a658298961ba1a7c1651a290563095048}{AddBuiltin}}(\mbox{\hyperlink{namespacetflite_ab29efbedf49bccb2d2259fd931ba06acac2b541de65eeb1ba1d1205431ea8ba93}{BuiltinOperator\_RESHAPE}},}
+\DoxyCodeLine{00436\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_1_1ops_1_1micro_af6c97100b34e57750837656e0093085f}{tflite::ops::micro::Register\_RESHAPE}}(),\ \mbox{\hyperlink{namespacetflite_af2324f6fb3d7ed2bf2845020597ddc95}{ParseReshape}});}
+\DoxyCodeLine{00437\ \ \ \}}
+\DoxyCodeLine{00438\ }
+\DoxyCodeLine{00439\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_afddb96778012a15229f25a6babfe84b8}{AddResizeBilinear}}()\ \{}
+\DoxyCodeLine{00440\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a658298961ba1a7c1651a290563095048}{AddBuiltin}}(\mbox{\hyperlink{namespacetflite_ab29efbedf49bccb2d2259fd931ba06aca511b9acee19029974d906998d189afd6}{BuiltinOperator\_RESIZE\_BILINEAR}},}
+\DoxyCodeLine{00441\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_a95239a9af3d6518f01921bc3e52555a8}{Register\_RESIZE\_BILINEAR}}(),\ \mbox{\hyperlink{namespacetflite_a22a126923e152c616e723c5c4cd77a38}{ParseResizeBilinear}});}
+\DoxyCodeLine{00442\ \ \ \}}
+\DoxyCodeLine{00443\ }
+\DoxyCodeLine{00444\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_ac1aaee97f15c01a46b56395da717377e}{AddResizeNearestNeighbor}}()\ \{}
+\DoxyCodeLine{00445\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a658298961ba1a7c1651a290563095048}{AddBuiltin}}(\mbox{\hyperlink{namespacetflite_ab29efbedf49bccb2d2259fd931ba06aca56a84456fd159ae6d04a482c7371be83}{BuiltinOperator\_RESIZE\_NEAREST\_NEIGHBOR}},}
+\DoxyCodeLine{00446\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_a1944e67750753ff4cca28353f315cca8}{Register\_RESIZE\_NEAREST\_NEIGHBOR}}(),}
+\DoxyCodeLine{00447\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_a27e5be3972f3395a2a3723b245e60621}{ParseResizeNearestNeighbor}});}
+\DoxyCodeLine{00448\ \ \ \}}
+\DoxyCodeLine{00449\ }
+\DoxyCodeLine{00450\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a751a61d6cad31967e3359057cb49da1f}{AddRound}}()\ \{}
+\DoxyCodeLine{00451\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a658298961ba1a7c1651a290563095048}{AddBuiltin}}(\mbox{\hyperlink{namespacetflite_ab29efbedf49bccb2d2259fd931ba06aca725cf4a6a31f326710a01f39ca5b1932}{BuiltinOperator\_ROUND}},}
+\DoxyCodeLine{00452\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_1_1ops_1_1micro_aeebe0e8f7403393f3162258e3736c90e}{tflite::ops::micro::Register\_ROUND}}(),\ \mbox{\hyperlink{namespacetflite_a79153e92fbba1d9e910e877e93ce7be2}{ParseRound}});}
+\DoxyCodeLine{00453\ \ \ \}}
+\DoxyCodeLine{00454\ }
+\DoxyCodeLine{00455\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_aebcd17a56800843635fb4a10f391e834}{AddRsqrt}}()\ \{}
+\DoxyCodeLine{00456\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a658298961ba1a7c1651a290563095048}{AddBuiltin}}(\mbox{\hyperlink{namespacetflite_ab29efbedf49bccb2d2259fd931ba06acaadb42c2ea1d139f6d404af7dcbfd031f}{BuiltinOperator\_RSQRT}},}
+\DoxyCodeLine{00457\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_1_1ops_1_1micro_a2eb57fb3b22ceed6d3b6bb87a02cbe27}{tflite::ops::micro::Register\_RSQRT}}(),\ \mbox{\hyperlink{namespacetflite_a72f719b99f44565a5116d2df59a4f39a}{ParseRsqrt}});}
+\DoxyCodeLine{00458\ \ \ \}}
+\DoxyCodeLine{00459\ }
+\DoxyCodeLine{00460\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a3db1a407489e6ce232bb4c1149861cd6}{AddSelectV2}}()\ \{}
+\DoxyCodeLine{00461\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a658298961ba1a7c1651a290563095048}{AddBuiltin}}(\mbox{\hyperlink{namespacetflite_ab29efbedf49bccb2d2259fd931ba06aca522add1209a486d721799e5275a552f3}{BuiltinOperator\_SELECT\_V2}},\ \mbox{\hyperlink{namespacetflite_a4fde5102b698b3e2c925dcae22a3d3b9}{Register\_SELECT\_V2}}(),}
+\DoxyCodeLine{00462\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_a66b890e84164c039d1fb3ebca5fea7b9}{ParseSelectV2}});}
+\DoxyCodeLine{00463\ \ \ \}}
+\DoxyCodeLine{00464\ }
+\DoxyCodeLine{00465\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_ae7e1aa162f3c72f46b3694795d2068c4}{AddShape}}()\ \{}
+\DoxyCodeLine{00466\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a658298961ba1a7c1651a290563095048}{AddBuiltin}}(\mbox{\hyperlink{namespacetflite_ab29efbedf49bccb2d2259fd931ba06aca5718605c65b56025256c5292e8b12121}{BuiltinOperator\_SHAPE}},\ \mbox{\hyperlink{namespacetflite_ad659657847290a7a46c727b9d5f49593}{Register\_SHAPE}}(),\ \mbox{\hyperlink{namespacetflite_a3420e2bfc70230f6535b67f937a4b05a}{ParseShape}});}
+\DoxyCodeLine{00467\ \ \ \}}
+\DoxyCodeLine{00468\ }
+\DoxyCodeLine{00469\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a0c4e4b92041193a3e9c84230fcc00ebe}{AddSin}}()\ \{}
+\DoxyCodeLine{00470\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a658298961ba1a7c1651a290563095048}{AddBuiltin}}(\mbox{\hyperlink{namespacetflite_ab29efbedf49bccb2d2259fd931ba06acab7c9d792002dc443697d92549068d0b1}{BuiltinOperator\_SIN}},\ \mbox{\hyperlink{namespacetflite_1_1ops_1_1micro_a841aa6bcfc830501420a7cff89140c18}{tflite::ops::micro::Register\_SIN}}(),}
+\DoxyCodeLine{00471\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_aae0eccd0897b4899cc403adcc69568f5}{ParseSin}});}
+\DoxyCodeLine{00472\ \ \ \}}
+\DoxyCodeLine{00473\ }
+\DoxyCodeLine{00474\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_ae26e50894d82838a96e71b5450c2e42d}{AddSlice}}()\ \{}
+\DoxyCodeLine{00475\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a658298961ba1a7c1651a290563095048}{AddBuiltin}}(\mbox{\hyperlink{namespacetflite_ab29efbedf49bccb2d2259fd931ba06aca37eee6a30fab087695ca26a831c65da4}{BuiltinOperator\_SLICE}},\ \mbox{\hyperlink{namespacetflite_a0d33c738c6956126b210434c3acda1c1}{Register\_SLICE}}(),\ \mbox{\hyperlink{namespacetflite_a703261990cdfc2aeebb3d4f4633f6d20}{ParseSlice}});}
+\DoxyCodeLine{00476\ \ \ \}}
+\DoxyCodeLine{00477\ }
+\DoxyCodeLine{00478\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_afcb66ef48b781d74203210ca4749e2a5}{AddSoftmax}}(}
+\DoxyCodeLine{00479\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_tf_lite_registration}{TfLiteRegistration}}\&\ registration\ =\ \mbox{\hyperlink{namespacetflite_a0b23900f9a2beb8b2c956a15e0b02105}{Register\_SOFTMAX}}())\ \{}
+\DoxyCodeLine{00480\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a658298961ba1a7c1651a290563095048}{AddBuiltin}}(\mbox{\hyperlink{namespacetflite_ab29efbedf49bccb2d2259fd931ba06acac944316abbf1478e19b0b8c5dffec1c8}{BuiltinOperator\_SOFTMAX}},\ registration,\ \mbox{\hyperlink{namespacetflite_ab7d48a7d757c98c9eee261c106ee55ec}{ParseSoftmax}});}
+\DoxyCodeLine{00481\ \ \ \}}
+\DoxyCodeLine{00482\ }
+\DoxyCodeLine{00483\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_acd6998250f885352f5d7b1e24bbdbd4b}{AddSpaceToBatchNd}}()\ \{}
+\DoxyCodeLine{00484\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a658298961ba1a7c1651a290563095048}{AddBuiltin}}(\mbox{\hyperlink{namespacetflite_ab29efbedf49bccb2d2259fd931ba06aca60e187bddbb68fc674c504e21a17c31f}{BuiltinOperator\_SPACE\_TO\_BATCH\_ND}},}
+\DoxyCodeLine{00485\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_ad9f1879b72bb9b68f4ef6062aabc1414}{Register\_SPACE\_TO\_BATCH\_ND}}(),\ \mbox{\hyperlink{namespacetflite_a62c4fdc5e248ba3d11a145874cdd6622}{ParseSpaceToBatchNd}});}
+\DoxyCodeLine{00486\ \ \ \}}
+\DoxyCodeLine{00487\ }
+\DoxyCodeLine{00488\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_ab31498749bf872624036947b10c14310}{AddSpaceToDepth}}()\ \{}
+\DoxyCodeLine{00489\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a658298961ba1a7c1651a290563095048}{AddBuiltin}}(\mbox{\hyperlink{namespacetflite_ab29efbedf49bccb2d2259fd931ba06acaf6ace64ed032ccb1d9118430532dceb7}{BuiltinOperator\_SPACE\_TO\_DEPTH}},\ \mbox{\hyperlink{namespacetflite_a23b0733e2221aae8e4741c382a02f4cd}{Register\_SPACE\_TO\_DEPTH}}(),}
+\DoxyCodeLine{00490\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_a5f53a57c81e20a9458c3e6195c1c9174}{ParseSpaceToDepth}});}
+\DoxyCodeLine{00491\ \ \ \}}
+\DoxyCodeLine{00492\ }
+\DoxyCodeLine{00493\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_ab7cac96f11b1edf12edcceaa055f3ea4}{AddSplit}}()\ \{}
+\DoxyCodeLine{00494\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a658298961ba1a7c1651a290563095048}{AddBuiltin}}(\mbox{\hyperlink{namespacetflite_ab29efbedf49bccb2d2259fd931ba06aca334dcd484328d5728de6afd6d3cef91c}{BuiltinOperator\_SPLIT}},\ \mbox{\hyperlink{namespacetflite_a2182325d564047e3155d172a5717d151}{Register\_SPLIT}}(),\ \mbox{\hyperlink{namespacetflite_aea6b942ca474f7e39c4ad7de6a25dddf}{ParseSplit}});}
+\DoxyCodeLine{00495\ \ \ \}}
+\DoxyCodeLine{00496\ }
+\DoxyCodeLine{00497\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a0d5294270036c156a699bc105afb614f}{AddSplitV}}()\ \{}
+\DoxyCodeLine{00498\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a658298961ba1a7c1651a290563095048}{AddBuiltin}}(\mbox{\hyperlink{namespacetflite_ab29efbedf49bccb2d2259fd931ba06aca8e10f698de461748f12b5d3ca9cd76d2}{BuiltinOperator\_SPLIT\_V}},\ \mbox{\hyperlink{namespacetflite_abe4313ac63f9575833977d3b29490163}{Register\_SPLIT\_V}}(),\ \mbox{\hyperlink{namespacetflite_a5e66a8d52dea5e541d21c73bd1492796}{ParseSplitV}});}
+\DoxyCodeLine{00499\ \ \ \}}
+\DoxyCodeLine{00500\ }
+\DoxyCodeLine{00501\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a5747d08ad97307fc572a23c2101acfd2}{AddSqueeze}}()\ \{}
+\DoxyCodeLine{00502\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a658298961ba1a7c1651a290563095048}{AddBuiltin}}(\mbox{\hyperlink{namespacetflite_ab29efbedf49bccb2d2259fd931ba06acafaac1533dc01bddc40fbae58575cffe8}{BuiltinOperator\_SQUEEZE}},\ \mbox{\hyperlink{namespacetflite_a0467c232c23c72e0a342f962aac7589c}{Register\_SQUEEZE}}(),}
+\DoxyCodeLine{00503\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_a0356dfca6616bbfc5cbf1e6d0b7c42f2}{ParseSqueeze}});}
+\DoxyCodeLine{00504\ \ \ \}}
+\DoxyCodeLine{00505\ }
+\DoxyCodeLine{00506\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a591b6e91081ef0715ff3f9e4305f6d48}{AddSqrt}}()\ \{}
+\DoxyCodeLine{00507\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a658298961ba1a7c1651a290563095048}{AddBuiltin}}(\mbox{\hyperlink{namespacetflite_ab29efbedf49bccb2d2259fd931ba06aca8402d34c8efa4b82f0df6ed631e2a73e}{BuiltinOperator\_SQRT}},\ \mbox{\hyperlink{namespacetflite_1_1ops_1_1micro_a4ccb80d6d492858b2cc5719cb3f8fef1}{tflite::ops::micro::Register\_SQRT}}(),}
+\DoxyCodeLine{00508\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_a9c8270573363cd418a21e3eddc56d396}{ParseSqrt}});}
+\DoxyCodeLine{00509\ \ \ \}}
+\DoxyCodeLine{00510\ }
+\DoxyCodeLine{00511\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_afe3cd96615a55ba6c03569476c773f2d}{AddSquare}}()\ \{}
+\DoxyCodeLine{00512\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a658298961ba1a7c1651a290563095048}{AddBuiltin}}(\mbox{\hyperlink{namespacetflite_ab29efbedf49bccb2d2259fd931ba06aca46c8a5598d8b52cc429917c717552432}{BuiltinOperator\_SQUARE}},}
+\DoxyCodeLine{00513\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_1_1ops_1_1micro_a41d41231e18790e01dda4ccfcab20254}{tflite::ops::micro::Register\_SQUARE}}(),\ \mbox{\hyperlink{namespacetflite_a6070cee78c1d20ba79228653a8408737}{ParseSquare}});}
+\DoxyCodeLine{00514\ \ \ \}}
+\DoxyCodeLine{00515\ }
+\DoxyCodeLine{00516\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a8d77706c87eb70bc92c988587fd5e25d}{AddSquaredDifference}}()\ \{}
+\DoxyCodeLine{00517\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a658298961ba1a7c1651a290563095048}{AddBuiltin}}(\mbox{\hyperlink{namespacetflite_ab29efbedf49bccb2d2259fd931ba06aca0976b3e3f8b2092c556740a578a90e33}{BuiltinOperator\_SQUARED\_DIFFERENCE}},}
+\DoxyCodeLine{00518\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_a55850bbc64a659aff21f2a52973503b3}{tflite::Register\_SQUARED\_DIFFERENCE}}(),}
+\DoxyCodeLine{00519\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_a35c2a4c8ac8b0838c4ab161f803fc801}{ParseSquaredDifference}});}
+\DoxyCodeLine{00520\ \ \ \}}
+\DoxyCodeLine{00521\ }
+\DoxyCodeLine{00522\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_ac4f3525bdd0bfe42c3e5fbb1c9337503}{AddStridedSlice}}()\ \{}
+\DoxyCodeLine{00523\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a658298961ba1a7c1651a290563095048}{AddBuiltin}}(\mbox{\hyperlink{namespacetflite_ab29efbedf49bccb2d2259fd931ba06aca72e3306ea0439eb64e9b53e725279f17}{BuiltinOperator\_STRIDED\_SLICE}},\ \mbox{\hyperlink{namespacetflite_a6125acac4199095eae9c2b7e871724eb}{Register\_STRIDED\_SLICE}}(),}
+\DoxyCodeLine{00524\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_a9852b082572ee2985060e8a48fca96ea}{ParseStridedSlice}});}
+\DoxyCodeLine{00525\ \ \ \}}
+\DoxyCodeLine{00526\ }
+\DoxyCodeLine{00527\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a1091aeeed6a5c73368569427be3249ef}{AddSub}}()\ \{}
+\DoxyCodeLine{00528\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a658298961ba1a7c1651a290563095048}{AddBuiltin}}(\mbox{\hyperlink{namespacetflite_ab29efbedf49bccb2d2259fd931ba06acaeb98b6693dd8fe5c339a2507260b0f9e}{BuiltinOperator\_SUB}},\ \mbox{\hyperlink{namespacetflite_a47fb57a70df1c932ac60ad3f6d21c66d}{tflite::Register\_SUB}}(),\ \mbox{\hyperlink{namespacetflite_a7f34dfe09b3a38d8058bc03254d077b0}{ParseSub}});}
+\DoxyCodeLine{00529\ \ \ \}}
+\DoxyCodeLine{00530\ }
+\DoxyCodeLine{00531\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a3f69b645fc825a44dbe3532e12e19027}{AddSum}}()\ \{}
+\DoxyCodeLine{00532\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a658298961ba1a7c1651a290563095048}{AddBuiltin}}(\mbox{\hyperlink{namespacetflite_ab29efbedf49bccb2d2259fd931ba06aca3461c606a90661e62b8dea0f3c4fdbc2}{BuiltinOperator\_SUM}},\ \mbox{\hyperlink{namespacetflite_a29a8ce918ce653ef73b3b45ec620a4d6}{Register\_SUM}}(),\ \mbox{\hyperlink{namespacetflite_ab2000f9bbef67669673169c3126b2e03}{ParseReducer}});}
+\DoxyCodeLine{00533\ \ \ \}}
+\DoxyCodeLine{00534\ }
+\DoxyCodeLine{00535\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a3e71e03cb3e84d88a0786110e8dd3ee3}{AddSvdf}}(}
+\DoxyCodeLine{00536\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_tf_lite_registration}{TfLiteRegistration}}\&\ registration\ =\ \mbox{\hyperlink{namespacetflite_a39157a6c97f47e2850bc3de3ac02db8b}{Register\_SVDF}}())\ \{}
+\DoxyCodeLine{00537\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a658298961ba1a7c1651a290563095048}{AddBuiltin}}(\mbox{\hyperlink{namespacetflite_ab29efbedf49bccb2d2259fd931ba06acae3996000d4b8b3729c0d3dd4283b4b94}{BuiltinOperator\_SVDF}},\ registration,\ \mbox{\hyperlink{namespacetflite_a9d474533f479b48604bf178cde3c5129}{ParseSvdf}});}
+\DoxyCodeLine{00538\ \ \ \}}
+\DoxyCodeLine{00539\ }
+\DoxyCodeLine{00540\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a32d8f3eb3bf78895f3a7f727ac8495d7}{AddTanh}}()\ \{}
+\DoxyCodeLine{00541\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a658298961ba1a7c1651a290563095048}{AddBuiltin}}(\mbox{\hyperlink{namespacetflite_ab29efbedf49bccb2d2259fd931ba06aca74af5c712032982a20d18dde8e13d090}{BuiltinOperator\_TANH}},\ \mbox{\hyperlink{namespacetflite_ae0e64f2b6e2a11d80363bd9a6b873f49}{Register\_TANH}}(),\ \mbox{\hyperlink{namespacetflite_a803d51dc730a7a9a82bb27a827d0da51}{ParseTanh}});}
+\DoxyCodeLine{00542\ \ \ \}}
+\DoxyCodeLine{00543\ }
+\DoxyCodeLine{00544\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_acc0094a26527b6e1d349d82ff139e160}{AddTransposeConv}}()\ \{}
+\DoxyCodeLine{00545\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a658298961ba1a7c1651a290563095048}{AddBuiltin}}(\mbox{\hyperlink{namespacetflite_ab29efbedf49bccb2d2259fd931ba06acaadd0a6f203316f2a29d345c2f86f1eb4}{BuiltinOperator\_TRANSPOSE\_CONV}},}
+\DoxyCodeLine{00546\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_ae521bed22906ce6173f4be4e744cc646}{tflite::Register\_TRANSPOSE\_CONV}}(),\ \mbox{\hyperlink{namespacetflite_a6f639fde603b98ac57fd7363a10cdb47}{ParseTransposeConv}});}
+\DoxyCodeLine{00547\ \ \ \}}
+\DoxyCodeLine{00548\ }
+\DoxyCodeLine{00549\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_ae1ab361feca3a47ec1bf145aed67aa08}{AddTranspose}}()\ \{}
+\DoxyCodeLine{00550\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a658298961ba1a7c1651a290563095048}{AddBuiltin}}(\mbox{\hyperlink{namespacetflite_ab29efbedf49bccb2d2259fd931ba06aca73a70c151816609ebf19c33798fcb544}{BuiltinOperator\_TRANSPOSE}},\ \mbox{\hyperlink{namespacetflite_ab2302fc0d77bb6e3e67c1afbb0d6d7cb}{Register\_TRANSPOSE}}(),}
+\DoxyCodeLine{00551\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_a3bc0dde0ebc6bb51dd3dcc2e4ae85db2}{ParseTranspose}});}
+\DoxyCodeLine{00552\ \ \ \}}
+\DoxyCodeLine{00553\ }
+\DoxyCodeLine{00554\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_abfc27c27f6ae80986cdca5a3b5ec80e8}{AddUnpack}}()\ \{}
+\DoxyCodeLine{00555\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a658298961ba1a7c1651a290563095048}{AddBuiltin}}(\mbox{\hyperlink{namespacetflite_ab29efbedf49bccb2d2259fd931ba06acaf2ccfda8ef206cc98289cfc8c82ba173}{BuiltinOperator\_UNPACK}},\ \mbox{\hyperlink{namespacetflite_a74ccc82646612c9d7750bc5fd7786326}{Register\_UNPACK}}(),\ \mbox{\hyperlink{namespacetflite_aaa922e26e89b7c25b0b21fcc76305607}{ParseUnpack}});}
+\DoxyCodeLine{00556\ \ \ \}}
+\DoxyCodeLine{00557\ }
+\DoxyCodeLine{00558\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_ade1830bd8d19cc2e751d2166991599ba}{AddUnidirectionalSequenceLSTM}}()\ \{}
+\DoxyCodeLine{00559\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a658298961ba1a7c1651a290563095048}{AddBuiltin}}(\mbox{\hyperlink{namespacetflite_ab29efbedf49bccb2d2259fd931ba06aca460cf3914c953a851c731f4462dbb132}{BuiltinOperator\_UNIDIRECTIONAL\_SEQUENCE\_LSTM}},}
+\DoxyCodeLine{00560\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_a042f5482a60e789425228901400a72e3}{Register\_UNIDIRECTIONAL\_SEQUENCE\_LSTM}}(),}
+\DoxyCodeLine{00561\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_abf10c94c6e0d4aeed88f94e2934cd558}{ParseUnidirectionalSequenceLSTM}});}
+\DoxyCodeLine{00562\ \ \ \}}
+\DoxyCodeLine{00563\ }
+\DoxyCodeLine{00564\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a570c8842c5c3536938cfcf95d5380960}{AddVarHandle}}()\ \{}
+\DoxyCodeLine{00565\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a658298961ba1a7c1651a290563095048}{AddBuiltin}}(\mbox{\hyperlink{namespacetflite_ab29efbedf49bccb2d2259fd931ba06acafff9e5eb3d1487c606af81f1b47ca858}{BuiltinOperator\_VAR\_HANDLE}},\ \mbox{\hyperlink{namespacetflite_ae39c11728be02d3fed6acfab6244f620}{Register\_VAR\_HANDLE}}(),}
+\DoxyCodeLine{00566\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_a8a4fafccdcede7fa9472e485787ce90e}{ParseVarHandle}});}
+\DoxyCodeLine{00567\ \ \ \}}
+\DoxyCodeLine{00568\ }
+\DoxyCodeLine{00569\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_ae2b3236a56494ed43aac5e7224d55ff2}{AddWhile}}()\ \{}
+\DoxyCodeLine{00570\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a658298961ba1a7c1651a290563095048}{AddBuiltin}}(\mbox{\hyperlink{namespacetflite_ab29efbedf49bccb2d2259fd931ba06aca881cb2349e556a280671597f9cfac40d}{BuiltinOperator\_WHILE}},\ \mbox{\hyperlink{namespacetflite_ae315a7e602166ea15992170bcfb5186b}{Register\_WHILE}}(),\ \mbox{\hyperlink{namespacetflite_a75e74e244dcb1d1077c5ed27f92de4c2}{ParseWhile}});}
+\DoxyCodeLine{00571\ \ \ \}}
+\DoxyCodeLine{00572\ }
+\DoxyCodeLine{00573\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a3b8ed18f5a087c3110b7bcc4ab7d0858}{AddZerosLike}}()\ \{}
+\DoxyCodeLine{00574\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a658298961ba1a7c1651a290563095048}{AddBuiltin}}(\mbox{\hyperlink{namespacetflite_ab29efbedf49bccb2d2259fd931ba06aca4c7ad7bd5e9bd217d163f67b25e4c52c}{BuiltinOperator\_ZEROS\_LIKE}},\ \mbox{\hyperlink{namespacetflite_a6b97ac1f76342dd1cfdc76f519358b06}{Register\_ZEROS\_LIKE}}(),}
+\DoxyCodeLine{00575\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_a03257982dd9c47776cb91636258ac626}{ParseZerosLike}});}
+\DoxyCodeLine{00576\ \ \ \}}
+\DoxyCodeLine{00577\ }
+\DoxyCodeLine{00578\ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a9508c1c61afb5a429f035b47f3a9642c}{GetRegistrationLength}}()\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a78e4ca5b323a7187bb307c3c5934ed4c}{registrations\_len\_}};\ \}}
+\DoxyCodeLine{00579\ }
+\DoxyCodeLine{00580\ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{00581\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a658298961ba1a7c1651a290563095048}{AddBuiltin}}(\mbox{\hyperlink{namespacetflite_ab29efbedf49bccb2d2259fd931ba06ac}{tflite::BuiltinOperator}}\ op,}
+\DoxyCodeLine{00582\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_tf_lite_registration}{TfLiteRegistration}}\&\ registration,}
+\DoxyCodeLine{00583\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_a6d04c6368d560b2eac8b896bccc64975}{TfLiteBridgeBuiltinParseFunction}}\ parser)\ \{}
+\DoxyCodeLine{00584\ \ \ \ \ \textcolor{keywordflow}{if}\ (op\ ==\ \mbox{\hyperlink{namespacetflite_ab29efbedf49bccb2d2259fd931ba06acab34eb6c3ffe79bc6ee64874f90e89901}{BuiltinOperator\_CUSTOM}})\ \{}
+\DoxyCodeLine{00585\ \ \ \ \ \ \ \mbox{\hyperlink{_face___access__inferencing_2src_2edge-impulse-sdk_2tensorflow_2lite_2micro_2micro__log_8h_ab9bf491b4a37b06ba732fd7de6b04cb2}{MicroPrintf}}(\textcolor{stringliteral}{"{}Invalid\ parameter\ BuiltinOperator\_CUSTOM\ to\ the\ "{}});}
+\DoxyCodeLine{00586\ \ \ \ \ \ \ \mbox{\hyperlink{_face___access__inferencing_2src_2edge-impulse-sdk_2tensorflow_2lite_2micro_2micro__log_8h_ab9bf491b4a37b06ba732fd7de6b04cb2}{MicroPrintf}}(\textcolor{stringliteral}{"{}AddBuiltin\ function."{}});}
+\DoxyCodeLine{00587\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361a0bf230cf34a88de9e37834dc127437db}{kTfLiteError}};}
+\DoxyCodeLine{00588\ \ \ \ \ \}}
+\DoxyCodeLine{00589\ }
+\DoxyCodeLine{00590\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_acb83c60ea0c37e43d8f456100dac4815}{FindOp}}(op)\ !=\ \textcolor{keyword}{nullptr})\ \{}
+\DoxyCodeLine{00591\ \ \ \ \ \ \ \mbox{\hyperlink{_face___access__inferencing_2src_2edge-impulse-sdk_2tensorflow_2lite_2micro_2micro__log_8h_ab9bf491b4a37b06ba732fd7de6b04cb2}{MicroPrintf}}(\textcolor{stringliteral}{"{}Calling\ AddBuiltin\ with\ the\ same\ op\ more\ than\ "{}});}
+\DoxyCodeLine{00592\ \ \ \ \ \ \ \mbox{\hyperlink{_face___access__inferencing_2src_2edge-impulse-sdk_2tensorflow_2lite_2micro_2micro__log_8h_ab9bf491b4a37b06ba732fd7de6b04cb2}{MicroPrintf}}(\textcolor{stringliteral}{"{}once\ is\ not\ supported\ (Op:\ \#\%d)."{}},\ op);}
+\DoxyCodeLine{00593\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361a0bf230cf34a88de9e37834dc127437db}{kTfLiteError}};}
+\DoxyCodeLine{00594\ \ \ \ \ \}}
+\DoxyCodeLine{00595\ }
+\DoxyCodeLine{00596\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a78e4ca5b323a7187bb307c3c5934ed4c}{registrations\_len\_}}\ >=\ tOpCount)\ \{}
+\DoxyCodeLine{00597\ \ \ \ \ \ \ \mbox{\hyperlink{_face___access__inferencing_2src_2edge-impulse-sdk_2tensorflow_2lite_2micro_2micro__log_8h_ab9bf491b4a37b06ba732fd7de6b04cb2}{MicroPrintf}}(\textcolor{stringliteral}{"{}Couldn't\ register\ builtin\ op\ \#\%d,\ resolver\ size\ "{}},\ op);}
+\DoxyCodeLine{00598\ \ \ \ \ \ \ \mbox{\hyperlink{_face___access__inferencing_2src_2edge-impulse-sdk_2tensorflow_2lite_2micro_2micro__log_8h_ab9bf491b4a37b06ba732fd7de6b04cb2}{MicroPrintf}}(\textcolor{stringliteral}{"{}is\ too\ small\ (\%d)."{}},\ tOpCount);}
+\DoxyCodeLine{00599\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361a0bf230cf34a88de9e37834dc127437db}{kTfLiteError}};}
+\DoxyCodeLine{00600\ \ \ \ \ \}}
+\DoxyCodeLine{00601\ }
+\DoxyCodeLine{00602\ \ \ \ \ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_ad11449031bd31bd341a995eaed322dde}{registrations\_}}[\mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a78e4ca5b323a7187bb307c3c5934ed4c}{registrations\_len\_}}]\ =\ registration;}
+\DoxyCodeLine{00603\ \ \ \ \ \textcolor{comment}{//\ Strictly\ speaking,\ the\ builtin\_code\ is\ not\ necessary\ for\ TFLM\ but\ filling}}
+\DoxyCodeLine{00604\ \ \ \ \ \textcolor{comment}{//\ it\ in\ regardless.}}
+\DoxyCodeLine{00605\ \ \ \ \ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_ad11449031bd31bd341a995eaed322dde}{registrations\_}}[\mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a78e4ca5b323a7187bb307c3c5934ed4c}{registrations\_len\_}}].\mbox{\hyperlink{struct_tf_lite_registration_a1a87f0c20fb23deaa745c25a4e84a08f}{builtin\_code}}\ =\ op;}
+\DoxyCodeLine{00606\ \ \ \ \ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a78e4ca5b323a7187bb307c3c5934ed4c}{registrations\_len\_}}++;}
+\DoxyCodeLine{00607\ }
+\DoxyCodeLine{00608\ \ \ \ \ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a163d55d66a31b4e24ebbcc4c27ac247b}{builtin\_codes\_}}[\mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a6c7d96443623418c923f7b80180feab8}{num\_buitin\_ops\_}}]\ =\ op;}
+\DoxyCodeLine{00609\ \ \ \ \ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a0146194491eaa7fb4f10c5494f5958ee}{builtin\_parsers\_}}[\mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a6c7d96443623418c923f7b80180feab8}{num\_buitin\_ops\_}}]\ =\ parser;}
+\DoxyCodeLine{00610\ \ \ \ \ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a6c7d96443623418c923f7b80180feab8}{num\_buitin\_ops\_}}++;}
+\DoxyCodeLine{00611\ }
+\DoxyCodeLine{00612\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361ab25fe210808197f1b6601df8ccdcd699}{kTfLiteOk}};}
+\DoxyCodeLine{00613\ \ \ \}}
+\DoxyCodeLine{00614\ }
+\DoxyCodeLine{00615\ \ \ \mbox{\hyperlink{struct_tf_lite_registration}{TfLiteRegistration}}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_ad11449031bd31bd341a995eaed322dde}{registrations\_}}[tOpCount];}
+\DoxyCodeLine{00616\ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a78e4ca5b323a7187bb307c3c5934ed4c}{registrations\_len\_}}\ =\ 0;}
+\DoxyCodeLine{00617\ }
+\DoxyCodeLine{00618\ \ \ \textcolor{comment}{//\ Arrays\ (and\ counter)\ to\ store\ the\ builtin\ codes\ and\ their\ corresponding}}
+\DoxyCodeLine{00619\ \ \ \textcolor{comment}{//\ parse\ functions\ as\ these\ are\ registered\ with\ the\ Op\ Resolver.}}
+\DoxyCodeLine{00620\ \ \ \mbox{\hyperlink{namespacetflite_ab29efbedf49bccb2d2259fd931ba06ac}{BuiltinOperator}}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a163d55d66a31b4e24ebbcc4c27ac247b}{builtin\_codes\_}}[tOpCount];}
+\DoxyCodeLine{00621\ \ \ \mbox{\hyperlink{namespacetflite_a6d04c6368d560b2eac8b896bccc64975}{TfLiteBridgeBuiltinParseFunction}}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a0146194491eaa7fb4f10c5494f5958ee}{builtin\_parsers\_}}[tOpCount];}
+\DoxyCodeLine{00622\ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{classtflite_1_1_micro_mutable_op_resolver_a6c7d96443623418c923f7b80180feab8}{num\_buitin\_ops\_}}\ =\ 0;}
+\DoxyCodeLine{00623\ \};}
+\DoxyCodeLine{00624\ }
+\DoxyCodeLine{00625\ \};\ \ \textcolor{comment}{//\ namespace\ tflite}}
+\DoxyCodeLine{00626\ }
+\DoxyCodeLine{00627\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ TENSORFLOW\_LITE\_MICRO\_MICRO\_MUTABLE\_OP\_RESOLVER\_H\_}}
+
+\end{DoxyCode}

@@ -1,0 +1,70 @@
+\doxysection{pybind11\+\_\+lib.\+h}
+\hypertarget{pybind11__lib_8h_source}{}\label{pybind11__lib_8h_source}\index{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/main/python/tflite\_micro/pybind11\_lib.h@{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/main/python/tflite\_micro/pybind11\_lib.h}}
+\mbox{\hyperlink{pybind11__lib_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{/*\ Copyright\ 2019\ The\ TensorFlow\ Authors.\ All\ Rights\ Reserved.}}
+\DoxyCodeLine{00002\ \textcolor{comment}{}}
+\DoxyCodeLine{00003\ \textcolor{comment}{Licensed\ under\ the\ Apache\ License,\ Version\ 2.0\ (the\ "{}License"{});}}
+\DoxyCodeLine{00004\ \textcolor{comment}{you\ may\ not\ use\ this\ file\ except\ in\ compliance\ with\ the\ License.}}
+\DoxyCodeLine{00005\ \textcolor{comment}{You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{00006\ \textcolor{comment}{}}
+\DoxyCodeLine{00007\ \textcolor{comment}{\ \ \ \ http://www.apache.org/licenses/LICENSE-\/2.0}}
+\DoxyCodeLine{00008\ \textcolor{comment}{}}
+\DoxyCodeLine{00009\ \textcolor{comment}{Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ software}}
+\DoxyCodeLine{00010\ \textcolor{comment}{distributed\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,}}
+\DoxyCodeLine{00011\ \textcolor{comment}{WITHOUT\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,\ either\ express\ or\ implied.}}
+\DoxyCodeLine{00012\ \textcolor{comment}{See\ the\ License\ for\ the\ specific\ language\ governing\ permissions\ and}}
+\DoxyCodeLine{00013\ \textcolor{comment}{limitations\ under\ the\ License.}}
+\DoxyCodeLine{00014\ \textcolor{comment}{==============================================================================*/}}
+\DoxyCodeLine{00015\ }
+\DoxyCodeLine{00016\ \textcolor{preprocessor}{\#include\ <pybind11/pybind11.h>}}
+\DoxyCodeLine{00017\ \textcolor{preprocessor}{\#include\ <pybind11/stl.h>}}
+\DoxyCodeLine{00018\ }
+\DoxyCodeLine{00019\ \textcolor{preprocessor}{\#ifndef\ TENSORFLOW\_LITE\_MICRO\_PYTHON\_INTERPRETER\_SRC\_PYBIND11\_LIB\_H\_}}
+\DoxyCodeLine{00020\ \textcolor{preprocessor}{\#define\ TENSORFLOW\_LITE\_MICRO\_PYTHON\_INTERPRETER\_SRC\_PYBIND11\_LIB\_H\_}}
+\DoxyCodeLine{00021\ }
+\DoxyCodeLine{00022\ \textcolor{keyword}{namespace\ }py\ =\ pybind11;}
+\DoxyCodeLine{00023\ }
+\DoxyCodeLine{00024\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacetflite}{tflite}}\ \{}
+\DoxyCodeLine{00025\ }
+\DoxyCodeLine{00026\ \textcolor{comment}{//\ Convert\ PyObject*\ to\ py::object\ with\ no\ error\ handling.}}
+\DoxyCodeLine{00027\ }
+\DoxyCodeLine{00028\ \textcolor{keyword}{inline}\ py::object\ \mbox{\hyperlink{namespacetflite_a56b6ba08db3b8a4ced4774db6b2b323d}{Pyo}}(PyObject*\ \mbox{\hyperlink{ei__aligned__malloc_8h_a0619a76ea2d4e6cce18b93ddf5082a36}{ptr}})\ \{}
+\DoxyCodeLine{00029\ \ \ \textcolor{keywordflow}{return}\ py::reinterpret\_steal<py::object>(\mbox{\hyperlink{ei__aligned__malloc_8h_a0619a76ea2d4e6cce18b93ddf5082a36}{ptr}});}
+\DoxyCodeLine{00030\ \}}
+\DoxyCodeLine{00031\ }
+\DoxyCodeLine{00032\ \textcolor{comment}{//\ Raise\ an\ exception\ if\ the\ PyErrOccurred\ flag\ is\ set\ or\ else\ return\ the\ Python}}
+\DoxyCodeLine{00033\ \textcolor{comment}{//\ object.}}
+\DoxyCodeLine{00034\ }
+\DoxyCodeLine{00035\ \textcolor{keyword}{inline}\ py::object\ \mbox{\hyperlink{namespacetflite_a5393d17bd77dd8841e712f45b6ee4a36}{PyoOrThrow}}(PyObject*\ \mbox{\hyperlink{ei__aligned__malloc_8h_a0619a76ea2d4e6cce18b93ddf5082a36}{ptr}})\ \{}
+\DoxyCodeLine{00036\ \ \ \textcolor{keywordflow}{if}\ (PyErr\_Occurred()\ ||\ \mbox{\hyperlink{ei__aligned__malloc_8h_a0619a76ea2d4e6cce18b93ddf5082a36}{ptr}}\ ==\ \textcolor{keyword}{nullptr})\ \{}
+\DoxyCodeLine{00037\ \ \ \ \ \textcolor{keywordflow}{throw}\ py::error\_already\_set();}
+\DoxyCodeLine{00038\ \ \ \}}
+\DoxyCodeLine{00039\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacetflite_a56b6ba08db3b8a4ced4774db6b2b323d}{Pyo}}(\mbox{\hyperlink{ei__aligned__malloc_8h_a0619a76ea2d4e6cce18b93ddf5082a36}{ptr}});}
+\DoxyCodeLine{00040\ \}}
+\DoxyCodeLine{00041\ }
+\DoxyCodeLine{00042\ [[noreturn]]\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_a70f4df608b128221e5eb4df797b4de22}{ThrowTypeError}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ error\_message)\ \{}
+\DoxyCodeLine{00043\ \ \ PyErr\_SetString(PyExc\_TypeError,\ error\_message);}
+\DoxyCodeLine{00044\ \ \ \textcolor{keywordflow}{throw}\ pybind11::error\_already\_set();}
+\DoxyCodeLine{00045\ \}}
+\DoxyCodeLine{00046\ }
+\DoxyCodeLine{00047\ [[noreturn]]\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_a9c3bc3ba0643918f3282e33a0b931659}{ThrowValueError}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ error\_message)\ \{}
+\DoxyCodeLine{00048\ \ \ PyErr\_SetString(PyExc\_ValueError,\ error\_message);}
+\DoxyCodeLine{00049\ \ \ \textcolor{keywordflow}{throw}\ pybind11::error\_already\_set();}
+\DoxyCodeLine{00050\ \}}
+\DoxyCodeLine{00051\ }
+\DoxyCodeLine{00052\ [[noreturn]]\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_acc534181cca1fbc0ed28c4fb5102fde1}{ThrowIndexError}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ error\_message)\ \{}
+\DoxyCodeLine{00053\ \ \ PyErr\_SetString(PyExc\_IndexError,\ error\_message);}
+\DoxyCodeLine{00054\ \ \ \textcolor{keywordflow}{throw}\ pybind11::error\_already\_set();}
+\DoxyCodeLine{00055\ \}}
+\DoxyCodeLine{00056\ }
+\DoxyCodeLine{00057\ [[noreturn]]\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_a23c09e115e27429eb4b30fd1707e08fd}{ThrowRuntimeError}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ error\_message)\ \{}
+\DoxyCodeLine{00058\ \ \ PyErr\_SetString(PyExc\_RuntimeError,\ error\_message);}
+\DoxyCodeLine{00059\ \ \ \textcolor{keywordflow}{throw}\ pybind11::error\_already\_set();}
+\DoxyCodeLine{00060\ \}}
+\DoxyCodeLine{00061\ }
+\DoxyCodeLine{00062\ \}\ \ \textcolor{comment}{//\ namespace\ tflite}}
+\DoxyCodeLine{00063\ }
+\DoxyCodeLine{00064\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ TENSORFLOW\_LITE\_MICRO\_PYTHON\_INTERPRETER\_SRC\_PYBIND11\_LIB\_H\_}}
+
+\end{DoxyCode}

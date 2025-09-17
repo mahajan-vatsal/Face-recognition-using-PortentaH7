@@ -1,0 +1,91 @@
+\chapter{Magic Wand}
+\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_248861a93d7e2425c0e8323dc4b2ea791}{}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_248861a93d7e2425c0e8323dc4b2ea791}\index{Magic Wand@{Magic Wand}}
+\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_248861a93d7e2425c0e8323dc4b2ea791_autotoc_md5}%
+\Hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_248861a93d7e2425c0e8323dc4b2ea791_autotoc_md5}%
+
+
+Magic Wand example for \href{https://www.tensorflow.org/lite/microcontrollers}{\texttt{ Tensor\+Flow Lite Micro}} on the \href{https://store-usa.arduino.cc/products/arduino-nano-33-ble-sense}{\texttt{ Arduino Nano 33 BLE Sense}}.\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_248861a93d7e2425c0e8323dc4b2ea791_autotoc_md6}{}\doxysection{\texorpdfstring{Table of contents}{Table of contents}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_248861a93d7e2425c0e8323dc4b2ea791_autotoc_md6}
+
+\begin{DoxyItemize}
+\item Introduction
+\item Hardware Requirements
+\item Installing the Sketch
+\begin{DoxyItemize}
+\item Arduino Desktop IDE
+\end{DoxyItemize}
+\item Building the Wand
+\item Using the wand
+\item Viewing Gestures in the Browser
+\item Pretrained Model
+\item Recording Gestures
+\item Training
+\item Deployment
+\end{DoxyItemize}\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_248861a93d7e2425c0e8323dc4b2ea791_autotoc_md7}{}\doxysection{\texorpdfstring{Introduction}{Introduction}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_248861a93d7e2425c0e8323dc4b2ea791_autotoc_md7}
+This project shows you how to recognize gestures made by waving a magic wand, using machine learning to analyze accelerometer and gyroscope data. It demonstrates the three main stages of an end-\/to-\/end machine learning project\+:
+
+
+\begin{DoxyItemize}
+\item {\bfseries{Gathering Data}}. Using a Bluetooth connection to a web page, you can capture gestures, label them, and download the results.
+\item {\bfseries{Training}}. A Python notebook on the free Colab service shows how to use Tensor\+Flow to train a model to recognize gestures from your data.
+\item {\bfseries{Deployment}}. You can deploy your trained model to the Arduino board using Tensor\+Flow Lite Micro and the Arduino IDE.
+\end{DoxyItemize}\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_248861a93d7e2425c0e8323dc4b2ea791_autotoc_md8}{}\doxysection{\texorpdfstring{Hardware Requirements}{Hardware Requirements}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_248861a93d7e2425c0e8323dc4b2ea791_autotoc_md8}
+You\textquotesingle{}ll need the following\+:
+
+
+\begin{DoxyItemize}
+\item Arduino Nano 33 BLE Sense board. These are available as part of \href{https://store-usa.arduino.cc/products/arduino-tiny-machine-learning-kit}{\texttt{ the Tiny\+ML Starter Kit}}, or separately from Arduino or resellers. Other Arduinos won\textquotesingle{}t work unfortunately, because the Bluetooth and sensor code rely on accessing the particular hardware of the Nano 33 BLE Sense.
+\item Micro\+USB cable. This is included in the Tiny\+ML Kit, but you\textquotesingle{}ll need a USB-\/A adaptor too if your computer only has USB-\/C ports.
+\item Computer. The Arduino toolchain runs on Linux, Windows, and Mac\+OS, so you should be able to use most laptops, desktops, or even a Raspberry Pi. For the training process, you\textquotesingle{}ll also need an up-\/to-\/date version of the Chrome web browser so you can use the Web Bluetooth APIs.
+\item Stick. We\textquotesingle{}ll be attaching your Arduino to a \textquotesingle{}wand\textquotesingle{}, but this can be practically anything, as long as it\textquotesingle{}s roughly a foot (30 centimeters) long.
+\end{DoxyItemize}\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_248861a93d7e2425c0e8323dc4b2ea791_autotoc_md9}{}\doxysection{\texorpdfstring{Installing the Sketch}{Installing the Sketch}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_248861a93d7e2425c0e8323dc4b2ea791_autotoc_md9}
+You\textquotesingle{}ll need to ensure you can successfully connect and load sketches onto your Arduino board, using the desktop IDE. Once you\textquotesingle{}ve made sure you can load a simple sketch successfully, you\textquotesingle{}ll follow these steps\+:\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_248861a93d7e2425c0e8323dc4b2ea791_autotoc_md10}{}\doxysubsection{\texorpdfstring{Arduino Desktop IDE}{Arduino Desktop IDE}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_248861a93d7e2425c0e8323dc4b2ea791_autotoc_md10}
+If you\textquotesingle{}re running using the Arduino IDE application, you\textquotesingle{}ll need to fetch the latest version of this sketch. To install the Tensor\+Flow Lite Micro for Arduino library, see the \href{../../README.md\#how-to-install}{\texttt{ how to install}} instructions.
+
+Open up the \doxylink{magic__wand_8ino}{magic\+\_\+wand.\+ino} file in the Arduino editor, and make sure the Arduino board is visible and connected to the right port. You\textquotesingle{}ll need to search for the some libraries that the sketch depends on, using {\ttfamily Sketch-\/\texorpdfstring{$>$}{>}Include Library-\/\texorpdfstring{$>$}{>}Manage Libraries} from the main menu. The \href{https://github.com/arduino-libraries/Arduino_LSM9DS1}{\texttt{ Arduino\+\_\+\+LSM9\+DS1}} lets us access the accelerometer and gyroscope readings from the board\textquotesingle{}s IMU, and you need at least version 1.\+1.\+0. We\textquotesingle{}ll be using Bluetooth to communicate with the web page, so you should also search for \href{https://www.arduino.cc/en/Reference/ArduinoBLE}{\texttt{ Arduino\+BLE}} and make sure you\textquotesingle{}ve got version 1.\+1.\+3 or newer.
+
+You should now be able to press the upload button to compile and install the sketch on your board.\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_248861a93d7e2425c0e8323dc4b2ea791_autotoc_md11}{}\doxysection{\texorpdfstring{Building the Wand}{Building the Wand}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_248861a93d7e2425c0e8323dc4b2ea791_autotoc_md11}
+The \textquotesingle{}wand\textquotesingle{} itself can be as simple as a stick, it doesn\textquotesingle{}t need to do anything other than keep the board at its end as you hold the other end and wave it about. A cheap wand from an online retailer will work. A simple piece of wood or ruler works just as well.
+
+You should place the board at the end of the wand, with the USB socket facing downwards, towards where you hold it, so that the cable can run down the handle. The sketch is designed to compensate for any rotation of the board around the wand\textquotesingle{}s shaft, so as long as it\textquotesingle{}s parallel to the wand\textquotesingle{}s length the board\textquotesingle{}s twist won\textquotesingle{}t matter. Use sticky tape or some other easy-\/to-\/remove method to attach the board to the wand, and hold the cable in place along the shaft. The end result should look something like this\+:
+
+
+
+If an ASCII-\/art diagram is more helpful, here\textquotesingle{}s what you should aim for\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \_\_\_\_}
+\DoxyCodeLine{|\ \ \ \ |<-\/\ Arduino\ board}
+\DoxyCodeLine{|\ \ \ \ |}
+\DoxyCodeLine{|\ ()\ |\ \ <-\/\ Reset\ button}
+\DoxyCodeLine{|\ \ \ \ |}
+\DoxyCodeLine{\ -\/TT-\/\ \ \ <-\/\ USB\ port}
+\DoxyCodeLine{\ \ ||}
+\DoxyCodeLine{\ \ ||<-\/\ Wand}
+\DoxyCodeLine{\ ....}
+\DoxyCodeLine{\ \ ||}
+\DoxyCodeLine{\ \ ||}
+\DoxyCodeLine{\ \ ()}
+
+\end{DoxyCode}
+\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_248861a93d7e2425c0e8323dc4b2ea791_autotoc_md12}{}\doxysection{\texorpdfstring{Using the wand}{Using the wand}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_248861a93d7e2425c0e8323dc4b2ea791_autotoc_md12}
+The wand can be used with or without the Nano 33 BLE attached to the Tiny Machine Learning Shield. It is easier to use without, as your hand will not tire as quickly. The wand should be held as you would a pencil or pen, about 8 inches from the USB socket. Use your wrist to make strokes, not your arm. Strokes will need to be made somewhat quickly, without stopping during changes in direction.\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_248861a93d7e2425c0e8323dc4b2ea791_autotoc_md13}{}\doxysection{\texorpdfstring{Viewing Gestures in the Browser}{Viewing Gestures in the Browser}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_248861a93d7e2425c0e8323dc4b2ea791_autotoc_md13}
+To preview and record gestures, we\textquotesingle{}ll be connecting the sketch you\textquotesingle{}ve just uploaded to a web page, using Bluetooth and Chrome\textquotesingle{}s Web\+BLE API. The code for the page is \href{https://github.com/tensorflow/tflite-micro-arduino-examples/tree/main/examples/magic_wand/website}{\texttt{ in this repository}}, but it\textquotesingle{}s all implemented using browser-\/side Javascript in a static HTML page, so you don\textquotesingle{}t need to host it on your own server. Just dragging and dropping the {\ttfamily index.\+html} file into your browser should work.
+
+If the sketch has uploaded successfully, the Arduino should be advertising itself through Bluetooth. On the web page, press the \textquotesingle{}Bluetooth\textquotesingle{} button to connect, and you should see a dialog appear asking you to pair with a device. After a second or two, there should be an entry that looks something like "{}\+BLESense-\/2\+F00"{}. Click on that to pair, and you should be returned to the web page.
+
+If everything is working as expected, the Bluetooth button should turn blue, with "{}\+Connected"{} next to it. Now try moving the wand and look at the square below the button. As you gesture, you should see tracks appearing as lines in the web page in real time. Try doing small circles, or a \textquotesingle{}Z\textquotesingle{} like Zorro!\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_248861a93d7e2425c0e8323dc4b2ea791_autotoc_md14}{}\doxysection{\texorpdfstring{Pretrained Model}{Pretrained Model}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_248861a93d7e2425c0e8323dc4b2ea791_autotoc_md14}
+The sketch comes with a model that\textquotesingle{}s been trained to recognize the hand-\/drawn digits zero to nine. This is based on a small dataset recorded by Google, so your accuracy may vary, but if you bring up the Serial Monitor in the Arduino IDE you can see what the model predicts for each gesture you make, with a confidence score between 0\% and 100\%, as well as ASCII art of the gesture outline.\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_248861a93d7e2425c0e8323dc4b2ea791_autotoc_md15}{}\doxysection{\texorpdfstring{Recording Gestures}{Recording Gestures}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_248861a93d7e2425c0e8323dc4b2ea791_autotoc_md15}
+As you get familiar with the wand, so should notice that the gestures you have performed start to stack on the right side of the web page. This is where the data you\textquotesingle{}ll eventually want to use for training is stored. When you leave or refresh the web page, these gestures will be lost, so make sure you use the "{}\+Download Data"{} link to save them locally if you\textquotesingle{}ve generated a number of them.
+
+The gestures are automatically split up by times when the wand is kept still. These pauses act like spaces between words, and so when you\textquotesingle{}ve finished a gesture you should stop moving the wand so that it ends cleanly.
+
+To get started, you should pick a couple of easy gestures to perform, like a \textquotesingle{}Z\textquotesingle{} and an \textquotesingle{}O\textquotesingle{}. As you make these gestures, you should see them appear in the right-\/hand stack of gestures. You can look at the shapes shown there to understand whether the gestures came out cleanly. A good rule of thumb is that if you can\textquotesingle{}t tell what the gesture is by looking at it in the stack, then a model will have a hard time recognizing it too.
+
+Once you have ten or so of each gesture, scroll through the stack to review them. If any don\textquotesingle{}t seem very recognizable, or are too \textquotesingle{}sloppy\textquotesingle{} (which is very subjective unfortunately), then you can press the trash can button on the top right of the image to remove it. If you removed any, try recording some more so you have at least ten of each gesture. If you are happy with a gesture, click on the label at the top left to type in the correct name for it (for example {\ttfamily O} or {\ttfamily Z}).
+
+After you\textquotesingle{}ve reviewed and labeled all of your data, you can download it as a JSON text file that can be used for training.\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_248861a93d7e2425c0e8323dc4b2ea791_autotoc_md16}{}\doxysection{\texorpdfstring{Training}{Training}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_248861a93d7e2425c0e8323dc4b2ea791_autotoc_md16}
+Once you have data, you should \href{https://colab.research.google.com/github/tensorflow/tflite-micro-arduino-examples/blob/main/examples/magic_wand/train/train_magic_wand_model.ipynb}{\texttt{ run the Python training notebook in Colab}} and follow the steps to create and export your own model.\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_248861a93d7e2425c0e8323dc4b2ea791_autotoc_md17}{}\doxysection{\texorpdfstring{Deployment}{Deployment}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_248861a93d7e2425c0e8323dc4b2ea791_autotoc_md17}
+The Python training process should give you a {\ttfamily magic\+\_\+wand\+\_\+model\+\_\+data.\+cc} file. Replace the file of the same name (but with a {\ttfamily .cpp} suffix) that\textquotesingle{}s in the sketch you\textquotesingle{}re using with this version. You\textquotesingle{}ll also need to update the {\ttfamily labels} and {\ttfamily label\+\_\+count} variables near the top of the {\ttfamily \doxylink{magic__wand_8ino}{magic\+\_\+wand.\+ino}} to reflect any changes you made to the gestures you\textquotesingle{}re trying to recognize.
+
+Upload this modified sketch, and you should be able to perform gestures and see them recognized in the Serial Monitor of your Arduino editor. 

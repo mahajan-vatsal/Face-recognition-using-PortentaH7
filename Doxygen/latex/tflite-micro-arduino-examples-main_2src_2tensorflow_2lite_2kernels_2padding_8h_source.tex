@@ -1,0 +1,121 @@
+\doxysection{padding.\+h}
+\hypertarget{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2kernels_2padding_8h_source}{}\label{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2kernels_2padding_8h_source}\index{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/arduino-\/examples-\/main/src/tensorflow/lite/kernels/padding.h@{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/arduino-\/examples-\/main/src/tensorflow/lite/kernels/padding.h}}
+\mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2kernels_2padding_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{/*\ Copyright\ 2017\ The\ TensorFlow\ Authors.\ All\ Rights\ Reserved.}}
+\DoxyCodeLine{00002\ \textcolor{comment}{}}
+\DoxyCodeLine{00003\ \textcolor{comment}{Licensed\ under\ the\ Apache\ License,\ Version\ 2.0\ (the\ "{}License"{});}}
+\DoxyCodeLine{00004\ \textcolor{comment}{you\ may\ not\ use\ this\ file\ except\ in\ compliance\ with\ the\ License.}}
+\DoxyCodeLine{00005\ \textcolor{comment}{You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{00006\ \textcolor{comment}{}}
+\DoxyCodeLine{00007\ \textcolor{comment}{\ \ \ \ http://www.apache.org/licenses/LICENSE-\/2.0}}
+\DoxyCodeLine{00008\ \textcolor{comment}{}}
+\DoxyCodeLine{00009\ \textcolor{comment}{Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ software}}
+\DoxyCodeLine{00010\ \textcolor{comment}{distributed\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,}}
+\DoxyCodeLine{00011\ \textcolor{comment}{WITHOUT\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,\ either\ express\ or\ implied.}}
+\DoxyCodeLine{00012\ \textcolor{comment}{See\ the\ License\ for\ the\ specific\ language\ governing\ permissions\ and}}
+\DoxyCodeLine{00013\ \textcolor{comment}{limitations\ under\ the\ License.}}
+\DoxyCodeLine{00014\ \textcolor{comment}{==============================================================================*/}}
+\DoxyCodeLine{00015\ \textcolor{preprocessor}{\#ifndef\ TENSORFLOW\_LITE\_KERNELS\_PADDING\_H\_}}
+\DoxyCodeLine{00016\ \textcolor{preprocessor}{\#define\ TENSORFLOW\_LITE\_KERNELS\_PADDING\_H\_}}
+\DoxyCodeLine{00017\ }
+\DoxyCodeLine{00018\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/core/c/builtin\_op\_data.h"{}}}
+\DoxyCodeLine{00019\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/kernels/internal/types.h"{}}}
+\DoxyCodeLine{00020\ }
+\DoxyCodeLine{00021\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacetflite}{tflite}}\ \{}
+\DoxyCodeLine{00022\ }
+\DoxyCodeLine{00023\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{namespacetflite_ac495e34f871d0b85ab29b422ac13e26f}{ComputePadding}}(\textcolor{keywordtype}{int}\ stride,\ \textcolor{keywordtype}{int}\ dilation\_rate,\ \textcolor{keywordtype}{int}\ in\_size,}
+\DoxyCodeLine{00024\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ filter\_size,\ \textcolor{keywordtype}{int}\ out\_size)\ \{}
+\DoxyCodeLine{00025\ \ \ \textcolor{keywordtype}{int}\ effective\_filter\_size\ =\ (filter\_size\ -\/\ 1)\ *\ dilation\_rate\ +\ 1;}
+\DoxyCodeLine{00026\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{arc__mli_2conv_8cc_ad870e8457a2c13cdb2d9a3566118bb4e}{padding}}\ =\ ((out\_size\ -\/\ 1)\ *\ stride\ +\ effective\_filter\_size\ -\/\ in\_size)\ /\ 2;}
+\DoxyCodeLine{00027\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{arc__mli_2conv_8cc_ad870e8457a2c13cdb2d9a3566118bb4e}{padding}}\ >\ 0\ ?\ \mbox{\hyperlink{arc__mli_2conv_8cc_ad870e8457a2c13cdb2d9a3566118bb4e}{padding}}\ :\ 0;}
+\DoxyCodeLine{00028\ \}}
+\DoxyCodeLine{00029\ }
+\DoxyCodeLine{00030\ \textcolor{comment}{//\ It's\ not\ guaranteed\ that\ padding\ is\ symmetric.\ It's\ important\ to\ keep}}
+\DoxyCodeLine{00031\ \textcolor{comment}{//\ offset\ for\ algorithms\ need\ all\ paddings.}}
+\DoxyCodeLine{00032\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{namespacetflite_ae47c54edf1138858a54c92b81a2aac84}{ComputePaddingWithOffset}}(\textcolor{keywordtype}{int}\ stride,\ \textcolor{keywordtype}{int}\ dilation\_rate,\ \textcolor{keywordtype}{int}\ in\_size,}
+\DoxyCodeLine{00033\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ filter\_size,\ \textcolor{keywordtype}{int}\ out\_size,}
+\DoxyCodeLine{00034\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}*\ \mbox{\hyperlink{mirror__pad_8cpp_aed7ea92f45bd273dde380a45ddced592}{offset}})\ \{}
+\DoxyCodeLine{00035\ \ \ \textcolor{keywordtype}{int}\ effective\_filter\_size\ =\ (filter\_size\ -\/\ 1)\ *\ dilation\_rate\ +\ 1;}
+\DoxyCodeLine{00036\ \ \ \textcolor{keywordtype}{int}\ total\_padding\ =}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ ((out\_size\ -\/\ 1)\ *\ stride\ +\ effective\_filter\_size\ -\/\ in\_size);}
+\DoxyCodeLine{00038\ \ \ total\_padding\ =\ total\_padding\ >\ 0\ ?\ total\_padding\ :\ 0;}
+\DoxyCodeLine{00039\ \ \ *\mbox{\hyperlink{mirror__pad_8cpp_aed7ea92f45bd273dde380a45ddced592}{offset}}\ =\ total\_padding\ \%\ 2;}
+\DoxyCodeLine{00040\ \ \ \textcolor{keywordflow}{return}\ total\_padding\ /\ 2;}
+\DoxyCodeLine{00041\ \}}
+\DoxyCodeLine{00042\ }
+\DoxyCodeLine{00043\ \textcolor{comment}{//\ Matching\ GetWindowedOutputSize\ in\ TensorFlow.}}
+\DoxyCodeLine{00044\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{namespacetflite_aec89b2b31876741c6bcef2c1499d8be2}{ComputeOutSize}}(\mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2core_2c_2builtin__op__data_8h_a3fc860f917e2acc94e750df4e1626c3b}{TfLitePadding}}\ \mbox{\hyperlink{arc__mli_2conv_8cc_ad870e8457a2c13cdb2d9a3566118bb4e}{padding}},\ \textcolor{keywordtype}{int}\ image\_size,}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ filter\_size,\ \textcolor{keywordtype}{int}\ stride,\ \textcolor{keywordtype}{int}\ dilation\_rate\ =\ 1)\ \{}
+\DoxyCodeLine{00046\ \ \ \textcolor{keywordtype}{int}\ effective\_filter\_size\ =\ (filter\_size\ -\/\ 1)\ *\ dilation\_rate\ +\ 1;}
+\DoxyCodeLine{00047\ }
+\DoxyCodeLine{00048\ \ \ \textcolor{comment}{//\ TODO(b/186448822):\ This\ uses\ 0\ since\ the\ function\ has\ no\ other\ way\ to}}
+\DoxyCodeLine{00049\ \ \ \textcolor{comment}{//\ report\ error\ case}}
+\DoxyCodeLine{00050\ \ \ \textcolor{keywordflow}{if}\ (stride\ ==\ 0)\ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00051\ }
+\DoxyCodeLine{00052\ \ \ \textcolor{keywordflow}{switch}\ (\mbox{\hyperlink{arc__mli_2conv_8cc_ad870e8457a2c13cdb2d9a3566118bb4e}{padding}})\ \{}
+\DoxyCodeLine{00053\ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2core_2c_2builtin__op__data_8h_a3fc860f917e2acc94e750df4e1626c3bae0a2f50af1d5c61fa150525b1e60ff42}{kTfLitePaddingSame}}:}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ (image\_size\ +\ stride\ -\/\ 1)\ /\ stride;}
+\DoxyCodeLine{00055\ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2core_2c_2builtin__op__data_8h_a3fc860f917e2acc94e750df4e1626c3baed3130c1738b5b7d9e42db87696a7bc7}{kTfLitePaddingValid}}:}
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ (image\_size\ +\ stride\ -\/\ effective\_filter\_size)\ /\ stride;}
+\DoxyCodeLine{00057\ \ \ \ \ \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00059\ \ \ \}}
+\DoxyCodeLine{00060\ \}}
+\DoxyCodeLine{00061\ }
+\DoxyCodeLine{00062\ \textcolor{keyword}{inline}\ \mbox{\hyperlink{struct_tf_lite_padding_values}{TfLitePaddingValues}}\ \mbox{\hyperlink{namespacetflite_a270d2ff901934a9a22a791d44526ea7c}{ComputePaddingHeightWidth}}(}
+\DoxyCodeLine{00063\ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{l2__pool__2d__test_8cc_a2448e5c60032b597583b86bfcb69e21d}{stride\_height}},\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{l2__pool__2d__test_8cc_adcfa78f07b43a1901221a34ea1e82cd9}{stride\_width}},\ \textcolor{keywordtype}{int}\ dilation\_rate\_height,}
+\DoxyCodeLine{00064\ \ \ \ \ \textcolor{keywordtype}{int}\ dilation\_rate\_width,\ \textcolor{keywordtype}{int}\ in\_height,\ \textcolor{keywordtype}{int}\ in\_width,\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{l2__pool__2d__test_8cc_acf238b4af444482dfe40604d694519cc}{filter\_height}},}
+\DoxyCodeLine{00065\ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{l2__pool__2d__test_8cc_accf3b04ce9953ef985675706a9bb3c8a}{filter\_width}},\ \mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2core_2c_2builtin__op__data_8h_a3fc860f917e2acc94e750df4e1626c3b}{TfLitePadding}}\ \mbox{\hyperlink{arc__mli_2conv_8cc_ad870e8457a2c13cdb2d9a3566118bb4e}{padding}},\ \textcolor{keywordtype}{int}*\ out\_height,\ \textcolor{keywordtype}{int}*\ out\_width)\ \{}
+\DoxyCodeLine{00066\ \ \ *out\_width\ =\ \mbox{\hyperlink{namespacetflite_aec89b2b31876741c6bcef2c1499d8be2}{ComputeOutSize}}(\mbox{\hyperlink{arc__mli_2conv_8cc_ad870e8457a2c13cdb2d9a3566118bb4e}{padding}},\ in\_width,\ \mbox{\hyperlink{l2__pool__2d__test_8cc_accf3b04ce9953ef985675706a9bb3c8a}{filter\_width}},\ \mbox{\hyperlink{l2__pool__2d__test_8cc_adcfa78f07b43a1901221a34ea1e82cd9}{stride\_width}},}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ dilation\_rate\_width);}
+\DoxyCodeLine{00068\ \ \ *out\_height\ =\ \mbox{\hyperlink{namespacetflite_aec89b2b31876741c6bcef2c1499d8be2}{ComputeOutSize}}(\mbox{\hyperlink{arc__mli_2conv_8cc_ad870e8457a2c13cdb2d9a3566118bb4e}{padding}},\ in\_height,\ \mbox{\hyperlink{l2__pool__2d__test_8cc_acf238b4af444482dfe40604d694519cc}{filter\_height}},\ \mbox{\hyperlink{l2__pool__2d__test_8cc_a2448e5c60032b597583b86bfcb69e21d}{stride\_height}},}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ dilation\_rate\_height);}
+\DoxyCodeLine{00070\ }
+\DoxyCodeLine{00071\ \ \ \mbox{\hyperlink{struct_tf_lite_padding_values}{TfLitePaddingValues}}\ padding\_values;}
+\DoxyCodeLine{00072\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{mirror__pad_8cpp_aed7ea92f45bd273dde380a45ddced592}{offset}}\ =\ 0;}
+\DoxyCodeLine{00073\ \ \ padding\_values.\mbox{\hyperlink{struct_tf_lite_padding_values_a3f7a74d62a28cc2bfd223ce53929754b}{height}}\ =}
+\DoxyCodeLine{00074\ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_ae47c54edf1138858a54c92b81a2aac84}{ComputePaddingWithOffset}}(\mbox{\hyperlink{l2__pool__2d__test_8cc_a2448e5c60032b597583b86bfcb69e21d}{stride\_height}},\ dilation\_rate\_height,\ in\_height,}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{l2__pool__2d__test_8cc_acf238b4af444482dfe40604d694519cc}{filter\_height}},\ *out\_height,\ \&\mbox{\hyperlink{mirror__pad_8cpp_aed7ea92f45bd273dde380a45ddced592}{offset}});}
+\DoxyCodeLine{00076\ \ \ padding\_values.\mbox{\hyperlink{struct_tf_lite_padding_values_a191e7c9b82adfc70cbe069969bd15bf3}{height\_offset}}\ =\ \mbox{\hyperlink{mirror__pad_8cpp_aed7ea92f45bd273dde380a45ddced592}{offset}};}
+\DoxyCodeLine{00077\ \ \ padding\_values.\mbox{\hyperlink{struct_tf_lite_padding_values_aa82fffb30c71948b0a72883e97635a55}{width}}\ =}
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_ae47c54edf1138858a54c92b81a2aac84}{ComputePaddingWithOffset}}(\mbox{\hyperlink{l2__pool__2d__test_8cc_adcfa78f07b43a1901221a34ea1e82cd9}{stride\_width}},\ dilation\_rate\_width,\ in\_width,}
+\DoxyCodeLine{00079\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{l2__pool__2d__test_8cc_accf3b04ce9953ef985675706a9bb3c8a}{filter\_width}},\ *out\_width,\ \&\mbox{\hyperlink{mirror__pad_8cpp_aed7ea92f45bd273dde380a45ddced592}{offset}});}
+\DoxyCodeLine{00080\ \ \ padding\_values.\mbox{\hyperlink{struct_tf_lite_padding_values_a26b0a389742eb517e9cf7d5f7181c422}{width\_offset}}\ =\ \mbox{\hyperlink{mirror__pad_8cpp_aed7ea92f45bd273dde380a45ddced592}{offset}};}
+\DoxyCodeLine{00081\ \ \ \textcolor{keywordflow}{return}\ padding\_values;}
+\DoxyCodeLine{00082\ \}}
+\DoxyCodeLine{00083\ }
+\DoxyCodeLine{00084\ \textcolor{keyword}{inline}\ \mbox{\hyperlink{structtflite_1_1_padding3_d_values}{Padding3DValues}}\ \mbox{\hyperlink{namespacetflite_a7a33edf7d632a907f9054ad5728313e2}{ComputePadding3DValues}}(}
+\DoxyCodeLine{00085\ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{l2__pool__2d__test_8cc_a2448e5c60032b597583b86bfcb69e21d}{stride\_height}},\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{l2__pool__2d__test_8cc_adcfa78f07b43a1901221a34ea1e82cd9}{stride\_width}},\ \textcolor{keywordtype}{int}\ stride\_depth,}
+\DoxyCodeLine{00086\ \ \ \ \ \textcolor{keywordtype}{int}\ dilation\_rate\_height,\ \textcolor{keywordtype}{int}\ dilation\_rate\_width,\ \textcolor{keywordtype}{int}\ dilation\_rate\_depth,}
+\DoxyCodeLine{00087\ \ \ \ \ \textcolor{keywordtype}{int}\ in\_height,\ \textcolor{keywordtype}{int}\ in\_width,\ \textcolor{keywordtype}{int}\ in\_depth,\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{l2__pool__2d__test_8cc_acf238b4af444482dfe40604d694519cc}{filter\_height}},}
+\DoxyCodeLine{00088\ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{l2__pool__2d__test_8cc_accf3b04ce9953ef985675706a9bb3c8a}{filter\_width}},\ \textcolor{keywordtype}{int}\ filter\_depth,\ \mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2core_2c_2builtin__op__data_8h_a3fc860f917e2acc94e750df4e1626c3b}{TfLitePadding}}\ \mbox{\hyperlink{arc__mli_2conv_8cc_ad870e8457a2c13cdb2d9a3566118bb4e}{padding}},\ \textcolor{keywordtype}{int}*\ out\_height,}
+\DoxyCodeLine{00089\ \ \ \ \ \textcolor{keywordtype}{int}*\ out\_width,\ \textcolor{keywordtype}{int}*\ out\_depth)\ \{}
+\DoxyCodeLine{00090\ \ \ *out\_width\ =\ \mbox{\hyperlink{namespacetflite_aec89b2b31876741c6bcef2c1499d8be2}{ComputeOutSize}}(\mbox{\hyperlink{arc__mli_2conv_8cc_ad870e8457a2c13cdb2d9a3566118bb4e}{padding}},\ in\_width,\ \mbox{\hyperlink{l2__pool__2d__test_8cc_accf3b04ce9953ef985675706a9bb3c8a}{filter\_width}},\ \mbox{\hyperlink{l2__pool__2d__test_8cc_adcfa78f07b43a1901221a34ea1e82cd9}{stride\_width}},}
+\DoxyCodeLine{00091\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ dilation\_rate\_width);}
+\DoxyCodeLine{00092\ \ \ *out\_height\ =\ \mbox{\hyperlink{namespacetflite_aec89b2b31876741c6bcef2c1499d8be2}{ComputeOutSize}}(\mbox{\hyperlink{arc__mli_2conv_8cc_ad870e8457a2c13cdb2d9a3566118bb4e}{padding}},\ in\_height,\ \mbox{\hyperlink{l2__pool__2d__test_8cc_acf238b4af444482dfe40604d694519cc}{filter\_height}},\ \mbox{\hyperlink{l2__pool__2d__test_8cc_a2448e5c60032b597583b86bfcb69e21d}{stride\_height}},}
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ dilation\_rate\_height);}
+\DoxyCodeLine{00094\ \ \ *out\_depth\ =\ \mbox{\hyperlink{namespacetflite_aec89b2b31876741c6bcef2c1499d8be2}{ComputeOutSize}}(\mbox{\hyperlink{arc__mli_2conv_8cc_ad870e8457a2c13cdb2d9a3566118bb4e}{padding}},\ in\_depth,\ filter\_depth,\ stride\_depth,}
+\DoxyCodeLine{00095\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ dilation\_rate\_depth);}
+\DoxyCodeLine{00096\ }
+\DoxyCodeLine{00097\ \ \ \mbox{\hyperlink{structtflite_1_1_padding3_d_values}{Padding3DValues}}\ padding\_values;}
+\DoxyCodeLine{00098\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{mirror__pad_8cpp_aed7ea92f45bd273dde380a45ddced592}{offset}}\ =\ 0;}
+\DoxyCodeLine{00099\ \ \ padding\_values.\mbox{\hyperlink{structtflite_1_1_padding3_d_values_ab0119429c89a25473693d44c844a3694}{depth}}\ =}
+\DoxyCodeLine{00100\ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_ae47c54edf1138858a54c92b81a2aac84}{ComputePaddingWithOffset}}(stride\_depth,\ dilation\_rate\_depth,\ in\_depth,}
+\DoxyCodeLine{00101\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ filter\_depth,\ *out\_depth,\ \&\mbox{\hyperlink{mirror__pad_8cpp_aed7ea92f45bd273dde380a45ddced592}{offset}});}
+\DoxyCodeLine{00102\ \ \ padding\_values.\mbox{\hyperlink{structtflite_1_1_padding3_d_values_a109cffa3292315366628bc5e5bf1c6c4}{depth\_offset}}\ =\ \mbox{\hyperlink{mirror__pad_8cpp_aed7ea92f45bd273dde380a45ddced592}{offset}};}
+\DoxyCodeLine{00103\ \ \ padding\_values.\mbox{\hyperlink{structtflite_1_1_padding3_d_values_afbd0d2a26b28e8d2a2685f89a314d69c}{height}}\ =}
+\DoxyCodeLine{00104\ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_ae47c54edf1138858a54c92b81a2aac84}{ComputePaddingWithOffset}}(\mbox{\hyperlink{l2__pool__2d__test_8cc_a2448e5c60032b597583b86bfcb69e21d}{stride\_height}},\ dilation\_rate\_height,\ in\_height,}
+\DoxyCodeLine{00105\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{l2__pool__2d__test_8cc_acf238b4af444482dfe40604d694519cc}{filter\_height}},\ *out\_height,\ \&\mbox{\hyperlink{mirror__pad_8cpp_aed7ea92f45bd273dde380a45ddced592}{offset}});}
+\DoxyCodeLine{00106\ \ \ padding\_values.\mbox{\hyperlink{structtflite_1_1_padding3_d_values_a2030be60ca95a5bc1274133399f131d1}{height\_offset}}\ =\ \mbox{\hyperlink{mirror__pad_8cpp_aed7ea92f45bd273dde380a45ddced592}{offset}};}
+\DoxyCodeLine{00107\ \ \ padding\_values.\mbox{\hyperlink{structtflite_1_1_padding3_d_values_a391e35804bf41e4e44aab731b9159968}{width}}\ =}
+\DoxyCodeLine{00108\ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_ae47c54edf1138858a54c92b81a2aac84}{ComputePaddingWithOffset}}(\mbox{\hyperlink{l2__pool__2d__test_8cc_adcfa78f07b43a1901221a34ea1e82cd9}{stride\_width}},\ dilation\_rate\_width,\ in\_width,}
+\DoxyCodeLine{00109\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{l2__pool__2d__test_8cc_accf3b04ce9953ef985675706a9bb3c8a}{filter\_width}},\ *out\_width,\ \&\mbox{\hyperlink{mirror__pad_8cpp_aed7ea92f45bd273dde380a45ddced592}{offset}});}
+\DoxyCodeLine{00110\ \ \ padding\_values.\mbox{\hyperlink{structtflite_1_1_padding3_d_values_a08e6fbd0debcd41c8be0243e02af6602}{width\_offset}}\ =\ \mbox{\hyperlink{mirror__pad_8cpp_aed7ea92f45bd273dde380a45ddced592}{offset}};}
+\DoxyCodeLine{00111\ \ \ \textcolor{keywordflow}{return}\ padding\_values;}
+\DoxyCodeLine{00112\ \}}
+\DoxyCodeLine{00113\ \}\ \ \textcolor{comment}{//\ namespace\ tflite}}
+\DoxyCodeLine{00114\ }
+\DoxyCodeLine{00115\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ TENSORFLOW\_LITE\_KERNELS\_PADDING\_H\_}}
+
+\end{DoxyCode}

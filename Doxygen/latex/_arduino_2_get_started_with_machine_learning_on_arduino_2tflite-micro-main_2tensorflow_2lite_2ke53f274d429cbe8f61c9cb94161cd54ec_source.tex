@@ -1,0 +1,629 @@
+\doxysection{portable\+\_\+tensor\+\_\+utils.\+h}
+\hypertarget{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_2ke53f274d429cbe8f61c9cb94161cd54ec_source}{}\label{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_2ke53f274d429cbe8f61c9cb94161cd54ec_source}\index{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/main/tensorflow/lite/kernels/internal/portable\_tensor\_utils.h@{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/main/tensorflow/lite/kernels/internal/portable\_tensor\_utils.h}}
+\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_2ke53f274d429cbe8f61c9cb94161cd54ec}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{/*\ Copyright\ 2021\ The\ TensorFlow\ Authors.\ All\ Rights\ Reserved.}}
+\DoxyCodeLine{00002\ \textcolor{comment}{}}
+\DoxyCodeLine{00003\ \textcolor{comment}{Licensed\ under\ the\ Apache\ License,\ Version\ 2.0\ (the\ "{}License"{});}}
+\DoxyCodeLine{00004\ \textcolor{comment}{you\ may\ not\ use\ this\ file\ except\ in\ compliance\ with\ the\ License.}}
+\DoxyCodeLine{00005\ \textcolor{comment}{You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{00006\ \textcolor{comment}{}}
+\DoxyCodeLine{00007\ \textcolor{comment}{\ \ \ \ http://www.apache.org/licenses/LICENSE-\/2.0}}
+\DoxyCodeLine{00008\ \textcolor{comment}{}}
+\DoxyCodeLine{00009\ \textcolor{comment}{Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ software}}
+\DoxyCodeLine{00010\ \textcolor{comment}{distributed\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,}}
+\DoxyCodeLine{00011\ \textcolor{comment}{WITHOUT\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,\ either\ express\ or\ implied.}}
+\DoxyCodeLine{00012\ \textcolor{comment}{See\ the\ License\ for\ the\ specific\ language\ governing\ permissions\ and}}
+\DoxyCodeLine{00013\ \textcolor{comment}{limitations\ under\ the\ License.}}
+\DoxyCodeLine{00014\ \textcolor{comment}{==============================================================================*/}}
+\DoxyCodeLine{00015\ }
+\DoxyCodeLine{00016\ \textcolor{preprocessor}{\#ifndef\ TENSORFLOW\_LITE\_KERNELS\_INTERNAL\_PORTABLE\_TENSOR\_UTILS\_H\_}}
+\DoxyCodeLine{00017\ \textcolor{preprocessor}{\#define\ TENSORFLOW\_LITE\_KERNELS\_INTERNAL\_PORTABLE\_TENSOR\_UTILS\_H\_}}
+\DoxyCodeLine{00018\ }
+\DoxyCodeLine{00019\ \textcolor{preprocessor}{\#include\ <algorithm>}}
+\DoxyCodeLine{00020\ \textcolor{preprocessor}{\#include\ <cmath>}}
+\DoxyCodeLine{00021\ \textcolor{preprocessor}{\#include\ <cstdint>}}
+\DoxyCodeLine{00022\ }
+\DoxyCodeLine{00023\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/core/c/builtin\_op\_data.h"{}}}
+\DoxyCodeLine{00024\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/core/c/common.h"{}}}
+\DoxyCodeLine{00025\ }
+\DoxyCodeLine{00026\ \textcolor{preprocessor}{\#if\ defined(\_MSC\_VER)}}
+\DoxyCodeLine{00027\ \textcolor{preprocessor}{\#define\ \_\_restrict\_\_\ \_\_restrict}}
+\DoxyCodeLine{00028\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00029\ }
+\DoxyCodeLine{00030\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacetflite}{tflite}}\ \{}
+\DoxyCodeLine{00031\ }
+\DoxyCodeLine{00032\ \textcolor{comment}{//\ Not\ all\ backends\ support\ CpuBackendContext\ usage,\ so\ forward\ declare\ to\ avoid}}
+\DoxyCodeLine{00033\ \textcolor{comment}{//\ pulling\ in\ its\ implementation.\ Use\ of\ CpuBackendContext\ in\ method}}
+\DoxyCodeLine{00034\ \textcolor{comment}{//\ implementations\ is\ purely\ optional.}}
+\DoxyCodeLine{00035\ \textcolor{keyword}{class\ }CpuBackendContext;}
+\DoxyCodeLine{00036\ }
+\DoxyCodeLine{00037\ \textcolor{keyword}{namespace\ }tensor\_utils\ \{}
+\DoxyCodeLine{00038\ }
+\DoxyCodeLine{00039\ \textcolor{comment}{//\ Multiplies\ a\ matrix\ with\ a\ scalar\ and\ reduce\ the\ result\ on\ each\ row\ to\ a}}
+\DoxyCodeLine{00040\ \textcolor{comment}{//\ scalar.}}
+\DoxyCodeLine{00041\ \textcolor{comment}{//\ Parameters:}}
+\DoxyCodeLine{00042\ \textcolor{comment}{//\ \ \ \ \ -\/\ matrix:\ matrix\ of\ size\ n\_row\ *\ n\_col}}
+\DoxyCodeLine{00043\ \textcolor{comment}{//\ \ \ \ \ -\/\ scalar:\ the\ scalar\ that\ is\ multiplied\ to\ each\ element\ in\ the\ matrix}}
+\DoxyCodeLine{00044\ \textcolor{comment}{//\ \ \ \ \ -\/\ n\_row:\ \ the\ row\ count\ of\ the\ matrix}}
+\DoxyCodeLine{00045\ \textcolor{comment}{//\ \ \ \ \ -\/\ n\_col:\ \ the\ column\ count\ of\ the\ matrix}}
+\DoxyCodeLine{00046\ \textcolor{comment}{//\ \ \ \ \ -\/\ output:\ the\ 32bit\ output}}
+\DoxyCodeLine{00047\ \textcolor{comment}{//\ Note:\ We\ do\ not\ need\ saturation\ because\ the\ int8\ *\ int8\ is\ safe\ from\ overflow}}
+\DoxyCodeLine{00048\ \textcolor{comment}{//\ in\ (2\string^31-\/1)\ /\ (2\string^14)\ =\ 131072,\ which\ is\ bigger\ than\ the\ n\_row.\ Non-\/zero}}
+\DoxyCodeLine{00049\ \textcolor{comment}{//\ initial\ output\ value\ is\ not\ exceptionally\ large.}}
+\DoxyCodeLine{00050\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_aa6ec4142f3565c0a51dfc30afc04faed}{MatrixScalarMultiplyAccumulate}}(\textcolor{keyword}{const}\ int8\_t*\ matrix,\ int32\_t\ scalar,}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ int32\_t\ n\_row,\ int32\_t\ n\_col,}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ int32\_t*\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbcd3bbe90c4644d53fde1ce4e312f437_a7a2a916a8059078c2d7a05f46c7126fd}{output}});}
+\DoxyCodeLine{00053\ }
+\DoxyCodeLine{00054\ \textcolor{comment}{//\ Add\ another\ vector\ for\ each\ batch\ in\ the\ batch\ vector.}}
+\DoxyCodeLine{00055\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{00056\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_a19871bdff4f6f49d47a03aba2187f2e4}{VectorBatchVectorAdd}}(\textcolor{keyword}{const}\ T*\ vector,\ \textcolor{keywordtype}{int}\ v\_size,\ \textcolor{keywordtype}{int}\ n\_batch,}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ T*\ batch\_vector)\ \{}
+\DoxyCodeLine{00058\ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}}\ =\ 0;\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}}\ <\ n\_batch;\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}}++)\ \{}
+\DoxyCodeLine{00059\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ v\_size;\ ++i)\ \{}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ batch\_vector[i]\ +=\ vector[i];}
+\DoxyCodeLine{00061\ \ \ \ \ \}}
+\DoxyCodeLine{00062\ \ \ \ \ batch\_vector\ +=\ v\_size;}
+\DoxyCodeLine{00063\ \ \ \}}
+\DoxyCodeLine{00064\ \}}
+\DoxyCodeLine{00065\ }
+\DoxyCodeLine{00066\ \textcolor{comment}{//\ Cwise\ product\ of\ two\ vectors.}}
+\DoxyCodeLine{00067\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{00068\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_af2d6ac1d9d03ebac78f7d6346ac0ae83}{VectorVectorCwiseProduct}}(\textcolor{keyword}{const}\ T*\ vector1,\ \textcolor{keyword}{const}\ T*\ vector2,}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ v\_size,\ T*\ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}})\ \{}
+\DoxyCodeLine{00070\ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ v\ =\ 0;\ v\ <\ v\_size;\ v++)\ \{}
+\DoxyCodeLine{00071\ \ \ \ \ *\mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}}++\ =\ *vector1++\ *\ *vector2++;}
+\DoxyCodeLine{00072\ \ \ \}}
+\DoxyCodeLine{00073\ \}}
+\DoxyCodeLine{00074\ }
+\DoxyCodeLine{00075\ \textcolor{comment}{//\ Cwise\ product\ of\ a\ vector\ and\ a\ batch-\/vector.}}
+\DoxyCodeLine{00076\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{00077\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_a0ac4e61f41d58b070565ba9dc029bad3}{VectorBatchVectorCwiseProduct}}(\textcolor{keyword}{const}\ T*\ vector,\ \textcolor{keywordtype}{int}\ v\_size,}
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ T*\ batch\_vector,\ \textcolor{keywordtype}{int}\ n\_batch,}
+\DoxyCodeLine{00079\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ T*\ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}})\ \{}
+\DoxyCodeLine{00080\ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}}\ =\ 0;\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}}\ <\ n\_batch;\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}}++)\ \{}
+\DoxyCodeLine{00081\ \ \ \ \ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_af2d6ac1d9d03ebac78f7d6346ac0ae83}{VectorVectorCwiseProduct}}(vector,\ batch\_vector,\ v\_size,\ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}});}
+\DoxyCodeLine{00082\ \ \ \ \ \textcolor{comment}{//\ Update\ the\ pointers.}}
+\DoxyCodeLine{00083\ \ \ \ \ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}}\ +=\ v\_size;}
+\DoxyCodeLine{00084\ \ \ \ \ batch\_vector\ +=\ v\_size;}
+\DoxyCodeLine{00085\ \ \ \}}
+\DoxyCodeLine{00086\ \}}
+\DoxyCodeLine{00087\ }
+\DoxyCodeLine{00088\ \textcolor{comment}{//\ Cwise\ product\ and\ accumulate\ of\ two\ vectors.\ Since\ it's\ a\ MAC\ operation,\ the}}
+\DoxyCodeLine{00089\ \textcolor{comment}{//\ assumption\ here\ is\ that\ result\ array\ is\ initialized\ to\ valid\ values.}}
+\DoxyCodeLine{00090\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{00091\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_a8e089876da3bd7d112db1849f601cf95}{VectorVectorCwiseProductAccumulate}}(\textcolor{keyword}{const}\ T*\ \_\_restrict\_\_\ vector1,}
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ T*\ \_\_restrict\_\_\ vector2,}
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ v\_size,}
+\DoxyCodeLine{00094\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ T*\ \_\_restrict\_\_\ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}})\ \{}
+\DoxyCodeLine{00095\ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ v\ =\ 0;\ v\ <\ v\_size;\ v++)\ \{}
+\DoxyCodeLine{00096\ \ \ \ \ *\mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}}++\ +=\ *vector1++\ *\ *vector2++;}
+\DoxyCodeLine{00097\ \ \ \}}
+\DoxyCodeLine{00098\ \}}
+\DoxyCodeLine{00099\ }
+\DoxyCodeLine{00100\ \textcolor{comment}{//\ Cwise\ product\ and\ accumulate\ of\ a\ vector\ and\ a\ batch-\/vector.\ Since\ it's\ a\ MAC}}
+\DoxyCodeLine{00101\ \textcolor{comment}{//\ operation,\ the\ assumption\ here\ is\ that\ result\ array\ is\ initialized\ to\ valid}}
+\DoxyCodeLine{00102\ \textcolor{comment}{//\ values.}}
+\DoxyCodeLine{00103\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{00104\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_acd7492f35f64a6801fedf426f5f6a4fd}{VectorBatchVectorCwiseProductAccumulate}}(\textcolor{keyword}{const}\ T*\ vector,\ \textcolor{keywordtype}{int}\ v\_size,}
+\DoxyCodeLine{00105\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ T*\ batch\_vector,}
+\DoxyCodeLine{00106\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ n\_batch,\ T*\ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}})\ \{}
+\DoxyCodeLine{00107\ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}}\ =\ 0;\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}}\ <\ n\_batch;\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}}++)\ \{}
+\DoxyCodeLine{00108\ \ \ \ \ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_a8e089876da3bd7d112db1849f601cf95}{VectorVectorCwiseProductAccumulate}}(vector,\ batch\_vector,\ v\_size,\ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}});}
+\DoxyCodeLine{00109\ \ \ \ \ \textcolor{comment}{//\ Update\ the\ pointers.}}
+\DoxyCodeLine{00110\ \ \ \ \ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}}\ +=\ v\_size;}
+\DoxyCodeLine{00111\ \ \ \ \ batch\_vector\ +=\ v\_size;}
+\DoxyCodeLine{00112\ \ \ \}}
+\DoxyCodeLine{00113\ \}}
+\DoxyCodeLine{00114\ }
+\DoxyCodeLine{00115\ \textcolor{comment}{//\ Batch\ vector\ initialization\ with\ another\ vector.}}
+\DoxyCodeLine{00116\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{00117\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_ad73fe84d0b228eaaad81a948ad29af79}{VectorBatchVectorAssign}}(\textcolor{keyword}{const}\ T*\ vector,\ \textcolor{keywordtype}{int}\ v\_size,\ \textcolor{keywordtype}{int}\ n\_batch,}
+\DoxyCodeLine{00118\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ T*\ batch\_vector)\ \{}
+\DoxyCodeLine{00119\ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}}\ =\ 0;\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}}\ <\ n\_batch;\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}}++)\ \{}
+\DoxyCodeLine{00120\ \ \ \ \ std::copy\_n(vector,\ v\_size,\ batch\_vector\ +\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}}\ *\ v\_size);}
+\DoxyCodeLine{00121\ \ \ \}}
+\DoxyCodeLine{00122\ \}}
+\DoxyCodeLine{00123\ }
+\DoxyCodeLine{00124\ \textcolor{comment}{//\ Checks\ if\ all\ entries\ of\ vector\ are\ zero\ for\ float.}}
+\DoxyCodeLine{00125\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_a1f49fa548503159cd9a4ca681bf2c978}{IsZeroVector}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{float}*\ vector,\ \textcolor{keywordtype}{int}\ v\_size);}
+\DoxyCodeLine{00126\ }
+\DoxyCodeLine{00127\ \textcolor{comment}{//\ Checks\ if\ all\ entries\ of\ vector\ are\ zero\ for\ int8.}}
+\DoxyCodeLine{00128\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_a1f49fa548503159cd9a4ca681bf2c978}{IsZeroVector}}(\textcolor{keyword}{const}\ int8\_t*\ vector,\ \textcolor{keywordtype}{int}\ v\_size);}
+\DoxyCodeLine{00129\ }
+\DoxyCodeLine{00130\ \textcolor{comment}{//\ Quantizes\ a\ buffer\ of\ floating\ point\ values\ using\ a\ symmetric\ quantization}}
+\DoxyCodeLine{00131\ \textcolor{comment}{//\ (i.e.\ linear\ quantization\ without\ an\ offset)\ to\ 8-\/bit\ signed\ integers.}}
+\DoxyCodeLine{00132\ \textcolor{comment}{//\ It\ also\ outputs\ the\ range\ (min,\ max)\ of\ the\ floating\ point\ buffer,\ and\ the}}
+\DoxyCodeLine{00133\ \textcolor{comment}{//\ scaling\ factor\ used\ to\ quantize\ the\ values.}}
+\DoxyCodeLine{00134\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_ad6f6cd2bf307d9d709470b6ee892aa4d}{SymmetricQuantizeFloats}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{float}*\ values,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{hello__world__model_8cc_a439227feff9d7f55384e8780cfc2eb82}{size}},}
+\DoxyCodeLine{00135\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ int8\_t*\ quantized\_values,\ \textcolor{keywordtype}{float}*\ min\_value,}
+\DoxyCodeLine{00136\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}*\ max\_value,\ \textcolor{keywordtype}{float}*\ scaling\_factor);}
+\DoxyCodeLine{00137\ }
+\DoxyCodeLine{00138\ \textcolor{comment}{//\ Quantizes\ a\ buffer\ of\ floating\ point\ values\ using\ a\ symmetric\ quantization}}
+\DoxyCodeLine{00139\ \textcolor{comment}{//\ (i.e.\ linear\ quantization\ without\ an\ offset)\ to\ 8-\/bit\ signed\ integers.}}
+\DoxyCodeLine{00140\ \textcolor{comment}{//\ It\ uses\ the\ range\ (min,\ max)\ provided\ to\ the\ function\ to\ calculate\ the}}
+\DoxyCodeLine{00141\ \textcolor{comment}{//\ appropriate\ scaling\ factor\ to\ quantize\ the\ values.}}
+\DoxyCodeLine{00142\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_ad6f6cd2bf307d9d709470b6ee892aa4d}{SymmetricQuantizeFloats}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{float}*\ values,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{hello__world__model_8cc_a439227feff9d7f55384e8780cfc2eb82}{size}},}
+\DoxyCodeLine{00143\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ int8\_t*\ quantized\_values,\ \textcolor{keywordtype}{float}\ min\_value,}
+\DoxyCodeLine{00144\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}\ max\_value,\ \textcolor{keywordtype}{float}*\ scaling\_factor);}
+\DoxyCodeLine{00145\ }
+\DoxyCodeLine{00146\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_aaca4048cfd0807a5ddb517474f3178d7}{AsymmetricQuantizeFloats}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{float}*\ values,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{hello__world__model_8cc_a439227feff9d7f55384e8780cfc2eb82}{size}},}
+\DoxyCodeLine{00147\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ int8\_t*\ quantized\_values,\ \textcolor{keywordtype}{float}*\ scaling\_factor,}
+\DoxyCodeLine{00148\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ int32\_t*\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcaf138809236f667e9686fdd4aaf17705_aed7ea92f45bd273dde380a45ddced592}{offset}});}
+\DoxyCodeLine{00149\ }
+\DoxyCodeLine{00150\ \textcolor{comment}{//\ Helper\ function\ to\ quantize\ floats.}}
+\DoxyCodeLine{00151\ \textcolor{comment}{//\ float\_data\_ptr\ \ \ \ \ input\ float\ vectors}}
+\DoxyCodeLine{00152\ \textcolor{comment}{//\ n\_batch\ \ \ \ \ \ \ \ \ \ \ \ number\ of\ input\ vectors}}
+\DoxyCodeLine{00153\ \textcolor{comment}{//\ n\_data\ \ \ \ \ \ \ \ \ \ \ \ \ size\ of\ a\ single\ input\ vector}}
+\DoxyCodeLine{00154\ \textcolor{comment}{//\ quantized\_data\_ptr\ (out)\ vector\ with\ quantized\ data}}
+\DoxyCodeLine{00155\ \textcolor{comment}{//\ scaling\_factors\ \ \ \ (out)\ scaling\ factors\ (one\ per\ vector)}}
+\DoxyCodeLine{00156\ \textcolor{comment}{//\ zero\_points\ \ \ \ \ \ \ \ (out)\ zero\ points\ (one\ per\ vector)}}
+\DoxyCodeLine{00157\ \textcolor{comment}{//\ do\_asymmetric\ \ \ \ \ \ controls\ if\ the\ quantization\ should\ be\ asymmetric.}}
+\DoxyCodeLine{00158\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_a641279c30789a1307fc603a4371694eb}{BatchQuantizeFloats}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{float}*\ float\_data\_ptr,\ \textcolor{keywordtype}{int}\ n\_batch,}
+\DoxyCodeLine{00159\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ n\_data,\ int8\_t*\ quantized\_data\_ptr,}
+\DoxyCodeLine{00160\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}*\ scaling\_factors,\ int32\_t*\ zero\_points,}
+\DoxyCodeLine{00161\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ do\_asymmetric)\ \{}
+\DoxyCodeLine{00162\ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}}\ =\ 0;\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}}\ <\ n\_batch;\ ++\mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}})\ \{}
+\DoxyCodeLine{00163\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcaf138809236f667e9686fdd4aaf17705_aed7ea92f45bd273dde380a45ddced592}{offset}}\ =\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}}\ *\ n\_data;}
+\DoxyCodeLine{00164\ \ \ \ \ \textcolor{keywordflow}{if}\ (do\_asymmetric)\ \{}
+\DoxyCodeLine{00165\ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_aaca4048cfd0807a5ddb517474f3178d7}{tensor\_utils::AsymmetricQuantizeFloats}}(}
+\DoxyCodeLine{00166\ \ \ \ \ \ \ \ \ \ \ float\_data\_ptr\ +\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcaf138809236f667e9686fdd4aaf17705_aed7ea92f45bd273dde380a45ddced592}{offset}},\ n\_data,\ quantized\_data\_ptr\ +\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcaf138809236f667e9686fdd4aaf17705_aed7ea92f45bd273dde380a45ddced592}{offset}},}
+\DoxyCodeLine{00167\ \ \ \ \ \ \ \ \ \ \ \&scaling\_factors[\mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}}],\ \&zero\_points[\mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}}]);}
+\DoxyCodeLine{00168\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00169\ \ \ \ \ \ \ \textcolor{keywordtype}{float}\ unused\_min,\ unused\_max;}
+\DoxyCodeLine{00170\ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_ad6f6cd2bf307d9d709470b6ee892aa4d}{tensor\_utils::SymmetricQuantizeFloats}}(}
+\DoxyCodeLine{00171\ \ \ \ \ \ \ \ \ \ \ float\_data\_ptr\ +\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcaf138809236f667e9686fdd4aaf17705_aed7ea92f45bd273dde380a45ddced592}{offset}},\ n\_data,\ quantized\_data\_ptr\ +\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcaf138809236f667e9686fdd4aaf17705_aed7ea92f45bd273dde380a45ddced592}{offset}},}
+\DoxyCodeLine{00172\ \ \ \ \ \ \ \ \ \ \ \&unused\_min,\ \&unused\_max,\ \&scaling\_factors[\mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}}]);}
+\DoxyCodeLine{00173\ \ \ \ \ \}}
+\DoxyCodeLine{00174\ \ \ \}}
+\DoxyCodeLine{00175\ \}}
+\DoxyCodeLine{00176\ }
+\DoxyCodeLine{00177\ \textcolor{comment}{//\ Multiplies\ a\ matrix\ by\ a\ "{}batched"{}\ vector\ (i.e.\ a\ matrix\ with\ a\ batch}}
+\DoxyCodeLine{00178\ \textcolor{comment}{//\ dimension\ composed\ by\ input\ vectors\ independent\ from\ each\ other).\ The\ result}}
+\DoxyCodeLine{00179\ \textcolor{comment}{//\ of\ the\ multiplication\ is\ accumulated\ to\ the\ passed\ result\ buffer.}}
+\DoxyCodeLine{00180\ \textcolor{comment}{//\ More\ specifically,\ for\ a\ matrix\ M\ of\ shape\ [n,\ i]\ and\ a\ batched-\/vector}}
+\DoxyCodeLine{00181\ \textcolor{comment}{//\ of\ shape\ [i,\ batch]\ it\ will\ first\ compute\ the\ product\ of\ shape\ [n,\ batch].}}
+\DoxyCodeLine{00182\ \textcolor{comment}{//\ This\ product\ will\ be\ accumulated\ to\ the\ result\ buffer.}}
+\DoxyCodeLine{00183\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_a7fa83cbe789fcec252e1f8fad0dded14}{MatrixBatchVectorMultiplyAccumulate}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{float}*\ matrix,\ \textcolor{keywordtype}{int}\ m\_rows,}
+\DoxyCodeLine{00184\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ m\_cols,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{float}*\ vector,}
+\DoxyCodeLine{00185\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ n\_batch,\ \textcolor{keywordtype}{float}*\ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}});}
+\DoxyCodeLine{00186\ }
+\DoxyCodeLine{00187\ \textcolor{comment}{//\ Same\ as\ the\ function\ above,\ but\ the\ matrix\ is\ a\ sparse\ tensor\ with\ block}}
+\DoxyCodeLine{00188\ \textcolor{comment}{//\ pattern\ 1x4.}}
+\DoxyCodeLine{00189\ \textcolor{comment}{//\ This\ function\ assumes\ that\ m\_cols\ is\ a\ multiple\ of\ the\ block\ size\ (4\ in\ this}}
+\DoxyCodeLine{00190\ \textcolor{comment}{//\ case)\ so\ that\ there's\ no\ incomplete\ block.}}
+\DoxyCodeLine{00191\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_ac03f033f390956884a385cbfe69e81ee}{SparseMatrixBatchVectorMultiplyAccumulate1x4}}(}
+\DoxyCodeLine{00192\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{float}*\ \_\_restrict\_\_\ matrix,\ \textcolor{keyword}{const}\ int32\_t*\ \_\_restrict\_\_\ segments,}
+\DoxyCodeLine{00193\ \ \ \ \ \textcolor{keyword}{const}\ int32\_t*\ \_\_restrict\_\_\ indices,\ \textcolor{keywordtype}{int}\ m\_rows,\ \textcolor{keywordtype}{int}\ m\_cols,}
+\DoxyCodeLine{00194\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{float}*\ \_\_restrict\_\_\ vector,\ \textcolor{keywordtype}{int}\ n\_batch,\ \textcolor{keywordtype}{float}*\ \_\_restrict\_\_\ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}});}
+\DoxyCodeLine{00195\ }
+\DoxyCodeLine{00196\ \textcolor{comment}{//\ Same\ as\ the\ function\ above,\ but\ the\ matrix\ is\ stored\ in\ block\ compressed}}
+\DoxyCodeLine{00197\ \textcolor{comment}{//\ sparse\ row\ format\ with\ block\ pattern\ 1x16\ which\ consists\ of\ two\ arrays:}}
+\DoxyCodeLine{00198\ \textcolor{comment}{//\ \ \ 1.\ A\ matrix\ array\ stores\ non-\/zero\ blocks\ of\ the\ matrix\ in\ row\ major.}}
+\DoxyCodeLine{00199\ \textcolor{comment}{//\ \ \ 2.\ A\ ledger\ array\ stores\ nrows\ groups,\ one\ group\ per\ row.\ Each\ group\ starts}}
+\DoxyCodeLine{00200\ \textcolor{comment}{//\ \ \ \ \ \ with\ an\ integer\ representing\ the\ number\ of\ non-\/zero\ blocks\ for\ the}}
+\DoxyCodeLine{00201\ \textcolor{comment}{//\ \ \ \ \ \ corresponding\ row\ and\ follows\ with\ column\ indexes\ of\ the\ first\ element}}
+\DoxyCodeLine{00202\ \textcolor{comment}{//\ \ \ \ \ \ of\ each\ non-\/zero\ block.}}
+\DoxyCodeLine{00203\ \textcolor{comment}{//\ This\ function\ assumes\ that}}
+\DoxyCodeLine{00204\ \textcolor{comment}{//\ \ \ 1.\ m\_cols\ is\ a\ multiple\ of\ 16\ so\ that\ all\ blocks\ are\ full\ blocks.}}
+\DoxyCodeLine{00205\ \textcolor{comment}{//\ \ \ 2.\ m\_cols\ <\ 254\ *\ 16\ so\ that\ block\ index\ can\ be\ represented\ by\ uint8.}}
+\DoxyCodeLine{00206\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_a246aaabdf1fa73214eabbd1953d2647b}{SparseMatrixBatchVectorMultiplyAccumulate}}(}
+\DoxyCodeLine{00207\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{float}*\ \_\_restrict\_\_\ matrix,\ \textcolor{keyword}{const}\ uint8\_t*\ \_\_restrict\_\_\ ledger,}
+\DoxyCodeLine{00208\ \ \ \ \ \textcolor{keywordtype}{int}\ m\_rows,\ \textcolor{keywordtype}{int}\ m\_cols,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{float}*\ \_\_restrict\_\_\ vector,\ \textcolor{keywordtype}{int}\ n\_batch,}
+\DoxyCodeLine{00209\ \ \ \ \ \textcolor{keywordtype}{float}*\ \_\_restrict\_\_\ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}});}
+\DoxyCodeLine{00210\ }
+\DoxyCodeLine{00211\ \textcolor{comment}{//\ Same\ as\ the\ function\ above,\ but\ for\ values\ quantized\ using\ symmetric}}
+\DoxyCodeLine{00212\ \textcolor{comment}{//\ quantization\ (e.g.\ by\ calling\ SymmetricQuantizeFloats).}}
+\DoxyCodeLine{00213\ \textcolor{comment}{//\ The\ passed\ scaling\ factors\ is\ a\ buffer\ of\ the\ quantization\ scaling\ factors}}
+\DoxyCodeLine{00214\ \textcolor{comment}{//\ that\ will\ be\ used\ to\ dequentize\ the\ products\ into\ the\ final\ result\ buffer.}}
+\DoxyCodeLine{00215\ \textcolor{comment}{//\ These\ scaling\ factors\ are\ the\ multiplication\ of\ the\ matrix\ scaling\ factor}}
+\DoxyCodeLine{00216\ \textcolor{comment}{//\ by\ the\ vector's\ scaling\ factor,\ one\ per\ batch\ (i.e.\ this\ allows\ quantizing}}
+\DoxyCodeLine{00217\ \textcolor{comment}{//\ each\ batch\ in\ the\ batch-\/vector\ matrix\ independently).}}
+\DoxyCodeLine{00218\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_a7fa83cbe789fcec252e1f8fad0dded14}{MatrixBatchVectorMultiplyAccumulate}}(}
+\DoxyCodeLine{00219\ \ \ \ \ \textcolor{keyword}{const}\ int8\_t*\ \_\_restrict\_\_\ matrix,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ m\_rows,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ m\_cols,}
+\DoxyCodeLine{00220\ \ \ \ \ \textcolor{keyword}{const}\ int8\_t*\ \_\_restrict\_\_\ vectors,}
+\DoxyCodeLine{00221\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{float}*\ \_\_restrict\_\_\ scaling\_factors,\ \textcolor{keywordtype}{int}\ n\_batch,}
+\DoxyCodeLine{00222\ \ \ \ \ \textcolor{keywordtype}{float}*\ \_\_restrict\_\_\ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}});}
+\DoxyCodeLine{00223\ }
+\DoxyCodeLine{00224\ \textcolor{comment}{//\ Same\ as\ the\ function\ above\ except\ that\ vector\ values}}
+\DoxyCodeLine{00225\ \textcolor{comment}{//\ are\ quantized\ with\ asymmetric\ quantization\ per-\/batch\ and\ the\ matrix}}
+\DoxyCodeLine{00226\ \textcolor{comment}{//\ is\ quantized\ per\ row.}}
+\DoxyCodeLine{00227\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_a7fa83cbe789fcec252e1f8fad0dded14}{MatrixBatchVectorMultiplyAccumulate}}(}
+\DoxyCodeLine{00228\ \ \ \ \ \textcolor{keyword}{const}\ int8\_t*\ \_\_restrict\_\_\ matrix,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ m\_rows,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ m\_cols,}
+\DoxyCodeLine{00229\ \ \ \ \ \textcolor{keyword}{const}\ int8\_t*\ \_\_restrict\_\_\ vectors,}
+\DoxyCodeLine{00230\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{float}*\ \_\_restrict\_\_\ scaling\_factors,\ \textcolor{keywordtype}{int}\ n\_batch,}
+\DoxyCodeLine{00231\ \ \ \ \ \textcolor{keywordtype}{float}*\ \_\_restrict\_\_\ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}},\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{float}*\ \_\_restrict\_\_\ per\_channel\_scale,}
+\DoxyCodeLine{00232\ \ \ \ \ \textcolor{keyword}{const}\ int32\_t*\ \_\_restrict\_\_\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src07231aa9a2b381aa3c97687e9f0d823d_ad4670fdc658d0517928e6b2c10b2259d}{input\_offset}});}
+\DoxyCodeLine{00233\ }
+\DoxyCodeLine{00234\ \textcolor{comment}{//\ Same\ as\ the\ function\ above,\ but\ the\ matrix\ is\ a\ sparse\ tensor\ with\ block}}
+\DoxyCodeLine{00235\ \textcolor{comment}{//\ pattern\ 1x16.}}
+\DoxyCodeLine{00236\ \textcolor{comment}{//\ This\ function\ assumes\ that\ m\_cols\ is\ a\ multiple\ of\ the\ block\ size\ (16\ in\ this}}
+\DoxyCodeLine{00237\ \textcolor{comment}{//\ case)\ so\ that\ there's\ no\ incomplete\ block.\ Also,\ it\ assumes\ all\ offsets\ of}}
+\DoxyCodeLine{00238\ \textcolor{comment}{//\ input,\ output\ and\ filter\ are\ zero.}}
+\DoxyCodeLine{00239\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_a3687fefe4c0a7e3d9215f9fb2715a5b9}{SparseMatrixBatchVectorMultiplyAccumulate1x16}}(}
+\DoxyCodeLine{00240\ \ \ \ \ \textcolor{keyword}{const}\ int8\_t*\ \_\_restrict\_\_\ matrix,\ \textcolor{keyword}{const}\ int32\_t*\ \_\_restrict\_\_\ segments,}
+\DoxyCodeLine{00241\ \ \ \ \ \textcolor{keyword}{const}\ int32\_t*\ \_\_restrict\_\_\ indices,\ \textcolor{keywordtype}{int}\ m\_rows,\ \textcolor{keywordtype}{int}\ m\_cols,}
+\DoxyCodeLine{00242\ \ \ \ \ \textcolor{keyword}{const}\ int8\_t*\ \_\_restrict\_\_\ vector,\ \textcolor{keyword}{const}\ int32\_t*\ \_\_restrict\_\_\ bias\_vector,}
+\DoxyCodeLine{00243\ \ \ \ \ \textcolor{keywordtype}{int}\ n\_batch,\ \textcolor{keyword}{const}\ int32\_t\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src07231aa9a2b381aa3c97687e9f0d823d_ad4670fdc658d0517928e6b2c10b2259d}{input\_offset}},\ \textcolor{keyword}{const}\ int32\_t\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src07231aa9a2b381aa3c97687e9f0d823d_a23e9f0626e0fdd28687b85e5065f904a}{output\_multiplier}},}
+\DoxyCodeLine{00244\ \ \ \ \ \textcolor{keyword}{const}\ int32\_t\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src07231aa9a2b381aa3c97687e9f0d823d_a239169c76410c3a81fd9cba67cc0bc8f}{output\_shift}},\ \textcolor{keyword}{const}\ int32\_t\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src07231aa9a2b381aa3c97687e9f0d823d_ab1dde269b1116cc98371e23a97740a58}{output\_offset}},}
+\DoxyCodeLine{00245\ \ \ \ \ \textcolor{keyword}{const}\ int32\_t\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src07231aa9a2b381aa3c97687e9f0d823d_a2e6a27b448848b3057c45363e04b7d0d}{output\_activation\_min}},\ \textcolor{keyword}{const}\ int32\_t\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src07231aa9a2b381aa3c97687e9f0d823d_aa889d7b51a3f84357d44f05993ac08a1}{output\_activation\_max}},}
+\DoxyCodeLine{00246\ \ \ \ \ int8\_t*\ \_\_restrict\_\_\ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}});}
+\DoxyCodeLine{00247\ }
+\DoxyCodeLine{00248\ \textcolor{comment}{//\ Same\ as\ the\ function\ above,\ but\ the\ matrix\ is\ stored\ in\ block\ compressed}}
+\DoxyCodeLine{00249\ \textcolor{comment}{//\ sparse\ row\ format\ with\ block\ pattern\ 1x16\ which\ consists\ of\ two\ arrays:}}
+\DoxyCodeLine{00250\ \textcolor{comment}{//\ \ \ 1.\ A\ matrix\ array\ stores\ non-\/zero\ blocks\ of\ the\ matrix\ in\ row\ major.}}
+\DoxyCodeLine{00251\ \textcolor{comment}{//\ \ \ 2.\ A\ ledger\ array\ stores\ nrows\ groups,\ one\ group\ per\ row.\ Each\ group\ starts}}
+\DoxyCodeLine{00252\ \textcolor{comment}{//\ \ \ \ \ \ with\ an\ integer\ representing\ the\ number\ of\ non-\/zero\ blocks\ for\ the}}
+\DoxyCodeLine{00253\ \textcolor{comment}{//\ \ \ \ \ \ corresponding\ row\ followed\ by\ column\ index\ of\ the\ first\ element\ of}}
+\DoxyCodeLine{00254\ \textcolor{comment}{//\ \ \ \ \ \ each\ non-\/zero\ block.}}
+\DoxyCodeLine{00255\ \textcolor{comment}{//\ This\ function\ assumes\ that}}
+\DoxyCodeLine{00256\ \textcolor{comment}{//\ \ \ 1.\ m\_cols\ is\ a\ multiple\ of\ 16\ so\ that\ all\ blocks\ are\ full\ blocks.}}
+\DoxyCodeLine{00257\ \textcolor{comment}{//\ \ \ 2.\ m\_cols\ <\ 254\ *\ 16\ so\ that\ block\ index\ can\ be\ represented\ by\ uint8.}}
+\DoxyCodeLine{00258\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_a246aaabdf1fa73214eabbd1953d2647b}{SparseMatrixBatchVectorMultiplyAccumulate}}(}
+\DoxyCodeLine{00259\ \ \ \ \ \textcolor{keyword}{const}\ int8\_t*\ \_\_restrict\_\_\ matrix,\ \textcolor{keyword}{const}\ uint8\_t*\ \_\_restrict\_\_\ ledger,}
+\DoxyCodeLine{00260\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ m\_rows,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ m\_cols,\ \textcolor{keyword}{const}\ int8\_t*\ \_\_restrict\_\_\ vectors,}
+\DoxyCodeLine{00261\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{float}*\ \_\_restrict\_\_\ scaling\_factors,\ \textcolor{keywordtype}{int}\ n\_batch,}
+\DoxyCodeLine{00262\ \ \ \ \ \textcolor{keywordtype}{float}*\ \_\_restrict\_\_\ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}});}
+\DoxyCodeLine{00263\ }
+\DoxyCodeLine{00264\ \textcolor{comment}{//\ Same\ as\ the\ above\ 8,\ 8,\ 8\ integer\ matmul\ except\ for\ the\ presence\ of\ zero}}
+\DoxyCodeLine{00265\ \textcolor{comment}{//\ point\ and\ non-\/accumulative.}}
+\DoxyCodeLine{00266\ \textcolor{comment}{//\ TODO(b/148688698):\ remove\ this\ function\ by\ folding\ zero\ point\ calculation\ in}}
+\DoxyCodeLine{00267\ \textcolor{comment}{//\ prepare()\ function.}}
+\DoxyCodeLine{00268\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_a5c3050bdbd554b288d59a1f909e3034c}{MatrixBatchVectorMultiply}}(\textcolor{keyword}{const}\ int8\_t*\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src5afb18c45f6346167aa977a363205143_a9cebfb3d6ddd692fbdd268cf4b9ad024}{input}},\ int32\_t\ input\_zeropoint,}
+\DoxyCodeLine{00269\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ int8\_t*\ input\_to\_gate\_weights,}
+\DoxyCodeLine{00270\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ int32\_t\ input\_to\_gate\_effective\_scale\_a,}
+\DoxyCodeLine{00271\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ int32\_t\ input\_to\_gate\_effective\_scale\_b,}
+\DoxyCodeLine{00272\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ int32\_t\ n\_batch,\ int32\_t\ n\_input,\ int32\_t\ n\_cell,}
+\DoxyCodeLine{00273\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ int8\_t*\ gate\_output,\ int8\_t\ gate\_output\_zp);}
+\DoxyCodeLine{00274\ }
+\DoxyCodeLine{00275\ \textcolor{comment}{//\ Same\ as\ above\ but\ has\ 16\ bit\ and\ 8\ bit\ input\ and\ 8\ bit\ output.}}
+\DoxyCodeLine{00276\ \textcolor{comment}{//\ Used\ in\ projection\ when\ hidden\ is\ 16bit.}}
+\DoxyCodeLine{00277\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_a5c3050bdbd554b288d59a1f909e3034c}{MatrixBatchVectorMultiply}}(\textcolor{keyword}{const}\ int16\_t*\ hidden,}
+\DoxyCodeLine{00278\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ int8\_t*\ hidden\_to\_output\_weights,}
+\DoxyCodeLine{00279\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ int32\_t\ proj\_effective\_scale\_a,}
+\DoxyCodeLine{00280\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ int32\_t\ proj\_effective\_scale\_b,}
+\DoxyCodeLine{00281\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ int32\_t*\ gate\_bias,\ int32\_t\ n\_batch,}
+\DoxyCodeLine{00282\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ int32\_t\ n\_hidden,\ int32\_t\ n\_output,}
+\DoxyCodeLine{00283\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ int32\_t\ output\_zp,\ int8\_t*\ proj\_output);}
+\DoxyCodeLine{00284\ }
+\DoxyCodeLine{00285\ \textcolor{comment}{//\ Apply\ Layer\ Normalization\ (https://arxiv.org/abs/1607.06450)\ to\ a\ Quantized}}
+\DoxyCodeLine{00286\ \textcolor{comment}{//\ vector.}}
+\DoxyCodeLine{00287\ \textcolor{comment}{//\ Parameters:}}
+\DoxyCodeLine{00288\ \textcolor{comment}{//\ \ \ \ \ -\/\ input:\ batch\ vector\ of\ size\ n\_batch\ *\ n\_input;\ 16\ bit.}}
+\DoxyCodeLine{00289\ \textcolor{comment}{//\ \ \ \ \ -\/\ layer\_norm\_weights:\ \ the\ quantized\ layer\ normalization\ weights.}}
+\DoxyCodeLine{00290\ \textcolor{comment}{//\ \ \ \ \ -\/\ bias:\ the\ bias\ for\ the\ layer\ normalization.}}
+\DoxyCodeLine{00291\ \textcolor{comment}{//\ \ \ \ \ -\/\ layer\_norm\_scale\_a:\ multiplier\ for\ scale\ factor.}}
+\DoxyCodeLine{00292\ \textcolor{comment}{//\ \ \ \ \ -\/\ layer\_norm\_scale\_b:\ shift\ for\ scale\ factor.}}
+\DoxyCodeLine{00293\ \textcolor{comment}{//\ \ \ \ \ -\/\ variance\_limit:\ the\ guard\ to\ make\ sure\ the\ inverse\ does\ not\ overflow.}}
+\DoxyCodeLine{00294\ \textcolor{comment}{//\ \ \ \ \ -\/\ n\_batch:\ the\ number\ of\ batches.}}
+\DoxyCodeLine{00295\ \textcolor{comment}{//\ \ \ \ \ -\/\ n\_input:\ the\ size\ for\ input\ and\ output.}}
+\DoxyCodeLine{00296\ \textcolor{comment}{//\ \ \ \ \ -\/\ output:\ \ the\ 16\ bit\ output}}
+\DoxyCodeLine{00297\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_ae3a437253dc60babd7f063cddb2f56a4}{ApplyLayerNorm}}(\textcolor{keyword}{const}\ int16\_t*\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src5afb18c45f6346167aa977a363205143_a9cebfb3d6ddd692fbdd268cf4b9ad024}{input}},\ \textcolor{keyword}{const}\ int16\_t*\ layer\_norm\_weights,}
+\DoxyCodeLine{00298\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ int32\_t*\ bias,\ int32\_t\ layer\_norm\_scale\_a,}
+\DoxyCodeLine{00299\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ int32\_t\ layer\_norm\_scale\_b,\ int32\_t\ variance\_limit,}
+\DoxyCodeLine{00300\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ n\_batch,\ \textcolor{keywordtype}{int}\ n\_input,\ int16\_t*\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbcd3bbe90c4644d53fde1ce4e312f437_a7a2a916a8059078c2d7a05f46c7126fd}{output}});}
+\DoxyCodeLine{00301\ }
+\DoxyCodeLine{00302\ \textcolor{comment}{//\ Same\ as\ above\ but\ the\ internal\ calculation\ is\ done\ in\ float.}}
+\DoxyCodeLine{00303\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_a67bc3bb5ec7593bd567afa6973cffd38}{ApplyLayerNormFloat}}(\textcolor{keyword}{const}\ int16\_t*\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src5afb18c45f6346167aa977a363205143_a9cebfb3d6ddd692fbdd268cf4b9ad024}{input}},}
+\DoxyCodeLine{00304\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ int16\_t*\ layer\_norm\_weights,}
+\DoxyCodeLine{00305\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ int32\_t\ layer\_norm\_scale\_a,\ int32\_t\ layer\_norm\_scale\_b,}
+\DoxyCodeLine{00306\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ int32\_t*\ bias,\ \textcolor{keywordtype}{int}\ n\_batch,\ \textcolor{keywordtype}{int}\ n\_input,}
+\DoxyCodeLine{00307\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ int16\_t*\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbcd3bbe90c4644d53fde1ce4e312f437_a7a2a916a8059078c2d7a05f46c7126fd}{output}});}
+\DoxyCodeLine{00308\ }
+\DoxyCodeLine{00309\ \textcolor{comment}{//\ Apply\ Sigmoid\ to\ a\ quantized\ vector.}}
+\DoxyCodeLine{00310\ \textcolor{comment}{//\ Parameters:}}
+\DoxyCodeLine{00311\ \textcolor{comment}{//\ \ \ \ \ -\/\ input:\ batch\ vector\ of\ size\ n\_batch\ *\ n\_input;\ 16\ bit.}}
+\DoxyCodeLine{00312\ \textcolor{comment}{//\ \ \ \ \ -\/\ n\_batch:\ the\ number\ of\ batches.}}
+\DoxyCodeLine{00313\ \textcolor{comment}{//\ \ \ \ \ -\/\ n\_input:\ the\ size\ for\ input\ and\ output.}}
+\DoxyCodeLine{00314\ \textcolor{comment}{//\ \ \ \ \ -\/\ output:\ \ the\ 16\ bit\ output}}
+\DoxyCodeLine{00315\ \textcolor{comment}{//\ The\ input\ is\ in\ Q3.12\ format\ and\ the\ output\ is\ in\ Q0.15\ format.}}
+\DoxyCodeLine{00316\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_ae8baef2267c575bc54ee5697a7a7277d}{ApplySigmoid}}(\textcolor{keyword}{const}\ int16\_t*\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src5afb18c45f6346167aa977a363205143_a9cebfb3d6ddd692fbdd268cf4b9ad024}{input}},\ int32\_t\ n\_batch,\ int32\_t\ n\_input,}
+\DoxyCodeLine{00317\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ int16\_t*\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbcd3bbe90c4644d53fde1ce4e312f437_a7a2a916a8059078c2d7a05f46c7126fd}{output}});}
+\DoxyCodeLine{00318\ }
+\DoxyCodeLine{00319\ \textcolor{comment}{//\ Same\ as\ above\ but\ the\ internal\ calcualtion\ is\ float.}}
+\DoxyCodeLine{00320\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_a670f91eba70d2d51dc385fc9f11c6c88}{ApplySigmoidFloat}}(\textcolor{keyword}{const}\ int16\_t*\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src5afb18c45f6346167aa977a363205143_a9cebfb3d6ddd692fbdd268cf4b9ad024}{input}},\ int32\_t\ n\_batch,\ int32\_t\ n\_input,}
+\DoxyCodeLine{00321\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ int16\_t*\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbcd3bbe90c4644d53fde1ce4e312f437_a7a2a916a8059078c2d7a05f46c7126fd}{output}});}
+\DoxyCodeLine{00322\ }
+\DoxyCodeLine{00323\ \textcolor{comment}{//\ Apply\ Tanh\ to\ a\ quantized\ vector.}}
+\DoxyCodeLine{00324\ \textcolor{comment}{//\ Parameters:}}
+\DoxyCodeLine{00325\ \textcolor{comment}{//\ \ \ \ \ -\/\ integer\_bits:\ the\ integer\ bits\ of\ the\ input.}}
+\DoxyCodeLine{00326\ \textcolor{comment}{//\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Currently\ supports\ 0,\ 1,\ 2,\ 3,\ 4,\ 5,\ 6.}}
+\DoxyCodeLine{00327\ \textcolor{comment}{//\ \ \ \ \ -\/\ input:\ batch\ vector\ of\ size\ n\_batch\ *\ n\_input;\ 16\ bit.}}
+\DoxyCodeLine{00328\ \textcolor{comment}{//\ \ \ \ \ -\/\ n\_batch:\ the\ number\ of\ batches.}}
+\DoxyCodeLine{00329\ \textcolor{comment}{//\ \ \ \ \ -\/\ n\_input:\ the\ size\ for\ input\ and\ output.}}
+\DoxyCodeLine{00330\ \textcolor{comment}{//\ \ \ \ \ -\/\ output:\ \ the\ 16\ bit\ output}}
+\DoxyCodeLine{00331\ \textcolor{comment}{//\ The\ input\ is\ in\ Qm.15-\/m\ format\ and\ the\ output\ is\ in\ Q0.15\ format.}}
+\DoxyCodeLine{00332\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_af5224fd4d02e02759666a101f7ad9b56}{ApplyTanh}}(int32\_t\ intger\_bits,\ \textcolor{keyword}{const}\ int16\_t*\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src5afb18c45f6346167aa977a363205143_a9cebfb3d6ddd692fbdd268cf4b9ad024}{input}},\ int32\_t\ n\_batch,}
+\DoxyCodeLine{00333\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ int32\_t\ n\_input,\ int16\_t*\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbcd3bbe90c4644d53fde1ce4e312f437_a7a2a916a8059078c2d7a05f46c7126fd}{output}});}
+\DoxyCodeLine{00334\ }
+\DoxyCodeLine{00335\ \textcolor{comment}{//\ Apply\ Tanh\ to\ a\ quantized\ vector.\ Tbe\ internal\ calculation\ is\ in\ float.}}
+\DoxyCodeLine{00336\ \textcolor{comment}{//\ \ \ \ -\/\ Input\ has\ 2\string^(integer\_bits)\ as\ scale.}}
+\DoxyCodeLine{00337\ \textcolor{comment}{//\ \ \ \ -\/\ Output\ has\ Q0.15\ as\ scale.}}
+\DoxyCodeLine{00338\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_ad409d55a899099431b20de28fbd10ab0}{ApplyTanhFloat}}(\textcolor{keyword}{const}\ int16\_t*\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src5afb18c45f6346167aa977a363205143_a9cebfb3d6ddd692fbdd268cf4b9ad024}{input}},\ int32\_t\ n\_batch,\ int32\_t\ n\_input,}
+\DoxyCodeLine{00339\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ int32\_t\ integer\_bits,\ int16\_t*\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbcd3bbe90c4644d53fde1ce4e312f437_a7a2a916a8059078c2d7a05f46c7126fd}{output}});}
+\DoxyCodeLine{00340\ }
+\DoxyCodeLine{00341\ \textcolor{comment}{//\ Element-\/wise\ multiplication\ of\ two\ quantized\ vectors.}}
+\DoxyCodeLine{00342\ \textcolor{comment}{//\ Parameters:}}
+\DoxyCodeLine{00343\ \textcolor{comment}{//\ \ \ \ \ -\/\ input\_1:\ batch\ vector\ of\ size\ n\_batch\ *\ n\_input;\ 16\ bit.}}
+\DoxyCodeLine{00344\ \textcolor{comment}{//\ \ \ \ \ -\/\ input\_2:\ batch\ vector\ of\ size\ n\_batch\ *\ n\_input;\ 16\ bit.}}
+\DoxyCodeLine{00345\ \textcolor{comment}{//\ \ \ \ \ -\/\ n\_batch:\ the\ number\ of\ batches.}}
+\DoxyCodeLine{00346\ \textcolor{comment}{//\ \ \ \ \ -\/\ n\_input:\ the\ size\ for\ input\ and\ output.}}
+\DoxyCodeLine{00347\ \textcolor{comment}{//\ \ \ \ \ -\/\ shift:\ \ \ the\ shift\ needed\ to\ produce\ the\ output.}}
+\DoxyCodeLine{00348\ \textcolor{comment}{//\ \ \ \ \ -\/\ output:\ \ the\ 16\ bit\ output\ of\ size\ n\_batch\ *\ n\_input.}}
+\DoxyCodeLine{00349\ \textcolor{comment}{//\ Output\ does\ not\ need\ to\ be\ initialized.}}
+\DoxyCodeLine{00350\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_a00b791515d2acb7d88f09cfd9cddd2bf}{CwiseMul}}(\textcolor{keyword}{const}\ int16\_t*\ input\_1,\ \textcolor{keyword}{const}\ int16\_t*\ input\_2,\ \textcolor{keywordtype}{int}\ n\_batch,}
+\DoxyCodeLine{00351\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ n\_input,\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{wm8960__regs_8h_ace4e4903c356d90d7a0e7548fc1e8b50}{shift}},\ int16\_t*\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbcd3bbe90c4644d53fde1ce4e312f437_a7a2a916a8059078c2d7a05f46c7126fd}{output}});}
+\DoxyCodeLine{00352\ }
+\DoxyCodeLine{00353\ \textcolor{comment}{//\ Element-\/wise\ multiplication\ of\ two\ quantized\ vectors.}}
+\DoxyCodeLine{00354\ \textcolor{comment}{//\ Parameters:}}
+\DoxyCodeLine{00355\ \textcolor{comment}{//\ \ \ \ \ -\/\ input\_1:\ batch\ vector\ of\ size\ n\_batch\ *\ n\_input;\ 16\ bit.}}
+\DoxyCodeLine{00356\ \textcolor{comment}{//\ \ \ \ \ -\/\ input\_2:\ batch\ vector\ of\ size\ n\_batch\ *\ n\_input;\ 16\ bit.}}
+\DoxyCodeLine{00357\ \textcolor{comment}{//\ \ \ \ \ -\/\ n\_batch:\ the\ number\ of\ batches.}}
+\DoxyCodeLine{00358\ \textcolor{comment}{//\ \ \ \ \ -\/\ n\_input:\ the\ size\ for\ input\ and\ output.}}
+\DoxyCodeLine{00359\ \textcolor{comment}{//\ \ \ \ \ -\/\ shift:\ \ \ the\ shift\ needed\ to\ produce\ the\ output.}}
+\DoxyCodeLine{00360\ \textcolor{comment}{//\ \ \ \ \ -\/\ output:\ \ the\ 8\ bit\ output\ of\ size\ n\_batch\ *\ n\_input.}}
+\DoxyCodeLine{00361\ \textcolor{comment}{//\ Output\ does\ not\ need\ to\ be\ initialized.}}
+\DoxyCodeLine{00362\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_a00b791515d2acb7d88f09cfd9cddd2bf}{CwiseMul}}(\textcolor{keyword}{const}\ int16\_t*\ input\_1,\ \textcolor{keyword}{const}\ int16\_t*\ input\_2,\ \textcolor{keywordtype}{int}\ n\_batch,}
+\DoxyCodeLine{00363\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ n\_input,\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{wm8960__regs_8h_ace4e4903c356d90d7a0e7548fc1e8b50}{shift}},\ int8\_t*\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbcd3bbe90c4644d53fde1ce4e312f437_a7a2a916a8059078c2d7a05f46c7126fd}{output}});}
+\DoxyCodeLine{00364\ }
+\DoxyCodeLine{00365\ \textcolor{comment}{//\ Element-\/wise\ multiplication\ of\ two\ quantized\ vectors\ with\ rescaling.}}
+\DoxyCodeLine{00366\ \textcolor{comment}{//\ Parameters:}}
+\DoxyCodeLine{00367\ \textcolor{comment}{//\ \ \ \ \ -\/\ input\_1:\ \ \ \ batch\ vector\ of\ size\ n\_batch\ *\ n\_input;\ 16\ bit.}}
+\DoxyCodeLine{00368\ \textcolor{comment}{//\ \ \ \ \ -\/\ input\_2:\ \ \ \ batch\ vector\ of\ size\ n\_batch\ *\ n\_input;\ 16\ bit.}}
+\DoxyCodeLine{00369\ \textcolor{comment}{//\ \ \ \ \ -\/\ multiplier:\ the\ multiplier\ part\ of\ scale.}}
+\DoxyCodeLine{00370\ \textcolor{comment}{//\ \ \ \ \ -\/\ shift:\ \ \ \ \ \ the\ shift\ part\ of\ scale.}}
+\DoxyCodeLine{00371\ \textcolor{comment}{//\ \ \ \ \ -\/\ n\_batch:\ \ \ \ the\ number\ of\ batches.}}
+\DoxyCodeLine{00372\ \textcolor{comment}{//\ \ \ \ \ -\/\ n\_input:\ \ \ \ the\ size\ for\ input\ and\ output.}}
+\DoxyCodeLine{00373\ \textcolor{comment}{//\ \ \ \ \ -\/\ output:\ \ \ \ \ the\ 8\ bit\ output\ of\ size\ n\_batch\ *\ n\_input.}}
+\DoxyCodeLine{00374\ \textcolor{comment}{//\ \ \ \ \ -\/\ output\_zp:\ \ the\ zero\ point\ of\ output.}}
+\DoxyCodeLine{00375\ \textcolor{comment}{//\ Output\ does\ not\ need\ to\ be\ initialized.}}
+\DoxyCodeLine{00376\ \textcolor{comment}{//\ Multiplier\ ("{}m"{})\ and\ shift\ ("{}s"{})\ are\ connected\ to\ scale\ ("{}s"{})\ with\ s\ =\ m\ *}}
+\DoxyCodeLine{00377\ \textcolor{comment}{//\ 2\string^(s\ -\/\ 31).}}
+\DoxyCodeLine{00378\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_a00b791515d2acb7d88f09cfd9cddd2bf}{CwiseMul}}(\textcolor{keyword}{const}\ int16\_t*\ input\_1,\ \textcolor{keyword}{const}\ int16\_t*\ input\_2,}
+\DoxyCodeLine{00379\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ int32\_t\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srceb17155221795f6c84adc198b18f61e2_aa48e56822ed6e4a79d6c8c3b688ca8d3}{multiplier}},\ int32\_t\ \mbox{\hyperlink{wm8960__regs_8h_ace4e4903c356d90d7a0e7548fc1e8b50}{shift}},\ int32\_t\ n\_batch,}
+\DoxyCodeLine{00380\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ int32\_t\ n\_input,\ int32\_t\ output\_zp,\ int8\_t*\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbcd3bbe90c4644d53fde1ce4e312f437_a7a2a916a8059078c2d7a05f46c7126fd}{output}});}
+\DoxyCodeLine{00381\ }
+\DoxyCodeLine{00382\ \textcolor{comment}{//\ Element-\/wise\ saturating\ addition\ of\ two\ quantized\ vectors\ without\ rescaling.}}
+\DoxyCodeLine{00383\ \textcolor{comment}{//\ Parameters:}}
+\DoxyCodeLine{00384\ \textcolor{comment}{//\ \ \ \ \ -\/\ input\_1:\ \ \ \ batch\ vector\ of\ size\ n\_batch\ *\ n\_input;\ 16\ bit.}}
+\DoxyCodeLine{00385\ \textcolor{comment}{//\ \ \ \ \ -\/\ input\_2:\ \ \ \ batch\ vector\ of\ size\ n\_batch\ *\ n\_input;\ 16\ bit.}}
+\DoxyCodeLine{00386\ \textcolor{comment}{//\ \ \ \ \ -\/\ n\_batch:\ \ \ \ the\ number\ of\ batches.}}
+\DoxyCodeLine{00387\ \textcolor{comment}{//\ \ \ \ \ -\/\ n\_input:\ \ \ \ the\ size\ for\ input\ and\ output.}}
+\DoxyCodeLine{00388\ \textcolor{comment}{//\ \ \ \ \ -\/\ output:\ \ \ \ \ the\ 8\ bit\ output\ of\ size\ n\_batch\ *\ n\_input.}}
+\DoxyCodeLine{00389\ \textcolor{comment}{//\ Output\ does\ not\ need\ to\ be\ initialized.}}
+\DoxyCodeLine{00390\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_a2e9fbef0ca0139e4da07d28b1fb70b88}{CwiseAdd}}(\textcolor{keyword}{const}\ int16\_t*\ input\_1,\ \textcolor{keyword}{const}\ int16\_t*\ input\_2,\ \textcolor{keywordtype}{int}\ n\_batch,}
+\DoxyCodeLine{00391\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ n\_input,\ int16\_t*\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbcd3bbe90c4644d53fde1ce4e312f437_a7a2a916a8059078c2d7a05f46c7126fd}{output}});}
+\DoxyCodeLine{00392\ }
+\DoxyCodeLine{00393\ \textcolor{comment}{//\ Element-\/wise\ in-\/place\ clipping\ of\ a\ vector.\ Overloaded\ for\ float,\ int16\_t,}}
+\DoxyCodeLine{00394\ \textcolor{comment}{//\ int8\_t.\ Parameters:}}
+\DoxyCodeLine{00395\ \textcolor{comment}{//\ \ \ \ \ -\/\ vector:\ \ \ \ \ \ \ \ \ vector\ of\ size\ v\_size.}}
+\DoxyCodeLine{00396\ \textcolor{comment}{//\ \ \ \ \ -\/\ v\_size:\ \ \ \ \ \ \ \ \ the\ size\ of\ the\ vector.}}
+\DoxyCodeLine{00397\ \textcolor{comment}{//\ \ \ \ \ -\/\ clipping\_value:\ the\ value\ used\ for\ clipping.}}
+\DoxyCodeLine{00398\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_a270fcc4f2976c9fbfd85ec3ef5fbea4d}{CwiseClipping}}(\textcolor{keywordtype}{float}*\ vector,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ v\_size,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{float}\ clipping\_value);}
+\DoxyCodeLine{00399\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_a270fcc4f2976c9fbfd85ec3ef5fbea4d}{CwiseClipping}}(int16\_t*\ vector,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ v\_size,}
+\DoxyCodeLine{00400\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ int16\_t\ clipping\_value);}
+\DoxyCodeLine{00401\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_a270fcc4f2976c9fbfd85ec3ef5fbea4d}{CwiseClipping}}(int8\_t*\ vector,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ v\_size,}
+\DoxyCodeLine{00402\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ int8\_t\ clipping\_value);}
+\DoxyCodeLine{00403\ }
+\DoxyCodeLine{00404\ \textcolor{comment}{//\ Dot\ product\ of\ two\ vectors.}}
+\DoxyCodeLine{00405\ \textcolor{keywordtype}{float}\ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_a40dd958ab0746e89e6bfe23cf4a4c6d0}{VectorVectorDotProduct}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{float}*\ vector1,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{float}*\ vector2,}
+\DoxyCodeLine{00406\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ v\_size);}
+\DoxyCodeLine{00407\ }
+\DoxyCodeLine{00408\ \textcolor{comment}{//\ Dot\ product\ of\ two\ batch\ vectors\ of\ size\ n\_batch\ *\ v\_size:}}
+\DoxyCodeLine{00409\ \textcolor{comment}{//\ vector1\ =\ [x\_1\_1,\ x\_1\_2,\ ...,\ x\_1\_vsize,}}
+\DoxyCodeLine{00410\ \textcolor{comment}{//\ \ \ \ \ \ \ \ \ \ \ \ x\_2\_1,\ x\_2\_2,\ ...,\ x\_2\_vsize,}}
+\DoxyCodeLine{00411\ \textcolor{comment}{//\ \ \ \ \ \ \ \ \ \ \ \ ...}}
+\DoxyCodeLine{00412\ \textcolor{comment}{//\ \ \ \ \ \ \ \ \ \ \ \ x\_nbatch\_1,...,\ x\_nbatch\_vsize]}}
+\DoxyCodeLine{00413\ \textcolor{comment}{//\ vector2\ =\ [y\_1\_1,\ y\_1\_2,\ ...,\ y\_1\_vsize,}}
+\DoxyCodeLine{00414\ \textcolor{comment}{//\ \ \ \ \ \ \ \ \ \ \ \ y\_2\_1,\ y\_2\_2,\ ...,\ y\_2\_vsize,}}
+\DoxyCodeLine{00415\ \textcolor{comment}{//\ \ \ \ \ \ \ \ \ \ \ \ ...}}
+\DoxyCodeLine{00416\ \textcolor{comment}{//\ \ \ \ \ \ \ \ \ \ \ \ y\_nbatch\_1,...,\ y\_nbatch\_vsize]}}
+\DoxyCodeLine{00417\ \textcolor{comment}{//\ Then\ result\ will\ be\ a\ vector\ of\ n\_batch\ size\ starting\ from\ 'result':}}
+\DoxyCodeLine{00418\ \textcolor{comment}{//\ [x\_1\_1\ *\ y\_1\_1\ +\ x\_1\_2\ *\ y\_1\_2\ +\ ...\ +\ x\_1\_vsize\ *\ y\_1\_vsize,}}
+\DoxyCodeLine{00419\ \textcolor{comment}{//\ \ x\_2\_1\ *\ y\_2\_1\ +\ x\_2\_2\ *\ y\_2\_2\ +\ ...\ +\ x\_2\_vsize\ *\ y\_2\_vsize,}}
+\DoxyCodeLine{00420\ \textcolor{comment}{//\ \ ...}}
+\DoxyCodeLine{00421\ \textcolor{comment}{//\ \ x\_nbatch\_1\ *\ y\_nbatch\_1\ +\ ...\ +\ x\_nbatch\_vsize\ *\ y\_nbatch\_vsize]}}
+\DoxyCodeLine{00422\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{00423\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_a0a308694788d08a58efcd1371084f54f}{BatchVectorBatchVectorDotProduct}}(\textcolor{keyword}{const}\ T*\ vector1,\ \textcolor{keyword}{const}\ T*\ vector2,}
+\DoxyCodeLine{00424\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ v\_size,\ \textcolor{keywordtype}{int}\ n\_batch,}
+\DoxyCodeLine{00425\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ T*\ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}})\ \{}
+\DoxyCodeLine{00426\ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}}\ =\ 0;\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}}\ <\ n\_batch;\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}}++)\ \{}
+\DoxyCodeLine{00427\ \ \ \ \ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}}[\mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}}]\ =\ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_a40dd958ab0746e89e6bfe23cf4a4c6d0}{VectorVectorDotProduct}}(vector1,\ vector2,\ v\_size);}
+\DoxyCodeLine{00428\ \ \ \ \ vector1\ +=\ v\_size;}
+\DoxyCodeLine{00429\ \ \ \ \ vector2\ +=\ v\_size;}
+\DoxyCodeLine{00430\ \ \ \}}
+\DoxyCodeLine{00431\ \}}
+\DoxyCodeLine{00432\ }
+\DoxyCodeLine{00433\ \textcolor{comment}{//\ Same\ as\ above\ but\ input\ is\ 16bit\ and\ output\ is\ 32bit.}}
+\DoxyCodeLine{00434\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_a0a308694788d08a58efcd1371084f54f}{BatchVectorBatchVectorDotProduct}}(\textcolor{keyword}{const}\ int16\_t*\ vector1,}
+\DoxyCodeLine{00435\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ int16\_t*\ vector2,\ \textcolor{keywordtype}{int}\ v\_size,}
+\DoxyCodeLine{00436\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ n\_batch,\ int32\_t*\ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}});}
+\DoxyCodeLine{00437\ }
+\DoxyCodeLine{00438\ \textcolor{comment}{//\ Same\ as\ above,\ but\ inputs\ are\ 16bit\ integer\ and\ output\ is\ 16bit\ integer.}}
+\DoxyCodeLine{00439\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_acd7492f35f64a6801fedf426f5f6a4fd}{VectorBatchVectorCwiseProductAccumulate}}(\textcolor{keyword}{const}\ int16\_t*\ vector,\ \textcolor{keywordtype}{int}\ v\_size,}
+\DoxyCodeLine{00440\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ int16\_t*\ batch\_vector,}
+\DoxyCodeLine{00441\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ n\_batch,\ int32\_t\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srceb17155221795f6c84adc198b18f61e2_aa48e56822ed6e4a79d6c8c3b688ca8d3}{multiplier}},}
+\DoxyCodeLine{00442\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{wm8960__regs_8h_ace4e4903c356d90d7a0e7548fc1e8b50}{shift}},\ int16\_t*\ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}});}
+\DoxyCodeLine{00443\ }
+\DoxyCodeLine{00444\ \textcolor{comment}{//\ Compute\ "{}1.0f\ -\/\ elements\ of\ vector"{}\ (used\ in\ CIFG).}}
+\DoxyCodeLine{00445\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_ad9f5c03e42698153f0ab3979c8b98523}{Sub1Vector}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{float}*\ vector,\ \textcolor{keywordtype}{int}\ v\_size,\ \textcolor{keywordtype}{float}*\ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}});}
+\DoxyCodeLine{00446\ }
+\DoxyCodeLine{00447\ \textcolor{comment}{//\ Compute\ "{}1.0f\ -\/\ elements\ of\ vector"{}\ (used\ in\ CIFG)\ for\ int16\ input.}}
+\DoxyCodeLine{00448\ \textcolor{comment}{//\ "{}vector"{}\ has\ range\ [0,\ 32767]\ because\ it\ is\ the\ output\ of\ sigmoid\ function.}}
+\DoxyCodeLine{00449\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_ad9f5c03e42698153f0ab3979c8b98523}{Sub1Vector}}(\textcolor{keyword}{const}\ int16\_t*\ vector,\ \textcolor{keywordtype}{int}\ v\_size,\ int16\_t*\ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}});}
+\DoxyCodeLine{00450\ }
+\DoxyCodeLine{00451\ \textcolor{comment}{//\ Reduce-\/sum\ on\ a\ float\ input\ vector:}}
+\DoxyCodeLine{00452\ \textcolor{comment}{//\ input\_vector:\ float\ pointer\ to\ input\ vector.}}
+\DoxyCodeLine{00453\ \textcolor{comment}{//\ output\_vector:\ float\ pointer\ to\ vector.}}
+\DoxyCodeLine{00454\ \textcolor{comment}{//\ output\_size:\ output\ vector\ size.}}
+\DoxyCodeLine{00455\ \textcolor{comment}{//\ reduction\_size:\ number\ of\ consecutive\ elements\ from\ input\ vector\ which\ are}}
+\DoxyCodeLine{00456\ \textcolor{comment}{//\ added\ to\ get\ one\ element\ of\ output.}}
+\DoxyCodeLine{00457\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_a695680608ead1c5de98a426e9aed0c96}{ReductionSumVector}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{float}*\ input\_vector,\ \textcolor{keywordtype}{float}*\ output\_vector,}
+\DoxyCodeLine{00458\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcaf138809236f667e9686fdd4aaf17705_ad8d3d4ec9395e78bb589ab744c5fbaaa}{output\_size}},\ \textcolor{keywordtype}{int}\ reduction\_size);}
+\DoxyCodeLine{00459\ }
+\DoxyCodeLine{00460\ \textcolor{comment}{//\ Same\ as\ above\ but\ input/output\ is\ 32\ bit\ integer.}}
+\DoxyCodeLine{00461\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_a695680608ead1c5de98a426e9aed0c96}{ReductionSumVector}}(\textcolor{keyword}{const}\ int32\_t*\ input\_vector,\ int32\_t*\ output\_vector,}
+\DoxyCodeLine{00462\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcaf138809236f667e9686fdd4aaf17705_ad8d3d4ec9395e78bb589ab744c5fbaaa}{output\_size}},\ \textcolor{keywordtype}{int}\ reduction\_size);}
+\DoxyCodeLine{00463\ }
+\DoxyCodeLine{00464\ \textcolor{comment}{//\ Same\ as\ above\ but\ input\ is\ 8\ bit\ integer.}}
+\DoxyCodeLine{00465\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_a695680608ead1c5de98a426e9aed0c96}{ReductionSumVector}}(\textcolor{keyword}{const}\ int8\_t*\ input\_vector,\ int32\_t*\ output\_vector,}
+\DoxyCodeLine{00466\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcaf138809236f667e9686fdd4aaf17705_ad8d3d4ec9395e78bb589ab744c5fbaaa}{output\_size}},\ \textcolor{keywordtype}{int}\ reduction\_size);}
+\DoxyCodeLine{00467\ }
+\DoxyCodeLine{00468\ \textcolor{comment}{//\ Multiply\ all\ elements\ of\ vector\ with\ a\ scalar.}}
+\DoxyCodeLine{00469\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_acb32e1681446e161dc3f1836f3a757ae}{VectorScalarMultiply}}(\textcolor{keyword}{const}\ int8\_t*\ vector,\ \textcolor{keywordtype}{int}\ v\_size,\ \textcolor{keywordtype}{float}\ \mbox{\hyperlink{batch__matmul__test_8cc_ab89fe30f475eefcbf59653d919c456bd}{scale}},}
+\DoxyCodeLine{00470\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}*\ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}});}
+\DoxyCodeLine{00471\ }
+\DoxyCodeLine{00472\ \textcolor{comment}{//\ Layer\ norm\ for\ each\ batch.}}
+\DoxyCodeLine{00473\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_a3de391bb3d11be44e4349d36f33320db}{MeanStddevNormalization}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{float}*\ input\_vector,\ \textcolor{keywordtype}{float}*\ output\_vector,}
+\DoxyCodeLine{00474\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ v\_size,\ \textcolor{keywordtype}{int}\ n\_batch);}
+\DoxyCodeLine{00475\ }
+\DoxyCodeLine{00476\ \textcolor{comment}{//\ Saturate\ Add\ with\ rescale\ on\ both\ inputs.}}
+\DoxyCodeLine{00477\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_a8bf1e3471ee86ce211a1f66afa9db512}{TwoGateSaturatingAdd}}(\textcolor{keyword}{const}\ int8\_t*\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src5afb18c45f6346167aa977a363205143_a9cebfb3d6ddd692fbdd268cf4b9ad024}{input}},\ int8\_t\ input\_zp,}
+\DoxyCodeLine{00478\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ int8\_t*\ recurrent,\ int8\_t\ recurrent\_zp,}
+\DoxyCodeLine{00479\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ int32\_t\ input\_effective\_scale\_a,}
+\DoxyCodeLine{00480\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ int32\_t\ input\_effective\_scale\_b,}
+\DoxyCodeLine{00481\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ int32\_t\ recurrent\_effective\_scale\_a,}
+\DoxyCodeLine{00482\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ int32\_t\ recurrent\_effective\_scale\_b,\ int32\_t\ n\_batch,}
+\DoxyCodeLine{00483\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ int32\_t\ n\_cell,\ int16\_t*\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbcd3bbe90c4644d53fde1ce4e312f437_a7a2a916a8059078c2d7a05f46c7126fd}{output}});}
+\DoxyCodeLine{00484\ }
+\DoxyCodeLine{00485\ \textcolor{comment}{//\ Same\ as\ the\ function\ above,\ but\ provide\ a\ scratch\ buffer\ for\ the}}
+\DoxyCodeLine{00486\ \textcolor{comment}{//\ int8\ x\ int8\ -\/>\ int32\ and\ a\ CpuBackendContext\ for\ the\ accumulator}}
+\DoxyCodeLine{00487\ \textcolor{comment}{//\ computation.}}
+\DoxyCodeLine{00488\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_a7fa83cbe789fcec252e1f8fad0dded14}{MatrixBatchVectorMultiplyAccumulate}}(}
+\DoxyCodeLine{00489\ \ \ \ \ \textcolor{keyword}{const}\ int8\_t*\ \_\_restrict\_\_\ matrix,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ m\_rows,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ m\_cols,}
+\DoxyCodeLine{00490\ \ \ \ \ \textcolor{keyword}{const}\ int8\_t*\ \_\_restrict\_\_\ vectors,}
+\DoxyCodeLine{00491\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{float}*\ \_\_restrict\_\_\ scaling\_factors,\ \textcolor{keywordtype}{int}\ n\_batch,}
+\DoxyCodeLine{00492\ \ \ \ \ int32\_t*\ \_\_restrict\_\_\ scratch,\ \textcolor{keywordtype}{float}*\ \_\_restrict\_\_\ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}},}
+\DoxyCodeLine{00493\ \ \ \ \ CpuBackendContext*\ \_\_restrict\_\_\ context);}
+\DoxyCodeLine{00494\ }
+\DoxyCodeLine{00495\ \textcolor{comment}{//\ Same\ as\ the\ function\ above\ except\ that\ can\ make\ use\ of\ cached\ row\ sums.}}
+\DoxyCodeLine{00496\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_a7fa83cbe789fcec252e1f8fad0dded14}{MatrixBatchVectorMultiplyAccumulate}}(}
+\DoxyCodeLine{00497\ \ \ \ \ \textcolor{keyword}{const}\ int8\_t*\ \_\_restrict\_\_\ matrix,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ m\_rows,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ m\_cols,}
+\DoxyCodeLine{00498\ \ \ \ \ \textcolor{keyword}{const}\ int8\_t*\ \_\_restrict\_\_\ vectors,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{float}*\ scaling\_factors,}
+\DoxyCodeLine{00499\ \ \ \ \ \textcolor{keywordtype}{int}\ n\_batch,\ \textcolor{keywordtype}{float}*\ \_\_restrict\_\_\ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}},\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{float}*\ per\_channel\_scale,}
+\DoxyCodeLine{00500\ \ \ \ \ \textcolor{keyword}{const}\ int32\_t*\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src07231aa9a2b381aa3c97687e9f0d823d_ad4670fdc658d0517928e6b2c10b2259d}{input\_offset}},\ int32\_t*\ scratch,\ int32\_t*\ row\_sums,}
+\DoxyCodeLine{00501\ \ \ \ \ \textcolor{keywordtype}{bool}*\ \mbox{\hyperlink{xtensa_2unidirectional__sequence__lstm_8cc_a58b1f1cca64a5f505e2170a29e471ae9}{compute\_row\_sums}},\ CpuBackendContext*\ context);}
+\DoxyCodeLine{00502\ }
+\DoxyCodeLine{00503\ \textcolor{comment}{//\ Same\ as\ the\ function\ above,\ but\ provides\ separate\ scaling\ factor\ for\ the}}
+\DoxyCodeLine{00504\ \textcolor{comment}{//\ matrix\ and\ the\ vectors.\ The\ scaling\ factors\ are\ multiplied\ in\ the}}
+\DoxyCodeLine{00505\ \textcolor{comment}{//\ scaling\_factor\_scratch\ buffer.}}
+\DoxyCodeLine{00506\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_a7fa83cbe789fcec252e1f8fad0dded14}{MatrixBatchVectorMultiplyAccumulate}}(}
+\DoxyCodeLine{00507\ \ \ \ \ \textcolor{keyword}{const}\ int8\_t*\ \_\_restrict\_\_\ matrix,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ m\_rows,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ m\_cols,}
+\DoxyCodeLine{00508\ \ \ \ \ \textcolor{keyword}{const}\ int8\_t*\ \_\_restrict\_\_\ vectors,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{float}\ matrix\_scaling\_factor,}
+\DoxyCodeLine{00509\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{float}*\ vector\_scaling\_factors,\ \textcolor{keywordtype}{int}\ n\_batch,}
+\DoxyCodeLine{00510\ \ \ \ \ \textcolor{keywordtype}{float}*\ \_\_restrict\_\_\ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}},\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{float}*\ per\_channel\_scale,}
+\DoxyCodeLine{00511\ \ \ \ \ \textcolor{keyword}{const}\ int32\_t*\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src07231aa9a2b381aa3c97687e9f0d823d_ad4670fdc658d0517928e6b2c10b2259d}{input\_offset}},\ int32\_t*\ scratch,\ int32\_t*\ row\_sums,}
+\DoxyCodeLine{00512\ \ \ \ \ \textcolor{keywordtype}{bool}*\ \mbox{\hyperlink{xtensa_2unidirectional__sequence__lstm_8cc_a58b1f1cca64a5f505e2170a29e471ae9}{compute\_row\_sums}},\ \textcolor{keywordtype}{float}*\ scaling\_factor\_scratch,}
+\DoxyCodeLine{00513\ \ \ \ \ CpuBackendContext*\ context)\ \{}
+\DoxyCodeLine{00514\ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}}\ =\ 0;\ \mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}}\ <\ n\_batch;\ ++\mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}})\ \{}
+\DoxyCodeLine{00515\ \ \ \ \ scaling\_factor\_scratch[\mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}}]\ =}
+\DoxyCodeLine{00516\ \ \ \ \ \ \ \ \ vector\_scaling\_factors[\mbox{\hyperlink{_test_a_p_d_s9960_color_8ino_a148e3876077787926724625411d6e7a9}{b}}]\ *\ matrix\_scaling\_factor;}
+\DoxyCodeLine{00517\ \ \ \}}
+\DoxyCodeLine{00518\ \ \ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_a7fa83cbe789fcec252e1f8fad0dded14}{MatrixBatchVectorMultiplyAccumulate}}(matrix,\ m\_rows,\ m\_cols,\ vectors,}
+\DoxyCodeLine{00519\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ scaling\_factor\_scratch,\ n\_batch,\ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}},}
+\DoxyCodeLine{00520\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ per\_channel\_scale,\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src07231aa9a2b381aa3c97687e9f0d823d_ad4670fdc658d0517928e6b2c10b2259d}{input\_offset}},\ scratch,}
+\DoxyCodeLine{00521\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ row\_sums,\ \mbox{\hyperlink{xtensa_2unidirectional__sequence__lstm_8cc_a58b1f1cca64a5f505e2170a29e471ae9}{compute\_row\_sums}},\ context);}
+\DoxyCodeLine{00522\ \}}
+\DoxyCodeLine{00523\ }
+\DoxyCodeLine{00524\ \textcolor{comment}{//\ Multiplies\ a\ matrix\ by\ a\ "{}batched"{}\ vector\ (i.e.\ a\ matrix\ with\ a\ batch}}
+\DoxyCodeLine{00525\ \textcolor{comment}{//\ dimension\ composed\ by\ input\ vectors\ independent\ from\ each\ other).\ The\ result}}
+\DoxyCodeLine{00526\ \textcolor{comment}{//\ of\ the\ multiplication\ is\ accumulated\ to\ the\ passed\ result\ buffer.}}
+\DoxyCodeLine{00527\ \textcolor{comment}{//\ More\ specifically,\ for\ a\ matrix\ M\ of\ shape\ [n,\ i]\ and\ a\ batched-\/vector}}
+\DoxyCodeLine{00528\ \textcolor{comment}{//\ of\ shape\ [i,\ batch]\ it\ will\ first\ compute\ the\ product\ of\ shape\ [n,\ batch].}}
+\DoxyCodeLine{00529\ \textcolor{comment}{//\ This\ product\ will\ be\ accumulated\ to\ the\ result\ buffer,}}
+\DoxyCodeLine{00530\ \textcolor{comment}{//\ Parameters:}}
+\DoxyCodeLine{00531\ \textcolor{comment}{//\ \ \ \ \ -\/\ input:\ batch\ vector\ of\ size\ n\_batch\ *\ n\_input}}
+\DoxyCodeLine{00532\ \textcolor{comment}{//\ \ \ \ \ -\/\ bias:\ \ vector\ of\ size\ b\_input}}
+\DoxyCodeLine{00533\ \textcolor{comment}{//\ \ \ \ \ -\/\ input\_to\_gate\_weights:\ matrix\ of\ size\ n\_input\ *\ n\_output}}
+\DoxyCodeLine{00534\ \textcolor{comment}{//\ \ \ \ \ -\/\ multiplier:\ scalar}}
+\DoxyCodeLine{00535\ \textcolor{comment}{//\ \ \ \ \ -\/\ shift:\ scalar}}
+\DoxyCodeLine{00536\ \textcolor{comment}{//\ \ \ \ \ -\/\ n\_batch:\ the\ batch\ size}}
+\DoxyCodeLine{00537\ \textcolor{comment}{//\ \ \ \ \ -\/\ n\_input:\ the\ input\ size}}
+\DoxyCodeLine{00538\ \textcolor{comment}{//\ \ \ \ \ -\/\ n\_output:\ the\ output\ size}}
+\DoxyCodeLine{00539\ \textcolor{comment}{//\ \ \ \ \ -\/\ output\_zp:\ the\ zero\ point\ of\ the\ output.}}
+\DoxyCodeLine{00540\ \textcolor{comment}{//\ \ \ \ \ -\/\ scratch:\ batch\ vector\ of\ size\ n\_batch\ *\ n\_output}}
+\DoxyCodeLine{00541\ \textcolor{comment}{//\ \ \ \ \ -\/\ output:\ the\ 16\ bit\ output}}
+\DoxyCodeLine{00542\ \textcolor{comment}{//\ Notes:}}
+\DoxyCodeLine{00543\ \textcolor{comment}{//\ \ \ \ \ -\/\ this\ is\ used\ for\ gate\ matmul:\ for\ non-\/cifg\ it\ is\ for\ input,\ forget,}}
+\DoxyCodeLine{00544\ \textcolor{comment}{//\ \ \ \ \ \ \ cell,\ output\ gates;\ for\ cifg,\ it\ is\ for\ forget,\ cell,\ output\ gates.}}
+\DoxyCodeLine{00545\ \textcolor{comment}{//\ \ \ \ \ -\/\ multiplier\ and\ shift\ combined\ gives\ the\ scale.}}
+\DoxyCodeLine{00546\ \textcolor{comment}{//\ \ \ \ \ -\/\ assumes\ input\ zero\ point\ is\ 0.}}
+\DoxyCodeLine{00547\ \textcolor{comment}{//\ \ \ \ \ -\/\ scratch\ is\ created\ for\ optimization\ purpose\ only.}}
+\DoxyCodeLine{00548\ \textcolor{comment}{//\ TODO(b/152066492):\ this\ can\ be\ removed\ if\ some\ future\ optimization}}
+\DoxyCodeLine{00549\ \textcolor{comment}{//\ work\ makes\ it\ unnecessary.}}
+\DoxyCodeLine{00550\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_a7fa83cbe789fcec252e1f8fad0dded14}{MatrixBatchVectorMultiplyAccumulate}}(}
+\DoxyCodeLine{00551\ \ \ \ \ \textcolor{keyword}{const}\ int8\_t*\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src5afb18c45f6346167aa977a363205143_a9cebfb3d6ddd692fbdd268cf4b9ad024}{input}},\ \textcolor{keyword}{const}\ int32\_t*\ bias,}
+\DoxyCodeLine{00552\ \ \ \ \ \textcolor{keyword}{const}\ int8\_t*\ input\_to\_gate\_weights,\ int32\_t\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srceb17155221795f6c84adc198b18f61e2_aa48e56822ed6e4a79d6c8c3b688ca8d3}{multiplier}},\ int32\_t\ \mbox{\hyperlink{wm8960__regs_8h_ace4e4903c356d90d7a0e7548fc1e8b50}{shift}},}
+\DoxyCodeLine{00553\ \ \ \ \ int32\_t\ n\_batch,\ int32\_t\ n\_input,\ int32\_t\ n\_output,\ int32\_t\ output\_zp,}
+\DoxyCodeLine{00554\ \ \ \ \ int32\_t*\ scratch,\ int16\_t*\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbcd3bbe90c4644d53fde1ce4e312f437_a7a2a916a8059078c2d7a05f46c7126fd}{output}},\ CpuBackendContext*\ context);}
+\DoxyCodeLine{00555\ }
+\DoxyCodeLine{00556\ \textcolor{comment}{//\ Multiplies\ a\ matrix\ by\ a\ "{}batched"{}\ vector\ (i.e.\ a\ matrix\ with\ a\ batch}}
+\DoxyCodeLine{00557\ \textcolor{comment}{//\ dimension\ composed\ by\ input\ vectors\ independent\ from\ each\ other).\ The\ result}}
+\DoxyCodeLine{00558\ \textcolor{comment}{//\ of\ the\ multiplication\ is\ accumulated\ to\ the\ passed\ result\ buffer.}}
+\DoxyCodeLine{00559\ \textcolor{comment}{//\ More\ specifically,\ for\ a\ matrix\ M\ of\ shape\ [n,\ i]\ and\ a\ batched-\/vector}}
+\DoxyCodeLine{00560\ \textcolor{comment}{//\ of\ shape\ [i,\ batch]\ it\ will\ first\ compute\ the\ product\ of\ shape\ [n,\ batch].}}
+\DoxyCodeLine{00561\ \textcolor{comment}{//\ This\ product\ will\ be\ accumulated\ to\ the\ result\ buffer,}}
+\DoxyCodeLine{00562\ \textcolor{comment}{//\ Parameters:}}
+\DoxyCodeLine{00563\ \textcolor{comment}{//\ \ \ \ \ -\/\ input:\ batch\ vector\ of\ size\ n\_batch\ *\ n\_input}}
+\DoxyCodeLine{00564\ \textcolor{comment}{//\ \ \ \ \ -\/\ bias:\ \ vector\ of\ size\ b\_input}}
+\DoxyCodeLine{00565\ \textcolor{comment}{//\ \ \ \ \ -\/\ input\_to\_gate\_weights:\ matrix\ of\ size\ n\_input\ *\ n\_output}}
+\DoxyCodeLine{00566\ \textcolor{comment}{//\ \ \ \ \ -\/\ multiplier:\ scalar}}
+\DoxyCodeLine{00567\ \textcolor{comment}{//\ \ \ \ \ -\/\ shift:\ scalar}}
+\DoxyCodeLine{00568\ \textcolor{comment}{//\ \ \ \ \ -\/\ n\_batch:\ the\ batch\ size}}
+\DoxyCodeLine{00569\ \textcolor{comment}{//\ \ \ \ \ -\/\ n\_input:\ the\ input\ size}}
+\DoxyCodeLine{00570\ \textcolor{comment}{//\ \ \ \ \ -\/\ n\_output:\ the\ output\ size}}
+\DoxyCodeLine{00571\ \textcolor{comment}{//\ \ \ \ \ -\/\ output\_zp:\ the\ zero\ point\ of\ the\ output.}}
+\DoxyCodeLine{00572\ \textcolor{comment}{//\ \ \ \ \ -\/\ scratch:\ batch\ vector\ of\ size\ n\_batch\ *\ n\_output}}
+\DoxyCodeLine{00573\ \textcolor{comment}{//\ \ \ \ \ -\/\ output:\ the\ 8\ bit\ output}}
+\DoxyCodeLine{00574\ \textcolor{comment}{//\ Notes:}}
+\DoxyCodeLine{00575\ \textcolor{comment}{//\ \ \ \ \ -\/\ this\ is\ used\ for\ projection\ matmul.}}
+\DoxyCodeLine{00576\ \textcolor{comment}{//\ \ \ \ \ -\/\ multiplier\ and\ shift\ combined\ gives\ the\ scale.}}
+\DoxyCodeLine{00577\ \textcolor{comment}{//\ \ \ \ \ -\/\ assumes\ input\ zero\ point\ is\ 0.}}
+\DoxyCodeLine{00578\ \textcolor{comment}{//\ \ \ \ \ -\/\ scratch\ is\ created\ for\ optimization\ purpose\ only.}}
+\DoxyCodeLine{00579\ \textcolor{comment}{//\ TODO(b/152066492):\ this\ can\ be\ removed\ if\ some\ future\ optimization}}
+\DoxyCodeLine{00580\ \textcolor{comment}{//\ work\ makes\ it\ unnecessary.}}
+\DoxyCodeLine{00581\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_a7fa83cbe789fcec252e1f8fad0dded14}{MatrixBatchVectorMultiplyAccumulate}}(}
+\DoxyCodeLine{00582\ \ \ \ \ \textcolor{keyword}{const}\ int8\_t*\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src5afb18c45f6346167aa977a363205143_a9cebfb3d6ddd692fbdd268cf4b9ad024}{input}},\ \textcolor{keyword}{const}\ int32\_t*\ bias,}
+\DoxyCodeLine{00583\ \ \ \ \ \textcolor{keyword}{const}\ int8\_t*\ input\_to\_gate\_weights,\ int32\_t\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srceb17155221795f6c84adc198b18f61e2_aa48e56822ed6e4a79d6c8c3b688ca8d3}{multiplier}},\ int32\_t\ \mbox{\hyperlink{wm8960__regs_8h_ace4e4903c356d90d7a0e7548fc1e8b50}{shift}},}
+\DoxyCodeLine{00584\ \ \ \ \ int32\_t\ n\_batch,\ int32\_t\ n\_input,\ int32\_t\ n\_output,\ int32\_t\ output\_zp,}
+\DoxyCodeLine{00585\ \ \ \ \ int32\_t*\ scratch,\ int8\_t*\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbcd3bbe90c4644d53fde1ce4e312f437_a7a2a916a8059078c2d7a05f46c7126fd}{output}},\ CpuBackendContext*\ context);}
+\DoxyCodeLine{00586\ }
+\DoxyCodeLine{00587\ \textcolor{comment}{//\ Apply\ Rectified\ Linear\ to\ elements\ of\ a\ vector.}}
+\DoxyCodeLine{00588\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_aa03ade239cf0c0cfdf5a4e8a721a48f2}{ApplyReluToVector}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{float}*\ \_\_restrict\_\_\ vector,\ \textcolor{keywordtype}{int}\ v\_size,}
+\DoxyCodeLine{00589\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}*\ \_\_restrict\_\_\ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}});}
+\DoxyCodeLine{00590\ }
+\DoxyCodeLine{00591\ \textcolor{comment}{//\ Apply\ Rectified\ Linear\ 1\ (cap\ to\ [-\/1;1])\ to\ elements\ of\ a\ vector}}
+\DoxyCodeLine{00592\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_a1a52621a880a5f7cda611280acf41f3f}{ApplyRelu1ToVector}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{float}*\ \_\_restrict\_\_\ vector,\ \textcolor{keywordtype}{int}\ v\_size,}
+\DoxyCodeLine{00593\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}*\ \_\_restrict\_\_\ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}});}
+\DoxyCodeLine{00594\ }
+\DoxyCodeLine{00595\ \textcolor{comment}{//\ Apply\ Rectified\ Linear\ 6\ (cap\ to\ [0;6])\ to\ elements\ of\ a\ vector}}
+\DoxyCodeLine{00596\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_ac736f360f79851978af17098b0de7b04}{ApplyRelu6ToVector}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{float}*\ \_\_restrict\_\_\ vector,\ \textcolor{keywordtype}{int}\ v\_size,}
+\DoxyCodeLine{00597\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}*\ \_\_restrict\_\_\ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}});}
+\DoxyCodeLine{00598\ }
+\DoxyCodeLine{00599\ \textcolor{comment}{//\ Apply\ signbit\ to\ elements\ of\ a\ vector}}
+\DoxyCodeLine{00600\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_a63ee5b071bf3024141202c1f43bb8d52}{ApplySignbitToVector}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{float}*\ \_\_restrict\_\_\ vector,\ \textcolor{keywordtype}{int}\ v\_size,}
+\DoxyCodeLine{00601\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}*\ \_\_restrict\_\_\ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}});}
+\DoxyCodeLine{00602\ }
+\DoxyCodeLine{00603\ \textcolor{comment}{//\ Unpack\ or\ inflate\ \`{}src\_buffer`\ by\ taking\ each\ element\ and\ splitting\ it\ as}}
+\DoxyCodeLine{00604\ \textcolor{comment}{//\ two\ elements\ into\ \`{}dst\_buffer`.}}
+\DoxyCodeLine{00605\ \textcolor{comment}{//\ Parameters:}}
+\DoxyCodeLine{00606\ \textcolor{comment}{//\ \ \ src\_buffer\ \ \ :\ Densely\ packed\ buffer\ containing\ int4\ values}}
+\DoxyCodeLine{00607\ \textcolor{comment}{//\ \ \ num\_elements\ :\ Number\ of\ elements\ stored\ in\ the\ buffer.\ Note\ that\ this\ can}}
+\DoxyCodeLine{00608\ \textcolor{comment}{//\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ be\ smaller\ than\ the\ size\ of\ \`{}src\_buffer`\ by\ 1\ if\ it's\ odd,}}
+\DoxyCodeLine{00609\ \textcolor{comment}{//\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ in\ which\ case\ the\ last\ nibble\ in\ \`{}src\_buffer`\ is\ ignored.}}
+\DoxyCodeLine{00610\ \textcolor{comment}{//\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ This\ should\ be\ equal\ to\ the\ size\ of\ \`{}dst\_buffer`.}}
+\DoxyCodeLine{00611\ \textcolor{comment}{//\ \ \ dst\_buffer\ \ \ :\ Buffer\ to\ unpack\ into.\ Should\ be\ allocated\ by\ the\ caller.}}
+\DoxyCodeLine{00612\ \textcolor{comment}{//\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Size\ should\ be\ at\ least\ \`{}num\_elements`.}}
+\DoxyCodeLine{00613\ \textcolor{comment}{//\ Notes:}}
+\DoxyCodeLine{00614\ \textcolor{comment}{//\ \ \ For\ example,\ given\ \`{}src\_buffer\ =\ \{0x12,\ 0x34\};`,\ calling\ this\ function}}
+\DoxyCodeLine{00615\ \textcolor{comment}{//\ \ \ will\ return\ \`{}dst\_buffer\ =\ \{0x02,\ 0x01,\ 0x04,\ 0x03\}`.}}
+\DoxyCodeLine{00616\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1tensor__utils_af14e9223f3b393e2c7760b3363936557}{UnpackDenseInt4IntoInt8}}(\textcolor{keyword}{const}\ int8\_t*\ src\_buffer,\ \textcolor{keywordtype}{int}\ num\_elements,}
+\DoxyCodeLine{00617\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ int8\_t*\ dst\_buffer);}
+\DoxyCodeLine{00618\ }
+\DoxyCodeLine{00619\ \}\ \ \textcolor{comment}{//\ namespace\ tensor\_utils}}
+\DoxyCodeLine{00620\ }
+\DoxyCodeLine{00621\ \}\ \ \textcolor{comment}{//\ namespace\ tflite}}
+\DoxyCodeLine{00622\ }
+\DoxyCodeLine{00623\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ TENSORFLOW\_LITE\_KERNELS\_INTERNAL\_PORTABLE\_TENSOR\_UTILS\_H\_}}
+
+\end{DoxyCode}

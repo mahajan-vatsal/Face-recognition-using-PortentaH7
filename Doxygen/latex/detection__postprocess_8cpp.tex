@@ -1,0 +1,222 @@
+\doxysection{Arduino/\+Get\+Started\+With\+Machine\+Learning\+On\+Arduino/tflite-\/micro-\/arduino-\/examples-\/main/src/tensorflow/lite/micro/kernels/detection\+\_\+postprocess.cpp File Reference}
+\hypertarget{detection__postprocess_8cpp}{}\label{detection__postprocess_8cpp}\index{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/arduino-\/examples-\/main/src/tensorflow/lite/micro/kernels/detection\_postprocess.cpp@{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/arduino-\/examples-\/main/src/tensorflow/lite/micro/kernels/detection\_postprocess.cpp}}
+{\ttfamily \#include $<$algorithm$>$}\newline
+{\ttfamily \#include $<$numeric$>$}\newline
+{\ttfamily \#include $<$tuple$>$}\newline
+{\ttfamily \#include "{}third\+\_\+party/flatbuffers/include/flatbuffers/flexbuffers.\+h"{}}\newline
+{\ttfamily \#include "{}tensorflow/lite/c/builtin\+\_\+op\+\_\+data.\+h"{}}\newline
+{\ttfamily \#include "{}tensorflow/lite/c/common.\+h"{}}\newline
+{\ttfamily \#include "{}tensorflow/lite/kernels/internal/common.\+h"{}}\newline
+{\ttfamily \#include "{}tensorflow/lite/kernels/internal/quantization\+\_\+util.\+h"{}}\newline
+{\ttfamily \#include "{}tensorflow/lite/kernels/internal/tensor\+\_\+ctypes.\+h"{}}\newline
+{\ttfamily \#include "{}tensorflow/lite/kernels/kernel\+\_\+util.\+h"{}}\newline
+{\ttfamily \#include "{}tensorflow/lite/kernels/op\+\_\+macros.\+h"{}}\newline
+{\ttfamily \#include "{}tensorflow/lite/micro/kernels/kernel\+\_\+util.\+h"{}}\newline
+{\ttfamily \#include "{}tensorflow/lite/micro/micro\+\_\+utils.\+h"{}}\newline
+Include dependency graph for detection\+\_\+postprocess.\+cpp\+:
+% FIG 0
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacetflite}{tflite}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{struct_tf_lite_registration}{Tf\+Lite\+Registration}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespacetflite_a91f8773e4b54388ad9ccc0166126f56c}{tflite\+::\+Register\+\_\+\+DETECTION\+\_\+\+POSTPROCESS}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Variable Documentation}
+\Hypertarget{detection__postprocess_8cpp_a0f2c3113e06532db7e5f721d84ccd316}\index{detection\_postprocess.cpp@{detection\_postprocess.cpp}!active\_candidate\_idx@{active\_candidate\_idx}}
+\index{active\_candidate\_idx@{active\_candidate\_idx}!detection\_postprocess.cpp@{detection\_postprocess.cpp}}
+\doxysubsubsection{\texorpdfstring{active\_candidate\_idx}{active\_candidate\_idx}}
+{\footnotesize\ttfamily \label{detection__postprocess_8cpp_a0f2c3113e06532db7e5f721d84ccd316} 
+int active\+\_\+candidate\+\_\+idx}
+
+\Hypertarget{detection__postprocess_8cpp_a82de2679c069b1bce97a7d4aeb83cf60}\index{detection\_postprocess.cpp@{detection\_postprocess.cpp}!buffer\_idx@{buffer\_idx}}
+\index{buffer\_idx@{buffer\_idx}!detection\_postprocess.cpp@{detection\_postprocess.cpp}}
+\doxysubsubsection{\texorpdfstring{buffer\_idx}{buffer\_idx}}
+{\footnotesize\ttfamily \label{detection__postprocess_8cpp_a82de2679c069b1bce97a7d4aeb83cf60} 
+int buffer\+\_\+idx}
+
+\Hypertarget{detection__postprocess_8cpp_ab5d8e4626eaf265738ac46d3985ac583}\index{detection\_postprocess.cpp@{detection\_postprocess.cpp}!decoded\_boxes\_idx@{decoded\_boxes\_idx}}
+\index{decoded\_boxes\_idx@{decoded\_boxes\_idx}!detection\_postprocess.cpp@{detection\_postprocess.cpp}}
+\doxysubsubsection{\texorpdfstring{decoded\_boxes\_idx}{decoded\_boxes\_idx}}
+{\footnotesize\ttfamily \label{detection__postprocess_8cpp_ab5d8e4626eaf265738ac46d3985ac583} 
+int decoded\+\_\+boxes\+\_\+idx}
+
+\Hypertarget{detection__postprocess_8cpp_abb27f0aa4342b149b82a0eb6584aee66}\index{detection\_postprocess.cpp@{detection\_postprocess.cpp}!detections\_per\_class@{detections\_per\_class}}
+\index{detections\_per\_class@{detections\_per\_class}!detection\_postprocess.cpp@{detection\_postprocess.cpp}}
+\doxysubsubsection{\texorpdfstring{detections\_per\_class}{detections\_per\_class}}
+{\footnotesize\ttfamily \label{detection__postprocess_8cpp_abb27f0aa4342b149b82a0eb6584aee66} 
+int detections\+\_\+per\+\_\+class}
+
+\Hypertarget{detection__postprocess_8cpp_a85f2f1bd58b3b44ffdf3881823393959}\index{detection\_postprocess.cpp@{detection\_postprocess.cpp}!h@{h}}
+\index{h@{h}!detection\_postprocess.cpp@{detection\_postprocess.cpp}}
+\doxysubsubsection{\texorpdfstring{h}{h}}
+{\footnotesize\ttfamily \label{detection__postprocess_8cpp_a85f2f1bd58b3b44ffdf3881823393959} 
+float h}
+
+\Hypertarget{detection__postprocess_8cpp_a8f5dba14084794ef680c4d5ef4756876}\index{detection\_postprocess.cpp@{detection\_postprocess.cpp}!input\_anchors@{input\_anchors}}
+\index{input\_anchors@{input\_anchors}!detection\_postprocess.cpp@{detection\_postprocess.cpp}}
+\doxysubsubsection{\texorpdfstring{input\_anchors}{input\_anchors}}
+{\footnotesize\ttfamily \label{detection__postprocess_8cpp_a8f5dba14084794ef680c4d5ef4756876} 
+\mbox{\hyperlink{struct_tf_lite_quantization_params}{Tf\+Lite\+Quantization\+Params}} input\+\_\+anchors}
+
+\Hypertarget{detection__postprocess_8cpp_a210cee753fb559c9de674c4b045df697}\index{detection\_postprocess.cpp@{detection\_postprocess.cpp}!input\_box\_encodings@{input\_box\_encodings}}
+\index{input\_box\_encodings@{input\_box\_encodings}!detection\_postprocess.cpp@{detection\_postprocess.cpp}}
+\doxysubsubsection{\texorpdfstring{input\_box\_encodings}{input\_box\_encodings}}
+{\footnotesize\ttfamily \label{detection__postprocess_8cpp_a210cee753fb559c9de674c4b045df697} 
+\mbox{\hyperlink{struct_tf_lite_quantization_params}{Tf\+Lite\+Quantization\+Params}} input\+\_\+box\+\_\+encodings}
+
+\Hypertarget{detection__postprocess_8cpp_aa5a5fd8b7881c8664fd91a488191b729}\index{detection\_postprocess.cpp@{detection\_postprocess.cpp}!input\_class\_predictions@{input\_class\_predictions}}
+\index{input\_class\_predictions@{input\_class\_predictions}!detection\_postprocess.cpp@{detection\_postprocess.cpp}}
+\doxysubsubsection{\texorpdfstring{input\_class\_predictions}{input\_class\_predictions}}
+{\footnotesize\ttfamily \label{detection__postprocess_8cpp_aa5a5fd8b7881c8664fd91a488191b729} 
+\mbox{\hyperlink{struct_tf_lite_quantization_params}{Tf\+Lite\+Quantization\+Params}} input\+\_\+class\+\_\+predictions}
+
+\Hypertarget{detection__postprocess_8cpp_a719f70829e27a5bab1453a3df31747f0}\index{detection\_postprocess.cpp@{detection\_postprocess.cpp}!intersection\_over\_union\_threshold@{intersection\_over\_union\_threshold}}
+\index{intersection\_over\_union\_threshold@{intersection\_over\_union\_threshold}!detection\_postprocess.cpp@{detection\_postprocess.cpp}}
+\doxysubsubsection{\texorpdfstring{intersection\_over\_union\_threshold}{intersection\_over\_union\_threshold}}
+{\footnotesize\ttfamily \label{detection__postprocess_8cpp_a719f70829e27a5bab1453a3df31747f0} 
+float intersection\+\_\+over\+\_\+union\+\_\+threshold}
+
+\Hypertarget{detection__postprocess_8cpp_a907b7b08db4d2b94374ce8e9e7efe115}\index{detection\_postprocess.cpp@{detection\_postprocess.cpp}!keep\_indices\_idx@{keep\_indices\_idx}}
+\index{keep\_indices\_idx@{keep\_indices\_idx}!detection\_postprocess.cpp@{detection\_postprocess.cpp}}
+\doxysubsubsection{\texorpdfstring{keep\_indices\_idx}{keep\_indices\_idx}}
+{\footnotesize\ttfamily \label{detection__postprocess_8cpp_a907b7b08db4d2b94374ce8e9e7efe115} 
+int keep\+\_\+indices\+\_\+idx}
+
+\Hypertarget{detection__postprocess_8cpp_a6efb4f6f8d627802ce89a56cf02d00a9}\index{detection\_postprocess.cpp@{detection\_postprocess.cpp}!keep\_scores\_idx@{keep\_scores\_idx}}
+\index{keep\_scores\_idx@{keep\_scores\_idx}!detection\_postprocess.cpp@{detection\_postprocess.cpp}}
+\doxysubsubsection{\texorpdfstring{keep\_scores\_idx}{keep\_scores\_idx}}
+{\footnotesize\ttfamily \label{detection__postprocess_8cpp_a6efb4f6f8d627802ce89a56cf02d00a9} 
+int keep\+\_\+scores\+\_\+idx}
+
+\Hypertarget{detection__postprocess_8cpp_ac14fd9b5efd5c8fed9023621abe6a995}\index{detection\_postprocess.cpp@{detection\_postprocess.cpp}!max\_classes\_per\_detection@{max\_classes\_per\_detection}}
+\index{max\_classes\_per\_detection@{max\_classes\_per\_detection}!detection\_postprocess.cpp@{detection\_postprocess.cpp}}
+\doxysubsubsection{\texorpdfstring{max\_classes\_per\_detection}{max\_classes\_per\_detection}}
+{\footnotesize\ttfamily \label{detection__postprocess_8cpp_ac14fd9b5efd5c8fed9023621abe6a995} 
+int max\+\_\+classes\+\_\+per\+\_\+detection}
+
+\Hypertarget{detection__postprocess_8cpp_a6275e0d5337602fd39f200fd9e14d249}\index{detection\_postprocess.cpp@{detection\_postprocess.cpp}!max\_detections@{max\_detections}}
+\index{max\_detections@{max\_detections}!detection\_postprocess.cpp@{detection\_postprocess.cpp}}
+\doxysubsubsection{\texorpdfstring{max\_detections}{max\_detections}}
+{\footnotesize\ttfamily \label{detection__postprocess_8cpp_a6275e0d5337602fd39f200fd9e14d249} 
+int max\+\_\+detections}
+
+\Hypertarget{detection__postprocess_8cpp_ac432396c1fe645dfe890f591ceccf6b8}\index{detection\_postprocess.cpp@{detection\_postprocess.cpp}!non\_max\_suppression\_score\_threshold@{non\_max\_suppression\_score\_threshold}}
+\index{non\_max\_suppression\_score\_threshold@{non\_max\_suppression\_score\_threshold}!detection\_postprocess.cpp@{detection\_postprocess.cpp}}
+\doxysubsubsection{\texorpdfstring{non\_max\_suppression\_score\_threshold}{non\_max\_suppression\_score\_threshold}}
+{\footnotesize\ttfamily \label{detection__postprocess_8cpp_ac432396c1fe645dfe890f591ceccf6b8} 
+float non\+\_\+max\+\_\+suppression\+\_\+score\+\_\+threshold}
+
+\Hypertarget{detection__postprocess_8cpp_a7ff44984cc50a9af5140c3809f62aabf}\index{detection\_postprocess.cpp@{detection\_postprocess.cpp}!num\_classes@{num\_classes}}
+\index{num\_classes@{num\_classes}!detection\_postprocess.cpp@{detection\_postprocess.cpp}}
+\doxysubsubsection{\texorpdfstring{num\_classes}{num\_classes}}
+{\footnotesize\ttfamily \label{detection__postprocess_8cpp_a7ff44984cc50a9af5140c3809f62aabf} 
+int num\+\_\+classes}
+
+\Hypertarget{detection__postprocess_8cpp_a000edc0d6a8400b1aed51f8b81a80ecd}\index{detection\_postprocess.cpp@{detection\_postprocess.cpp}!scale\_@{scale\_}}
+\index{scale\_@{scale\_}!detection\_postprocess.cpp@{detection\_postprocess.cpp}}
+\doxysubsubsection{\texorpdfstring{scale\_}{scale\_}}
+{\footnotesize\ttfamily \label{detection__postprocess_8cpp_a000edc0d6a8400b1aed51f8b81a80ecd} 
+float scale\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+\Hypertarget{detection__postprocess_8cpp_ac71f1ade775ad36a4a5c87f34f186905}\index{detection\_postprocess.cpp@{detection\_postprocess.cpp}!scale\_values@{scale\_values}}
+\index{scale\_values@{scale\_values}!detection\_postprocess.cpp@{detection\_postprocess.cpp}}
+\doxysubsubsection{\texorpdfstring{scale\_values}{scale\_values}}
+{\footnotesize\ttfamily \label{detection__postprocess_8cpp_ac71f1ade775ad36a4a5c87f34f186905} 
+Center\+Size\+Encoding scale\+\_\+values}
+
+\Hypertarget{detection__postprocess_8cpp_a48726afade7e21c839097e186f6946ae}\index{detection\_postprocess.cpp@{detection\_postprocess.cpp}!score\_buffer\_idx@{score\_buffer\_idx}}
+\index{score\_buffer\_idx@{score\_buffer\_idx}!detection\_postprocess.cpp@{detection\_postprocess.cpp}}
+\doxysubsubsection{\texorpdfstring{score\_buffer\_idx}{score\_buffer\_idx}}
+{\footnotesize\ttfamily \label{detection__postprocess_8cpp_a48726afade7e21c839097e186f6946ae} 
+int score\+\_\+buffer\+\_\+idx}
+
+\Hypertarget{detection__postprocess_8cpp_a6b62c7d39016f896deeeb369ed3eb231}\index{detection\_postprocess.cpp@{detection\_postprocess.cpp}!scores\_after\_regular\_non\_max\_suppression\_idx@{scores\_after\_regular\_non\_max\_suppression\_idx}}
+\index{scores\_after\_regular\_non\_max\_suppression\_idx@{scores\_after\_regular\_non\_max\_suppression\_idx}!detection\_postprocess.cpp@{detection\_postprocess.cpp}}
+\doxysubsubsection{\texorpdfstring{scores\_after\_regular\_non\_max\_suppression\_idx}{scores\_after\_regular\_non\_max\_suppression\_idx}}
+{\footnotesize\ttfamily \label{detection__postprocess_8cpp_a6b62c7d39016f896deeeb369ed3eb231} 
+int scores\+\_\+after\+\_\+regular\+\_\+non\+\_\+max\+\_\+suppression\+\_\+idx}
+
+\Hypertarget{detection__postprocess_8cpp_a1ff5060c5277ed0197d9be8e3c8afef6}\index{detection\_postprocess.cpp@{detection\_postprocess.cpp}!scores\_idx@{scores\_idx}}
+\index{scores\_idx@{scores\_idx}!detection\_postprocess.cpp@{detection\_postprocess.cpp}}
+\doxysubsubsection{\texorpdfstring{scores\_idx}{scores\_idx}}
+{\footnotesize\ttfamily \label{detection__postprocess_8cpp_a1ff5060c5277ed0197d9be8e3c8afef6} 
+int scores\+\_\+idx}
+
+\Hypertarget{detection__postprocess_8cpp_a53d46437c39870fd37c5bbccc922a733}\index{detection\_postprocess.cpp@{detection\_postprocess.cpp}!selected\_idx@{selected\_idx}}
+\index{selected\_idx@{selected\_idx}!detection\_postprocess.cpp@{detection\_postprocess.cpp}}
+\doxysubsubsection{\texorpdfstring{selected\_idx}{selected\_idx}}
+{\footnotesize\ttfamily \label{detection__postprocess_8cpp_a53d46437c39870fd37c5bbccc922a733} 
+int selected\+\_\+idx}
+
+\Hypertarget{detection__postprocess_8cpp_ab3f65f955647f4ba392cf543afafb678}\index{detection\_postprocess.cpp@{detection\_postprocess.cpp}!sorted\_indices\_idx@{sorted\_indices\_idx}}
+\index{sorted\_indices\_idx@{sorted\_indices\_idx}!detection\_postprocess.cpp@{detection\_postprocess.cpp}}
+\doxysubsubsection{\texorpdfstring{sorted\_indices\_idx}{sorted\_indices\_idx}}
+{\footnotesize\ttfamily \label{detection__postprocess_8cpp_ab3f65f955647f4ba392cf543afafb678} 
+int sorted\+\_\+indices\+\_\+idx}
+
+\Hypertarget{detection__postprocess_8cpp_aaec0c8f1898d086168279955cdc24931}\index{detection\_postprocess.cpp@{detection\_postprocess.cpp}!sorted\_values\_idx@{sorted\_values\_idx}}
+\index{sorted\_values\_idx@{sorted\_values\_idx}!detection\_postprocess.cpp@{detection\_postprocess.cpp}}
+\doxysubsubsection{\texorpdfstring{sorted\_values\_idx}{sorted\_values\_idx}}
+{\footnotesize\ttfamily \label{detection__postprocess_8cpp_aaec0c8f1898d086168279955cdc24931} 
+int sorted\+\_\+values\+\_\+idx}
+
+\Hypertarget{detection__postprocess_8cpp_a9f467e93c859ba79feb5d3dbddc92a84}\index{detection\_postprocess.cpp@{detection\_postprocess.cpp}!use\_regular\_non\_max\_suppression@{use\_regular\_non\_max\_suppression}}
+\index{use\_regular\_non\_max\_suppression@{use\_regular\_non\_max\_suppression}!detection\_postprocess.cpp@{detection\_postprocess.cpp}}
+\doxysubsubsection{\texorpdfstring{use\_regular\_non\_max\_suppression}{use\_regular\_non\_max\_suppression}}
+{\footnotesize\ttfamily \label{detection__postprocess_8cpp_a9f467e93c859ba79feb5d3dbddc92a84} 
+bool use\+\_\+regular\+\_\+non\+\_\+max\+\_\+suppression}
+
+\Hypertarget{detection__postprocess_8cpp_a56eca241e2896b9f57a79589e76fd24b}\index{detection\_postprocess.cpp@{detection\_postprocess.cpp}!w@{w}}
+\index{w@{w}!detection\_postprocess.cpp@{detection\_postprocess.cpp}}
+\doxysubsubsection{\texorpdfstring{w}{w}}
+{\footnotesize\ttfamily \label{detection__postprocess_8cpp_a56eca241e2896b9f57a79589e76fd24b} 
+float w}
+
+\Hypertarget{detection__postprocess_8cpp_ad0da36b2558901e21e7a30f6c227a45e}\index{detection\_postprocess.cpp@{detection\_postprocess.cpp}!x@{x}}
+\index{x@{x}!detection\_postprocess.cpp@{detection\_postprocess.cpp}}
+\doxysubsubsection{\texorpdfstring{x}{x}}
+{\footnotesize\ttfamily \label{detection__postprocess_8cpp_ad0da36b2558901e21e7a30f6c227a45e} 
+float x}
+
+\Hypertarget{detection__postprocess_8cpp_a9c42f51718ed192ed1841a53d2b0e507}\index{detection\_postprocess.cpp@{detection\_postprocess.cpp}!xmax@{xmax}}
+\index{xmax@{xmax}!detection\_postprocess.cpp@{detection\_postprocess.cpp}}
+\doxysubsubsection{\texorpdfstring{xmax}{xmax}}
+{\footnotesize\ttfamily \label{detection__postprocess_8cpp_a9c42f51718ed192ed1841a53d2b0e507} 
+float xmax}
+
+\Hypertarget{detection__postprocess_8cpp_a058f249a5e6d20724cb0784b40a183e8}\index{detection\_postprocess.cpp@{detection\_postprocess.cpp}!xmin@{xmin}}
+\index{xmin@{xmin}!detection\_postprocess.cpp@{detection\_postprocess.cpp}}
+\doxysubsubsection{\texorpdfstring{xmin}{xmin}}
+{\footnotesize\ttfamily \label{detection__postprocess_8cpp_a058f249a5e6d20724cb0784b40a183e8} 
+float xmin}
+
+\Hypertarget{detection__postprocess_8cpp_aa4f0d3eebc3c443f9be81bf48561a217}\index{detection\_postprocess.cpp@{detection\_postprocess.cpp}!y@{y}}
+\index{y@{y}!detection\_postprocess.cpp@{detection\_postprocess.cpp}}
+\doxysubsubsection{\texorpdfstring{y}{y}}
+{\footnotesize\ttfamily \label{detection__postprocess_8cpp_aa4f0d3eebc3c443f9be81bf48561a217} 
+float y}
+
+\Hypertarget{detection__postprocess_8cpp_acee1a082369857c7ee64924a0d9bc706}\index{detection\_postprocess.cpp@{detection\_postprocess.cpp}!ymax@{ymax}}
+\index{ymax@{ymax}!detection\_postprocess.cpp@{detection\_postprocess.cpp}}
+\doxysubsubsection{\texorpdfstring{ymax}{ymax}}
+{\footnotesize\ttfamily \label{detection__postprocess_8cpp_acee1a082369857c7ee64924a0d9bc706} 
+float ymax}
+
+\Hypertarget{detection__postprocess_8cpp_a5c6190dc7aa1bd7aafb9592a64f7046d}\index{detection\_postprocess.cpp@{detection\_postprocess.cpp}!ymin@{ymin}}
+\index{ymin@{ymin}!detection\_postprocess.cpp@{detection\_postprocess.cpp}}
+\doxysubsubsection{\texorpdfstring{ymin}{ymin}}
+{\footnotesize\ttfamily \label{detection__postprocess_8cpp_a5c6190dc7aa1bd7aafb9592a64f7046d} 
+float ymin}
+
+\Hypertarget{detection__postprocess_8cpp_a7c5c2d979a6e0d834171a96ffa26db7c}\index{detection\_postprocess.cpp@{detection\_postprocess.cpp}!zero\_point\_@{zero\_point\_}}
+\index{zero\_point\_@{zero\_point\_}!detection\_postprocess.cpp@{detection\_postprocess.cpp}}
+\doxysubsubsection{\texorpdfstring{zero\_point\_}{zero\_point\_}}
+{\footnotesize\ttfamily \label{detection__postprocess_8cpp_a7c5c2d979a6e0d834171a96ffa26db7c} 
+int zero\+\_\+point\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+

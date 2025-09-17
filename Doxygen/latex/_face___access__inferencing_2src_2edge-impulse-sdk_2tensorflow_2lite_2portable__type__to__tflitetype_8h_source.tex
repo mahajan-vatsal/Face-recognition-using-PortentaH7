@@ -1,0 +1,81 @@
+\doxysection{portable\+\_\+type\+\_\+to\+\_\+tflitetype.\+h}
+\hypertarget{_face___access__inferencing_2src_2edge-impulse-sdk_2tensorflow_2lite_2portable__type__to__tflitetype_8h_source}{}\label{_face___access__inferencing_2src_2edge-impulse-sdk_2tensorflow_2lite_2portable__type__to__tflitetype_8h_source}\index{Face\_Access\_inferencing/src/edge-\/impulse-\/sdk/tensorflow/lite/portable\_type\_to\_tflitetype.h@{Face\_Access\_inferencing/src/edge-\/impulse-\/sdk/tensorflow/lite/portable\_type\_to\_tflitetype.h}}
+\mbox{\hyperlink{_face___access__inferencing_2src_2edge-impulse-sdk_2tensorflow_2lite_2portable__type__to__tflitetype_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{/*\ Copyright\ 2019\ The\ TensorFlow\ Authors.\ All\ Rights\ Reserved.}}
+\DoxyCodeLine{00002\ \textcolor{comment}{}}
+\DoxyCodeLine{00003\ \textcolor{comment}{Licensed\ under\ the\ Apache\ License,\ Version\ 2.0\ (the\ "{}License"{});}}
+\DoxyCodeLine{00004\ \textcolor{comment}{you\ may\ not\ use\ this\ file\ except\ in\ compliance\ with\ the\ License.}}
+\DoxyCodeLine{00005\ \textcolor{comment}{You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{00006\ \textcolor{comment}{}}
+\DoxyCodeLine{00007\ \textcolor{comment}{\ \ \ \ http://www.apache.org/licenses/LICENSE-\/2.0}}
+\DoxyCodeLine{00008\ \textcolor{comment}{}}
+\DoxyCodeLine{00009\ \textcolor{comment}{Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ software}}
+\DoxyCodeLine{00010\ \textcolor{comment}{distributed\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,}}
+\DoxyCodeLine{00011\ \textcolor{comment}{WITHOUT\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,\ either\ express\ or\ implied.}}
+\DoxyCodeLine{00012\ \textcolor{comment}{See\ the\ License\ for\ the\ specific\ language\ governing\ permissions\ and}}
+\DoxyCodeLine{00013\ \textcolor{comment}{limitations\ under\ the\ License.}}
+\DoxyCodeLine{00014\ \textcolor{comment}{==============================================================================*/}}
+\DoxyCodeLine{00015\ \textcolor{preprocessor}{\#ifndef\ TENSORFLOW\_LITE\_PORTABLE\_TYPE\_TO\_TFLITETYPE\_H\_}}
+\DoxyCodeLine{00016\ \textcolor{preprocessor}{\#define\ TENSORFLOW\_LITE\_PORTABLE\_TYPE\_TO\_TFLITETYPE\_H\_}}
+\DoxyCodeLine{00017\ }
+\DoxyCodeLine{00018\ \textcolor{comment}{//\ Most\ of\ the\ definitions\ have\ been\ moved\ to\ this\ subheader\ so\ that\ Micro}}
+\DoxyCodeLine{00019\ \textcolor{comment}{//\ can\ include\ it\ without\ relying\ on\ <string>\ and\ <complex>,\ which\ isn't}}
+\DoxyCodeLine{00020\ \textcolor{comment}{//\ available\ on\ all\ platforms.}}
+\DoxyCodeLine{00021\ }
+\DoxyCodeLine{00022\ \textcolor{comment}{//\ Arduino\ build\ defines\ abs\ as\ a\ macro\ here.\ That\ is\ invalid\ C++,\ and\ breaks}}
+\DoxyCodeLine{00023\ \textcolor{comment}{//\ libc++'s\ <complex>\ header,\ undefine\ it.}}
+\DoxyCodeLine{00024\ \textcolor{preprocessor}{\#ifdef\ abs}}
+\DoxyCodeLine{00025\ \textcolor{preprocessor}{\#undef\ abs}}
+\DoxyCodeLine{00026\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00027\ }
+\DoxyCodeLine{00028\ \textcolor{preprocessor}{\#include\ <stdint.h>}}
+\DoxyCodeLine{00029\ }
+\DoxyCodeLine{00030\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{_face___access__inferencing_2src_2edge-impulse-sdk_2tensorflow_2lite_2core_2c_2common_8h}{edge-\/impulse-\/sdk/tensorflow/lite/core/c/common.h}}"{}}}
+\DoxyCodeLine{00031\ }
+\DoxyCodeLine{00032\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacetflite}{tflite}}\ \{}
+\DoxyCodeLine{00033\ }
+\DoxyCodeLine{00034\ \textcolor{comment}{//\ Map\ statically\ from\ a\ C++\ type\ to\ a\ TfLiteType.\ Used\ in\ interpreter\ for}}
+\DoxyCodeLine{00035\ \textcolor{comment}{//\ safe\ casts.}}
+\DoxyCodeLine{00036\ \textcolor{comment}{//\ Example:}}
+\DoxyCodeLine{00037\ \textcolor{comment}{//\ \ typeToTfLiteType<bool>()\ -\/>\ kTfLiteBool}}
+\DoxyCodeLine{00038\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{00039\ \textcolor{keyword}{constexpr}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_a8a47ba81bdef28b5c479ee7928a7d123}{TfLiteType}}\ \mbox{\hyperlink{namespacetflite_a1d14d9702ca0640b7abfcfb4749697f3}{typeToTfLiteType}}()\ \{}
+\DoxyCodeLine{00040\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_a8a47ba81bdef28b5c479ee7928a7d123abe7e67b1f37873e602f2b20b9b42c6c8}{kTfLiteNoType}};}
+\DoxyCodeLine{00041\ \}}
+\DoxyCodeLine{00042\ \textcolor{comment}{//\ Map\ from\ TfLiteType\ to\ the\ corresponding\ C++\ type.}}
+\DoxyCodeLine{00043\ \textcolor{comment}{//\ Example:}}
+\DoxyCodeLine{00044\ \textcolor{comment}{//\ \ \ TfLiteTypeToType<kTfLiteBool>::Type\ -\/>\ bool}}
+\DoxyCodeLine{00045\ \textcolor{keyword}{template}\ <TfLiteType\ TFLITE\_TYPE\_ENUM>}
+\DoxyCodeLine{00046\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structtflite_1_1_tf_lite_type_to_type}{TfLiteTypeToType}}\ \{\};\ \ \textcolor{comment}{//\ Specializations\ below}}
+\DoxyCodeLine{00047\ }
+\DoxyCodeLine{00048\ \textcolor{comment}{//\ Template\ specialization\ for\ both\ typeToTfLiteType\ and\ TfLiteTypeToType.}}
+\DoxyCodeLine{00049\ \textcolor{preprocessor}{\#define\ MATCH\_TYPE\_AND\_TFLITE\_TYPE(CPP\_TYPE,\ TFLITE\_TYPE\_ENUM)\ \(\backslash\)}}
+\DoxyCodeLine{00050\ \textcolor{preprocessor}{\ \ template\ <>\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00051\ \textcolor{preprocessor}{\ \ constexpr\ TfLiteType\ typeToTfLiteType<CPP\_TYPE>()\ \{\ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00052\ \textcolor{preprocessor}{\ \ \ \ return\ TFLITE\_TYPE\_ENUM;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00053\ \textcolor{preprocessor}{\ \ \}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00054\ \textcolor{preprocessor}{\ \ template\ <>\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00055\ \textcolor{preprocessor}{\ \ struct\ TfLiteTypeToType<TFLITE\_TYPE\_ENUM>\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00056\ \textcolor{preprocessor}{\ \ \ \ using\ Type\ =\ CPP\_TYPE;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00057\ \textcolor{preprocessor}{\ \ \}}}
+\DoxyCodeLine{00058\ }
+\DoxyCodeLine{00059\ \textcolor{comment}{//\ No\ string\ mapping\ is\ included\ here,\ since\ the\ TF\ Lite\ packed\ representation}}
+\DoxyCodeLine{00060\ \textcolor{comment}{//\ doesn't\ correspond\ to\ a\ C++\ type\ well.}}
+\DoxyCodeLine{00061\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcb412bfd187a1b270089e2cde928dbbd9_ae96dd51a9e9e5c09eb3908a1de22bb3b}{MATCH\_TYPE\_AND\_TFLITE\_TYPE}}(int32\_t,\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_a8a47ba81bdef28b5c479ee7928a7d123a3be7bb6b2164f8d28936ed3c3649182a}{kTfLiteInt32}});}
+\DoxyCodeLine{00062\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcb412bfd187a1b270089e2cde928dbbd9_ae96dd51a9e9e5c09eb3908a1de22bb3b}{MATCH\_TYPE\_AND\_TFLITE\_TYPE}}(uint32\_t,\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_a8a47ba81bdef28b5c479ee7928a7d123afb6ae1b7649966d13305730d19c8372c}{kTfLiteUInt32}});}
+\DoxyCodeLine{00063\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcb412bfd187a1b270089e2cde928dbbd9_ae96dd51a9e9e5c09eb3908a1de22bb3b}{MATCH\_TYPE\_AND\_TFLITE\_TYPE}}(int16\_t,\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_a8a47ba81bdef28b5c479ee7928a7d123a6142296f825a31497ceb1e829010dd0c}{kTfLiteInt16}});}
+\DoxyCodeLine{00064\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcb412bfd187a1b270089e2cde928dbbd9_ae96dd51a9e9e5c09eb3908a1de22bb3b}{MATCH\_TYPE\_AND\_TFLITE\_TYPE}}(uint16\_t,\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_a8a47ba81bdef28b5c479ee7928a7d123a0dfa7669ee1c2864ca208fe9ec39fca3}{kTfLiteUInt16}});}
+\DoxyCodeLine{00065\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcb412bfd187a1b270089e2cde928dbbd9_ae96dd51a9e9e5c09eb3908a1de22bb3b}{MATCH\_TYPE\_AND\_TFLITE\_TYPE}}(int64\_t,\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_a8a47ba81bdef28b5c479ee7928a7d123a24d0572e25ccdf3230c792e3e9be39e2}{kTfLiteInt64}});}
+\DoxyCodeLine{00066\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcb412bfd187a1b270089e2cde928dbbd9_ae96dd51a9e9e5c09eb3908a1de22bb3b}{MATCH\_TYPE\_AND\_TFLITE\_TYPE}}(\textcolor{keywordtype}{float},\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_a8a47ba81bdef28b5c479ee7928a7d123a0abdf1d6cf1c5907891defe4ce746455}{kTfLiteFloat32}});}
+\DoxyCodeLine{00067\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcb412bfd187a1b270089e2cde928dbbd9_ae96dd51a9e9e5c09eb3908a1de22bb3b}{MATCH\_TYPE\_AND\_TFLITE\_TYPE}}(\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char},\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_a8a47ba81bdef28b5c479ee7928a7d123ace4bd38da5d38da1014190421a4694a7}{kTfLiteUInt8}});}
+\DoxyCodeLine{00068\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcb412bfd187a1b270089e2cde928dbbd9_ae96dd51a9e9e5c09eb3908a1de22bb3b}{MATCH\_TYPE\_AND\_TFLITE\_TYPE}}(int8\_t,\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_a8a47ba81bdef28b5c479ee7928a7d123aa5aabb7d65c4d50cda0658c6ecb4851c}{kTfLiteInt8}});}
+\DoxyCodeLine{00069\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcb412bfd187a1b270089e2cde928dbbd9_ae96dd51a9e9e5c09eb3908a1de22bb3b}{MATCH\_TYPE\_AND\_TFLITE\_TYPE}}(\textcolor{keywordtype}{bool},\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_a8a47ba81bdef28b5c479ee7928a7d123a6e6693620d224d52e8e9e9d8e0ef672c}{kTfLiteBool}});}
+\DoxyCodeLine{00070\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcb412bfd187a1b270089e2cde928dbbd9_ae96dd51a9e9e5c09eb3908a1de22bb3b}{MATCH\_TYPE\_AND\_TFLITE\_TYPE}}(\mbox{\hyperlink{struct_tf_lite_float16}{TfLiteFloat16}},\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_a8a47ba81bdef28b5c479ee7928a7d123a749000152a7ac14db91d2f67565e703a}{kTfLiteFloat16}});}
+\DoxyCodeLine{00071\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcb412bfd187a1b270089e2cde928dbbd9_ae96dd51a9e9e5c09eb3908a1de22bb3b}{MATCH\_TYPE\_AND\_TFLITE\_TYPE}}(\textcolor{keywordtype}{double},\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_a8a47ba81bdef28b5c479ee7928a7d123a9f62bc24782bfba6cc9923f535852b9e}{kTfLiteFloat64}});}
+\DoxyCodeLine{00072\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcb412bfd187a1b270089e2cde928dbbd9_ae96dd51a9e9e5c09eb3908a1de22bb3b}{MATCH\_TYPE\_AND\_TFLITE\_TYPE}}(uint64\_t,\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_a8a47ba81bdef28b5c479ee7928a7d123a283eb70588fb34ba2d5c9b893f8606b7}{kTfLiteUInt64}});}
+\DoxyCodeLine{00073\ }
+\DoxyCodeLine{00074\ \}\ \ \textcolor{comment}{//\ namespace\ tflite}}
+\DoxyCodeLine{00075\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ TENSORFLOW\_LITE\_PORTABLE\_TYPE\_TO\_TFLITETYPE\_H\_}}
+
+\end{DoxyCode}

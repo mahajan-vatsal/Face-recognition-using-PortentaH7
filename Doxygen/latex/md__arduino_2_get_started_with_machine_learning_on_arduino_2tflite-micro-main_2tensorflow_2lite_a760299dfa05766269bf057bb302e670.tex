@@ -1,0 +1,39 @@
+\chapter{README}
+\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_a760299dfa05766269bf057bb302e670}{}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_a760299dfa05766269bf057bb302e670}\index{README@{README}}
+The aim of this application is to provide a quick way to test different networks.
+
+It contains one testcase and a default network model (network\+\_\+model.\+h), default input data (input\+\_\+data.\+h) and default expected output data (expected\+\_\+output\+\_\+data.\+h). The header files were created using the {\ttfamily xxd} command.
+
+The default model is a single int8 Depthwise\+Conv2D operator, with an input shape of \{1, 8, 8, 16\}, \{1, 2, 2, 16\} and \{16\} and an output shape of \{1, 4, 4, 16\}.
+
+When building the FVP target for Ethos-\/U (CO\+\_\+\+PROCESSOR=ethos\+\_\+u) the person detect int8 model is used instead. The downloaded model is optimized for Ethos-\/U with Ethos-\/U Vela. For more info see the following readmes\+: \doxylink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_2mieff15ee57cfe38179083b08ddb86ebf4}{tensorflow/lite/micro/kernels/ethos\+\_\+u/\+README.\+md} \doxylink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_2mi64a8b0ef0bf8cba27a04b1d995177b91}{tensorflow/lite/micro/cortex\+\_\+m\+\_\+corstone\+\_\+300/\+README.\+md} \doxylink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_2miee354610e627d49b633010d2c66f8b5b}{tensorflow/lite/micro/examples/person\+\_\+detection/\+README.\+md} The following Vela configuration has been used, which is compatible with the FVP build target (TARGET=cortex\+\_\+m\+\_\+corstone\+\_\+300).
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{vela\ -\/-\/accelerator-\/config=ethos-\/u55-\/256}
+
+\end{DoxyCode}
+
+
+In order to use another model, input data, or expected output data, simply specify the path to the new header files when running make as seen below.
+
+The variables in the specified header files (array and array length) need to have the same name and type as the ones in the default header files. The include guards also needs to be the same. When swapping out the network model, it is likely that the memory allocated by the interpreter needs to be increased to fit the new model. This is done by using the {\ttfamily ARENA\+\_\+\+SIZE} option when running {\ttfamily make}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{make\ -\/f\ tensorflow/lite/micro/tools/make/Makefile\ network\_tester\_test\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ NETWORK\_MODEL=path/to/network\_model.h\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ INPUT\_DATA=path/to/input\_data.h\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ OUTPUT\_DATA=path/to/expected\_output\_data.h\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ARENA\_SIZE=<tensor\ arena\ size\ in\ bytes>\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ NUM\_BYTES\_TO\_PRINT=<number\ of\ bytes\ to\ print>\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ COMPARE\_OUTPUT\_DATA=no}
+
+\end{DoxyCode}
+
+
+{\ttfamily NETWORK\+\_\+\+MODEL}\+: The path to the network model header. \textbackslash{} {\ttfamily INPUT\+\_\+\+DATA}\+: The path to the input data. \textbackslash{} {\ttfamily OUTPUT\+\_\+\+DATA}\+: The path to the expected output data. \textbackslash{} {\ttfamily ARENA\+\_\+\+SIZE}\+: The size of the memory to be allocated (in bytes) by the interpreter. \textbackslash{} {\ttfamily NUM\+\_\+\+BYTES\+\_\+\+TO\+\_\+\+PRINT}\+: The number of bytes of the output data to print. \textbackslash{} If set to 0, all bytes of the output are printed. \textbackslash{} {\ttfamily COMPARE\+\_\+\+OUTPUT\+\_\+\+DATA}\+: If set to "{}no"{} the output data is not compared to the expected output data. This could be useful e.\+g. if the execution time needs to be minimized, or there is no expected output data. If omitted, the output data is compared to the expected output. {\ttfamily NUM\+\_\+\+INFERENCES}\+: Define how many inferences that are made. Defaults to 1. \textbackslash{}
+
+The output is printed in JSON format using printf\+: {\ttfamily num\+\_\+of\+\_\+outputs\+: 1 output\+\_\+begin \mbox{[} \{ "{}dims"{}\+: \mbox{[}4,1,2,2,1\mbox{]}, "{}data\+\_\+address"{}\+: "{}0x000000"{}, "{}data"{}\+:"{}0x06,0x08,0x0e,0x10"{} \}\mbox{]} output\+\_\+end}
+
+If there are multiple output tensors, the output will look like this\+: {\ttfamily num\+\_\+of\+\_\+outputs\+: 2 output\+\_\+begin \mbox{[} \{ "{}dims"{}\+: \mbox{[}4,1,2,2,1\mbox{]}, "{}data\+\_\+address"{}\+: "{}0x000000"{}, "{}data"{}\+:"{}0x06,0x08,0x0e,0x10"{} \}, \{ "{}dims"{}\+: \mbox{[}4,1,2,2,1\mbox{]}, "{}data\+\_\+address"{}\+: "{}0x111111"{}, "{}data"{}\+:"{}0x06,0x08,0x0e,0x10"{} \}\mbox{]} output\+\_\+end} 

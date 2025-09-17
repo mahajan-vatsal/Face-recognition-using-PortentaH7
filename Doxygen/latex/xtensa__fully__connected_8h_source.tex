@@ -1,0 +1,84 @@
+\doxysection{xtensa\+\_\+fully\+\_\+connected.\+h}
+\hypertarget{xtensa__fully__connected_8h_source}{}\label{xtensa__fully__connected_8h_source}\index{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/main/tensorflow/lite/micro/kernels/xtensa/xtensa\_fully\_connected.h@{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/main/tensorflow/lite/micro/kernels/xtensa/xtensa\_fully\_connected.h}}
+\mbox{\hyperlink{xtensa__fully__connected_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{/*\ Copyright\ 2023\ The\ TensorFlow\ Authors.\ All\ Rights\ Reserved.}}
+\DoxyCodeLine{00002\ \textcolor{comment}{}}
+\DoxyCodeLine{00003\ \textcolor{comment}{Licensed\ under\ the\ Apache\ License,\ Version\ 2.0\ (the\ "{}License"{});}}
+\DoxyCodeLine{00004\ \textcolor{comment}{you\ may\ not\ use\ this\ file\ except\ in\ compliance\ with\ the\ License.}}
+\DoxyCodeLine{00005\ \textcolor{comment}{You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{00006\ \textcolor{comment}{}}
+\DoxyCodeLine{00007\ \textcolor{comment}{\ \ \ \ http://www.apache.org/licenses/LICENSE-\/2.0}}
+\DoxyCodeLine{00008\ \textcolor{comment}{}}
+\DoxyCodeLine{00009\ \textcolor{comment}{Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ software}}
+\DoxyCodeLine{00010\ \textcolor{comment}{distributed\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,}}
+\DoxyCodeLine{00011\ \textcolor{comment}{WITHOUT\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,\ either\ express\ or\ implied.}}
+\DoxyCodeLine{00012\ \textcolor{comment}{See\ the\ License\ for\ the\ specific\ language\ governing\ permissions\ and}}
+\DoxyCodeLine{00013\ \textcolor{comment}{limitations\ under\ the\ License.}}
+\DoxyCodeLine{00014\ \textcolor{comment}{==============================================================================*/}}
+\DoxyCodeLine{00015\ \textcolor{preprocessor}{\#ifndef\ TENSORFLOW\_LITE\_MICRO\_KERNELS\_XTENSA\_XTENSA\_FULLY\_CONNECTED\_H\_}}
+\DoxyCodeLine{00016\ \textcolor{preprocessor}{\#define\ TENSORFLOW\_LITE\_MICRO\_KERNELS\_XTENSA\_XTENSA\_FULLY\_CONNECTED\_H\_}}
+\DoxyCodeLine{00017\ }
+\DoxyCodeLine{00018\ \textcolor{preprocessor}{\#include\ <cstdint>}}
+\DoxyCodeLine{00019\ }
+\DoxyCodeLine{00020\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/c/common.h"{}}}
+\DoxyCodeLine{00021\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/kernels/internal/types.h"{}}}
+\DoxyCodeLine{00022\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/micro/kernels/fully\_connected.h"{}}}
+\DoxyCodeLine{00023\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/micro/micro\_log.h"{}}}
+\DoxyCodeLine{00024\ }
+\DoxyCodeLine{00025\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacetflite}{tflite}}\ \{}
+\DoxyCodeLine{00026\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structtflite_1_1_xtensa_fully_connected_op_data}{XtensaFullyConnectedOpData}}\ \{}
+\DoxyCodeLine{00027\ \ \ \mbox{\hyperlink{structtflite_1_1_op_data_fully_connected}{OpDataFullyConnected}}\ \mbox{\hyperlink{structtflite_1_1_xtensa_fully_connected_op_data_ad6c156133b25d6d8b52bde84e569535c}{reference\_op\_data}};}
+\DoxyCodeLine{00028\ }
+\DoxyCodeLine{00029\ \textcolor{preprocessor}{\#if\ defined(VISION\_P6)}}
+\DoxyCodeLine{00030\ \ \ int8\_t*\ reorder\_coefficient\_bias;\ \ \textcolor{comment}{//\ buffers\ used\ to\ keep\ reordered\ coeff\ and}}
+\DoxyCodeLine{00031\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ biases.}}
+\DoxyCodeLine{00032\ \ \ uint32\_t\ reorder\_coefficient\_bias\_size;}
+\DoxyCodeLine{00033\ \ \ uint8\_t*\ p\_context;\ \ \textcolor{comment}{//\ persistent\ lib\ context\ for\ this\ instance\ saved\ here}}
+\DoxyCodeLine{00034\ \ \ uint32\_t\ context\_size;}
+\DoxyCodeLine{00035\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ VISION\_P6}}
+\DoxyCodeLine{00036\ \};}
+\DoxyCodeLine{00037\ }
+\DoxyCodeLine{00038\ \textcolor{preprocessor}{\#if\ defined(HIFIMINI)}}
+\DoxyCodeLine{00039\ \textcolor{keywordtype}{void}\ FullyConnectedEvalHifimini(}
+\DoxyCodeLine{00040\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structtflite_1_1_fully_connected_params}{FullyConnectedParams}}\&\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src4cbee0bfdfed30e8771023cedb1bab0d_a434686eb00eea897154eb5c3f9364ef7}{params}},\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classtflite_1_1_runtime_shape}{RuntimeShape}}\&\ \mbox{\hyperlink{akida_8h_a0792621910eb31f95019ddc94eb3dece}{input\_shape}},}
+\DoxyCodeLine{00041\ \ \ \ \ \textcolor{keyword}{const}\ int8\_t*\ \mbox{\hyperlink{add__n__test_8cc_a5612ba79d1f0b544c7aeae4621166fea}{input\_data}},\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classtflite_1_1_runtime_shape}{RuntimeShape}}\&\ filter\_shape,}
+\DoxyCodeLine{00042\ \ \ \ \ \textcolor{keyword}{const}\ int8\_t*\ filter\_data,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classtflite_1_1_runtime_shape}{RuntimeShape}}\&\ bias\_shape,}
+\DoxyCodeLine{00043\ \ \ \ \ \textcolor{keyword}{const}\ int32\_t*\ bias\_data,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classtflite_1_1_runtime_shape}{RuntimeShape}}\&\ output\_shape,}
+\DoxyCodeLine{00044\ \ \ \ \ int8\_t*\ \mbox{\hyperlink{add__n__test_8cc_a3305b43869c4b837b0a33c12cff5069b}{output\_data}});}
+\DoxyCodeLine{00045\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ defined(HIFIMINI)}}
+\DoxyCodeLine{00046\ }
+\DoxyCodeLine{00047\ \textcolor{preprocessor}{\#if\ defined(VISION\_P6)}}
+\DoxyCodeLine{00048\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ FullyConnectedPrepareVision(\mbox{\hyperlink{struct_tf_lite_context}{TfLiteContext}}*\ context,}
+\DoxyCodeLine{00049\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_tf_lite_node}{TfLiteNode}}*\ node);}
+\DoxyCodeLine{00050\ }
+\DoxyCodeLine{00051\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ FullyConnectedEvalVision(\mbox{\hyperlink{struct_tf_lite_context}{TfLiteContext}}*\ context,\ \mbox{\hyperlink{struct_tf_lite_node}{TfLiteNode}}*\ node,}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_tf_lite_conv_params}{TfLiteConvParams}}\&\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src4cbee0bfdfed30e8771023cedb1bab0d_a434686eb00eea897154eb5c3f9364ef7}{params}},}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structtflite_1_1_xtensa_fully_connected_op_data}{XtensaFullyConnectedOpData}}\&\ \mbox{\hyperlink{hello__world__model_8cc_ab2a9259b73b53c0bb06a6b242aa7ae32}{data}},}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_tf_lite_eval_tensor}{TfLiteEvalTensor}}*\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src5afb18c45f6346167aa977a363205143_a9cebfb3d6ddd692fbdd268cf4b9ad024}{input}},}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_tf_lite_eval_tensor}{TfLiteEvalTensor}}*\ filter,}
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_tf_lite_eval_tensor}{TfLiteEvalTensor}}*\ bias,}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_tf_lite_eval_tensor}{TfLiteEvalTensor}}*\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbcd3bbe90c4644d53fde1ce4e312f437_a7a2a916a8059078c2d7a05f46c7126fd}{output}});}
+\DoxyCodeLine{00058\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ VISION\_P6}}
+\DoxyCodeLine{00059\ }
+\DoxyCodeLine{00060\ \textcolor{keywordtype}{void}*\ \mbox{\hyperlink{namespacetflite_a041ae937c5e8bfe3e94ecde5e4989d5d}{XtensaInitFullyConnected}}(\mbox{\hyperlink{struct_tf_lite_context}{TfLiteContext}}*\ context,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \mbox{\hyperlink{nano__ble33__sense__accelerometer__continuous_8ino_a221f01f29c6cba77d9479aba615283f5}{buffer}},}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ length);}
+\DoxyCodeLine{00062\ }
+\DoxyCodeLine{00063\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_a5728ef10afa3ae9e1b409f9dacfddc42}{XtensaEvalFullyConnectedQuantizedInt8}}(}
+\DoxyCodeLine{00064\ \ \ \ \ \mbox{\hyperlink{struct_tf_lite_context}{TfLiteContext}}*\ context,\ \mbox{\hyperlink{struct_tf_lite_node}{TfLiteNode}}*\ node,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structtflite_1_1_op_data_fully_connected}{OpDataFullyConnected}}\&\ \mbox{\hyperlink{hello__world__model_8cc_ab2a9259b73b53c0bb06a6b242aa7ae32}{data}},}
+\DoxyCodeLine{00065\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_tf_lite_eval_tensor}{TfLiteEvalTensor}}*\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src5afb18c45f6346167aa977a363205143_a9cebfb3d6ddd692fbdd268cf4b9ad024}{input}},\ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_tf_lite_eval_tensor}{TfLiteEvalTensor}}*\ filter,}
+\DoxyCodeLine{00066\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_tf_lite_eval_tensor}{TfLiteEvalTensor}}*\ bias,\ \mbox{\hyperlink{struct_tf_lite_eval_tensor}{TfLiteEvalTensor}}*\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbcd3bbe90c4644d53fde1ce4e312f437_a7a2a916a8059078c2d7a05f46c7126fd}{output}});}
+\DoxyCodeLine{00067\ }
+\DoxyCodeLine{00068\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_acf2a565fa3238fdc5be50d1093e9c475}{XtensaCalculateOpDataFullyConnected}}(}
+\DoxyCodeLine{00069\ \ \ \ \ \mbox{\hyperlink{struct_tf_lite_context}{TfLiteContext}}*\ context,\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src7f67a4373e2a0d20daf1d1ff4e1f4339_acc9e377dbc009d68bbfa5480d2559565}{TfLiteFusedActivation}}\ \mbox{\hyperlink{l2__pool__2d__test_8cc_a77ea056afd837c816867a0a9887131b6}{activation}},}
+\DoxyCodeLine{00070\ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_a8a47ba81bdef28b5c479ee7928a7d123}{TfLiteType}}\ data\_type,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_tf_lite_tensor}{TfLiteTensor}}*\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src5afb18c45f6346167aa977a363205143_a9cebfb3d6ddd692fbdd268cf4b9ad024}{input}},\ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_tf_lite_tensor}{TfLiteTensor}}*\ filter,}
+\DoxyCodeLine{00071\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_tf_lite_tensor}{TfLiteTensor}}*\ bias,\ \mbox{\hyperlink{struct_tf_lite_tensor}{TfLiteTensor}}*\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbcd3bbe90c4644d53fde1ce4e312f437_a7a2a916a8059078c2d7a05f46c7126fd}{output}},\ \mbox{\hyperlink{structtflite_1_1_op_data_fully_connected}{OpDataFullyConnected}}*\ \mbox{\hyperlink{hello__world__model_8cc_ab2a9259b73b53c0bb06a6b242aa7ae32}{data}});}
+\DoxyCodeLine{00072\ }
+\DoxyCodeLine{00073\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_acd4c72a514af6451da6b8d38cd984261}{XtensaPrepareFullyConnected}}(\mbox{\hyperlink{struct_tf_lite_context}{TfLiteContext}}*\ context,}
+\DoxyCodeLine{00074\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_tf_lite_node}{TfLiteNode}}*\ node);}
+\DoxyCodeLine{00075\ }
+\DoxyCodeLine{00076\ \}\ \ \textcolor{comment}{//\ namespace\ tflite}}
+\DoxyCodeLine{00077\ }
+\DoxyCodeLine{00078\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ TENSORFLOW\_LITE\_MICRO\_KERNELS\_XTENSA\_XTENSA\_FULLY\_CONNECTED\_H\_}}
+
+\end{DoxyCode}

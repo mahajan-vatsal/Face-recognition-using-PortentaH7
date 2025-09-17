@@ -1,0 +1,53 @@
+\doxysection{audio\+\_\+provider.\+h}
+\hypertarget{audio__provider_8h_source}{}\label{audio__provider_8h_source}\index{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/arduino-\/examples-\/main/examples/micro\_speech/audio\_provider.h@{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/arduino-\/examples-\/main/examples/micro\_speech/audio\_provider.h}}
+\mbox{\hyperlink{audio__provider_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{/*\ Copyright\ 2022\ The\ TensorFlow\ Authors.\ All\ Rights\ Reserved.}}
+\DoxyCodeLine{00002\ \textcolor{comment}{}}
+\DoxyCodeLine{00003\ \textcolor{comment}{Licensed\ under\ the\ Apache\ License,\ Version\ 2.0\ (the\ "{}License"{});}}
+\DoxyCodeLine{00004\ \textcolor{comment}{you\ may\ not\ use\ this\ file\ except\ in\ compliance\ with\ the\ License.}}
+\DoxyCodeLine{00005\ \textcolor{comment}{You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{00006\ \textcolor{comment}{}}
+\DoxyCodeLine{00007\ \textcolor{comment}{\ \ \ \ http://www.apache.org/licenses/LICENSE-\/2.0}}
+\DoxyCodeLine{00008\ \textcolor{comment}{}}
+\DoxyCodeLine{00009\ \textcolor{comment}{Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ software}}
+\DoxyCodeLine{00010\ \textcolor{comment}{distributed\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,}}
+\DoxyCodeLine{00011\ \textcolor{comment}{WITHOUT\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,\ either\ express\ or\ implied.}}
+\DoxyCodeLine{00012\ \textcolor{comment}{See\ the\ License\ for\ the\ specific\ language\ governing\ permissions\ and}}
+\DoxyCodeLine{00013\ \textcolor{comment}{limitations\ under\ the\ License.}}
+\DoxyCodeLine{00014\ \textcolor{comment}{==============================================================================*/}}
+\DoxyCodeLine{00015\ }
+\DoxyCodeLine{00016\ \textcolor{preprocessor}{\#ifndef\ TENSORFLOW\_LITE\_MICRO\_EXAMPLES\_MICRO\_SPEECH\_AUDIO\_PROVIDER\_H\_}}
+\DoxyCodeLine{00017\ \textcolor{preprocessor}{\#define\ TENSORFLOW\_LITE\_MICRO\_EXAMPLES\_MICRO\_SPEECH\_AUDIO\_PROVIDER\_H\_}}
+\DoxyCodeLine{00018\ }
+\DoxyCodeLine{00019\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/c/common.h"{}}}
+\DoxyCodeLine{00020\ }
+\DoxyCodeLine{00021\ \textcolor{comment}{//\ This\ is\ an\ abstraction\ around\ an\ audio\ source\ like\ a\ microphone,\ and\ is}}
+\DoxyCodeLine{00022\ \textcolor{comment}{//\ expected\ to\ return\ 16-\/bit\ PCM\ sample\ data\ for\ a\ given\ point\ in\ time.\ The}}
+\DoxyCodeLine{00023\ \textcolor{comment}{//\ sample\ data\ itself\ should\ be\ used\ as\ quickly\ as\ possible\ by\ the\ caller,\ since}}
+\DoxyCodeLine{00024\ \textcolor{comment}{//\ to\ allow\ memory\ optimizations\ there\ are\ no\ guarantees\ that\ the\ samples\ won't}}
+\DoxyCodeLine{00025\ \textcolor{comment}{//\ be\ overwritten\ by\ new\ data\ in\ the\ future.\ In\ practice,\ implementations\ should}}
+\DoxyCodeLine{00026\ \textcolor{comment}{//\ ensure\ that\ there's\ a\ reasonable\ time\ allowed\ for\ clients\ to\ access\ the\ data}}
+\DoxyCodeLine{00027\ \textcolor{comment}{//\ before\ any\ reuse.}}
+\DoxyCodeLine{00028\ \textcolor{comment}{//\ The\ reference\ implementation\ can\ have\ no\ platform-\/specific\ dependencies,\ so}}
+\DoxyCodeLine{00029\ \textcolor{comment}{//\ it\ just\ returns\ an\ array\ filled\ with\ zeros.\ For\ real\ applications,\ you\ should}}
+\DoxyCodeLine{00030\ \textcolor{comment}{//\ ensure\ there's\ a\ specialized\ implementation\ that\ accesses\ hardware\ APIs.}}
+\DoxyCodeLine{00031\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{audio__provider_8h_aba550b765fe9aaf6ef0a20a5a565d12c}{GetAudioSamples}}(\textcolor{keywordtype}{int}\ start\_ms,\ \textcolor{keywordtype}{int}\ duration\_ms,}
+\DoxyCodeLine{00032\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}*\ audio\_samples\_size,\ int16\_t**\ audio\_samples);}
+\DoxyCodeLine{00033\ }
+\DoxyCodeLine{00034\ \textcolor{comment}{//\ Returns\ the\ time\ that\ audio\ data\ was\ last\ captured\ in\ milliseconds.\ There's}}
+\DoxyCodeLine{00035\ \textcolor{comment}{//\ no\ contract\ about\ what\ time\ zero\ represents,\ the\ accuracy,\ or\ the\ granularity}}
+\DoxyCodeLine{00036\ \textcolor{comment}{//\ of\ the\ result.\ Subsequent\ calls\ will\ generally\ not\ return\ a\ lower\ value,\ but}}
+\DoxyCodeLine{00037\ \textcolor{comment}{//\ even\ that's\ not\ guaranteed\ if\ there's\ an\ overflow\ wraparound.}}
+\DoxyCodeLine{00038\ \textcolor{comment}{//\ The\ reference\ implementation\ of\ this\ function\ just\ returns\ a\ constantly}}
+\DoxyCodeLine{00039\ \textcolor{comment}{//\ incrementing\ value\ for\ each\ call,\ since\ it\ would\ need\ a\ non-\/portable\ platform}}
+\DoxyCodeLine{00040\ \textcolor{comment}{//\ call\ to\ access\ time\ information.\ For\ real\ applications,\ you'll\ need\ to\ write}}
+\DoxyCodeLine{00041\ \textcolor{comment}{//\ your\ own\ platform-\/specific\ implementation.}}
+\DoxyCodeLine{00042\ int32\_t\ \mbox{\hyperlink{audio__provider_8h_ad949a62dec8d1ed5f3f4ef3bc4afd762}{LatestAudioTimestamp}}();}
+\DoxyCodeLine{00043\ }
+\DoxyCodeLine{00044\ \textcolor{comment}{//\ Starts\ audio\ capture}}
+\DoxyCodeLine{00045\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{audio__provider_8h_ab422670e5f327309d7dc2121ed5c0972}{InitAudioRecording}}();}
+\DoxyCodeLine{00046\ }
+\DoxyCodeLine{00047\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ TENSORFLOW\_LITE\_MICRO\_EXAMPLES\_MICRO\_SPEECH\_AUDIO\_PROVIDER\_H\_}}
+
+\end{DoxyCode}

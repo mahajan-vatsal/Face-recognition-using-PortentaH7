@@ -1,0 +1,22 @@
+var searchData=
+[
+  ['acc_5fformat_0',['acc_format',['../ethosu55__interface_8h.html#ac495316a81713a1555fd8b23219ae2c7',1,'acc_format:&#160;ethosu55_interface.h'],['../ethosu65__interface_8h.html#ac495316a81713a1555fd8b23219ae2c7',1,'acc_format:&#160;ethosu65_interface.h']]],
+  ['activation_5fclip_5frange_1',['activation_clip_range',['../ethosu55__interface_8h.html#a9b5babf0d88572f37301dbb14faa60ae',1,'activation_clip_range:&#160;ethosu55_interface.h'],['../ethosu65__interface_8h.html#a9b5babf0d88572f37301dbb14faa60ae',1,'activation_clip_range:&#160;ethosu65_interface.h']]],
+  ['activation_5fformat_2',['activation_format',['../ethosu55__interface_8h.html#a4aa09d71c577870cd9ee58c113f25f09',1,'activation_format:&#160;ethosu55_interface.h'],['../ethosu65__interface_8h.html#a4aa09d71c577870cd9ee58c113f25f09',1,'activation_format:&#160;ethosu65_interface.h']]],
+  ['activation_5ffunction_3',['activation_function',['../ethosu55__interface_8h.html#a9ed207533bdd375b64bf7ec37f7f5170',1,'activation_function:&#160;ethosu55_interface.h'],['../ethosu65__interface_8h.html#a9ed207533bdd375b64bf7ec37f7f5170',1,'activation_function:&#160;ethosu65_interface.h']]],
+  ['activation_5fprecision_4',['activation_precision',['../ethosu55__interface_8h.html#aad70c037178965eb4bb9f67023c3c56f',1,'activation_precision:&#160;ethosu55_interface.h'],['../ethosu65__interface_8h.html#aad70c037178965eb4bb9f67023c3c56f',1,'activation_precision:&#160;ethosu65_interface.h']]],
+  ['activation_5ftype_5',['activation_type',['../ethosu55__interface_8h.html#a94da37fbeb6378f6b52e1d4ee7f195d5',1,'activation_type:&#160;ethosu55_interface.h'],['../ethosu65__interface_8h.html#a94da37fbeb6378f6b52e1d4ee7f195d5',1,'activation_type:&#160;ethosu65_interface.h']]],
+  ['activationfunctiontype_6',['ActivationFunctionType',['../namespacetflite.html#ad46c697b055221d918c08f845e25d66a',1,'tflite::ActivationFunctionType'],['../namespacetflite.html#ad46c697b055221d918c08f845e25d66a',1,'tflite::ActivationFunctionType'],['../namespacetflite.html#ad46c697b055221d918c08f845e25d66a',1,'tflite::ActivationFunctionType']]],
+  ['arm_5fcmsis_5fnn_5fstatus_7',['arm_cmsis_nn_status',['../_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321.html#a67ac3e1e650a7040b0f706fb83ea6184',1,'arm_cmsis_nn_status:&#160;arm_nn_math_types.h'],['../_face___access__inferencing_2src_2edge-impulse-sdk_2_c_m_s_i_s_2_n_n_2_include_2arm__nn__math__types_8h.html#a67ac3e1e650a7040b0f706fb83ea6184',1,'arm_cmsis_nn_status:&#160;arm_nn_math_types.h']]],
+  ['arm_5fml_5fkernel_5ftype_8',['arm_ml_kernel_type',['../svm__defines_8h.html#a893faa263531cb331871cfc5cf09d027',1,'svm_defines.h']]],
+  ['arm_5fnn_5factivation_5ftype_9',['arm_nn_activation_type',['../_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbed6136de05c6e069de3710a56d1390e.html#a7f41aa78cd9a0552fae9b348ee4831a0',1,'arm_nn_activation_type:&#160;arm_nnfunctions.h'],['../_face___access__inferencing_2src_2edge-impulse-sdk_2_c_m_s_i_s_2_n_n_2_include_2arm__nnfunctions_8h.html#a7f41aa78cd9a0552fae9b348ee4831a0',1,'arm_nn_activation_type:&#160;arm_nnfunctions.h']]],
+  ['arm_5fsort_5falg_10',['arm_sort_alg',['../support__functions_8h.html#a39c7478f2a29c3ac0a8008ca916c811e',1,'support_functions.h']]],
+  ['arm_5fsort_5fdir_11',['arm_sort_dir',['../support__functions_8h.html#a171bff70e8bc15590ef1df0457093d78',1,'support_functions.h']]],
+  ['arm_5fspline_5ftype_12',['arm_spline_type',['../interpolation__functions_8h.html#a545cad4aaf64955a2d2e93d7e806bcd7',1,'interpolation_functions.h']]],
+  ['arm_5fstatus_13',['arm_status',['../arm__math__types_8h.html#a5e459c6409dfcd2927bb8a57491d7cf6',1,'arm_math_types.h']]],
+  ['audiochannelconfig_14',['AudioChannelConfig',['../namespaceperipherals.html#ab7c14f3b41de10657b7efa0ea4690e86',1,'peripherals']]],
+  ['audiofunction_15',['AudioFunction',['../namespaceperipherals.html#a95958b21186e7002e23d2837b9b1990f',1,'peripherals']]],
+  ['audiosamplerate_16',['AudioSampleRate',['../namespaceperipherals.html#af626525ab1f31877ef0e677b01c8b9b3',1,'peripherals']]],
+  ['audiosamplewidth_17',['AudioSampleWidth',['../namespaceperipherals.html#a409f8fcb7a7708cef3e1146bf3c0b921',1,'peripherals']]],
+  ['axi_5fmem_5fencoding_18',['axi_mem_encoding',['../ethosu55__interface_8h.html#ae6facae4232adf01f4903a1e942f94d9',1,'axi_mem_encoding:&#160;ethosu55_interface.h'],['../ethosu65__interface_8h.html#ae6facae4232adf01f4903a1e942f94d9',1,'axi_mem_encoding:&#160;ethosu65_interface.h']]]
+];

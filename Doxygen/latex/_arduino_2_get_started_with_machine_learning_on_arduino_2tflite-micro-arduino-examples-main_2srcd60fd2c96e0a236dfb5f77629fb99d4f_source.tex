@@ -1,0 +1,131 @@
+\doxysection{kiss\+\_\+fft.\+h}
+\hypertarget{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcd60fd2c96e0a236dfb5f77629fb99d4f_source}{}\label{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcd60fd2c96e0a236dfb5f77629fb99d4f_source}\index{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/arduino-\/examples-\/main/src/third\_party/kissfft/kiss\_fft.h@{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/arduino-\/examples-\/main/src/third\_party/kissfft/kiss\_fft.h}}
+\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcd60fd2c96e0a236dfb5f77629fb99d4f}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{preprocessor}{\#ifndef\ KISS\_FFT\_H}}
+\DoxyCodeLine{00002\ \textcolor{preprocessor}{\#define\ KISS\_FFT\_H}}
+\DoxyCodeLine{00003\ }
+\DoxyCodeLine{00004\ \textcolor{preprocessor}{\#include\ <stdlib.h>}}
+\DoxyCodeLine{00005\ \textcolor{preprocessor}{\#include\ <stdio.h>}}
+\DoxyCodeLine{00006\ \textcolor{preprocessor}{\#include\ <math.h>}}
+\DoxyCodeLine{00007\ \textcolor{comment}{//\#include\ <string.h>}}
+\DoxyCodeLine{00008\ \textcolor{comment}{/*\ Patched\ by\ create\_tflm\_arduino.py\ for\ Arduino\ compatibility\ */}}
+\DoxyCodeLine{00009\ }
+\DoxyCodeLine{00010\ \textcolor{preprocessor}{\#ifdef\ \_\_cplusplus}}
+\DoxyCodeLine{00011\ \textcolor{keyword}{extern}\ \textcolor{stringliteral}{"{}C++"{}}\ \{}
+\DoxyCodeLine{00012\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00013\ }
+\DoxyCodeLine{00014\ \textcolor{comment}{/*}}
+\DoxyCodeLine{00015\ \textcolor{comment}{\ ATTENTION!}}
+\DoxyCodeLine{00016\ \textcolor{comment}{\ If\ you\ would\ like\ a\ :}}
+\DoxyCodeLine{00017\ \textcolor{comment}{\ -\/-\/\ a\ utility\ that\ will\ handle\ the\ caching\ of\ fft\ objects}}
+\DoxyCodeLine{00018\ \textcolor{comment}{\ -\/-\/\ real-\/only\ (no\ imaginary\ time\ component\ )\ FFT}}
+\DoxyCodeLine{00019\ \textcolor{comment}{\ -\/-\/\ a\ multi-\/dimensional\ FFT}}
+\DoxyCodeLine{00020\ \textcolor{comment}{\ -\/-\/\ a\ command-\/line\ utility\ to\ perform\ ffts}}
+\DoxyCodeLine{00021\ \textcolor{comment}{\ -\/-\/\ a\ command-\/line\ utility\ to\ perform\ fast-\/convolution\ filtering}}
+\DoxyCodeLine{00022\ \textcolor{comment}{}}
+\DoxyCodeLine{00023\ \textcolor{comment}{\ Then\ see\ kfc.h\ kiss\_fftr.h\ kiss\_fftnd.h\ fftutil.c\ kiss\_fastfir.c}}
+\DoxyCodeLine{00024\ \textcolor{comment}{\ \ in\ the\ tools/\ directory.}}
+\DoxyCodeLine{00025\ \textcolor{comment}{*/}}
+\DoxyCodeLine{00026\ }
+\DoxyCodeLine{00027\ \textcolor{preprocessor}{\#ifdef\ USE\_SIMD}}
+\DoxyCodeLine{00028\ \textcolor{preprocessor}{\#\ include\ <xmmintrin.h>}}
+\DoxyCodeLine{00029\ \textcolor{preprocessor}{\#\ define\ kiss\_fft\_scalar\ \_\_m128}}
+\DoxyCodeLine{00030\ \textcolor{preprocessor}{\#define\ KISS\_FFT\_MALLOC(nbytes)\ \_mm\_malloc(nbytes,16)}}
+\DoxyCodeLine{00031\ \textcolor{preprocessor}{\#define\ KISS\_FFT\_FREE\ \_mm\_free}}
+\DoxyCodeLine{00032\ \textcolor{preprocessor}{\#else\ \ \ }}
+\DoxyCodeLine{00033\ \textcolor{preprocessor}{\#define\ KISS\_FFT\_MALLOC(X)\ (void*)(0x0)\ }\textcolor{comment}{/*\ Patched.\ */}\textcolor{preprocessor}{}}
+\DoxyCodeLine{00034\ \textcolor{preprocessor}{\#define\ KISS\_FFT\_FREE(X)\ }\textcolor{comment}{/*\ Patched.\ */}\textcolor{preprocessor}{}}
+\DoxyCodeLine{00035\ \textcolor{preprocessor}{\#endif\ \ }}
+\DoxyCodeLine{00036\ }
+\DoxyCodeLine{00037\ }
+\DoxyCodeLine{00038\ \textcolor{preprocessor}{\#ifdef\ FIXED\_POINT}}
+\DoxyCodeLine{00039\ \textcolor{preprocessor}{\#include\ <stdint.h>}\ \textcolor{comment}{/*\ Patched.\ */}}
+\DoxyCodeLine{00040\ \textcolor{preprocessor}{\#\ if\ (FIXED\_POINT\ ==\ 32)}}
+\DoxyCodeLine{00041\ \textcolor{preprocessor}{\#\ \ define\ kiss\_fft\_scalar\ int32\_t}}
+\DoxyCodeLine{00042\ \textcolor{preprocessor}{\#\ else\ \ }}
+\DoxyCodeLine{00043\ \textcolor{preprocessor}{\#\ \ define\ kiss\_fft\_scalar\ int16\_t}}
+\DoxyCodeLine{00044\ \textcolor{preprocessor}{\#\ endif}}
+\DoxyCodeLine{00045\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00046\ \textcolor{preprocessor}{\#\ ifndef\ kiss\_fft\_scalar}}
+\DoxyCodeLine{00047\ \textcolor{comment}{/*\ \ default\ is\ float\ */}}
+\DoxyCodeLine{00048\ \textcolor{preprocessor}{\#\ \ \ define\ kiss\_fft\_scalar\ float}}
+\DoxyCodeLine{00049\ \textcolor{preprocessor}{\#\ endif}}
+\DoxyCodeLine{00050\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00051\ }
+\DoxyCodeLine{00052\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\{}
+\DoxyCodeLine{00053\ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcd60fd2c96e0a236dfb5f77629fb99d4f_a4d9bf2d6a2ce1b061545a16faf77d337}{kiss\_fft\_scalar}}\ \mbox{\hyperlink{structkiss__fft__cpx_a686b6187e3e885de316908319c71ea8f}{r}};}
+\DoxyCodeLine{00054\ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcd60fd2c96e0a236dfb5f77629fb99d4f_a4d9bf2d6a2ce1b061545a16faf77d337}{kiss\_fft\_scalar}}\ \mbox{\hyperlink{structkiss__fft__cpx_ac1e17add2ae6b815da29d7d67b03fa70}{i}};}
+\DoxyCodeLine{00055\ \}\mbox{\hyperlink{structkiss__fft__cpx}{kiss\_fft\_cpx}};}
+\DoxyCodeLine{00056\ }
+\DoxyCodeLine{00057\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structkiss__fft__state}{kiss\_fft\_state}}*\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcd60fd2c96e0a236dfb5f77629fb99d4f_ab8c364e12d4cbde47dca54eb4bc3ce79}{kiss\_fft\_cfg}};}
+\DoxyCodeLine{00058\ }
+\DoxyCodeLine{00059\ \textcolor{comment}{/*\ }}
+\DoxyCodeLine{00060\ \textcolor{comment}{\ *\ \ kiss\_fft\_alloc}}
+\DoxyCodeLine{00061\ \textcolor{comment}{\ *\ \ }}
+\DoxyCodeLine{00062\ \textcolor{comment}{\ *\ \ Initialize\ a\ FFT\ (or\ IFFT)\ algorithm's\ cfg/state\ buffer.}}
+\DoxyCodeLine{00063\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00064\ \textcolor{comment}{\ *\ \ typical\ usage:\ \ \ \ \ \ kiss\_fft\_cfg\ mycfg=kiss\_fft\_alloc(1024,0,NULL,NULL);}}
+\DoxyCodeLine{00065\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00066\ \textcolor{comment}{\ *\ \ The\ return\ value\ from\ fft\_alloc\ is\ a\ cfg\ buffer\ used\ internally}}
+\DoxyCodeLine{00067\ \textcolor{comment}{\ *\ \ by\ the\ fft\ routine\ or\ NULL.}}
+\DoxyCodeLine{00068\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00069\ \textcolor{comment}{\ *\ \ If\ lenmem\ is\ NULL,\ then\ kiss\_fft\_alloc\ will\ allocate\ a\ cfg\ buffer\ using\ malloc.}}
+\DoxyCodeLine{00070\ \textcolor{comment}{\ *\ \ The\ returned\ value\ should\ be\ free()d\ when\ done\ to\ avoid\ memory\ leaks.}}
+\DoxyCodeLine{00071\ \textcolor{comment}{\ *\ \ }}
+\DoxyCodeLine{00072\ \textcolor{comment}{\ *\ \ The\ state\ can\ be\ placed\ in\ a\ user\ supplied\ buffer\ 'mem':}}
+\DoxyCodeLine{00073\ \textcolor{comment}{\ *\ \ If\ lenmem\ is\ not\ NULL\ and\ mem\ is\ not\ NULL\ and\ *lenmem\ is\ large\ enough,}}
+\DoxyCodeLine{00074\ \textcolor{comment}{\ *\ \ \ \ \ \ then\ the\ function\ places\ the\ cfg\ in\ mem\ and\ the\ size\ used\ in\ *lenmem}}
+\DoxyCodeLine{00075\ \textcolor{comment}{\ *\ \ \ \ \ \ and\ returns\ mem.}}
+\DoxyCodeLine{00076\ \textcolor{comment}{\ *\ \ }}
+\DoxyCodeLine{00077\ \textcolor{comment}{\ *\ \ If\ lenmem\ is\ not\ NULL\ and\ (\ mem\ is\ NULL\ or\ *lenmem\ is\ not\ large\ enough),}}
+\DoxyCodeLine{00078\ \textcolor{comment}{\ *\ \ \ \ \ \ then\ the\ function\ returns\ NULL\ and\ places\ the\ minimum\ cfg\ }}
+\DoxyCodeLine{00079\ \textcolor{comment}{\ *\ \ \ \ \ \ buffer\ size\ in\ *lenmem.}}
+\DoxyCodeLine{00080\ \textcolor{comment}{\ *\ */}}
+\DoxyCodeLine{00081\ }
+\DoxyCodeLine{00082\ \mbox{\hyperlink{structkiss__fft__state}{kiss\_fft\_cfg}}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcd60fd2c96e0a236dfb5f77629fb99d4f_ab5ad1560b58375ec071da45401911358}{kiss\_fft\_alloc}}(\textcolor{keywordtype}{int}\ \mbox{\hyperlink{structkiss__fft__state_aa7446bded329a40e13aef0826e349791}{nfft}},\textcolor{keywordtype}{int}\ inverse\_fft,\textcolor{keywordtype}{void}\ *\ mem,\textcolor{keywordtype}{size\_t}\ *\ lenmem);\ }
+\DoxyCodeLine{00083\ }
+\DoxyCodeLine{00084\ \textcolor{comment}{/*}}
+\DoxyCodeLine{00085\ \textcolor{comment}{\ *\ kiss\_fft(cfg,in\_out\_buf)}}
+\DoxyCodeLine{00086\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00087\ \textcolor{comment}{\ *\ Perform\ an\ FFT\ on\ a\ complex\ input\ buffer.}}
+\DoxyCodeLine{00088\ \textcolor{comment}{\ *\ for\ a\ forward\ FFT,}}
+\DoxyCodeLine{00089\ \textcolor{comment}{\ *\ fin\ should\ be\ \ f[0]\ ,\ f[1]\ ,\ ...\ ,f[nfft-\/1]}}
+\DoxyCodeLine{00090\ \textcolor{comment}{\ *\ fout\ will\ be\ \ \ F[0]\ ,\ F[1]\ ,\ ...\ ,F[nfft-\/1]}}
+\DoxyCodeLine{00091\ \textcolor{comment}{\ *\ Note\ that\ each\ element\ is\ complex\ and\ can\ be\ accessed\ like}}
+\DoxyCodeLine{00092\ \textcolor{comment}{\ \ \ \ f[k].r\ and\ f[k].i}}
+\DoxyCodeLine{00093\ \textcolor{comment}{\ *\ */}}
+\DoxyCodeLine{00094\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcd60fd2c96e0a236dfb5f77629fb99d4f_ab36e2bb33b74c1a7eabe3271d0916030}{kiss\_fft}}(\mbox{\hyperlink{structkiss__fft__state}{kiss\_fft\_cfg}}\ \mbox{\hyperlink{arc__mli_2conv_8cc_adf2a9cd16accb576c21e71252ae8ceba}{cfg}},\textcolor{keyword}{const}\ \mbox{\hyperlink{structkiss__fft__cpx}{kiss\_fft\_cpx}}\ *fin,\mbox{\hyperlink{structkiss__fft__cpx}{kiss\_fft\_cpx}}\ *fout);}
+\DoxyCodeLine{00095\ }
+\DoxyCodeLine{00096\ \textcolor{comment}{/*}}
+\DoxyCodeLine{00097\ \textcolor{comment}{\ A\ more\ generic\ version\ of\ the\ above\ function.\ It\ reads\ its\ input\ from\ every\ Nth\ sample.}}
+\DoxyCodeLine{00098\ \textcolor{comment}{\ *\ */}}
+\DoxyCodeLine{00099\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcd60fd2c96e0a236dfb5f77629fb99d4f_a240e0a77bb991890d609f498f9c75ec8}{kiss\_fft\_stride}}(\mbox{\hyperlink{structkiss__fft__state}{kiss\_fft\_cfg}}\ \mbox{\hyperlink{arc__mli_2conv_8cc_adf2a9cd16accb576c21e71252ae8ceba}{cfg}},\textcolor{keyword}{const}\ \mbox{\hyperlink{structkiss__fft__cpx}{kiss\_fft\_cpx}}\ *fin,\mbox{\hyperlink{structkiss__fft__cpx}{kiss\_fft\_cpx}}\ *fout,\textcolor{keywordtype}{int}\ fin\_stride);}
+\DoxyCodeLine{00100\ }
+\DoxyCodeLine{00101\ \textcolor{comment}{/*\ If\ kiss\_fft\_alloc\ allocated\ a\ buffer,\ it\ is\ one\ contiguous\ }}
+\DoxyCodeLine{00102\ \textcolor{comment}{\ \ \ buffer\ and\ can\ be\ simply\ free()d\ when\ no\ longer\ needed*/}}
+\DoxyCodeLine{00103\ \textcolor{preprocessor}{\#define\ kiss\_fft\_free\ free}}
+\DoxyCodeLine{00104\ }
+\DoxyCodeLine{00105\ \textcolor{comment}{/*}}
+\DoxyCodeLine{00106\ \textcolor{comment}{\ Cleans\ up\ some\ memory\ that\ gets\ managed\ internally.\ Not\ necessary\ to\ call,\ but\ it\ might\ clean\ up\ }}
+\DoxyCodeLine{00107\ \textcolor{comment}{\ your\ compiler\ output\ to\ call\ this\ before\ you\ exit.}}
+\DoxyCodeLine{00108\ \textcolor{comment}{*/}}
+\DoxyCodeLine{00109\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcd60fd2c96e0a236dfb5f77629fb99d4f_aab7972365fc8f30a13eed91fa29172ba}{kiss\_fft\_cleanup}}(\textcolor{keywordtype}{void});}
+\DoxyCodeLine{00110\ \ \ \ \ }
+\DoxyCodeLine{00111\ }
+\DoxyCodeLine{00112\ \textcolor{comment}{/*}}
+\DoxyCodeLine{00113\ \textcolor{comment}{\ *\ Returns\ the\ smallest\ integer\ k,\ such\ that\ k>=n\ and\ k\ has\ only\ "{}fast"{}\ factors\ (2,3,5)}}
+\DoxyCodeLine{00114\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{00115\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcd60fd2c96e0a236dfb5f77629fb99d4f_a26b8ac31a43a356943061318831508e9}{kiss\_fft\_next\_fast\_size}}(\textcolor{keywordtype}{int}\ n);}
+\DoxyCodeLine{00116\ }
+\DoxyCodeLine{00117\ \textcolor{comment}{/*\ for\ real\ ffts,\ we\ need\ an\ even\ size\ */}}
+\DoxyCodeLine{00118\ \textcolor{preprocessor}{\#define\ kiss\_fftr\_next\_fast\_size\_real(n)\ \(\backslash\)}}
+\DoxyCodeLine{00119\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ (kiss\_fft\_next\_fast\_size(\ ((n)+1)>>1)<<1)}}
+\DoxyCodeLine{00120\ }
+\DoxyCodeLine{00121\ \textcolor{preprocessor}{\#ifdef\ \_\_cplusplus}}
+\DoxyCodeLine{00122\ \}\ }
+\DoxyCodeLine{00123\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00124\ }
+\DoxyCodeLine{00125\ \textcolor{preprocessor}{\#endif}}
+
+\end{DoxyCode}

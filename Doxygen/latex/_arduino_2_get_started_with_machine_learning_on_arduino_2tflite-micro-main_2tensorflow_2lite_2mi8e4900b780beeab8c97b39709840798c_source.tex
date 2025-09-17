@@ -1,0 +1,176 @@
+\doxysection{greedy\+\_\+memory\+\_\+planner.\+h}
+\hypertarget{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_2mi8e4900b780beeab8c97b39709840798c_source}{}\label{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_2mi8e4900b780beeab8c97b39709840798c_source}\index{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/main/tensorflow/lite/micro/memory\_planner/greedy\_memory\_planner.h@{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/main/tensorflow/lite/micro/memory\_planner/greedy\_memory\_planner.h}}
+\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_2mi8e4900b780beeab8c97b39709840798c}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{/*\ Copyright\ 2019\ The\ TensorFlow\ Authors.\ All\ Rights\ Reserved.}}
+\DoxyCodeLine{00002\ \textcolor{comment}{}}
+\DoxyCodeLine{00003\ \textcolor{comment}{Licensed\ under\ the\ Apache\ License,\ Version\ 2.0\ (the\ "{}License"{});}}
+\DoxyCodeLine{00004\ \textcolor{comment}{you\ may\ not\ use\ this\ file\ except\ in\ compliance\ with\ the\ License.}}
+\DoxyCodeLine{00005\ \textcolor{comment}{You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{00006\ \textcolor{comment}{}}
+\DoxyCodeLine{00007\ \textcolor{comment}{\ \ \ \ http://www.apache.org/licenses/LICENSE-\/2.0}}
+\DoxyCodeLine{00008\ \textcolor{comment}{}}
+\DoxyCodeLine{00009\ \textcolor{comment}{Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ software}}
+\DoxyCodeLine{00010\ \textcolor{comment}{distributed\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,}}
+\DoxyCodeLine{00011\ \textcolor{comment}{WITHOUT\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,\ either\ express\ or\ implied.}}
+\DoxyCodeLine{00012\ \textcolor{comment}{See\ the\ License\ for\ the\ specific\ language\ governing\ permissions\ and}}
+\DoxyCodeLine{00013\ \textcolor{comment}{limitations\ under\ the\ License.}}
+\DoxyCodeLine{00014\ \textcolor{comment}{==============================================================================*/}}
+\DoxyCodeLine{00015\ }
+\DoxyCodeLine{00016\ \textcolor{preprocessor}{\#ifndef\ TENSORFLOW\_LITE\_MICRO\_MEMORY\_PLANNER\_GREEDY\_MEMORY\_PLANNER\_H\_}}
+\DoxyCodeLine{00017\ \textcolor{preprocessor}{\#define\ TENSORFLOW\_LITE\_MICRO\_MEMORY\_PLANNER\_GREEDY\_MEMORY\_PLANNER\_H\_}}
+\DoxyCodeLine{00018\ }
+\DoxyCodeLine{00019\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/micro/compatibility.h"{}}}
+\DoxyCodeLine{00020\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/micro/memory\_planner/micro\_memory\_planner.h"{}}}
+\DoxyCodeLine{00021\ }
+\DoxyCodeLine{00022\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacetflite}{tflite}}\ \{}
+\DoxyCodeLine{00023\ }
+\DoxyCodeLine{00024\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{namespacetflite_a2ef9702ebfa0960ff58c8d716c293af5}{kOnlinePlannedBuffer}}\ =\ -\/1;}
+\DoxyCodeLine{00025\ }
+\DoxyCodeLine{00026\ \textcolor{comment}{//\ A\ memory\ planner\ that\ uses\ a\ greedy\ algorithm\ to\ arrange\ buffers\ in\ memory}}
+\DoxyCodeLine{00027\ \textcolor{comment}{//\ to\ minimize\ the\ overall\ arena\ size\ needed.}}
+\DoxyCodeLine{00028\ \textcolor{comment}{//}}
+\DoxyCodeLine{00029\ \textcolor{comment}{//\ The\ algorithm\ works\ like\ this:}}
+\DoxyCodeLine{00030\ \textcolor{comment}{//\ \ -\/\ The\ client\ enters\ the\ buffer\ information\ through\ AddBuffer().}}
+\DoxyCodeLine{00031\ \textcolor{comment}{//\ \ -\/\ When\ a\ function\ like\ GetOffsetForBuffer()\ is\ called,\ the}}
+\DoxyCodeLine{00032\ \textcolor{comment}{//\ \ \ \ CalculateOffsetsIfNeeded()\ method\ is\ invoked.}}
+\DoxyCodeLine{00033\ \textcolor{comment}{//\ \ -\/\ If\ an\ up\ to\ date\ plan\ is\ not\ already\ present,\ one\ will\ be\ calculated.}}
+\DoxyCodeLine{00034\ \textcolor{comment}{//\ \ -\/\ The\ buffers\ are\ sorted\ in\ descending\ order\ of\ size.}}
+\DoxyCodeLine{00035\ \textcolor{comment}{//\ \ -\/\ The\ largest\ buffer\ is\ placed\ at\ offset\ zero.}}
+\DoxyCodeLine{00036\ \textcolor{comment}{//\ \ -\/\ The\ rest\ of\ the\ buffers\ are\ looped\ through\ in\ descending\ size\ order.}}
+\DoxyCodeLine{00037\ \textcolor{comment}{//\ \ -\/\ The\ other\ buffers\ that\ need\ to\ be\ in\ memory\ at\ the\ same\ time\ are\ found.}}
+\DoxyCodeLine{00038\ \textcolor{comment}{//\ \ -\/\ The\ first\ gap\ between\ simultaneously\ active\ buffers\ that\ the\ current}}
+\DoxyCodeLine{00039\ \textcolor{comment}{//\ \ \ \ buffer\ fits\ into\ will\ be\ used.}}
+\DoxyCodeLine{00040\ \textcolor{comment}{//\ \ -\/\ If\ no\ large-\/enough\ gap\ is\ found,\ the\ current\ buffer\ is\ placed\ after\ the}}
+\DoxyCodeLine{00041\ \textcolor{comment}{//\ \ \ \ last\ buffer\ that's\ simultaneously\ active.}}
+\DoxyCodeLine{00042\ \textcolor{comment}{//\ \ -\/\ This\ continues\ until\ all\ buffers\ are\ placed,\ and\ the\ offsets\ stored.}}
+\DoxyCodeLine{00043\ \textcolor{comment}{//}}
+\DoxyCodeLine{00044\ \textcolor{comment}{//\ This\ is\ not\ guaranteed\ to\ produce\ the\ best\ placement,\ since\ that's\ an}}
+\DoxyCodeLine{00045\ \textcolor{comment}{//\ NP-\/Complete\ problem,\ but\ in\ practice\ it\ should\ produce\ one\ that's\ decent.}}
+\DoxyCodeLine{00046\ \textcolor{keyword}{class\ }GreedyMemoryPlanner\ :\ \textcolor{keyword}{public}\ MicroMemoryPlanner\ \{}
+\DoxyCodeLine{00047\ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00048\ \ \ \mbox{\hyperlink{classtflite_1_1_greedy_memory_planner_a3ff7d3d4388891d427228cbfc03af2d5}{GreedyMemoryPlanner}}();}
+\DoxyCodeLine{00049\ \ \ \mbox{\hyperlink{classtflite_1_1_greedy_memory_planner_a21fd776cd645e67754894a05ae05ddd5}{\string~GreedyMemoryPlanner}}()\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00050\ }
+\DoxyCodeLine{00051\ \ \ \textcolor{comment}{//\ You\ need\ to\ pass\ in\ an\ area\ of\ memory\ to\ be\ used\ for\ planning.\ The\ client}}
+\DoxyCodeLine{00052\ \ \ \textcolor{comment}{//\ should\ ensure\ the\ validity\ of\ the\ memory\ when\ it\ needs\ to\ use\ this\ object.}}
+\DoxyCodeLine{00053\ \ \ \textcolor{comment}{//\ This\ memory\ isn't\ owned\ by\ this\ object,\ so\ management\ should\ be\ handled\ by}}
+\DoxyCodeLine{00054\ \ \ \textcolor{comment}{//\ the\ client.\ This\ is\ so\ it\ can\ be\ stack\ or\ globally\ allocated\ if\ necessary}}
+\DoxyCodeLine{00055\ \ \ \textcolor{comment}{//\ on\ devices\ without\ dynamic\ memory\ allocation.\ How\ many\ buffers\ can\ be}}
+\DoxyCodeLine{00056\ \ \ \textcolor{comment}{//\ planned\ for\ will\ depend\ on\ the\ size\ of\ this\ scratch\ memory,\ so\ you\ should}}
+\DoxyCodeLine{00057\ \ \ \textcolor{comment}{//\ enlarge\ it\ if\ you\ see\ an\ error\ when\ calling\ AddBuffer().\ The\ memory\ can\ be}}
+\DoxyCodeLine{00058\ \ \ \textcolor{comment}{//\ reused\ once\ you're\ done\ with\ the\ planner,\ as\ long\ as\ you\ copy\ the}}
+\DoxyCodeLine{00059\ \ \ \textcolor{comment}{//\ calculated\ offsets\ to\ another\ location.\ Each\ buffer\ requires\ about\ 36\ bytes}}
+\DoxyCodeLine{00060\ \ \ \textcolor{comment}{//\ of\ scratch.}}
+\DoxyCodeLine{00061\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_greedy_memory_planner_a96b95bf541cd28d185f7de440c7b5acb}{Init}}(\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}*\ scratch\_buffer,}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ scratch\_buffer\_size)\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00063\ }
+\DoxyCodeLine{00064\ \ \ \textcolor{comment}{//\ Record\ details\ of\ a\ buffer\ we\ want\ to\ place.}}
+\DoxyCodeLine{00065\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_greedy_memory_planner_ace53d9f7cabd0185dbae7e8efeca9c3f}{AddBuffer}}(\textcolor{keywordtype}{int}\ \mbox{\hyperlink{hello__world__model_8cc_a439227feff9d7f55384e8780cfc2eb82}{size}},\ \textcolor{keywordtype}{int}\ first\_time\_used,}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ last\_time\_used)\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00067\ }
+\DoxyCodeLine{00068\ \ \ \textcolor{comment}{//\ Record\ details\ of\ an\ offline\ planned\ buffer\ offset\ we\ want\ to\ place.}}
+\DoxyCodeLine{00069\ \ \ \textcolor{comment}{//\ offline\_offset\ is\ the\ buffer\ offset\ from\ the\ start\ of\ the\ arena.}}
+\DoxyCodeLine{00070\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_greedy_memory_planner_aeec6ef086e45488218835ee61f4b76ce}{AddBuffer}}(\textcolor{keywordtype}{int}\ \mbox{\hyperlink{hello__world__model_8cc_a439227feff9d7f55384e8780cfc2eb82}{size}},\ \textcolor{keywordtype}{int}\ first\_time\_used,\ \textcolor{keywordtype}{int}\ last\_time\_used,}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ offline\_offset)\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00072\ }
+\DoxyCodeLine{00073\ \ \ \textcolor{comment}{//\ Returns\ the\ high-\/water\ mark\ of\ used\ memory.\ This\ is\ the\ minimum\ size\ of\ a}}
+\DoxyCodeLine{00074\ \ \ \textcolor{comment}{//\ memory\ arena\ you'd\ need\ to\ allocate\ to\ hold\ these\ buffers.}}
+\DoxyCodeLine{00075\ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{classtflite_1_1_greedy_memory_planner_a1464cfc49923c928211747eb0a1f5aee}{GetMaximumMemorySize}}()\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00076\ }
+\DoxyCodeLine{00077\ \ \ \textcolor{comment}{//\ How\ many\ buffers\ have\ been\ recorded.}}
+\DoxyCodeLine{00078\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{classtflite_1_1_greedy_memory_planner_af6afd2e3cb050643807abbe5fbb03790}{GetBufferCount}}()\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00079\ }
+\DoxyCodeLine{00080\ \ \ \textcolor{comment}{//\ Where\ a\ given\ buffer\ should\ be\ placed\ in\ the\ memory\ arena.}}
+\DoxyCodeLine{00081\ \ \ \textcolor{comment}{//\ This\ information\ is\ stored\ in\ the\ memory\ arena\ itself,\ so\ once\ the\ arena}}
+\DoxyCodeLine{00082\ \ \ \textcolor{comment}{//\ is\ used\ for\ inference,\ it\ will\ be\ overwritten.}}
+\DoxyCodeLine{00083\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{classtflite_1_1_greedy_memory_planner_a005d095304db07688fd4bf0ece968e66}{GetOffsetForBuffer}}(\textcolor{keywordtype}{int}\ buffer\_index,\ \textcolor{keywordtype}{int}*\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcaf138809236f667e9686fdd4aaf17705_aed7ea92f45bd273dde380a45ddced592}{offset}})\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00084\ }
+\DoxyCodeLine{00085\ \ \ \textcolor{comment}{//\ Prints\ an\ ascii-\/art\ diagram\ of\ the\ buffer\ layout\ plan.}}
+\DoxyCodeLine{00086\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classtflite_1_1_greedy_memory_planner_a9f0365b6c62dea7b1351916977ec2a6e}{PrintMemoryPlan}}()\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00087\ }
+\DoxyCodeLine{00088\ \ \ \textcolor{comment}{//\ Debug\ method\ to\ check\ whether\ any\ buffer\ allocations\ are\ overlapping.\ This}}
+\DoxyCodeLine{00089\ \ \ \textcolor{comment}{//\ is\ an\ O(N\string^2)\ complexity\ operation,\ so\ only\ use\ for\ testing.}}
+\DoxyCodeLine{00090\ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classtflite_1_1_greedy_memory_planner_ad3ea652326e8c8a6301b2ccf9769e16d}{DoAnyBuffersOverlap}}();}
+\DoxyCodeLine{00091\ }
+\DoxyCodeLine{00092\ \ \ \textcolor{comment}{//\ Used\ to\ store\ a\ list\ of\ buffers\ ordered\ by\ their\ offset.}}
+\DoxyCodeLine{00093\ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structtflite_1_1_greedy_memory_planner_1_1_list_entry}{ListEntry}}\ \{}
+\DoxyCodeLine{00094\ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{structtflite_1_1_greedy_memory_planner_1_1_list_entry_ab87e59e06aa41fc1d33f9b9d3f6524b8}{offset}};}
+\DoxyCodeLine{00095\ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{structtflite_1_1_greedy_memory_planner_1_1_list_entry_a2942e3d35109442fa7e689cdf6ee967b}{requirements\_index}};}
+\DoxyCodeLine{00096\ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{structtflite_1_1_greedy_memory_planner_1_1_list_entry_ad359382848907f5941810cde80b668d7}{next\_entry\_index}};}
+\DoxyCodeLine{00097\ \ \ \};}
+\DoxyCodeLine{00098\ }
+\DoxyCodeLine{00099\ \ \ \textcolor{comment}{//\ Number\ of\ bytes\ required\ in\ order\ to\ plan\ a\ buffer.}}
+\DoxyCodeLine{00100\ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{classtflite_1_1_greedy_memory_planner_a9a28a95c2ef5663897d601927fc012b9}{per\_buffer\_size}}()\ \{}
+\DoxyCodeLine{00101\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{classtflite_1_1_greedy_memory_planner_a9a28a95c2ef5663897d601927fc012b9}{per\_buffer\_size}}\ =}
+\DoxyCodeLine{00102\ \ \ \ \ \ \ \ \ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{structtflite_1_1_greedy_memory_planner_1_1_buffer_requirements}{BufferRequirements}})\ +\ \ \textcolor{comment}{//\ requirements\_}}
+\DoxyCodeLine{00103\ \ \ \ \ \ \ \ \ \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{int})\ +\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ buffer\_sizes\_sorted\_}}
+\DoxyCodeLine{00104\ \ \ \ \ \ \ \ \ \textcolor{keyword}{sizeof}(int)\ +\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ buffer\_ids\_sorted\_}}
+\DoxyCodeLine{00105\ \ \ \ \ \ \ \ \ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{structtflite_1_1_greedy_memory_planner_1_1_list_entry}{ListEntry}})\ +\ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ buffers\_sorted\_by\_offset\_}}
+\DoxyCodeLine{00106\ \ \ \ \ \ \ \ \ \textcolor{keyword}{sizeof}(int);\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ buffer\_offsets\_;}}
+\DoxyCodeLine{00107\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1_greedy_memory_planner_a9a28a95c2ef5663897d601927fc012b9}{per\_buffer\_size}};}
+\DoxyCodeLine{00108\ \ \ \}}
+\DoxyCodeLine{00109\ }
+\DoxyCodeLine{00110\ \ \ \textcolor{comment}{//\ Returns\ False\ because\ the\ GreedyMemoryPlanner\ doesn't\ preserves\ all\ tensors}}
+\DoxyCodeLine{00111\ \ \ \textcolor{comment}{//\ after\ invocation.\ Do\ to\ the\ fact\ that\ tensors\ that\ tensor\ data\ for\ tensors}}
+\DoxyCodeLine{00112\ \ \ \textcolor{comment}{//\ that\ aren't\ being\ used\ during\ a\ phase\ of\ invocation\ are\ overwritten.}}
+\DoxyCodeLine{00113\ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classtflite_1_1_greedy_memory_planner_a2055fec0f471609a19762356b4c0a658}{preserves\_all\_tensors}}()\textcolor{keyword}{\ const\ override\ }\{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};\ \}}
+\DoxyCodeLine{00114\ }
+\DoxyCodeLine{00115\ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{00116\ \ \ \textcolor{comment}{//\ Whether\ a\ buffer\ is\ active\ in\ a\ given\ time\ range.}}
+\DoxyCodeLine{00117\ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classtflite_1_1_greedy_memory_planner_a46480555b18ac4ed5f5aa48724f6fb19}{DoesEntryOverlapInTime}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structtflite_1_1_greedy_memory_planner_1_1_list_entry}{ListEntry}}*\ entry,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ first\_time\_used,}
+\DoxyCodeLine{00118\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ last\_time\_used)\ \textcolor{keyword}{const};}
+\DoxyCodeLine{00119\ }
+\DoxyCodeLine{00120\ \ \ \textcolor{comment}{//\ Walks\ the\ list\ to\ return\ the\ next\ buffer\ that\ is\ active\ in\ a\ given\ time}}
+\DoxyCodeLine{00121\ \ \ \textcolor{comment}{//\ range,\ or\ a\ null\ pointer\ if\ there\ are\ none.}}
+\DoxyCodeLine{00122\ \ \ \mbox{\hyperlink{structtflite_1_1_greedy_memory_planner_1_1_list_entry}{ListEntry}}*\ \mbox{\hyperlink{classtflite_1_1_greedy_memory_planner_adfed1f851c0d843348e0a2bae56f8988}{NextSimultaneouslyActiveBuffer}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structtflite_1_1_greedy_memory_planner_1_1_list_entry}{ListEntry}}*\ start,}
+\DoxyCodeLine{00123\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ first\_time\_used,}
+\DoxyCodeLine{00124\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ last\_time\_used);}
+\DoxyCodeLine{00125\ }
+\DoxyCodeLine{00126\ \ \ \textcolor{comment}{//\ If\ there\ isn't\ an\ up\ to\ date\ plan,\ calculate\ a\ new\ one.}}
+\DoxyCodeLine{00127\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classtflite_1_1_greedy_memory_planner_a40eec2c06679532c61753aa0537e023d}{CalculateOffsetsIfNeeded}}();}
+\DoxyCodeLine{00128\ }
+\DoxyCodeLine{00129\ \ \ \textcolor{comment}{//\ How\ many\ buffers\ we\ can\ plan\ for,\ based\ on\ the\ arena\ size\ we're\ given\ in}}
+\DoxyCodeLine{00130\ \ \ \textcolor{comment}{//\ the\ constructor.}}
+\DoxyCodeLine{00131\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{classtflite_1_1_greedy_memory_planner_abe9efd7ed861fa480647b96b58469b6f}{max\_buffer\_count\_}};}
+\DoxyCodeLine{00132\ }
+\DoxyCodeLine{00133\ \ \ \textcolor{comment}{//\ The\ number\ of\ buffers\ added\ so\ far.}}
+\DoxyCodeLine{00134\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{classtflite_1_1_greedy_memory_planner_a30981b32bb5d4a574fdff58b80e07798}{buffer\_count\_}};}
+\DoxyCodeLine{00135\ }
+\DoxyCodeLine{00136\ \ \ \textcolor{comment}{//\ Records\ the\ client-\/provided\ information\ about\ each\ buffer.}}
+\DoxyCodeLine{00137\ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structtflite_1_1_greedy_memory_planner_1_1_buffer_requirements}{BufferRequirements}}\ \{}
+\DoxyCodeLine{00138\ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{structtflite_1_1_greedy_memory_planner_1_1_buffer_requirements_a7b5d310fe09d94ed75da3820dac652ba}{size}};}
+\DoxyCodeLine{00139\ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{structtflite_1_1_greedy_memory_planner_1_1_buffer_requirements_abbf87bfb1694cb9cc0062fd6e0c721cc}{offline\_offset}};}
+\DoxyCodeLine{00140\ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{structtflite_1_1_greedy_memory_planner_1_1_buffer_requirements_aa6ad03a1b97024962bd8015f19329a58}{first\_time\_used}};}
+\DoxyCodeLine{00141\ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{structtflite_1_1_greedy_memory_planner_1_1_buffer_requirements_a963511cc92861c7deefe2f230ed10907}{last\_time\_used}};}
+\DoxyCodeLine{00142\ \ \ \};}
+\DoxyCodeLine{00143\ }
+\DoxyCodeLine{00144\ \ \ \textcolor{comment}{//\ Working\ arrays\ used\ during\ the\ layout\ algorithm.}}
+\DoxyCodeLine{00145\ \ \ BufferRequirements*\ \mbox{\hyperlink{classtflite_1_1_greedy_memory_planner_a83795d1d4d622ccd6cb4ca7e83504a5f}{requirements\_}};}
+\DoxyCodeLine{00146\ \ \ \textcolor{comment}{//\ buffer\_sizes\_sorted\_\ and\ buffer\_ids\_sorted\_\ are\ sorted\ according\ to:}}
+\DoxyCodeLine{00147\ \ \ \textcolor{comment}{//\ \ \ \{}}
+\DoxyCodeLine{00148\ \ \ \textcolor{comment}{//\ \ \ \ \ offline\ planned\ buffers,}}
+\DoxyCodeLine{00149\ \ \ \textcolor{comment}{//\ \ \ \ \ online\ planned\ buffers\ sorted\ by\ size}}
+\DoxyCodeLine{00150\ \ \ \textcolor{comment}{//\ \ \ \}}}
+\DoxyCodeLine{00151\ \ \ \textcolor{keywordtype}{int}*\ \mbox{\hyperlink{classtflite_1_1_greedy_memory_planner_af2192a386eccc9c0fff4e8e9256551ac}{buffer\_sizes\_sorted\_}};}
+\DoxyCodeLine{00152\ \ \ \textcolor{keywordtype}{int}*\ \mbox{\hyperlink{classtflite_1_1_greedy_memory_planner_a1f41cf5144e4f83199cdb863262eb0fb}{buffer\_ids\_sorted\_}};}
+\DoxyCodeLine{00153\ \ \ ListEntry*\ \mbox{\hyperlink{classtflite_1_1_greedy_memory_planner_af9c9c208b93db7f869484ce436f0d3cc}{buffers\_sorted\_by\_offset\_}};}
+\DoxyCodeLine{00154\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{classtflite_1_1_greedy_memory_planner_a5de83fcb68ee76f89c195775d42942b0}{next\_free\_entry\_}};\ \ \ \ \textcolor{comment}{//\ Index\ of\ the\ next\ free\ entry\ of}}
+\DoxyCodeLine{00155\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ buffers\_sorted\_by\_offset\_}}
+\DoxyCodeLine{00156\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{classtflite_1_1_greedy_memory_planner_a602991eb6b329178e7fceb52402bf106}{first\_entry\_index\_}};\ \ \textcolor{comment}{//\ Index\ of\ the\ first\ entry\ (smallest\ offset)\ of}}
+\DoxyCodeLine{00157\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ buffers\_sorted\_by\_offset\_}}
+\DoxyCodeLine{00158\ }
+\DoxyCodeLine{00159\ \ \ \textcolor{comment}{//\ Stores\ the\ outcome\ of\ the\ plan,\ the\ location\ of\ each\ buffer\ in\ the\ arena.}}
+\DoxyCodeLine{00160\ \ \ \textcolor{keywordtype}{int}*\ \mbox{\hyperlink{classtflite_1_1_greedy_memory_planner_a35a0e2781713d2972d4241c767936392}{buffer\_offsets\_}};}
+\DoxyCodeLine{00161\ }
+\DoxyCodeLine{00162\ \ \ \textcolor{comment}{//\ Whether\ buffers\ have\ been\ added\ since\ the\ last\ plan\ was\ calculated.}}
+\DoxyCodeLine{00163\ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classtflite_1_1_greedy_memory_planner_ae6fa31bf5f148091615ddd568dbf4784}{need\_to\_calculate\_offsets\_}};}
+\DoxyCodeLine{00164\ }
+\DoxyCodeLine{00165\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src336b24cffab807348972c47c46f8de00_a92a34c72cfcc4f6c5bd49086ba082af4}{TF\_LITE\_REMOVE\_VIRTUAL\_DELETE}}}
+\DoxyCodeLine{00166\ \};}
+\DoxyCodeLine{00167\ }
+\DoxyCodeLine{00168\ \}\ \ \textcolor{comment}{//\ namespace\ tflite}}
+\DoxyCodeLine{00169\ }
+\DoxyCodeLine{00170\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ TENSORFLOW\_LITE\_MICRO\_MEMORY\_PLANNER\_GREEDY\_MEMORY\_PLANNER\_H\_}}
+
+\end{DoxyCode}

@@ -1,0 +1,128 @@
+\doxysection{portable\+\_\+tensor.\+h}
+\hypertarget{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcd25d4d25c4fde2a20d110d1405904466_source}{}\label{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcd25d4d25c4fde2a20d110d1405904466_source}\index{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/arduino-\/examples-\/main/src/tensorflow/lite/kernels/internal/portable\_tensor.h@{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/arduino-\/examples-\/main/src/tensorflow/lite/kernels/internal/portable\_tensor.h}}
+\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcd25d4d25c4fde2a20d110d1405904466}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{/*\ Copyright\ 2017\ The\ TensorFlow\ Authors.\ All\ Rights\ Reserved.}}
+\DoxyCodeLine{00002\ \textcolor{comment}{}}
+\DoxyCodeLine{00003\ \textcolor{comment}{Licensed\ under\ the\ Apache\ License,\ Version\ 2.0\ (the\ "{}License"{});}}
+\DoxyCodeLine{00004\ \textcolor{comment}{you\ may\ not\ use\ this\ file\ except\ in\ compliance\ with\ the\ License.}}
+\DoxyCodeLine{00005\ \textcolor{comment}{You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{00006\ \textcolor{comment}{}}
+\DoxyCodeLine{00007\ \textcolor{comment}{\ \ \ \ http://www.apache.org/licenses/LICENSE-\/2.0}}
+\DoxyCodeLine{00008\ \textcolor{comment}{}}
+\DoxyCodeLine{00009\ \textcolor{comment}{Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ software}}
+\DoxyCodeLine{00010\ \textcolor{comment}{distributed\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,}}
+\DoxyCodeLine{00011\ \textcolor{comment}{WITHOUT\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,\ either\ express\ or\ implied.}}
+\DoxyCodeLine{00012\ \textcolor{comment}{See\ the\ License\ for\ the\ specific\ language\ governing\ permissions\ and}}
+\DoxyCodeLine{00013\ \textcolor{comment}{limitations\ under\ the\ License.}}
+\DoxyCodeLine{00014\ \textcolor{comment}{==============================================================================*/}}
+\DoxyCodeLine{00015\ \textcolor{preprocessor}{\#ifndef\ TENSORFLOW\_LITE\_KERNELS\_INTERNAL\_PORTABLE\_TENSOR\_H\_}}
+\DoxyCodeLine{00016\ \textcolor{preprocessor}{\#define\ TENSORFLOW\_LITE\_KERNELS\_INTERNAL\_PORTABLE\_TENSOR\_H\_}}
+\DoxyCodeLine{00017\ }
+\DoxyCodeLine{00018\ \textcolor{preprocessor}{\#include\ <vector>}}
+\DoxyCodeLine{00019\ }
+\DoxyCodeLine{00020\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/core/c/common.h"{}}}
+\DoxyCodeLine{00021\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/kernels/internal/tensor\_ctypes.h"{}}}
+\DoxyCodeLine{00022\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/kernels/internal/types.h"{}}}
+\DoxyCodeLine{00023\ }
+\DoxyCodeLine{00024\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacetflite}{tflite}}\ \{}
+\DoxyCodeLine{00025\ }
+\DoxyCodeLine{00026\ \textcolor{keyword}{inline}\ \mbox{\hyperlink{classtflite_1_1_runtime_shape}{RuntimeShape}}\ \mbox{\hyperlink{namespacetflite_a575226cacf2453458286f00dd4bed1b3}{GetTensorShape}}(std::vector<int32\_t>\ \mbox{\hyperlink{hello__world__model_8cc_ab2a9259b73b53c0bb06a6b242aa7ae32}{data}})\ \{}
+\DoxyCodeLine{00027\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1_runtime_shape}{RuntimeShape}}(\mbox{\hyperlink{hello__world__model_8cc_ab2a9259b73b53c0bb06a6b242aa7ae32}{data}}.size(),\ \mbox{\hyperlink{hello__world__model_8cc_ab2a9259b73b53c0bb06a6b242aa7ae32}{data}}.data());}
+\DoxyCodeLine{00028\ \}}
+\DoxyCodeLine{00029\ }
+\DoxyCodeLine{00030\ \textcolor{comment}{//\ A\ list\ of\ tensors\ in\ a\ format\ that\ can\ be\ used\ by\ kernels\ like\ split\ and}}
+\DoxyCodeLine{00031\ \textcolor{comment}{//\ concatenation.}}
+\DoxyCodeLine{00032\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{00033\ \textcolor{keyword}{class\ }VectorOfTensors\ \{}
+\DoxyCodeLine{00034\ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00035\ \ \ \textcolor{comment}{//\ Build\ with\ the\ tensors\ in\ 'tensor\_list'.}}
+\DoxyCodeLine{00036\ \ \ \mbox{\hyperlink{classtflite_1_1_vector_of_tensors_afc43141abd3f37642701f14bdc3b3522}{VectorOfTensors}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{struct_tf_lite_context}{TfLiteContext}}\&\ context,}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_tf_lite_int_array}{TfLiteIntArray}}\&\ tensor\_list)\ \{}
+\DoxyCodeLine{00038\ \ \ \ \ \textcolor{keywordtype}{int}\ num\_tensors\ =\ tensor\_list.\mbox{\hyperlink{struct_tf_lite_int_array_aaaa4554b9c73a68a4d6a99f1285be320}{size}};}
+\DoxyCodeLine{00039\ }
+\DoxyCodeLine{00040\ \ \ \ \ \mbox{\hyperlink{classtflite_1_1_vector_of_tensors_a7c95df285909648fa4f3dd821ed8d13a}{all\_data\_}}.reserve(num\_tensors);}
+\DoxyCodeLine{00041\ \ \ \ \ \mbox{\hyperlink{classtflite_1_1_vector_of_tensors_a90ac4551063630c9faac02504c64b500}{all\_shape\_}}.reserve(num\_tensors);}
+\DoxyCodeLine{00042\ \ \ \ \ \mbox{\hyperlink{classtflite_1_1_vector_of_tensors_a61a4975526fd4f8b3a98fe18d04bc126}{all\_shape\_ptr\_}}.reserve(num\_tensors);}
+\DoxyCodeLine{00043\ }
+\DoxyCodeLine{00044\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ num\_tensors;\ ++i)\ \{}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \mbox{\hyperlink{struct_tf_lite_tensor}{TfLiteTensor}}*\ t\ =\ \&context.\mbox{\hyperlink{struct_tf_lite_context_a2264b9daa01733bb6e328302ab8a039b}{tensors}}[tensor\_list.\mbox{\hyperlink{struct_tf_lite_int_array_ab262dcb3609e96a3d8a5e64fccd092d6}{data}}[i]];}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \mbox{\hyperlink{classtflite_1_1_vector_of_tensors_a7c95df285909648fa4f3dd821ed8d13a}{all\_data\_}}.push\_back(\mbox{\hyperlink{namespacetflite_a87697fa28f46987bdcbd53736c6d8959}{GetTensorData<T>}}(t));}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \mbox{\hyperlink{classtflite_1_1_vector_of_tensors_a90ac4551063630c9faac02504c64b500}{all\_shape\_}}.push\_back(\mbox{\hyperlink{namespacetflite_a575226cacf2453458286f00dd4bed1b3}{GetTensorShape}}(t));}
+\DoxyCodeLine{00048\ \ \ \ \ \}}
+\DoxyCodeLine{00049\ }
+\DoxyCodeLine{00050\ \ \ \ \ \textcolor{comment}{//\ Taking\ the\ pointer\ from\ inside\ a\ std::vector\ is\ only\ OK\ if\ the\ vector\ is}}
+\DoxyCodeLine{00051\ \ \ \ \ \textcolor{comment}{//\ never\ modified,\ so\ we\ populate\ all\_shape\ in\ the\ previous\ loop\ and\ then\ we}}
+\DoxyCodeLine{00052\ \ \ \ \ \textcolor{comment}{//\ are\ free\ to\ grab\ iterators\ here.}}
+\DoxyCodeLine{00053\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ num\_tensors;\ ++i)\ \{}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \mbox{\hyperlink{classtflite_1_1_vector_of_tensors_a61a4975526fd4f8b3a98fe18d04bc126}{all\_shape\_ptr\_}}.push\_back(\&\mbox{\hyperlink{classtflite_1_1_vector_of_tensors_a90ac4551063630c9faac02504c64b500}{all\_shape\_}}[i]);}
+\DoxyCodeLine{00055\ \ \ \ \ \}}
+\DoxyCodeLine{00056\ \ \ \}}
+\DoxyCodeLine{00057\ \ \ \textcolor{comment}{//\ Return\ a\ pointer\ to\ the\ data\ pointers\ of\ all\ tensors\ in\ the\ list.\ For}}
+\DoxyCodeLine{00058\ \ \ \textcolor{comment}{//\ example:}}
+\DoxyCodeLine{00059\ \ \ \textcolor{comment}{//\ \ \ float*\ const*\ f\ =\ v.data();}}
+\DoxyCodeLine{00060\ \ \ \textcolor{comment}{//\ \ \ f[0][1]\ is\ the\ second\ element\ of\ the\ first\ tensor.}}
+\DoxyCodeLine{00061\ \ \ T*\ \textcolor{keyword}{const}*\ \mbox{\hyperlink{classtflite_1_1_vector_of_tensors_a06f9df2efbece6280362287a2e7c820d}{data}}()\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1_vector_of_tensors_a7c95df285909648fa4f3dd821ed8d13a}{all\_data\_}}.data();\ \}}
+\DoxyCodeLine{00062\ }
+\DoxyCodeLine{00063\ \ \ \textcolor{comment}{//\ Return\ a\ pointer\ the\ shape\ pointers\ of\ all\ tensors\ in\ the\ list.\ For}}
+\DoxyCodeLine{00064\ \ \ \textcolor{comment}{//\ example:}}
+\DoxyCodeLine{00065\ \ \ \textcolor{comment}{//\ \ \ const\ RuntimeShape*\ const*\ d\ =\ v.dims();}}
+\DoxyCodeLine{00066\ \ \ \textcolor{comment}{//\ \ \ dims[1]\ are\ the\ dimensions\ of\ the\ second\ tensor\ in\ the\ list.}}
+\DoxyCodeLine{00067\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classtflite_1_1_runtime_shape}{RuntimeShape}}*\ \textcolor{keyword}{const}*\ \mbox{\hyperlink{classtflite_1_1_vector_of_tensors_a2a1b7005a0945995149145864fae8b55}{shapes}}()\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1_vector_of_tensors_a61a4975526fd4f8b3a98fe18d04bc126}{all\_shape\_ptr\_}}.data();\ \}}
+\DoxyCodeLine{00068\ }
+\DoxyCodeLine{00069\ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{00070\ \ \ std::vector<T*>\ \mbox{\hyperlink{classtflite_1_1_vector_of_tensors_a7c95df285909648fa4f3dd821ed8d13a}{all\_data\_}};}
+\DoxyCodeLine{00071\ \ \ std::vector<RuntimeShape>\ \mbox{\hyperlink{classtflite_1_1_vector_of_tensors_a90ac4551063630c9faac02504c64b500}{all\_shape\_}};}
+\DoxyCodeLine{00072\ \ \ std::vector<RuntimeShape*>\ \mbox{\hyperlink{classtflite_1_1_vector_of_tensors_a61a4975526fd4f8b3a98fe18d04bc126}{all\_shape\_ptr\_}};}
+\DoxyCodeLine{00073\ \};}
+\DoxyCodeLine{00074\ }
+\DoxyCodeLine{00075\ \textcolor{comment}{//\ A\ list\ of\ quantized\ tensors\ in\ a\ format\ that\ can\ be\ used\ by\ kernels\ like}}
+\DoxyCodeLine{00076\ \textcolor{comment}{//\ split\ and\ concatenation.}}
+\DoxyCodeLine{00077\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classtflite_1_1_vector_of_quantized_tensors}{VectorOfQuantizedTensors}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{classtflite_1_1_vector_of_tensors}{VectorOfTensors}}<uint8\_t>\ \{}
+\DoxyCodeLine{00078\ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00079\ \ \ \textcolor{comment}{//\ Build\ with\ the\ tensors\ in\ 'tensor\_list'.}}
+\DoxyCodeLine{00080\ \ \ \mbox{\hyperlink{classtflite_1_1_vector_of_quantized_tensors_ae84fb5a93b0eecaa022b6ba2441c7e57}{VectorOfQuantizedTensors}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{struct_tf_lite_context}{TfLiteContext}}\&\ context,}
+\DoxyCodeLine{00081\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_tf_lite_int_array}{TfLiteIntArray}}\&\ tensor\_list)}
+\DoxyCodeLine{00082\ \ \ \ \ \ \ :\ \mbox{\hyperlink{classtflite_1_1_vector_of_tensors}{VectorOfTensors}}<uint8\_t>(context,\ tensor\_list)\ \{}
+\DoxyCodeLine{00083\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ tensor\_list.\mbox{\hyperlink{struct_tf_lite_int_array_aaaa4554b9c73a68a4d6a99f1285be320}{size}};\ ++i)\ \{}
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \mbox{\hyperlink{struct_tf_lite_tensor}{TfLiteTensor}}*\ t\ =\ \&context.\mbox{\hyperlink{struct_tf_lite_context_a2264b9daa01733bb6e328302ab8a039b}{tensors}}[tensor\_list.\mbox{\hyperlink{struct_tf_lite_int_array_ab262dcb3609e96a3d8a5e64fccd092d6}{data}}[i]];}
+\DoxyCodeLine{00085\ \ \ \ \ \ \ \mbox{\hyperlink{classtflite_1_1_vector_of_quantized_tensors_ada409592843ebe75095c2222a4119afc}{zero\_point\_}}.push\_back(t-\/>params.zero\_point);}
+\DoxyCodeLine{00086\ \ \ \ \ \ \ \mbox{\hyperlink{classtflite_1_1_vector_of_quantized_tensors_a0b60af9d27368927062b5915b34805a4}{scale\_}}.push\_back(t-\/>params.scale);}
+\DoxyCodeLine{00087\ \ \ \ \ \}}
+\DoxyCodeLine{00088\ \ \ \}}
+\DoxyCodeLine{00089\ }
+\DoxyCodeLine{00090\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{float}*\ \mbox{\hyperlink{classtflite_1_1_vector_of_quantized_tensors_a77d2a5357fcb5bb7c5a8f638caaf7d04}{scale}}()\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1_vector_of_quantized_tensors_a0b60af9d27368927062b5915b34805a4}{scale\_}}.data();\ \}}
+\DoxyCodeLine{00091\ \ \ \textcolor{keyword}{const}\ int32\_t*\ \mbox{\hyperlink{classtflite_1_1_vector_of_quantized_tensors_a45e489d4ebaf150a99d118aff71108df}{zero\_point}}()\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtflite_1_1_vector_of_quantized_tensors_ada409592843ebe75095c2222a4119afc}{zero\_point\_}}.data();\ \}}
+\DoxyCodeLine{00092\ }
+\DoxyCodeLine{00093\ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{00094\ \ \ std::vector<int32\_t>\ \mbox{\hyperlink{classtflite_1_1_vector_of_quantized_tensors_ada409592843ebe75095c2222a4119afc}{zero\_point\_}};}
+\DoxyCodeLine{00095\ \ \ std::vector<float>\ \mbox{\hyperlink{classtflite_1_1_vector_of_quantized_tensors_a0b60af9d27368927062b5915b34805a4}{scale\_}};}
+\DoxyCodeLine{00096\ \};}
+\DoxyCodeLine{00097\ }
+\DoxyCodeLine{00098\ \textcolor{comment}{//\ Writes\ randomly\ accessed\ values\ from\ \`{}input`\ sequentially\ into\ \`{}output`.}}
+\DoxyCodeLine{00099\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{00100\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classtflite_1_1_sequential_tensor_writer}{SequentialTensorWriter}}\ \{}
+\DoxyCodeLine{00101\ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00102\ \ \ \mbox{\hyperlink{classtflite_1_1_sequential_tensor_writer_adad062b652ad628c3587b55051f3e1b6}{SequentialTensorWriter}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{struct_tf_lite_tensor}{TfLiteTensor}}*\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src5afb18c45f6346167aa977a363205143_a9cebfb3d6ddd692fbdd268cf4b9ad024}{input}},\ \mbox{\hyperlink{struct_tf_lite_tensor}{TfLiteTensor}}*\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbcd3bbe90c4644d53fde1ce4e312f437_a7a2a916a8059078c2d7a05f46c7126fd}{output}})\ \{}
+\DoxyCodeLine{00103\ \ \ \ \ \mbox{\hyperlink{classtflite_1_1_sequential_tensor_writer_a927fceeb04f5fcc154fe15c777a867ff}{input\_data\_}}\ =\ \mbox{\hyperlink{namespacetflite_a87697fa28f46987bdcbd53736c6d8959}{GetTensorData<T>}}(\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src5afb18c45f6346167aa977a363205143_a9cebfb3d6ddd692fbdd268cf4b9ad024}{input}});}
+\DoxyCodeLine{00104\ \ \ \ \ \mbox{\hyperlink{classtflite_1_1_sequential_tensor_writer_ab735126edb26d075ec178279d918e401}{output\_ptr\_}}\ =\ \mbox{\hyperlink{namespacetflite_a87697fa28f46987bdcbd53736c6d8959}{GetTensorData<T>}}(\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbcd3bbe90c4644d53fde1ce4e312f437_a7a2a916a8059078c2d7a05f46c7126fd}{output}});}
+\DoxyCodeLine{00105\ \ \ \}}
+\DoxyCodeLine{00106\ \ \ \mbox{\hyperlink{classtflite_1_1_sequential_tensor_writer_abaca200dcd59f5c397f8827d0c223750}{SequentialTensorWriter}}(\textcolor{keyword}{const}\ T*\ \mbox{\hyperlink{add__n__test_8cc_a5612ba79d1f0b544c7aeae4621166fea}{input\_data}},\ T*\ \mbox{\hyperlink{add__n__test_8cc_a3305b43869c4b837b0a33c12cff5069b}{output\_data}})}
+\DoxyCodeLine{00107\ \ \ \ \ \ \ :\ \mbox{\hyperlink{classtflite_1_1_sequential_tensor_writer_a927fceeb04f5fcc154fe15c777a867ff}{input\_data\_}}(\mbox{\hyperlink{add__n__test_8cc_a5612ba79d1f0b544c7aeae4621166fea}{input\_data}}),\ \mbox{\hyperlink{classtflite_1_1_sequential_tensor_writer_ab735126edb26d075ec178279d918e401}{output\_ptr\_}}(\mbox{\hyperlink{add__n__test_8cc_a3305b43869c4b837b0a33c12cff5069b}{output\_data}})\ \{\}}
+\DoxyCodeLine{00108\ }
+\DoxyCodeLine{00109\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classtflite_1_1_sequential_tensor_writer_afce95db8c9d293ecebfbe8934fe99770}{Write}}(\textcolor{keywordtype}{int}\ position)\ \{\ *\mbox{\hyperlink{classtflite_1_1_sequential_tensor_writer_ab735126edb26d075ec178279d918e401}{output\_ptr\_}}++\ =\ \mbox{\hyperlink{classtflite_1_1_sequential_tensor_writer_a927fceeb04f5fcc154fe15c777a867ff}{input\_data\_}}[position];\ \}}
+\DoxyCodeLine{00110\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classtflite_1_1_sequential_tensor_writer_af99e7f9bdf8787f0000288feaef26ce5}{WriteN}}(\textcolor{keywordtype}{int}\ position,\ \textcolor{keywordtype}{int}\ len)\ \{}
+\DoxyCodeLine{00111\ \ \ \ \ memcpy(\mbox{\hyperlink{classtflite_1_1_sequential_tensor_writer_ab735126edb26d075ec178279d918e401}{output\_ptr\_}},\ \&\mbox{\hyperlink{classtflite_1_1_sequential_tensor_writer_a927fceeb04f5fcc154fe15c777a867ff}{input\_data\_}}[position],\ \textcolor{keyword}{sizeof}(T)\ *\ len);}
+\DoxyCodeLine{00112\ \ \ \ \ \mbox{\hyperlink{classtflite_1_1_sequential_tensor_writer_ab735126edb26d075ec178279d918e401}{output\_ptr\_}}\ +=\ len;}
+\DoxyCodeLine{00113\ \ \ \}}
+\DoxyCodeLine{00114\ }
+\DoxyCodeLine{00115\ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{00116\ \ \ \textcolor{keyword}{const}\ T*\ \mbox{\hyperlink{classtflite_1_1_sequential_tensor_writer_a927fceeb04f5fcc154fe15c777a867ff}{input\_data\_}};}
+\DoxyCodeLine{00117\ \ \ T*\ \mbox{\hyperlink{classtflite_1_1_sequential_tensor_writer_ab735126edb26d075ec178279d918e401}{output\_ptr\_}};}
+\DoxyCodeLine{00118\ \};}
+\DoxyCodeLine{00119\ }
+\DoxyCodeLine{00120\ \}\ \ \textcolor{comment}{//\ namespace\ tflite}}
+\DoxyCodeLine{00121\ }
+\DoxyCodeLine{00122\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ TENSORFLOW\_LITE\_KERNELS\_INTERNAL\_PORTABLE\_TENSOR\_H\_}}
+
+\end{DoxyCode}

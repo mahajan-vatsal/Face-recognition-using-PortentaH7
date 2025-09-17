@@ -1,0 +1,83 @@
+\doxysection{scatter\+\_\+nd.\+h}
+\hypertarget{scatter__nd_8h_source}{}\label{scatter__nd_8h_source}\index{Face\_Access\_inferencing/src/edge-\/impulse-\/sdk/tensorflow/lite/kernels/internal/reference/scatter\_nd.h@{Face\_Access\_inferencing/src/edge-\/impulse-\/sdk/tensorflow/lite/kernels/internal/reference/scatter\_nd.h}}
+\mbox{\hyperlink{scatter__nd_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{/*\ Copyright\ 2018\ The\ TensorFlow\ Authors.\ All\ Rights\ Reserved.}}
+\DoxyCodeLine{00002\ \textcolor{comment}{}}
+\DoxyCodeLine{00003\ \textcolor{comment}{Licensed\ under\ the\ Apache\ License,\ Version\ 2.0\ (the\ "{}License"{});}}
+\DoxyCodeLine{00004\ \textcolor{comment}{you\ may\ not\ use\ this\ file\ except\ in\ compliance\ with\ the\ License.}}
+\DoxyCodeLine{00005\ \textcolor{comment}{You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{00006\ \textcolor{comment}{}}
+\DoxyCodeLine{00007\ \textcolor{comment}{\ \ \ \ http://www.apache.org/licenses/LICENSE-\/2.0}}
+\DoxyCodeLine{00008\ \textcolor{comment}{}}
+\DoxyCodeLine{00009\ \textcolor{comment}{Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ software}}
+\DoxyCodeLine{00010\ \textcolor{comment}{distributed\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,}}
+\DoxyCodeLine{00011\ \textcolor{comment}{WITHOUT\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,\ either\ express\ or\ implied.}}
+\DoxyCodeLine{00012\ \textcolor{comment}{See\ the\ License\ for\ the\ specific\ language\ governing\ permissions\ and}}
+\DoxyCodeLine{00013\ \textcolor{comment}{limitations\ under\ the\ License.}}
+\DoxyCodeLine{00014\ \textcolor{comment}{==============================================================================*/}}
+\DoxyCodeLine{00015\ \textcolor{preprocessor}{\#ifndef\ TENSORFLOW\_LITE\_KERNELS\_INTERNAL\_REFERENCE\_SCATTER\_ND\_H\_}}
+\DoxyCodeLine{00016\ \textcolor{preprocessor}{\#define\ TENSORFLOW\_LITE\_KERNELS\_INTERNAL\_REFERENCE\_SCATTER\_ND\_H\_}}
+\DoxyCodeLine{00017\ }
+\DoxyCodeLine{00018\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{_face___access__inferencing_2src_2edge-impulse-sdk_2tensorflow_2lite_2kernels_2internal_2common_8h}{edge-\/impulse-\/sdk/tensorflow/lite/kernels/internal/common.h}}"{}}}
+\DoxyCodeLine{00019\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{_face___access__inferencing_2src_2edge-impulse-sdk_2tensorflow_2lite_2kernels_2internal_2types_8h}{edge-\/impulse-\/sdk/tensorflow/lite/kernels/internal/types.h}}"{}}}
+\DoxyCodeLine{00020\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{_face___access__inferencing_2src_2edge-impulse-sdk_2tensorflow_2lite_2kernels_2internal_2tensor__ctypes_8h}{edge-\/impulse-\/sdk/tensorflow/lite/kernels/internal/tensor\_ctypes.h}}"{}}}
+\DoxyCodeLine{00021\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{_face___access__inferencing_2src_2edge-impulse-sdk_2tensorflow_2lite_2kernels_2kernel__util_8h}{edge-\/impulse-\/sdk/tensorflow/lite/kernels/kernel\_util.h}}"{}}}
+\DoxyCodeLine{00022\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{_face___access__inferencing_2src_2edge-impulse-sdk_2tensorflow_2lite_2micro_2kernels_2kernel__util_8h}{edge-\/impulse-\/sdk/tensorflow/lite/micro/kernels/kernel\_util.h}}"{}}}
+\DoxyCodeLine{00023\ }
+\DoxyCodeLine{00024\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacetflite}{tflite}}\ \{}
+\DoxyCodeLine{00025\ }
+\DoxyCodeLine{00026\ \textcolor{keyword}{namespace\ }reference\_ops\ \{}
+\DoxyCodeLine{00027\ }
+\DoxyCodeLine{00028\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ IndicesT,\ \textcolor{keyword}{typename}\ UpdatesT>}
+\DoxyCodeLine{00029\ \textcolor{keyword}{inline}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_1_1reference__ops_ad1a6a3bb9b02c2e869b6d2fd69f64c53}{ScatterNd}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classtflite_1_1_runtime_shape}{RuntimeShape}}\&\ indices\_shape,}
+\DoxyCodeLine{00030\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ IndicesT*\ indices\_data,}
+\DoxyCodeLine{00031\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classtflite_1_1_runtime_shape}{RuntimeShape}}\&\ updates\_shape,}
+\DoxyCodeLine{00032\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ UpdatesT*\ updates\_data,}
+\DoxyCodeLine{00033\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classtflite_1_1_runtime_shape}{RuntimeShape}}\&\ output\_shape,}
+\DoxyCodeLine{00034\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UpdatesT*\ \mbox{\hyperlink{add__n__test_8cc_a3305b43869c4b837b0a33c12cff5069b}{output\_data}})\ \{}
+\DoxyCodeLine{00035\ \ \ \textcolor{keywordtype}{int}\ n\_slices\ =\ 1;}
+\DoxyCodeLine{00036\ \ \ \textcolor{keywordtype}{int}\ slice\_size\ =\ 1;}
+\DoxyCodeLine{00037\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{delay_8cc_a5886ed05dd12fe8736c1756b4debeb56}{outer\_dims}}\ =\ indices\_shape.\mbox{\hyperlink{classtflite_1_1_runtime_shape_a9de8e21fa79a2a74e69578f0240f4ebe}{DimensionsCount}}()\ -\/\ 1;}
+\DoxyCodeLine{00038\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ indices\_nd\ =\ indices\_shape.\mbox{\hyperlink{classtflite_1_1_runtime_shape_a2039ed030a02c05b73a0ea723339a808}{Dims}}(\mbox{\hyperlink{delay_8cc_a5886ed05dd12fe8736c1756b4debeb56}{outer\_dims}});}
+\DoxyCodeLine{00039\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ updates\_dims\ =\ updates\_shape.\mbox{\hyperlink{classtflite_1_1_runtime_shape_a9de8e21fa79a2a74e69578f0240f4ebe}{DimensionsCount}}();}
+\DoxyCodeLine{00040\ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ \mbox{\hyperlink{delay_8cc_a5886ed05dd12fe8736c1756b4debeb56}{outer\_dims}};\ ++i)\ \{}
+\DoxyCodeLine{00041\ \ \ \ \ n\_slices\ *=\ indices\_shape.\mbox{\hyperlink{classtflite_1_1_runtime_shape_a2039ed030a02c05b73a0ea723339a808}{Dims}}(i);}
+\DoxyCodeLine{00042\ \ \ \}}
+\DoxyCodeLine{00043\ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ \mbox{\hyperlink{delay_8cc_a5886ed05dd12fe8736c1756b4debeb56}{outer\_dims}};\ i\ <\ updates\_dims;\ ++i)\ \{}
+\DoxyCodeLine{00044\ \ \ \ \ slice\_size\ *=\ updates\_shape.\mbox{\hyperlink{classtflite_1_1_runtime_shape_a2039ed030a02c05b73a0ea723339a808}{Dims}}(i);}
+\DoxyCodeLine{00045\ \ \ \}}
+\DoxyCodeLine{00046\ }
+\DoxyCodeLine{00047\ \ \ \textcolor{keywordtype}{int}\ output\_flat\_size\ =\ output\_shape.\mbox{\hyperlink{classtflite_1_1_runtime_shape_a73fb2c2df1c833850d88faf428c65630}{FlatSize}}();}
+\DoxyCodeLine{00048\ \ \ \textcolor{keywordtype}{int}\ remain\_flat\_size\ =\ output\_flat\_size;}
+\DoxyCodeLine{00049\ \ \ std::vector<int>\ dims\_to\_count(indices\_nd,\ 0);}
+\DoxyCodeLine{00050\ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ indices\_nd;\ ++i)\ \{}
+\DoxyCodeLine{00051\ \ \ \ \ dims\_to\_count[i]\ =\ remain\_flat\_size\ /\ output\_shape.\mbox{\hyperlink{classtflite_1_1_runtime_shape_a2039ed030a02c05b73a0ea723339a808}{Dims}}(i);}
+\DoxyCodeLine{00052\ \ \ \ \ remain\_flat\_size\ =\ dims\_to\_count[i];}
+\DoxyCodeLine{00053\ \ \ \}}
+\DoxyCodeLine{00054\ }
+\DoxyCodeLine{00055\ \ \ \textcolor{keywordflow}{if}\ (n\_slices\ *\ slice\_size\ >\ updates\_shape.\mbox{\hyperlink{classtflite_1_1_runtime_shape_a73fb2c2df1c833850d88faf428c65630}{FlatSize}}())\ \{}
+\DoxyCodeLine{00056\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361a0bf230cf34a88de9e37834dc127437db}{kTfLiteError}};}
+\DoxyCodeLine{00057\ \ \ \}}
+\DoxyCodeLine{00058\ \ \ memset(\mbox{\hyperlink{add__n__test_8cc_a3305b43869c4b837b0a33c12cff5069b}{output\_data}},\ 0,\ \textcolor{keyword}{sizeof}(UpdatesT)\ *\ output\_flat\_size);}
+\DoxyCodeLine{00059\ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ n\_slices;\ ++i)\ \{}
+\DoxyCodeLine{00060\ \ \ \ \ \textcolor{keywordtype}{int}\ to\_pos\ =\ 0;}
+\DoxyCodeLine{00061\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ j\ =\ 0;\ j\ <\ indices\_nd;\ ++j)\ \{}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ IndicesT\ idx\ =\ indices\_data[i\ *\ indices\_nd\ +\ j];}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ to\_pos\ +=\ idx\ *\ dims\_to\_count[j];}
+\DoxyCodeLine{00064\ \ \ \ \ \}}
+\DoxyCodeLine{00065\ \ \ \ \ \textcolor{keywordflow}{if}\ (to\_pos\ <\ 0\ ||\ to\_pos\ +\ slice\_size\ >\ output\_flat\_size)\ \{}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361a0bf230cf34a88de9e37834dc127437db}{kTfLiteError}};}
+\DoxyCodeLine{00067\ \ \ \ \ \}}
+\DoxyCodeLine{00068\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ j\ =\ 0;\ j\ <\ slice\_size;\ j++)\ \{}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \mbox{\hyperlink{add__n__test_8cc_a3305b43869c4b837b0a33c12cff5069b}{output\_data}}[to\_pos\ +\ j]\ +=\ updates\_data[i\ *\ slice\_size\ +\ j];}
+\DoxyCodeLine{00070\ \ \ \ \ \}}
+\DoxyCodeLine{00071\ \ \ \}}
+\DoxyCodeLine{00072\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361ab25fe210808197f1b6601df8ccdcd699}{kTfLiteOk}};}
+\DoxyCodeLine{00073\ \}}
+\DoxyCodeLine{00074\ }
+\DoxyCodeLine{00075\ \}\ \ \textcolor{comment}{//\ namespace\ reference\_ops}}
+\DoxyCodeLine{00076\ \}\ \ \textcolor{comment}{//\ namespace\ tflite}}
+\DoxyCodeLine{00077\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ TENSORFLOW\_LITE\_KERNELS\_INTERNAL\_REFERENCE\_SCATTER\_ND\_H\_}}
+
+\end{DoxyCode}

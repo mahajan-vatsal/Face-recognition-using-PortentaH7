@@ -1,0 +1,49 @@
+\chapter{How to debug invalid output}
+\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2debugging__output}{}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2debugging__output}\index{How to debug invalid output@{How to debug invalid output}}
+\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2debugging__output_autotoc_md89}%
+\Hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2debugging__output_autotoc_md89}%
+
+
+The TFLM debugging output tools allow TFLM users to easily debug their models by providing a tool that will compare the intermediate values(output of each OP/\+Kernel) from a model post invoke between the TFLM and Tf\+Lite. As well as a way to compare intermediate values between TFLM x86 implementations and Optimized Implementations.\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2debugging__output_autotoc_md90}{}\doxysection{\texorpdfstring{How to debug TFLM Interpreter output on embedded targets}{How to debug TFLM Interpreter output on embedded targets}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2debugging__output_autotoc_md90}
+First you call a C++ binary that takes a Tf\+Lite model and returns a file that has random inputs and their corresponding output values for each layer of the model it was provided.
+
+The second is you provide a Tf\+Lite model and file outputted by C++ binary above to a python script. The script runs TFLM x86 inference comparison to the expected output.\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2debugging__output_autotoc_md91}{}\doxysection{\texorpdfstring{How to debug TFLM Python Interpreter output}{How to debug TFLM Python Interpreter output}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2debugging__output_autotoc_md91}
+Using a python script mentioned in the section above when only a Tf\+Lite model is provided as input, the script generates random input and compares TFLM vs Tf\+Lite inference outputs for each layer of the model.\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2debugging__output_autotoc_md92}{}\doxysection{\texorpdfstring{C++ Expected Layer by Layer Output Tool on TFLite Micro}{C++ Expected Layer by Layer Output Tool on TFLite Micro}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2debugging__output_autotoc_md92}
+This C++ binary allows you to pass in a Tf\+Lite model and returns a flatbuffer file with input and the corresponding output values appended into it that can be passed into a python debugging tool which can compare those golden values vs the x86 TFLM reference kernel implementation.
+
+The C++ Tool/binary will write a debugging file to the path provide in 2nd arg using the tflite\+\_\+model provided in the 1st arg.\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2debugging__output_autotoc_md93}{}\doxysubsubsubsection{\texorpdfstring{Command bazel/blaze\+:}{Command bazel/blaze\+:}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2debugging__output_autotoc_md93}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{bazel\ run\ tensorflow/lite/micro/tools:layer\_cc\ -\/-\/\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ </path/to/input\_model.tflite>}
+\DoxyCodeLine{\ \ </path/to/output.file\_name>}
+
+\end{DoxyCode}
+\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2debugging__output_autotoc_md94}{}\doxysubsubsubsection{\texorpdfstring{How to Build using Makefile \+:}{How to Build using Makefile \+:}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2debugging__output_autotoc_md94}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{make\ -\/f\ tensorflow/lite/micro/tools/make/Makefile\ layer\_by\_layer\_output\_tool\ -\/j24}
+
+\end{DoxyCode}
+\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2debugging__output_autotoc_md95}{}\doxysection{\texorpdfstring{Python Layer by Layer Debugging Tool}{Python Layer by Layer Debugging Tool}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2debugging__output_autotoc_md95}
+The Python Tool/\+Script can first be used to compare TFLM vs Tflite outputs for random inputs by only providing a Tf\+Lite file.\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2debugging__output_autotoc_md96}{}\doxysubsubsection{\texorpdfstring{Tf\+Lite vs TFLM command\+:}{Tf\+Lite vs TFLM command\+:}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2debugging__output_autotoc_md96}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{bazel\ run\ tensorflow/lite/micro/tools:layer\_by\_layer\_debugger\ -\/-\/\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ -\/-\/input\_tflite\_file=</path/to/my\_model.tflite>}
+
+\end{DoxyCode}
+
+
+The Python Tool/\+Script can also be used to compare TFLM\textquotesingle{}s python x86 output vs expected output provided by the C++ Tool/binary.\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2debugging__output_autotoc_md97}{}\doxysubsubsection{\texorpdfstring{TFLM vs Expected Command\+:}{TFLM vs Expected Command\+:}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2debugging__output_autotoc_md97}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{bazel\ run\ tensorflow/lite/micro/tools:layer\_by\_layer\_debugger\ -\/-\/\ \(\backslash\)}
+\DoxyCodeLine{\ \ -\/-\/input\_tflite\_file=</path/to/my\_model.tflite>\ \(\backslash\)}
+\DoxyCodeLine{\ \ -\/-\/layer\_by\_layer\_data\_file=</path/to/my\_debug\_flatbuffer\_file>}
+
+\end{DoxyCode}
+\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2debugging__output_autotoc_md98}{}\doxysubsubsection{\texorpdfstring{Optional Flags\+:}{Optional Flags\+:}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2debugging__output_autotoc_md98}
+{\ttfamily -\/-\/print\+\_\+dump} When this flag is set, it will print the TFLM output for each layer that is compared.
+
+{\ttfamily -\/-\/rng} Integer random number seed for generating input data for comparisons against TFLite. (Default\+: 42) 

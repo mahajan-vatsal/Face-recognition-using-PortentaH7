@@ -1,0 +1,24 @@
+var searchData=
+[
+  ['wavelet_0',['wavelet',['../classei_1_1spectral_1_1wavelet.html',1,'ei::spectral']]],
+  ['wd_5fstatus_5fr_1',['wd_status_r',['../structwd__status__r.html',1,'']]],
+  ['weight1_5fbase_5fr_2',['weight1_base_r',['../structweight1__base__r.html',1,'']]],
+  ['weight1_5flength_5fr_3',['weight1_length_r',['../structweight1__length__r.html',1,'']]],
+  ['weight_5fbase_5fr_4',['weight_base_r',['../structweight__base__r.html',1,'']]],
+  ['weight_5flength_5fr_5',['weight_length_r',['../structweight__length__r.html',1,'']]],
+  ['weight_5fregion_5fr_6',['weight_region_r',['../structweight__region__r.html',1,'']]],
+  ['whereoptions_7',['WhereOptions',['../classschema__py__generated_1_1_where_options.html',1,'schema_py_generated']]],
+  ['whereoptionsbuilder_8',['WhereOptionsBuilder',['../structtflite_1_1_where_options_builder.html',1,'tflite']]],
+  ['whereoptionst_9',['WhereOptionsT',['../classschema__py__generated_1_1_where_options_t.html',1,'schema_py_generated.WhereOptionsT'],['../structtflite_1_1_where_options_t.html',1,'tflite::WhereOptionsT']]],
+  ['whileoptions_10',['WhileOptions',['../classschema__py__generated_1_1_while_options.html',1,'schema_py_generated']]],
+  ['whileoptionsbuilder_11',['WhileOptionsBuilder',['../structtflite_1_1_while_options_builder.html',1,'tflite']]],
+  ['whileoptionst_12',['WhileOptionsT',['../classschema__py__generated_1_1_while_options_t.html',1,'schema_py_generated.WhileOptionsT'],['../structtflite_1_1_while_options_t.html',1,'tflite::WhileOptionsT']]],
+  ['widedynamicfuncluttest_13',['WideDynamicFuncLutTest',['../classwide__dynamic__func__lut__test_1_1_wide_dynamic_func_lut_test.html',1,'wide_dynamic_func_lut_test']]],
+  ['windowconfig_14',['WindowConfig',['../struct_window_config.html',1,'']]],
+  ['windowop_15',['WindowOp',['../classtensorflow_1_1signal_1_1_window_op.html',1,'tensorflow::signal']]],
+  ['windowoptest_16',['WindowOpTest',['../classtflite__micro_1_1signal_1_1ops_1_1window__op__test_1_1_window_op_test.html',1,'tflite_micro::signal::ops::window_op_test']]],
+  ['windowstate_17',['WindowState',['../struct_window_state.html',1,'']]],
+  ['wm8960_18',['WM8960',['../classperipherals_1_1_w_m8960.html',1,'peripherals']]],
+  ['writereadmodeltest_19',['WriteReadModelTest',['../classflatbuffer__utils__test_1_1_write_read_model_test.html',1,'flatbuffer_utils_test']]],
+  ['ws_5fwm8960_5faudiohat_5fnrf52840_20',['WS_WM8960_AudioHat_NRF52840',['../classperipherals_1_1_w_s___w_m8960___audio_hat___n_r_f52840.html',1,'peripherals']]]
+];

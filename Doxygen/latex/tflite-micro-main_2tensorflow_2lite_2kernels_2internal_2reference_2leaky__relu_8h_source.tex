@@ -1,0 +1,75 @@
+\doxysection{leaky\+\_\+relu.\+h}
+\hypertarget{tflite-micro-main_2tensorflow_2lite_2kernels_2internal_2reference_2leaky__relu_8h_source}{}\label{tflite-micro-main_2tensorflow_2lite_2kernels_2internal_2reference_2leaky__relu_8h_source}\index{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/main/tensorflow/lite/kernels/internal/reference/leaky\_relu.h@{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/main/tensorflow/lite/kernels/internal/reference/leaky\_relu.h}}
+\mbox{\hyperlink{tflite-micro-main_2tensorflow_2lite_2kernels_2internal_2reference_2leaky__relu_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{/*\ Copyright\ 2020\ The\ TensorFlow\ Authors.\ All\ Rights\ Reserved.}}
+\DoxyCodeLine{00002\ \textcolor{comment}{}}
+\DoxyCodeLine{00003\ \textcolor{comment}{Licensed\ under\ the\ Apache\ License,\ Version\ 2.0\ (the\ "{}License"{});}}
+\DoxyCodeLine{00004\ \textcolor{comment}{you\ may\ not\ use\ this\ file\ except\ in\ compliance\ with\ the\ License.}}
+\DoxyCodeLine{00005\ \textcolor{comment}{You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{00006\ \textcolor{comment}{}}
+\DoxyCodeLine{00007\ \textcolor{comment}{\ \ \ \ http://www.apache.org/licenses/LICENSE-\/2.0}}
+\DoxyCodeLine{00008\ \textcolor{comment}{}}
+\DoxyCodeLine{00009\ \textcolor{comment}{Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ software}}
+\DoxyCodeLine{00010\ \textcolor{comment}{distributed\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,}}
+\DoxyCodeLine{00011\ \textcolor{comment}{WITHOUT\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,\ either\ express\ or\ implied.}}
+\DoxyCodeLine{00012\ \textcolor{comment}{See\ the\ License\ for\ the\ specific\ language\ governing\ permissions\ and}}
+\DoxyCodeLine{00013\ \textcolor{comment}{limitations\ under\ the\ License.}}
+\DoxyCodeLine{00014\ \textcolor{comment}{==============================================================================*/}}
+\DoxyCodeLine{00015\ \textcolor{preprocessor}{\#ifndef\ TENSORFLOW\_LITE\_KERNELS\_INTERNAL\_REFERENCE\_LEAKY\_RELU\_H\_}}
+\DoxyCodeLine{00016\ \textcolor{preprocessor}{\#define\ TENSORFLOW\_LITE\_KERNELS\_INTERNAL\_REFERENCE\_LEAKY\_RELU\_H\_}}
+\DoxyCodeLine{00017\ }
+\DoxyCodeLine{00018\ \textcolor{preprocessor}{\#include\ <algorithm>}}
+\DoxyCodeLine{00019\ \textcolor{preprocessor}{\#include\ <limits>}}
+\DoxyCodeLine{00020\ }
+\DoxyCodeLine{00021\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/kernels/internal/common.h"{}}}
+\DoxyCodeLine{00022\ }
+\DoxyCodeLine{00023\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacetflite}{tflite}}\ \{}
+\DoxyCodeLine{00024\ \textcolor{keyword}{namespace\ }reference\_ops\ \{}
+\DoxyCodeLine{00025\ }
+\DoxyCodeLine{00026\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1reference__ops_a14a6dd045732545db29401a326681191}{LeakyRelu}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structtflite_1_1_leaky_relu_params}{tflite::LeakyReluParams}}\&\ \mbox{\hyperlink{comparisons_8cpp_a434686eb00eea897154eb5c3f9364ef7}{params}},}
+\DoxyCodeLine{00027\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ RuntimeShape\&\ input\_shape,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{float}*\ \mbox{\hyperlink{add__n__test_8cc_a5612ba79d1f0b544c7aeae4621166fea}{input\_data}},}
+\DoxyCodeLine{00028\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ RuntimeShape\&\ output\_shape,\ \textcolor{keywordtype}{float}*\ \mbox{\hyperlink{add__n__test_8cc_a3305b43869c4b837b0a33c12cff5069b}{output\_data}})\ \{}
+\DoxyCodeLine{00029\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ flat\_size\ =\ \mbox{\hyperlink{namespacetflite_a8d6998b7eb7b2f0d21f8352da6f6271f}{MatchingFlatSize}}(input\_shape,\ output\_shape);}
+\DoxyCodeLine{00030\ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ flat\_size;\ ++i)\ \{}
+\DoxyCodeLine{00031\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{float}\ val\ =\ \mbox{\hyperlink{add__n__test_8cc_a5612ba79d1f0b544c7aeae4621166fea}{input\_data}}[i];}
+\DoxyCodeLine{00032\ \ \ \ \ \textcolor{comment}{//\ Note\ that\ alpha\ might\ be\ >\ 1\ or\ <\ 0,\ so\ we\ don't\ use\ std::max\ here.}}
+\DoxyCodeLine{00033\ \ \ \ \ \mbox{\hyperlink{add__n__test_8cc_a3305b43869c4b837b0a33c12cff5069b}{output\_data}}[i]\ =\ val\ >\ 0\ ?\ val\ :\ val\ *\ \mbox{\hyperlink{comparisons_8cpp_a434686eb00eea897154eb5c3f9364ef7}{params}}.alpha;}
+\DoxyCodeLine{00034\ \ \ \}}
+\DoxyCodeLine{00035\ \}}
+\DoxyCodeLine{00036\ }
+\DoxyCodeLine{00037\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{00038\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1reference__ops_a874ad3ca553044613f97655095573180}{QuantizeLeakyRelu}}(\textcolor{keyword}{const}\ LeakyReluParams\&\ \mbox{\hyperlink{comparisons_8cpp_a434686eb00eea897154eb5c3f9364ef7}{params}},}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ RuntimeShape\&\ input\_shape,}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ T*\ \mbox{\hyperlink{add__n__test_8cc_a5612ba79d1f0b544c7aeae4621166fea}{input\_data}},}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ RuntimeShape\&\ output\_shape,}
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ T*\ \mbox{\hyperlink{add__n__test_8cc_a3305b43869c4b837b0a33c12cff5069b}{output\_data}})\ \{}
+\DoxyCodeLine{00043\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ flat\_size\ =\ \mbox{\hyperlink{namespacetflite_a8d6998b7eb7b2f0d21f8352da6f6271f}{MatchingFlatSize}}(input\_shape,\ output\_shape);}
+\DoxyCodeLine{00044\ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ int32\_t\ quantized\_min\ =\ std::numeric\_limits<T>::min();}
+\DoxyCodeLine{00045\ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ int32\_t\ quantized\_max\ =\ std::numeric\_limits<T>::max();}
+\DoxyCodeLine{00046\ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ flat\_size;\ ++i)\ \{}
+\DoxyCodeLine{00047\ \ \ \ \ \textcolor{keyword}{const}\ int32\_t\ input\_value\ =\ \mbox{\hyperlink{add__n__test_8cc_a5612ba79d1f0b544c7aeae4621166fea}{input\_data}}[i]\ -\/\ \mbox{\hyperlink{comparisons_8cpp_a434686eb00eea897154eb5c3f9364ef7}{params}}.input\_offset;}
+\DoxyCodeLine{00048\ \ \ \ \ int32\_t\ unclamped\_output;}
+\DoxyCodeLine{00049\ \ \ \ \ \textcolor{keywordflow}{if}\ (input\_value\ >=\ 0)\ \{}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ unclamped\_output\ =\ \mbox{\hyperlink{comparisons_8cpp_a434686eb00eea897154eb5c3f9364ef7}{params}}.output\_offset\ +}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_a680551edd476cf4545b014a401a532cb}{MultiplyByQuantizedMultiplier}}(}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ input\_value,\ \mbox{\hyperlink{comparisons_8cpp_a434686eb00eea897154eb5c3f9364ef7}{params}}.output\_multiplier\_identity,}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{comparisons_8cpp_a434686eb00eea897154eb5c3f9364ef7}{params}}.output\_shift\_identity);}
+\DoxyCodeLine{00054\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ unclamped\_output\ =\ \mbox{\hyperlink{comparisons_8cpp_a434686eb00eea897154eb5c3f9364ef7}{params}}.output\_offset\ +}
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_a680551edd476cf4545b014a401a532cb}{MultiplyByQuantizedMultiplier}}(}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ input\_value,\ \mbox{\hyperlink{comparisons_8cpp_a434686eb00eea897154eb5c3f9364ef7}{params}}.output\_multiplier\_alpha,}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{comparisons_8cpp_a434686eb00eea897154eb5c3f9364ef7}{params}}.output\_shift\_alpha);}
+\DoxyCodeLine{00059\ \ \ \ \ \}}
+\DoxyCodeLine{00060\ \ \ \ \ \textcolor{keyword}{const}\ T\ clamped\_output\ =}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \ \ std::min(quantized\_max,\ std::max(quantized\_min,\ unclamped\_output));}
+\DoxyCodeLine{00062\ \ \ \ \ \mbox{\hyperlink{add__n__test_8cc_a3305b43869c4b837b0a33c12cff5069b}{output\_data}}[i]\ =\ \textcolor{keyword}{static\_cast<}T\textcolor{keyword}{>}(clamped\_output);}
+\DoxyCodeLine{00063\ \ \ \}}
+\DoxyCodeLine{00064\ \}}
+\DoxyCodeLine{00065\ }
+\DoxyCodeLine{00066\ \}\ \ \textcolor{comment}{//\ namespace\ reference\_ops}}
+\DoxyCodeLine{00067\ \}\ \ \textcolor{comment}{//\ namespace\ tflite}}
+\DoxyCodeLine{00068\ }
+\DoxyCodeLine{00069\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ TENSORFLOW\_LITE\_KERNELS\_INTERNAL\_REFERENCE\_LEAKY\_RELU\_H\_}}
+
+\end{DoxyCode}

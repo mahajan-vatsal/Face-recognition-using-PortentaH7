@@ -1,0 +1,310 @@
+\doxysection{verifier.\+h}
+\hypertarget{verifier_8h_source}{}\label{verifier_8h_source}\index{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/arduino-\/examples-\/main/src/third\_party/flatbuffers/include/flatbuffers/verifier.h@{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/arduino-\/examples-\/main/src/third\_party/flatbuffers/include/flatbuffers/verifier.h}}
+\mbox{\hyperlink{verifier_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{00002\ \textcolor{comment}{\ *\ Copyright\ 2021\ Google\ Inc.\ All\ rights\ reserved.}}
+\DoxyCodeLine{00003\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00004\ \textcolor{comment}{\ *\ Licensed\ under\ the\ Apache\ License,\ Version\ 2.0\ (the\ "{}License"{});}}
+\DoxyCodeLine{00005\ \textcolor{comment}{\ *\ you\ may\ not\ use\ this\ file\ except\ in\ compliance\ with\ the\ License.}}
+\DoxyCodeLine{00006\ \textcolor{comment}{\ *\ You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{00007\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00008\ \textcolor{comment}{\ *\ \ \ \ \ http://www.apache.org/licenses/LICENSE-\/2.0}}
+\DoxyCodeLine{00009\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00010\ \textcolor{comment}{\ *\ Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ software}}
+\DoxyCodeLine{00011\ \textcolor{comment}{\ *\ distributed\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,}}
+\DoxyCodeLine{00012\ \textcolor{comment}{\ *\ WITHOUT\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,\ either\ express\ or\ implied.}}
+\DoxyCodeLine{00013\ \textcolor{comment}{\ *\ See\ the\ License\ for\ the\ specific\ language\ governing\ permissions\ and}}
+\DoxyCodeLine{00014\ \textcolor{comment}{\ *\ limitations\ under\ the\ License.}}
+\DoxyCodeLine{00015\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{00016\ }
+\DoxyCodeLine{00017\ \textcolor{preprocessor}{\#ifndef\ FLATBUFFERS\_VERIFIER\_H\_}}
+\DoxyCodeLine{00018\ \textcolor{preprocessor}{\#define\ FLATBUFFERS\_VERIFIER\_H\_}}
+\DoxyCodeLine{00019\ }
+\DoxyCodeLine{00020\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{base_8h}{third\_party/flatbuffers/include/flatbuffers/base.h}}"{}}}
+\DoxyCodeLine{00021\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{vector_8h}{third\_party/flatbuffers/include/flatbuffers/vector.h}}"{}}}
+\DoxyCodeLine{00022\ }
+\DoxyCodeLine{00023\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespaceflatbuffers}{flatbuffers}}\ \{}
+\DoxyCodeLine{00024\ }
+\DoxyCodeLine{00025\ \textcolor{comment}{//\ Helper\ class\ to\ verify\ the\ integrity\ of\ a\ FlatBuffer}}
+\DoxyCodeLine{00026\ \textcolor{keyword}{class\ }Verifier\ \mbox{\hyperlink{struct_f_l_a_t_b_u_f_f_e_r_s___f_i_n_a_l___c_l_a_s_s}{FLATBUFFERS\_FINAL\_CLASS}}\ \{}
+\DoxyCodeLine{00027\ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00028\ \ \ \mbox{\hyperlink{classflatbuffers_1_1_f_l_a_t_b_u_f_f_e_r_s___f_i_n_a_l___c_l_a_s_s_ac7cece02306954fe85300f0b29c90ec4}{Verifier}}(\textcolor{keyword}{const}\ uint8\_t\ *\textcolor{keyword}{const}\ buf,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ buf\_len,}
+\DoxyCodeLine{00029\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ uoffset\_t\ \_max\_depth\ =\ 64,}
+\DoxyCodeLine{00030\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ uoffset\_t\ \_max\_tables\ =\ 1000000,}
+\DoxyCodeLine{00031\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{bool}\ \_check\_alignment\ =\ \textcolor{keyword}{true})}
+\DoxyCodeLine{00032\ \ \ \ \ \ \ :\ buf\_(buf),}
+\DoxyCodeLine{00033\ \ \ \ \ \ \ \ \ size\_(buf\_len),}
+\DoxyCodeLine{00034\ \ \ \ \ \ \ \ \ max\_depth\_(\_max\_depth),}
+\DoxyCodeLine{00035\ \ \ \ \ \ \ \ \ max\_tables\_(\_max\_tables),}
+\DoxyCodeLine{00036\ \ \ \ \ \ \ \ \ check\_alignment\_(\_check\_alignment),}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \ \ upper\_bound\_(0),}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \ \ depth\_(0),}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \ \ num\_tables\_(0),}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \ \ flex\_reuse\_tracker\_(nullptr)\ \{}
+\DoxyCodeLine{00041\ \ \ \ \ \mbox{\hyperlink{base_8h_ab2116a3957cb3c19761609ea7fd796fe}{FLATBUFFERS\_ASSERT}}(size\_\ <\ FLATBUFFERS\_MAX\_BUFFER\_SIZE);}
+\DoxyCodeLine{00042\ \ \ \}}
+\DoxyCodeLine{00043\ }
+\DoxyCodeLine{00044\ \ \ \textcolor{comment}{//\ Central\ location\ where\ any\ verification\ failures\ register.}}
+\DoxyCodeLine{00045\ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classflatbuffers_1_1_f_l_a_t_b_u_f_f_e_r_s___f_i_n_a_l___c_l_a_s_s_a45316c4269d6c25e019b59ccba0cc81a}{Check}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{bool}\ ok)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{00046\ \ \ \ \ \textcolor{comment}{//\ clang-\/format\ off}}
+\DoxyCodeLine{00047\ \textcolor{preprocessor}{\ \ \ \ \#ifdef\ FLATBUFFERS\_DEBUG\_VERIFICATION\_FAILURE}}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \mbox{\hyperlink{base_8h_ab2116a3957cb3c19761609ea7fd796fe}{FLATBUFFERS\_ASSERT}}(ok);}
+\DoxyCodeLine{00049\ \textcolor{preprocessor}{\ \ \ \ \#endif}}
+\DoxyCodeLine{00050\ \textcolor{preprocessor}{\ \ \ \ \#ifdef\ FLATBUFFERS\_TRACK\_VERIFIER\_BUFFER\_SIZE}}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!ok)}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \ \ upper\_bound\_\ =\ 0;}
+\DoxyCodeLine{00053\ \textcolor{preprocessor}{\ \ \ \ \#endif}}
+\DoxyCodeLine{00054\ \ \ \ \ \textcolor{comment}{//\ clang-\/format\ on}}
+\DoxyCodeLine{00055\ \ \ \ \ \textcolor{keywordflow}{return}\ ok;}
+\DoxyCodeLine{00056\ \ \ \}}
+\DoxyCodeLine{00057\ }
+\DoxyCodeLine{00058\ \ \ \textcolor{comment}{//\ Verify\ any\ range\ within\ the\ buffer.}}
+\DoxyCodeLine{00059\ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classflatbuffers_1_1_f_l_a_t_b_u_f_f_e_r_s___f_i_n_a_l___c_l_a_s_s_af0b648532b7e75a1602dd23574ab4d39}{Verify}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ elem,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ elem\_len)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{00060\ \ \ \ \ \textcolor{comment}{//\ clang-\/format\ off}}
+\DoxyCodeLine{00061\ \textcolor{preprocessor}{\ \ \ \ \#ifdef\ FLATBUFFERS\_TRACK\_VERIFIER\_BUFFER\_SIZE}}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ upper\_bound\ =\ elem\ +\ elem\_len;}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (upper\_bound\_\ <\ upper\_bound)}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \ \ upper\_bound\_\ =\ \ upper\_bound;}
+\DoxyCodeLine{00065\ \textcolor{preprocessor}{\ \ \ \ \#endif}}
+\DoxyCodeLine{00066\ \ \ \ \ \textcolor{comment}{//\ clang-\/format\ on}}
+\DoxyCodeLine{00067\ \ \ \ \ \textcolor{keywordflow}{return}\ Check(elem\_len\ <\ size\_\ \&\&\ elem\ <=\ size\_\ -\/\ elem\_len);}
+\DoxyCodeLine{00068\ \ \ \}}
+\DoxyCodeLine{00069\ }
+\DoxyCodeLine{00070\ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classflatbuffers_1_1_f_l_a_t_b_u_f_f_e_r_s___f_i_n_a_l___c_l_a_s_s_a3c37fdce24d35a2e6922cb73e6ee6f6d}{VerifyAlignment}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ elem,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ align)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{00071\ \ \ \ \ \textcolor{keywordflow}{return}\ Check((elem\ \&\ (align\ -\/\ 1))\ ==\ 0\ ||\ !check\_alignment\_);}
+\DoxyCodeLine{00072\ \ \ \}}
+\DoxyCodeLine{00073\ }
+\DoxyCodeLine{00074\ \ \ \textcolor{comment}{//\ Verify\ a\ range\ indicated\ by\ sizeof(T).}}
+\DoxyCodeLine{00075\ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classflatbuffers_1_1_f_l_a_t_b_u_f_f_e_r_s___f_i_n_a_l___c_l_a_s_s_a9047db24e59d63e187f5cb1052e5ecbc}{Verify}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ elem)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{00076\ \ \ \ \ \textcolor{keywordflow}{return}\ VerifyAlignment(elem,\ \textcolor{keyword}{sizeof}(T))\ \&\&\ Verify(elem,\ \textcolor{keyword}{sizeof}(T));}
+\DoxyCodeLine{00077\ \ \ \}}
+\DoxyCodeLine{00078\ }
+\DoxyCodeLine{00079\ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classflatbuffers_1_1_f_l_a_t_b_u_f_f_e_r_s___f_i_n_a_l___c_l_a_s_s_af787e71f6268ca08e8e2108e351cdacf}{VerifyFromPointer}}(\textcolor{keyword}{const}\ uint8\_t\ *\textcolor{keyword}{const}\ p,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ len)\ \{}
+\DoxyCodeLine{00080\ \ \ \ \ \textcolor{keywordflow}{return}\ Verify(\textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{size\_t}\textcolor{keyword}{>}(p\ -\/\ buf\_),\ len);}
+\DoxyCodeLine{00081\ \ \ \}}
+\DoxyCodeLine{00082\ }
+\DoxyCodeLine{00083\ \ \ \textcolor{comment}{//\ Verify\ relative\ to\ a\ known-\/good\ base\ pointer.}}
+\DoxyCodeLine{00084\ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classflatbuffers_1_1_f_l_a_t_b_u_f_f_e_r_s___f_i_n_a_l___c_l_a_s_s_a5cfae81e2172b424d2978299e0a46832}{VerifyFieldStruct}}(\textcolor{keyword}{const}\ uint8\_t\ *\textcolor{keyword}{const}\ base,\ \textcolor{keyword}{const}\ voffset\_t\ elem\_off,}
+\DoxyCodeLine{00085\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ elem\_len,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ align)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{00086\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ f\ =\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{size\_t}\textcolor{keyword}{>}(base\ -\/\ buf\_)\ +\ elem\_off;}
+\DoxyCodeLine{00087\ \ \ \ \ \textcolor{keywordflow}{return}\ VerifyAlignment(f,\ align)\ \&\&\ Verify(f,\ elem\_len);}
+\DoxyCodeLine{00088\ \ \ \}}
+\DoxyCodeLine{00089\ }
+\DoxyCodeLine{00090\ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{00091\ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classflatbuffers_1_1_f_l_a_t_b_u_f_f_e_r_s___f_i_n_a_l___c_l_a_s_s_a5d69727985eb863e523d04c4bc73fd35}{VerifyField}}(\textcolor{keyword}{const}\ uint8\_t\ *\textcolor{keyword}{const}\ base,\ \textcolor{keyword}{const}\ voffset\_t\ elem\_off,}
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ align)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{00093\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ f\ =\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{size\_t}\textcolor{keyword}{>}(base\ -\/\ buf\_)\ +\ elem\_off;}
+\DoxyCodeLine{00094\ \ \ \ \ \textcolor{keywordflow}{return}\ VerifyAlignment(f,\ align)\ \&\&\ Verify(f,\ \textcolor{keyword}{sizeof}(T));}
+\DoxyCodeLine{00095\ \ \ \}}
+\DoxyCodeLine{00096\ }
+\DoxyCodeLine{00097\ \ \ \textcolor{comment}{//\ Verify\ a\ pointer\ (may\ be\ NULL)\ of\ a\ table\ type.}}
+\DoxyCodeLine{00098\ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classflatbuffers_1_1_f_l_a_t_b_u_f_f_e_r_s___f_i_n_a_l___c_l_a_s_s_a79ad6e1fe2d952e8a02e6d13a6918338}{VerifyTable}}(\textcolor{keyword}{const}\ T\ *\textcolor{keyword}{const}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcaa715bcbccfd2c1131fb15ef75f0ddfd_a89ead81608095f24b8cc943c9265bccc}{table}})\ \{}
+\DoxyCodeLine{00099\ \ \ \ \ \textcolor{keywordflow}{return}\ !\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcaa715bcbccfd2c1131fb15ef75f0ddfd_a89ead81608095f24b8cc943c9265bccc}{table}}\ ||\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcaa715bcbccfd2c1131fb15ef75f0ddfd_a89ead81608095f24b8cc943c9265bccc}{table}}-\/>Verify(*\textcolor{keyword}{this});}
+\DoxyCodeLine{00100\ \ \ \}}
+\DoxyCodeLine{00101\ }
+\DoxyCodeLine{00102\ \ \ \textcolor{comment}{//\ Verify\ a\ pointer\ (may\ be\ NULL)\ of\ any\ vector\ type.}}
+\DoxyCodeLine{00103\ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classflatbuffers_1_1_f_l_a_t_b_u_f_f_e_r_s___f_i_n_a_l___c_l_a_s_s_a252b8bbf7a9cfbdc929e0dd66b12bbbc}{VerifyVector}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classflatbuffers_1_1_vector}{Vector<T>}}\ *\textcolor{keyword}{const}\ vec)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{00104\ \ \ \ \ \textcolor{keywordflow}{return}\ !vec\ ||\ VerifyVectorOrString(\textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }uint8\_t\ *\textcolor{keyword}{>}(vec),}
+\DoxyCodeLine{00105\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{sizeof}(T));}
+\DoxyCodeLine{00106\ \ \ \}}
+\DoxyCodeLine{00107\ }
+\DoxyCodeLine{00108\ \ \ \textcolor{comment}{//\ Verify\ a\ pointer\ (may\ be\ NULL)\ of\ a\ vector\ to\ struct.}}
+\DoxyCodeLine{00109\ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{00110\ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classflatbuffers_1_1_f_l_a_t_b_u_f_f_e_r_s___f_i_n_a_l___c_l_a_s_s_a4988ec2a00e0ceeba026b956b7d4e1b5}{VerifyVector}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classflatbuffers_1_1_vector}{Vector<const\ T\ *>}}\ *\textcolor{keyword}{const}\ vec)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{00111\ \ \ \ \ \textcolor{keywordflow}{return}\ VerifyVector(\textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\mbox{\hyperlink{classflatbuffers_1_1_vector}{Vector<T>}}\ *\textcolor{keyword}{>}(vec));}
+\DoxyCodeLine{00112\ \ \ \}}
+\DoxyCodeLine{00113\ }
+\DoxyCodeLine{00114\ \ \ \textcolor{comment}{//\ Verify\ a\ pointer\ (may\ be\ NULL)\ to\ string.}}
+\DoxyCodeLine{00115\ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classflatbuffers_1_1_f_l_a_t_b_u_f_f_e_r_s___f_i_n_a_l___c_l_a_s_s_add49e3a2de869a9e154b349650d2a996}{VerifyString}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structflatbuffers_1_1_string}{String}}\ *\textcolor{keyword}{const}\ str)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{00116\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcdc91c794b43404000e39f72876c1c287_a4415abf9861e3883a31d588f3909eba9}{end}};}
+\DoxyCodeLine{00117\ \ \ \ \ \textcolor{keywordflow}{return}\ !str\ ||\ (VerifyVectorOrString(\textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }uint8\_t\ *\textcolor{keyword}{>}(str),}
+\DoxyCodeLine{00118\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 1,\ \&\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcdc91c794b43404000e39f72876c1c287_a4415abf9861e3883a31d588f3909eba9}{end}})\ \&\&}
+\DoxyCodeLine{00119\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Verify(\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcdc91c794b43404000e39f72876c1c287_a4415abf9861e3883a31d588f3909eba9}{end}},\ 1)\ \&\&\ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Must\ have\ terminator}}
+\DoxyCodeLine{00120\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Check(buf\_[\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcdc91c794b43404000e39f72876c1c287_a4415abf9861e3883a31d588f3909eba9}{end}}]\ ==\ \textcolor{charliteral}{'\(\backslash\)0'}));\ \ \textcolor{comment}{//\ Terminating\ byte\ must\ be\ 0.}}
+\DoxyCodeLine{00121\ \ \ \}}
+\DoxyCodeLine{00122\ }
+\DoxyCodeLine{00123\ \ \ \textcolor{comment}{//\ Common\ code\ between\ vectors\ and\ strings.}}
+\DoxyCodeLine{00124\ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classflatbuffers_1_1_f_l_a_t_b_u_f_f_e_r_s___f_i_n_a_l___c_l_a_s_s_a9df4da4d469595a6958547e286fb427f}{VerifyVectorOrString}}(\textcolor{keyword}{const}\ uint8\_t\ *\textcolor{keyword}{const}\ vec,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ elem\_size,}
+\DoxyCodeLine{00125\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ *\textcolor{keyword}{const}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcdc91c794b43404000e39f72876c1c287_a4415abf9861e3883a31d588f3909eba9}{end}}\ =\ \textcolor{keyword}{nullptr})\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{00126\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ veco\ =\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{size\_t}\textcolor{keyword}{>}(vec\ -\/\ buf\_);}
+\DoxyCodeLine{00127\ \ \ \ \ \textcolor{comment}{//\ Check\ we\ can\ read\ the\ size\ field.}}
+\DoxyCodeLine{00128\ \ \ \ \ \textcolor{keywordflow}{if}\ (!Verify<uoffset\_t>(veco))\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00129\ \ \ \ \ \textcolor{comment}{//\ Check\ the\ whole\ array.\ If\ this\ is\ a\ string,\ the\ byte\ past\ the\ array}}
+\DoxyCodeLine{00130\ \ \ \ \ \textcolor{comment}{//\ must\ be\ 0.}}
+\DoxyCodeLine{00131\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ \mbox{\hyperlink{hello__world__model_8cc_a439227feff9d7f55384e8780cfc2eb82}{size}}\ =\ ReadScalar<uoffset\_t>(vec);}
+\DoxyCodeLine{00132\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ max\_elems\ =\ FLATBUFFERS\_MAX\_BUFFER\_SIZE\ /\ elem\_size;}
+\DoxyCodeLine{00133\ \ \ \ \ \textcolor{keywordflow}{if}\ (!Check(\mbox{\hyperlink{hello__world__model_8cc_a439227feff9d7f55384e8780cfc2eb82}{size}}\ <\ max\_elems))}
+\DoxyCodeLine{00134\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};\ \ \textcolor{comment}{//\ Protect\ against\ byte\_size\ overflowing.}}
+\DoxyCodeLine{00135\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ byte\_size\ =\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{hello__world__model_8cc_a439227feff9d7f55384e8780cfc2eb82}{size}})\ +\ elem\_size\ *\ \mbox{\hyperlink{hello__world__model_8cc_a439227feff9d7f55384e8780cfc2eb82}{size}};}
+\DoxyCodeLine{00136\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcdc91c794b43404000e39f72876c1c287_a4415abf9861e3883a31d588f3909eba9}{end}})\ *\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcdc91c794b43404000e39f72876c1c287_a4415abf9861e3883a31d588f3909eba9}{end}}\ =\ veco\ +\ byte\_size;}
+\DoxyCodeLine{00137\ \ \ \ \ \textcolor{keywordflow}{return}\ Verify(veco,\ byte\_size);}
+\DoxyCodeLine{00138\ \ \ \}}
+\DoxyCodeLine{00139\ }
+\DoxyCodeLine{00140\ \ \ \textcolor{comment}{//\ Special\ case\ for\ string\ contents,\ after\ the\ above\ has\ been\ called.}}
+\DoxyCodeLine{00141\ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classflatbuffers_1_1_f_l_a_t_b_u_f_f_e_r_s___f_i_n_a_l___c_l_a_s_s_ad51647f27cd993c4da54d546e6787c95}{VerifyVectorOfStrings}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classflatbuffers_1_1_vector}{Vector}}<Offset<String>>\ *\textcolor{keyword}{const}\ vec)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{00142\ \ \ \ \ \textcolor{keywordflow}{if}\ (vec)\ \{}
+\DoxyCodeLine{00143\ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (uoffset\_t\ i\ =\ 0;\ i\ <\ vec-\/>size();\ i++)\ \{}
+\DoxyCodeLine{00144\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!VerifyString(vec-\/>Get(i)))\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00145\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00146\ \ \ \ \ \}}
+\DoxyCodeLine{00147\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00148\ \ \ \}}
+\DoxyCodeLine{00149\ }
+\DoxyCodeLine{00150\ \ \ \textcolor{comment}{//\ Special\ case\ for\ table\ contents,\ after\ the\ above\ has\ been\ called.}}
+\DoxyCodeLine{00151\ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{00152\ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classflatbuffers_1_1_f_l_a_t_b_u_f_f_e_r_s___f_i_n_a_l___c_l_a_s_s_a4e124a882ab59fc3755776500ebb623f}{VerifyVectorOfTables}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classflatbuffers_1_1_vector}{Vector}}<Offset<T>>\ *\textcolor{keyword}{const}\ vec)\ \{}
+\DoxyCodeLine{00153\ \ \ \ \ \textcolor{keywordflow}{if}\ (vec)\ \{}
+\DoxyCodeLine{00154\ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (uoffset\_t\ i\ =\ 0;\ i\ <\ vec-\/>size();\ i++)\ \{}
+\DoxyCodeLine{00155\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!vec-\/>Get(i)-\/>Verify(*\textcolor{keyword}{this}))\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00156\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00157\ \ \ \ \ \}}
+\DoxyCodeLine{00158\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00159\ \ \ \}}
+\DoxyCodeLine{00160\ }
+\DoxyCodeLine{00161\ \ \ \mbox{\hyperlink{classflatbuffers_1_1_f_l_a_t_b_u_f_f_e_r_s___f_i_n_a_l___c_l_a_s_s_a88b2071d637796b0f3537eeeb73df08d}{\_\_supress\_ubsan\_\_}}(\textcolor{stringliteral}{"{}unsigned-\/integer-\/overflow"{}})\ bool\ VerifyTableStart(}
+\DoxyCodeLine{00162\ \ \ \ \ \ \ const\ uint8\_t\ *const\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcaa715bcbccfd2c1131fb15ef75f0ddfd_a89ead81608095f24b8cc943c9265bccc}{table}})\ \{}
+\DoxyCodeLine{00163\ \ \ \ \ \textcolor{comment}{//\ Check\ the\ vtable\ offset.}}
+\DoxyCodeLine{00164\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ tableo\ =\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{size\_t}\textcolor{keyword}{>}(\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcaa715bcbccfd2c1131fb15ef75f0ddfd_a89ead81608095f24b8cc943c9265bccc}{table}}\ -\/\ buf\_);}
+\DoxyCodeLine{00165\ \ \ \ \ \textcolor{keywordflow}{if}\ (!Verify<soffset\_t>(tableo))\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00166\ \ \ \ \ \textcolor{comment}{//\ This\ offset\ may\ be\ signed,\ but\ doing\ the\ subtraction\ unsigned\ always}}
+\DoxyCodeLine{00167\ \ \ \ \ \textcolor{comment}{//\ gives\ the\ result\ we\ want.}}
+\DoxyCodeLine{00168\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ vtableo\ =}
+\DoxyCodeLine{00169\ \ \ \ \ \ \ \ \ tableo\ -\/\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{size\_t}\textcolor{keyword}{>}(ReadScalar<soffset\_t>(\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcaa715bcbccfd2c1131fb15ef75f0ddfd_a89ead81608095f24b8cc943c9265bccc}{table}}));}
+\DoxyCodeLine{00170\ \ \ \ \ \textcolor{comment}{//\ Check\ the\ vtable\ size\ field,\ then\ check\ vtable\ fits\ in\ its\ entirety.}}
+\DoxyCodeLine{00171\ \ \ \ \ \textcolor{keywordflow}{if}\ (!(VerifyComplexity()\ \&\&\ Verify<voffset\_t>(vtableo)\ \&\&}
+\DoxyCodeLine{00172\ \ \ \ \ \ \ \ \ \ \ VerifyAlignment(ReadScalar<voffset\_t>(buf\_\ +\ vtableo),}
+\DoxyCodeLine{00173\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{sizeof}(voffset\_t))))}
+\DoxyCodeLine{00174\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00175\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ vsize\ =\ ReadScalar<voffset\_t>(buf\_\ +\ vtableo);}
+\DoxyCodeLine{00176\ \ \ \ \ \textcolor{keywordflow}{return}\ Check((vsize\ \&\ 1)\ ==\ 0)\ \&\&\ Verify(vtableo,\ vsize);}
+\DoxyCodeLine{00177\ \ \ \}}
+\DoxyCodeLine{00178\ }
+\DoxyCodeLine{00179\ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{00180\ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classflatbuffers_1_1_f_l_a_t_b_u_f_f_e_r_s___f_i_n_a_l___c_l_a_s_s_aaa92d43bf78468b14b9df7c017842a4d}{VerifyBufferFromStart}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *\textcolor{keyword}{const}\ identifier,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ start)\ \{}
+\DoxyCodeLine{00181\ \ \ \ \ \textcolor{comment}{//\ Buffers\ have\ to\ be\ of\ some\ size\ to\ be\ valid.\ The\ reason\ it\ is\ a\ runtime}}
+\DoxyCodeLine{00182\ \ \ \ \ \textcolor{comment}{//\ check\ instead\ of\ static\_assert,\ is\ that\ nested\ flatbuffers\ go\ through}}
+\DoxyCodeLine{00183\ \ \ \ \ \textcolor{comment}{//\ this\ call\ and\ their\ size\ is\ determined\ at\ runtime.}}
+\DoxyCodeLine{00184\ \ \ \ \ \textcolor{keywordflow}{if}\ (!Check(size\_\ >=\ FLATBUFFERS\_MIN\_BUFFER\_SIZE))\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00185\ }
+\DoxyCodeLine{00186\ \ \ \ \ \textcolor{comment}{//\ If\ an\ identifier\ is\ provided,\ check\ that\ we\ have\ a\ buffer}}
+\DoxyCodeLine{00187\ \ \ \ \ \textcolor{keywordflow}{if}\ (identifier\ \&\&\ !Check((size\_\ >=\ 2\ *\ \textcolor{keyword}{sizeof}(flatbuffers::uoffset\_t)\ \&\&}
+\DoxyCodeLine{00188\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BufferHasIdentifier(buf\_\ +\ start,\ identifier))))\ \{}
+\DoxyCodeLine{00189\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00190\ \ \ \ \ \}}
+\DoxyCodeLine{00191\ }
+\DoxyCodeLine{00192\ \ \ \ \ \textcolor{comment}{//\ Call\ T::Verify,\ which\ must\ be\ in\ the\ generated\ code\ for\ this\ type.}}
+\DoxyCodeLine{00193\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ o\ =\ VerifyOffset(start);}
+\DoxyCodeLine{00194\ \ \ \ \ \textcolor{keywordflow}{return}\ Check(o\ !=\ 0)\ \&\&}
+\DoxyCodeLine{00195\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }T\ *\textcolor{keyword}{>}(buf\_\ +\ start\ +\ o)-\/>Verify(*\textcolor{keyword}{this})}
+\DoxyCodeLine{00196\ \ \ \ \ \textcolor{comment}{//\ clang-\/format\ off}}
+\DoxyCodeLine{00197\ \textcolor{preprocessor}{\ \ \ \ \#ifdef\ FLATBUFFERS\_TRACK\_VERIFIER\_BUFFER\_SIZE}}
+\DoxyCodeLine{00198\ \ \ \ \ \ \ \ \ \ \ \ \&\&\ GetComputedSize()}
+\DoxyCodeLine{00199\ \ \ \ \ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00200\ \ \ \ \ \ \ \ \ ;}
+\DoxyCodeLine{00201\ \ \ \ \ \textcolor{comment}{//\ clang-\/format\ on}}
+\DoxyCodeLine{00202\ \ \ \}}
+\DoxyCodeLine{00203\ }
+\DoxyCodeLine{00204\ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{00205\ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classflatbuffers_1_1_f_l_a_t_b_u_f_f_e_r_s___f_i_n_a_l___c_l_a_s_s_a8e5bfacdc3d0607ee3ff740799bdc8ad}{VerifyNestedFlatBuffer}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classflatbuffers_1_1_vector}{Vector<uint8\_t>}}\ *\textcolor{keyword}{const}\ buf,}
+\DoxyCodeLine{00206\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *\textcolor{keyword}{const}\ identifier)\ \{}
+\DoxyCodeLine{00207\ \ \ \ \ \textcolor{comment}{//\ An\ empty\ buffer\ is\ OK\ as\ it\ indicates\ not\ present.}}
+\DoxyCodeLine{00208\ \ \ \ \ \textcolor{keywordflow}{if}\ (!buf)\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00209\ }
+\DoxyCodeLine{00210\ \ \ \ \ \textcolor{comment}{//\ If\ there\ is\ a\ nested\ buffer,\ it\ must\ be\ greater\ than\ the\ min\ size.}}
+\DoxyCodeLine{00211\ \ \ \ \ \textcolor{keywordflow}{if}(!Check(buf-\/>\mbox{\hyperlink{classflatbuffers_1_1_vector_a602e093850b2984a95581edc0b47b2f3}{size}}()\ >=\ FLATBUFFERS\_MIN\_BUFFER\_SIZE))\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00212\ }
+\DoxyCodeLine{00213\ \ \ \ \ Verifier\ nested\_verifier(buf-\/>\mbox{\hyperlink{classflatbuffers_1_1_vector_a8b1291de40ed961611b89d5f39fe571a}{data}}(),\ buf-\/>\mbox{\hyperlink{classflatbuffers_1_1_vector_a602e093850b2984a95581edc0b47b2f3}{size}}());}
+\DoxyCodeLine{00214\ \ \ \ \ \textcolor{keywordflow}{return}\ nested\_verifier.VerifyBuffer<T>(identifier);}
+\DoxyCodeLine{00215\ \ \ \}}
+\DoxyCodeLine{00216\ }
+\DoxyCodeLine{00217\ \ \ \textcolor{comment}{//\ Verify\ this\ whole\ buffer,\ starting\ with\ root\ type\ T.}}
+\DoxyCodeLine{00218\ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classflatbuffers_1_1_f_l_a_t_b_u_f_f_e_r_s___f_i_n_a_l___c_l_a_s_s_a2a98d425615ade22481a96fe61e1ed01}{VerifyBuffer}}()\ \{\ \textcolor{keywordflow}{return}\ VerifyBuffer<T>(\textcolor{keyword}{nullptr});\ \}}
+\DoxyCodeLine{00219\ }
+\DoxyCodeLine{00220\ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classflatbuffers_1_1_f_l_a_t_b_u_f_f_e_r_s___f_i_n_a_l___c_l_a_s_s_a533ae7ab5851163f2c6288cefe56bd36}{VerifyBuffer}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *\textcolor{keyword}{const}\ identifier)\ \{}
+\DoxyCodeLine{00221\ \ \ \ \ \textcolor{keywordflow}{return}\ VerifyBufferFromStart<T>(identifier,\ 0);}
+\DoxyCodeLine{00222\ \ \ \}}
+\DoxyCodeLine{00223\ }
+\DoxyCodeLine{00224\ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{00225\ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classflatbuffers_1_1_f_l_a_t_b_u_f_f_e_r_s___f_i_n_a_l___c_l_a_s_s_a3dfd467ebc65c1f49241592db57b1c35}{VerifySizePrefixedBuffer}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *\textcolor{keyword}{const}\ identifier)\ \{}
+\DoxyCodeLine{00226\ \ \ \ \ \textcolor{keywordflow}{return}\ Verify<uoffset\_t>(0U)\ \&\&}
+\DoxyCodeLine{00227\ \ \ \ \ \ \ \ \ \ \ \ Check(ReadScalar<uoffset\_t>(buf\_)\ ==\ size\_\ -\/\ \textcolor{keyword}{sizeof}(uoffset\_t))\ \&\&}
+\DoxyCodeLine{00228\ \ \ \ \ \ \ \ \ \ \ \ VerifyBufferFromStart<T>(identifier,\ \textcolor{keyword}{sizeof}(uoffset\_t));}
+\DoxyCodeLine{00229\ \ \ \}}
+\DoxyCodeLine{00230\ }
+\DoxyCodeLine{00231\ \ \ uoffset\_t\ \mbox{\hyperlink{classflatbuffers_1_1_f_l_a_t_b_u_f_f_e_r_s___f_i_n_a_l___c_l_a_s_s_a4e90bbfb7926561c01f6c66ccf7b6f80}{VerifyOffset}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ start)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{00232\ \ \ \ \ \textcolor{keywordflow}{if}\ (!Verify<uoffset\_t>(start))\ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00233\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ o\ =\ ReadScalar<uoffset\_t>(buf\_\ +\ start);}
+\DoxyCodeLine{00234\ \ \ \ \ \textcolor{comment}{//\ May\ not\ point\ to\ itself.}}
+\DoxyCodeLine{00235\ \ \ \ \ \textcolor{keywordflow}{if}\ (!Check(o\ !=\ 0))\ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00236\ \ \ \ \ \textcolor{comment}{//\ Can't\ wrap\ around\ /\ buffers\ are\ max\ 2GB.}}
+\DoxyCodeLine{00237\ \ \ \ \ \textcolor{keywordflow}{if}\ (!Check(\textcolor{keyword}{static\_cast<}soffset\_t\textcolor{keyword}{>}(o)\ >=\ 0))\ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00238\ \ \ \ \ \textcolor{comment}{//\ Must\ be\ inside\ the\ buffer\ to\ create\ a\ pointer\ from\ it\ (pointer\ outside}}
+\DoxyCodeLine{00239\ \ \ \ \ \textcolor{comment}{//\ buffer\ is\ UB).}}
+\DoxyCodeLine{00240\ \ \ \ \ \textcolor{keywordflow}{if}\ (!Verify(start\ +\ o,\ 1))\ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00241\ \ \ \ \ \textcolor{keywordflow}{return}\ o;}
+\DoxyCodeLine{00242\ \ \ \}}
+\DoxyCodeLine{00243\ }
+\DoxyCodeLine{00244\ \ \ uoffset\_t\ \mbox{\hyperlink{classflatbuffers_1_1_f_l_a_t_b_u_f_f_e_r_s___f_i_n_a_l___c_l_a_s_s_accf075e02324a27ffd045dd5d15ab915}{VerifyOffset}}(\textcolor{keyword}{const}\ uint8\_t\ *\textcolor{keyword}{const}\ base,}
+\DoxyCodeLine{00245\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ voffset\_t\ start)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{00246\ \ \ \ \ \textcolor{keywordflow}{return}\ VerifyOffset(\textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{size\_t}\textcolor{keyword}{>}(base\ -\/\ buf\_)\ +\ start);}
+\DoxyCodeLine{00247\ \ \ \}}
+\DoxyCodeLine{00248\ }
+\DoxyCodeLine{00249\ \ \ \textcolor{comment}{//\ Called\ at\ the\ start\ of\ a\ table\ to\ increase\ counters\ measuring\ data}}
+\DoxyCodeLine{00250\ \ \ \textcolor{comment}{//\ structure\ depth\ and\ amount,\ and\ possibly\ bails\ out\ with\ false\ if}}
+\DoxyCodeLine{00251\ \ \ \textcolor{comment}{//\ limits\ set\ by\ the\ constructor\ have\ been\ hit.\ Needs\ to\ be\ balanced}}
+\DoxyCodeLine{00252\ \ \ \textcolor{comment}{//\ with\ EndTable().}}
+\DoxyCodeLine{00253\ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classflatbuffers_1_1_f_l_a_t_b_u_f_f_e_r_s___f_i_n_a_l___c_l_a_s_s_af6501c0b5088287e4d45aff2b2a2b946}{VerifyComplexity}}()\ \{}
+\DoxyCodeLine{00254\ \ \ \ \ depth\_++;}
+\DoxyCodeLine{00255\ \ \ \ \ num\_tables\_++;}
+\DoxyCodeLine{00256\ \ \ \ \ \textcolor{keywordflow}{return}\ Check(depth\_\ <=\ max\_depth\_\ \&\&\ num\_tables\_\ <=\ max\_tables\_);}
+\DoxyCodeLine{00257\ \ \ \}}
+\DoxyCodeLine{00258\ }
+\DoxyCodeLine{00259\ \ \ \textcolor{comment}{//\ Called\ at\ the\ end\ of\ a\ table\ to\ pop\ the\ depth\ count.}}
+\DoxyCodeLine{00260\ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classflatbuffers_1_1_f_l_a_t_b_u_f_f_e_r_s___f_i_n_a_l___c_l_a_s_s_a24da28ef0634979514d664f9ce4b878a}{EndTable}}()\ \{}
+\DoxyCodeLine{00261\ \ \ \ \ depth\_-\/-\/;}
+\DoxyCodeLine{00262\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00263\ \ \ \}}
+\DoxyCodeLine{00264\ }
+\DoxyCodeLine{00265\ \ \ \textcolor{comment}{//\ Returns\ the\ message\ size\ in\ bytes}}
+\DoxyCodeLine{00266\ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{classflatbuffers_1_1_f_l_a_t_b_u_f_f_e_r_s___f_i_n_a_l___c_l_a_s_s_a26b69d04ddf545f1b142f3a611d6be39}{GetComputedSize}}()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{00267\ \ \ \ \ \textcolor{comment}{//\ clang-\/format\ off}}
+\DoxyCodeLine{00268\ \textcolor{preprocessor}{\ \ \ \ \#ifdef\ FLATBUFFERS\_TRACK\_VERIFIER\_BUFFER\_SIZE}}
+\DoxyCodeLine{00269\ \ \ \ \ \ \ uintptr\_t\ \mbox{\hyperlink{hello__world__model_8cc_a439227feff9d7f55384e8780cfc2eb82}{size}}\ =\ upper\_bound\_;}
+\DoxyCodeLine{00270\ \ \ \ \ \ \ \textcolor{comment}{//\ Align\ the\ size\ to\ uoffset\_t}}
+\DoxyCodeLine{00271\ \ \ \ \ \ \ \mbox{\hyperlink{hello__world__model_8cc_a439227feff9d7f55384e8780cfc2eb82}{size}}\ =\ (\mbox{\hyperlink{hello__world__model_8cc_a439227feff9d7f55384e8780cfc2eb82}{size}}\ -\/\ 1\ +\ \textcolor{keyword}{sizeof}(uoffset\_t))\ \&\ \string~(\textcolor{keyword}{sizeof}(uoffset\_t)\ -\/\ 1);}
+\DoxyCodeLine{00272\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ (\mbox{\hyperlink{hello__world__model_8cc_a439227feff9d7f55384e8780cfc2eb82}{size}}\ >\ size\_)\ ?\ \ 0\ :\ \mbox{\hyperlink{hello__world__model_8cc_a439227feff9d7f55384e8780cfc2eb82}{size}};}
+\DoxyCodeLine{00273\ \textcolor{preprocessor}{\ \ \ \ \#else}}
+\DoxyCodeLine{00274\ \ \ \ \ \ \ \textcolor{comment}{//\ Must\ turn\ on\ FLATBUFFERS\_TRACK\_VERIFIER\_BUFFER\_SIZE\ for\ this\ to\ work.}}
+\DoxyCodeLine{00275\ \ \ \ \ \ \ (void)upper\_bound\_;}
+\DoxyCodeLine{00276\ \ \ \ \ \ \ \mbox{\hyperlink{base_8h_ab2116a3957cb3c19761609ea7fd796fe}{FLATBUFFERS\_ASSERT}}(\textcolor{keyword}{false});}
+\DoxyCodeLine{00277\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00278\ \textcolor{preprocessor}{\ \ \ \ \#endif}}
+\DoxyCodeLine{00279\ \ \ \ \ \textcolor{comment}{//\ clang-\/format\ on}}
+\DoxyCodeLine{00280\ \ \ \}}
+\DoxyCodeLine{00281\ }
+\DoxyCodeLine{00282\ \ \ std::vector<uint8\_t>\ *\mbox{\hyperlink{classflatbuffers_1_1_f_l_a_t_b_u_f_f_e_r_s___f_i_n_a_l___c_l_a_s_s_a2c672cd22d9b53259dea3583d315a653}{GetFlexReuseTracker}}()\ \{\ \textcolor{keywordflow}{return}\ flex\_reuse\_tracker\_;\ \}}
+\DoxyCodeLine{00283\ }
+\DoxyCodeLine{00284\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classflatbuffers_1_1_f_l_a_t_b_u_f_f_e_r_s___f_i_n_a_l___c_l_a_s_s_acb4c4c35deefc560ae0685769b250b88}{SetFlexReuseTracker}}(std::vector<uint8\_t>\ *\textcolor{keyword}{const}\ rt)\ \{}
+\DoxyCodeLine{00285\ \ \ \ \ flex\_reuse\_tracker\_\ =\ rt;}
+\DoxyCodeLine{00286\ \ \ \}}
+\DoxyCodeLine{00287\ }
+\DoxyCodeLine{00288\ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{00289\ \ \ \textcolor{keyword}{const}\ uint8\_t\ *\mbox{\hyperlink{classflatbuffers_1_1_f_l_a_t_b_u_f_f_e_r_s___f_i_n_a_l___c_l_a_s_s_a8b6041943b9487f71101396d825afdc6}{buf\_}};}
+\DoxyCodeLine{00290\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{classflatbuffers_1_1_f_l_a_t_b_u_f_f_e_r_s___f_i_n_a_l___c_l_a_s_s_abd8ff4393079da5145c6070203938439}{size\_}};}
+\DoxyCodeLine{00291\ \ \ \textcolor{keyword}{const}\ uoffset\_t\ \mbox{\hyperlink{classflatbuffers_1_1_f_l_a_t_b_u_f_f_e_r_s___f_i_n_a_l___c_l_a_s_s_a084916c10183b147870d579d2453b2c1}{max\_depth\_}};}
+\DoxyCodeLine{00292\ \ \ \textcolor{keyword}{const}\ uoffset\_t\ \mbox{\hyperlink{classflatbuffers_1_1_f_l_a_t_b_u_f_f_e_r_s___f_i_n_a_l___c_l_a_s_s_aa1c5987f90a8bbd993b31b26c70c894e}{max\_tables\_}};}
+\DoxyCodeLine{00293\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classflatbuffers_1_1_f_l_a_t_b_u_f_f_e_r_s___f_i_n_a_l___c_l_a_s_s_a62f6688420e6a013b7c746efbe4de714}{check\_alignment\_}};}
+\DoxyCodeLine{00294\ }
+\DoxyCodeLine{00295\ \ \ \textcolor{keyword}{mutable}\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{classflatbuffers_1_1_f_l_a_t_b_u_f_f_e_r_s___f_i_n_a_l___c_l_a_s_s_ae9bf93082296e33182676e7550d500f6}{upper\_bound\_}};}
+\DoxyCodeLine{00296\ }
+\DoxyCodeLine{00297\ \ \ uoffset\_t\ \mbox{\hyperlink{classflatbuffers_1_1_f_l_a_t_b_u_f_f_e_r_s___f_i_n_a_l___c_l_a_s_s_ab49aa5b1b2c287d5b95671a6356bae31}{depth\_}};}
+\DoxyCodeLine{00298\ \ \ uoffset\_t\ \mbox{\hyperlink{classflatbuffers_1_1_f_l_a_t_b_u_f_f_e_r_s___f_i_n_a_l___c_l_a_s_s_aaabbc1ea8631fa8b8e784410a134754c}{num\_tables\_}};}
+\DoxyCodeLine{00299\ \ \ std::vector<uint8\_t>\ *\mbox{\hyperlink{classflatbuffers_1_1_f_l_a_t_b_u_f_f_e_r_s___f_i_n_a_l___c_l_a_s_s_a39193cae9fcbb21372a82e6e31faf1f6}{flex\_reuse\_tracker\_}};}
+\DoxyCodeLine{00300\ \};}
+\DoxyCodeLine{00301\ }
+\DoxyCodeLine{00302\ \}\ \ \textcolor{comment}{//\ namespace\ flatbuffers}}
+\DoxyCodeLine{00303\ }
+\DoxyCodeLine{00304\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ FLATBUFFERS\_VERIFIER\_H\_}}
+
+\end{DoxyCode}

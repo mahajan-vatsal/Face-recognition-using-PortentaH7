@@ -1,0 +1,284 @@
+\doxysection{strided\+\_\+slice\+\_\+logic.\+h}
+\hypertarget{tflite-micro-main_2tensorflow_2lite_2kernels_2internal_2strided__slice__logic_8h_source}{}\label{tflite-micro-main_2tensorflow_2lite_2kernels_2internal_2strided__slice__logic_8h_source}\index{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/main/tensorflow/lite/kernels/internal/strided\_slice\_logic.h@{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/main/tensorflow/lite/kernels/internal/strided\_slice\_logic.h}}
+\mbox{\hyperlink{tflite-micro-main_2tensorflow_2lite_2kernels_2internal_2strided__slice__logic_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{/*\ Copyright\ 2018\ The\ TensorFlow\ Authors.\ All\ Rights\ Reserved.}}
+\DoxyCodeLine{00002\ \textcolor{comment}{}}
+\DoxyCodeLine{00003\ \textcolor{comment}{Licensed\ under\ the\ Apache\ License,\ Version\ 2.0\ (the\ "{}License"{});}}
+\DoxyCodeLine{00004\ \textcolor{comment}{you\ may\ not\ use\ this\ file\ except\ in\ compliance\ with\ the\ License.}}
+\DoxyCodeLine{00005\ \textcolor{comment}{You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{00006\ \textcolor{comment}{}}
+\DoxyCodeLine{00007\ \textcolor{comment}{\ \ \ \ http://www.apache.org/licenses/LICENSE-\/2.0}}
+\DoxyCodeLine{00008\ \textcolor{comment}{}}
+\DoxyCodeLine{00009\ \textcolor{comment}{Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ software}}
+\DoxyCodeLine{00010\ \textcolor{comment}{distributed\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,}}
+\DoxyCodeLine{00011\ \textcolor{comment}{WITHOUT\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,\ either\ express\ or\ implied.}}
+\DoxyCodeLine{00012\ \textcolor{comment}{See\ the\ License\ for\ the\ specific\ language\ governing\ permissions\ and}}
+\DoxyCodeLine{00013\ \textcolor{comment}{limitations\ under\ the\ License.}}
+\DoxyCodeLine{00014\ \textcolor{comment}{==============================================================================*/}}
+\DoxyCodeLine{00015\ }
+\DoxyCodeLine{00016\ \textcolor{preprocessor}{\#ifndef\ TENSORFLOW\_LITE\_KERNELS\_INTERNAL\_STRIDED\_SLICE\_LOGIC\_H\_}}
+\DoxyCodeLine{00017\ \textcolor{preprocessor}{\#define\ TENSORFLOW\_LITE\_KERNELS\_INTERNAL\_STRIDED\_SLICE\_LOGIC\_H\_}}
+\DoxyCodeLine{00018\ }
+\DoxyCodeLine{00019\ \textcolor{preprocessor}{\#include\ <limits>}}
+\DoxyCodeLine{00020\ \textcolor{preprocessor}{\#include\ <vector>}}
+\DoxyCodeLine{00021\ }
+\DoxyCodeLine{00022\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/kernels/internal/compatibility.h"{}}}
+\DoxyCodeLine{00023\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/kernels/internal/types.h"{}}}
+\DoxyCodeLine{00024\ }
+\DoxyCodeLine{00025\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacetflite}{tflite}}\ \{}
+\DoxyCodeLine{00026\ \textcolor{keyword}{namespace\ }strided\_slice\ \{}
+\DoxyCodeLine{00027\ }
+\DoxyCodeLine{00028\ \textcolor{comment}{//\ Use\ until\ std::clamp()\ is\ available\ from\ C++17.}}
+\DoxyCodeLine{00029\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{namespacetflite_1_1strided__slice_ad27293051e91a6a0fe299813738361be}{Clamp}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ v,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ lo,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ hi)\ \{}
+\DoxyCodeLine{00030\ \ \ \mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2kernels_2internal_2compatibility_8h_aae1ef2f661f926fac4c1555e46d4c704}{TFLITE\_DCHECK}}(!(hi\ <\ lo));}
+\DoxyCodeLine{00031\ \ \ \textcolor{keywordflow}{if}\ (hi\ <\ v)\ \textcolor{keywordflow}{return}\ hi;}
+\DoxyCodeLine{00032\ \ \ \textcolor{keywordflow}{if}\ (v\ <\ lo)\ \textcolor{keywordflow}{return}\ lo;}
+\DoxyCodeLine{00033\ \ \ \textcolor{keywordflow}{return}\ v;}
+\DoxyCodeLine{00034\ \}}
+\DoxyCodeLine{00035\ }
+\DoxyCodeLine{00036\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1strided__slice_a744a0e56f01f2ee6ea645799c4dafe01}{StridedSlicePadIndices}}(\mbox{\hyperlink{structtflite_1_1_strided_slice_params}{tflite::StridedSliceParams}}*\ p,}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ dim\_count)\ \{}
+\DoxyCodeLine{00038\ \ \ \textcolor{comment}{//\ Add\ indices\ and\ mask\ bits\ to\ fully\ include\ extra\ dimensions}}
+\DoxyCodeLine{00039\ \ \ \mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2kernels_2internal_2compatibility_8h_ace9cd769315c29ddbc38accac7c00720}{TFLITE\_CHECK\_LE}}(dim\_count,\ 5);}
+\DoxyCodeLine{00040\ \ \ \mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2kernels_2internal_2compatibility_8h_ac0c26f95fb7945df93981da0bc05ac94}{TFLITE\_CHECK\_GE}}(dim\_count,\ p-\/>\mbox{\hyperlink{structtflite_1_1_strided_slice_params_a39955128fb1541831367cf91c21704e9}{start\_indices\_count}});}
+\DoxyCodeLine{00041\ \ \ \mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2kernels_2internal_2compatibility_8h_a44455408f6c9ed7a185e2a124d2a4127}{TFLITE\_CHECK\_EQ}}(p-\/>\mbox{\hyperlink{structtflite_1_1_strided_slice_params_a39955128fb1541831367cf91c21704e9}{start\_indices\_count}},\ p-\/>\mbox{\hyperlink{structtflite_1_1_strided_slice_params_aa6e506ff4f6e99d0136db7ab3d9be674}{stop\_indices\_count}});}
+\DoxyCodeLine{00042\ \ \ \mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2kernels_2internal_2compatibility_8h_a44455408f6c9ed7a185e2a124d2a4127}{TFLITE\_CHECK\_EQ}}(p-\/>\mbox{\hyperlink{structtflite_1_1_strided_slice_params_aa6e506ff4f6e99d0136db7ab3d9be674}{stop\_indices\_count}},\ p-\/>\mbox{\hyperlink{structtflite_1_1_strided_slice_params_a9908d04a91a4350db8e3b92ef9c098cf}{strides\_count}});}
+\DoxyCodeLine{00043\ }
+\DoxyCodeLine{00044\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ pad\_count\ =\ dim\_count\ -\/\ p-\/>\mbox{\hyperlink{structtflite_1_1_strided_slice_params_a39955128fb1541831367cf91c21704e9}{start\_indices\_count}};}
+\DoxyCodeLine{00045\ }
+\DoxyCodeLine{00046\ \ \ \textcolor{comment}{//\ Pad\ indices\ at\ start,\ so\ move\ arrays\ by\ pad\_count.}}
+\DoxyCodeLine{00047\ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ p-\/>\mbox{\hyperlink{structtflite_1_1_strided_slice_params_a39955128fb1541831367cf91c21704e9}{start\_indices\_count}}\ -\/\ 1;\ i\ >=\ 0;\ -\/-\/i)\ \{}
+\DoxyCodeLine{00048\ \ \ \ \ p-\/>\mbox{\hyperlink{structtflite_1_1_strided_slice_params_aa31f0113c11f9579f0b4bd1c8c6e4629}{strides}}[i\ +\ pad\_count]\ =\ p-\/>\mbox{\hyperlink{structtflite_1_1_strided_slice_params_aa31f0113c11f9579f0b4bd1c8c6e4629}{strides}}[i];}
+\DoxyCodeLine{00049\ \ \ \ \ p-\/>\mbox{\hyperlink{structtflite_1_1_strided_slice_params_a125f7def6e28ccf88d3aac8979456a8c}{start\_indices}}[i\ +\ pad\_count]\ =\ p-\/>\mbox{\hyperlink{structtflite_1_1_strided_slice_params_a125f7def6e28ccf88d3aac8979456a8c}{start\_indices}}[i];}
+\DoxyCodeLine{00050\ \ \ \ \ p-\/>\mbox{\hyperlink{structtflite_1_1_strided_slice_params_a403374e4f21e3243b0953b856f9ef778}{stop\_indices}}[i\ +\ pad\_count]\ =\ p-\/>\mbox{\hyperlink{structtflite_1_1_strided_slice_params_a403374e4f21e3243b0953b856f9ef778}{stop\_indices}}[i];}
+\DoxyCodeLine{00051\ \ \ \}}
+\DoxyCodeLine{00052\ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ pad\_count;\ ++i)\ \{}
+\DoxyCodeLine{00053\ \ \ \ \ p-\/>\mbox{\hyperlink{structtflite_1_1_strided_slice_params_a125f7def6e28ccf88d3aac8979456a8c}{start\_indices}}[i]\ =\ 0;}
+\DoxyCodeLine{00054\ \ \ \ \ p-\/>\mbox{\hyperlink{structtflite_1_1_strided_slice_params_a403374e4f21e3243b0953b856f9ef778}{stop\_indices}}[i]\ =\ 1;}
+\DoxyCodeLine{00055\ \ \ \ \ p-\/>\mbox{\hyperlink{structtflite_1_1_strided_slice_params_aa31f0113c11f9579f0b4bd1c8c6e4629}{strides}}[i]\ =\ 1;}
+\DoxyCodeLine{00056\ \ \ \}}
+\DoxyCodeLine{00057\ }
+\DoxyCodeLine{00058\ \ \ \textcolor{comment}{//\ Pad\ masks\ with\ 0s\ or\ 1s\ as\ required.}}
+\DoxyCodeLine{00059\ \ \ p-\/>\mbox{\hyperlink{structtflite_1_1_strided_slice_params_ae7318711334c873516197159466aae2e}{shrink\_axis\_mask}}\ <<=\ pad\_count;}
+\DoxyCodeLine{00060\ \ \ p-\/>\mbox{\hyperlink{structtflite_1_1_strided_slice_params_a11f59cd6cf34e3e041518c850eedf43a}{ellipsis\_mask}}\ <<=\ pad\_count;}
+\DoxyCodeLine{00061\ \ \ p-\/>\mbox{\hyperlink{structtflite_1_1_strided_slice_params_a4f67398c157c1ca3ec69c3228ef27c2e}{new\_axis\_mask}}\ <<=\ pad\_count;}
+\DoxyCodeLine{00062\ \ \ p-\/>\mbox{\hyperlink{structtflite_1_1_strided_slice_params_a368486fc94ff958c20360d08e1ba8d53}{begin\_mask}}\ <<=\ pad\_count;}
+\DoxyCodeLine{00063\ \ \ p-\/>\mbox{\hyperlink{structtflite_1_1_strided_slice_params_a3ca946a00464a2a4bd37da78cf929e31}{end\_mask}}\ <<=\ pad\_count;}
+\DoxyCodeLine{00064\ \ \ p-\/>\mbox{\hyperlink{structtflite_1_1_strided_slice_params_a368486fc94ff958c20360d08e1ba8d53}{begin\_mask}}\ |=\ (1\ <<\ pad\_count)\ -\/\ 1;}
+\DoxyCodeLine{00065\ \ \ p-\/>\mbox{\hyperlink{structtflite_1_1_strided_slice_params_a3ca946a00464a2a4bd37da78cf929e31}{end\_mask}}\ |=\ (1\ <<\ pad\_count)\ -\/\ 1;}
+\DoxyCodeLine{00066\ }
+\DoxyCodeLine{00067\ \ \ p-\/>\mbox{\hyperlink{structtflite_1_1_strided_slice_params_a39955128fb1541831367cf91c21704e9}{start\_indices\_count}}\ =\ dim\_count;}
+\DoxyCodeLine{00068\ \ \ p-\/>\mbox{\hyperlink{structtflite_1_1_strided_slice_params_aa6e506ff4f6e99d0136db7ab3d9be674}{stop\_indices\_count}}\ =\ dim\_count;}
+\DoxyCodeLine{00069\ \ \ p-\/>\mbox{\hyperlink{structtflite_1_1_strided_slice_params_a9908d04a91a4350db8e3b92ef9c098cf}{strides\_count}}\ =\ dim\_count;}
+\DoxyCodeLine{00070\ \}}
+\DoxyCodeLine{00071\ }
+\DoxyCodeLine{00072\ \textcolor{comment}{//\ Return\ the\ index\ for\ the\ first\ element\ along\ that\ axis.\ This\ index\ will\ be\ a}}
+\DoxyCodeLine{00073\ \textcolor{comment}{//\ positive\ integer\ between\ [0,\ axis\_size]\ (or\ [-\/1,\ axis\_size\ -\/1]\ if\ stride\ <\ 0)}}
+\DoxyCodeLine{00074\ \textcolor{comment}{//\ that\ can\ be\ used\ to\ index\ directly\ into\ the\ data.}}
+\DoxyCodeLine{00075\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{namespacetflite_1_1strided__slice_a93a9643ace0f642b56b489ef285af956}{StridedSliceStartForAxis}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structtflite_1_1_strided_slice_params}{tflite::StridedSliceParams}}\&\ \mbox{\hyperlink{comparisons_8cpp_a434686eb00eea897154eb5c3f9364ef7}{params}},}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ RuntimeShape\&\ input\_shape,}
+\DoxyCodeLine{00077\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ int32\_t\ \mbox{\hyperlink{cumsum__test_8cc_a195d3f5576f1c8b039cff255b07a3aee}{axis}})\ \{}
+\DoxyCodeLine{00078\ \ \ \textcolor{keyword}{const}\ int32\_t\ axis\_size\ =\ \mbox{\hyperlink{namespace_m_n_i_s_t_afa2c1de24d40248bcf9a833cf7e9e0bc}{input\_shape}}.Dims(\mbox{\hyperlink{cumsum__test_8cc_a195d3f5576f1c8b039cff255b07a3aee}{axis}});}
+\DoxyCodeLine{00079\ \ \ int32\_t\ \mbox{\hyperlink{namespace_training___c_i_f_a_r_a960122f99a22c403ea381857cb4d73ae}{start}}\ =\ \mbox{\hyperlink{comparisons_8cpp_a434686eb00eea897154eb5c3f9364ef7}{params}}.start\_indices[\mbox{\hyperlink{cumsum__test_8cc_a195d3f5576f1c8b039cff255b07a3aee}{axis}}];}
+\DoxyCodeLine{00080\ \ \ \textcolor{keyword}{const}\ int32\_t\ stride\ =\ \mbox{\hyperlink{comparisons_8cpp_a434686eb00eea897154eb5c3f9364ef7}{params}}.strides[\mbox{\hyperlink{cumsum__test_8cc_a195d3f5576f1c8b039cff255b07a3aee}{axis}}];}
+\DoxyCodeLine{00081\ \ \ \textcolor{keyword}{const}\ int32\_t\ begin\_mask\ =\ (\mbox{\hyperlink{comparisons_8cpp_a434686eb00eea897154eb5c3f9364ef7}{params}}.begin\_mask\ \&\ 1\ <<\ \mbox{\hyperlink{cumsum__test_8cc_a195d3f5576f1c8b039cff255b07a3aee}{axis}});}
+\DoxyCodeLine{00082\ \ \ \textcolor{keywordflow}{if}\ (start\ <\ 0)\ \{}
+\DoxyCodeLine{00083\ \ \ \ \ \mbox{\hyperlink{namespace_training___c_i_f_a_r_a960122f99a22c403ea381857cb4d73ae}{start}}\ +=\ axis\_size;}
+\DoxyCodeLine{00084\ \ \ \}}
+\DoxyCodeLine{00085\ \ \ \textcolor{keywordflow}{if}\ (stride\ >\ 0)\ \{}
+\DoxyCodeLine{00086\ \ \ \ \ \mbox{\hyperlink{namespace_training___c_i_f_a_r_a960122f99a22c403ea381857cb4d73ae}{start}}\ =\ \mbox{\hyperlink{namespacetflite_1_1strided__slice_ad27293051e91a6a0fe299813738361be}{Clamp}}(start,\ 0,\ axis\_size);}
+\DoxyCodeLine{00087\ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00088\ \ \ \ \ \mbox{\hyperlink{namespace_training___c_i_f_a_r_a960122f99a22c403ea381857cb4d73ae}{start}}\ =\ \mbox{\hyperlink{namespacetflite_1_1strided__slice_ad27293051e91a6a0fe299813738361be}{Clamp}}(start,\ -\/1,\ axis\_size\ -\/\ 1);}
+\DoxyCodeLine{00089\ \ \ \}}
+\DoxyCodeLine{00090\ \ \ \textcolor{keywordflow}{if}\ (begin\_mask)\ \{}
+\DoxyCodeLine{00091\ \ \ \ \ \textcolor{keywordflow}{if}\ (stride\ >\ 0)\ \{}
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \mbox{\hyperlink{namespace_training___c_i_f_a_r_a960122f99a22c403ea381857cb4d73ae}{start}}\ =\ 0;}
+\DoxyCodeLine{00093\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00094\ \ \ \ \ \ \ \mbox{\hyperlink{namespace_training___c_i_f_a_r_a960122f99a22c403ea381857cb4d73ae}{start}}\ =\ axis\_size\ -\/\ 1;}
+\DoxyCodeLine{00095\ \ \ \ \ \}}
+\DoxyCodeLine{00096\ \ \ \}}
+\DoxyCodeLine{00097\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespace_training___c_i_f_a_r_a960122f99a22c403ea381857cb4d73ae}{start}};}
+\DoxyCodeLine{00098\ \}}
+\DoxyCodeLine{00099\ }
+\DoxyCodeLine{00100\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{namespacetflite_1_1strided__slice_a47b234fb853114fda7b62d7a1bb8d31e}{StridedSliceEndForAxis}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structtflite_1_1_strided_slice_params}{tflite::StridedSliceParams}}\&\ \mbox{\hyperlink{comparisons_8cpp_a434686eb00eea897154eb5c3f9364ef7}{params}},}
+\DoxyCodeLine{00101\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ RuntimeShape\&\ input\_shape,\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{cumsum__test_8cc_a195d3f5576f1c8b039cff255b07a3aee}{axis}},}
+\DoxyCodeLine{00102\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ start)\ \{}
+\DoxyCodeLine{00103\ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ shrink\_axis\_mask\ =\ \mbox{\hyperlink{comparisons_8cpp_a434686eb00eea897154eb5c3f9364ef7}{params}}.shrink\_axis\_mask;}
+\DoxyCodeLine{00104\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{bool}\ shrink\_axis\ =\ shrink\_axis\_mask\ \&\ (1\ <<\ \mbox{\hyperlink{cumsum__test_8cc_a195d3f5576f1c8b039cff255b07a3aee}{axis}});}
+\DoxyCodeLine{00105\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ axis\_size\ =\ \mbox{\hyperlink{namespace_m_n_i_s_t_afa2c1de24d40248bcf9a833cf7e9e0bc}{input\_shape}}.Dims(\mbox{\hyperlink{cumsum__test_8cc_a195d3f5576f1c8b039cff255b07a3aee}{axis}});}
+\DoxyCodeLine{00106\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{mirror__pad_8cpp_aed7ea92f45bd273dde380a45ddced592}{offset}}\ =\ \mbox{\hyperlink{comparisons_8cpp_a434686eb00eea897154eb5c3f9364ef7}{params}}.offset;}
+\DoxyCodeLine{00107\ \ \ \textcolor{keywordflow}{if}\ (shrink\_axis)\ \{}
+\DoxyCodeLine{00108\ \ \ \ \ \textcolor{keywordflow}{if}\ (start\ >=\ axis\_size)\ \{}
+\DoxyCodeLine{00109\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespace_training___c_i_f_a_r_a960122f99a22c403ea381857cb4d73ae}{start}};}
+\DoxyCodeLine{00110\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00111\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespace_training___c_i_f_a_r_a960122f99a22c403ea381857cb4d73ae}{start}}\ +\ 1;}
+\DoxyCodeLine{00112\ \ \ \ \ \}}
+\DoxyCodeLine{00113\ \ \ \}}
+\DoxyCodeLine{00114\ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}*\ indices\ =\ \mbox{\hyperlink{comparisons_8cpp_a434686eb00eea897154eb5c3f9364ef7}{params}}.stop\_indices;}
+\DoxyCodeLine{00115\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{strided__slice_8cpp_a4415abf9861e3883a31d588f3909eba9}{end}}\ =\ indices[\mbox{\hyperlink{cumsum__test_8cc_a195d3f5576f1c8b039cff255b07a3aee}{axis}}];}
+\DoxyCodeLine{00116\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{mirror__pad_8cpp_aed7ea92f45bd273dde380a45ddced592}{offset}})\ \{}
+\DoxyCodeLine{00117\ \ \ \ \ \mbox{\hyperlink{strided__slice_8cpp_a4415abf9861e3883a31d588f3909eba9}{end}}\ +=\ \mbox{\hyperlink{namespace_training___c_i_f_a_r_a960122f99a22c403ea381857cb4d73ae}{start}};}
+\DoxyCodeLine{00118\ \ \ \}}
+\DoxyCodeLine{00119\ \ \ \textcolor{keyword}{const}\ int32\_t\ stride\ =\ \mbox{\hyperlink{comparisons_8cpp_a434686eb00eea897154eb5c3f9364ef7}{params}}.strides[\mbox{\hyperlink{cumsum__test_8cc_a195d3f5576f1c8b039cff255b07a3aee}{axis}}];}
+\DoxyCodeLine{00120\ \ \ \textcolor{keyword}{const}\ int32\_t\ end\_mask\ =\ (\mbox{\hyperlink{comparisons_8cpp_a434686eb00eea897154eb5c3f9364ef7}{params}}.end\_mask\ \&\ 1\ <<\ \mbox{\hyperlink{cumsum__test_8cc_a195d3f5576f1c8b039cff255b07a3aee}{axis}});}
+\DoxyCodeLine{00121\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{strided__slice_8cpp_a4415abf9861e3883a31d588f3909eba9}{end}}\ <\ 0)\ \{}
+\DoxyCodeLine{00122\ \ \ \ \ \mbox{\hyperlink{strided__slice_8cpp_a4415abf9861e3883a31d588f3909eba9}{end}}\ +=\ axis\_size;}
+\DoxyCodeLine{00123\ \ \ \}}
+\DoxyCodeLine{00124\ \ \ \textcolor{keywordflow}{if}\ (stride\ >\ 0)\ \{}
+\DoxyCodeLine{00125\ \ \ \ \ \mbox{\hyperlink{strided__slice_8cpp_a4415abf9861e3883a31d588f3909eba9}{end}}\ =\ \mbox{\hyperlink{namespacetflite_1_1strided__slice_ad27293051e91a6a0fe299813738361be}{Clamp}}(\mbox{\hyperlink{strided__slice_8cpp_a4415abf9861e3883a31d588f3909eba9}{end}},\ 0,\ axis\_size);}
+\DoxyCodeLine{00126\ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00127\ \ \ \ \ \mbox{\hyperlink{strided__slice_8cpp_a4415abf9861e3883a31d588f3909eba9}{end}}\ =\ \mbox{\hyperlink{namespacetflite_1_1strided__slice_ad27293051e91a6a0fe299813738361be}{Clamp}}(\mbox{\hyperlink{strided__slice_8cpp_a4415abf9861e3883a31d588f3909eba9}{end}},\ -\/1,\ axis\_size\ -\/\ 1);}
+\DoxyCodeLine{00128\ \ \ \}}
+\DoxyCodeLine{00129\ \ \ \textcolor{keywordflow}{if}\ (end\_mask)\ \{}
+\DoxyCodeLine{00130\ \ \ \ \ \textcolor{keywordflow}{if}\ (stride\ >\ 0)\ \{}
+\DoxyCodeLine{00131\ \ \ \ \ \ \ \mbox{\hyperlink{strided__slice_8cpp_a4415abf9861e3883a31d588f3909eba9}{end}}\ =\ axis\_size;}
+\DoxyCodeLine{00132\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00133\ \ \ \ \ \ \ \mbox{\hyperlink{strided__slice_8cpp_a4415abf9861e3883a31d588f3909eba9}{end}}\ =\ -\/1;}
+\DoxyCodeLine{00134\ \ \ \ \ \}}
+\DoxyCodeLine{00135\ \ \ \}}
+\DoxyCodeLine{00136\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{strided__slice_8cpp_a4415abf9861e3883a31d588f3909eba9}{end}};}
+\DoxyCodeLine{00137\ \}}
+\DoxyCodeLine{00138\ }
+\DoxyCodeLine{00139\ \textcolor{comment}{//\ Return\ the\ index\ for\ the\ first\ element\ along\ that\ axis.\ This\ index\ will\ be\ a}}
+\DoxyCodeLine{00140\ \textcolor{comment}{//\ positive\ integer\ between\ [0,\ axis\_size]\ (or\ [-\/1,\ axis\_size\ -\/1]\ if\ stride\ <\ 0)}}
+\DoxyCodeLine{00141\ \textcolor{comment}{//\ that\ can\ be\ used\ to\ index\ directly\ into\ the\ data.}}
+\DoxyCodeLine{00142\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{namespacetflite_1_1strided__slice_aa9c186fb3aa0872365d86a6b43a21c5b}{StartForAxis}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structtflite_1_1_strided_slice_params}{tflite::StridedSliceParams}}\&\ \mbox{\hyperlink{comparisons_8cpp_a434686eb00eea897154eb5c3f9364ef7}{params}},}
+\DoxyCodeLine{00143\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ RuntimeShape\&\ input\_shape,\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{cumsum__test_8cc_a195d3f5576f1c8b039cff255b07a3aee}{axis}})\ \{}
+\DoxyCodeLine{00144\ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ begin\_mask\ =\ \mbox{\hyperlink{comparisons_8cpp_a434686eb00eea897154eb5c3f9364ef7}{params}}.begin\_mask;}
+\DoxyCodeLine{00145\ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}*\ start\_indices\ =\ \mbox{\hyperlink{comparisons_8cpp_a434686eb00eea897154eb5c3f9364ef7}{params}}.start\_indices;}
+\DoxyCodeLine{00146\ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}*\ \mbox{\hyperlink{strided__slice_8cpp_a0f79ebb17e0c702e870c706595d6e1c2}{strides}}\ =\ \mbox{\hyperlink{comparisons_8cpp_a434686eb00eea897154eb5c3f9364ef7}{params}}.strides;}
+\DoxyCodeLine{00147\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ axis\_size\ =\ \mbox{\hyperlink{namespace_m_n_i_s_t_afa2c1de24d40248bcf9a833cf7e9e0bc}{input\_shape}}.Dims(\mbox{\hyperlink{cumsum__test_8cc_a195d3f5576f1c8b039cff255b07a3aee}{axis}});}
+\DoxyCodeLine{00148\ \ \ \textcolor{keywordflow}{if}\ (axis\_size\ ==\ 0)\ \{}
+\DoxyCodeLine{00149\ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00150\ \ \ \}}
+\DoxyCodeLine{00151\ \ \ \textcolor{comment}{//\ Begin\ with\ the\ specified\ index.}}
+\DoxyCodeLine{00152\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{namespace_training___c_i_f_a_r_a960122f99a22c403ea381857cb4d73ae}{start}}\ =\ start\_indices[\mbox{\hyperlink{cumsum__test_8cc_a195d3f5576f1c8b039cff255b07a3aee}{axis}}];}
+\DoxyCodeLine{00153\ }
+\DoxyCodeLine{00154\ \ \ \textcolor{comment}{//\ begin\_mask\ override}}
+\DoxyCodeLine{00155\ \ \ \textcolor{keywordflow}{if}\ (begin\_mask\ \&\ 1\ <<\ \mbox{\hyperlink{cumsum__test_8cc_a195d3f5576f1c8b039cff255b07a3aee}{axis}})\ \{}
+\DoxyCodeLine{00156\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{strided__slice_8cpp_a0f79ebb17e0c702e870c706595d6e1c2}{strides}}[\mbox{\hyperlink{cumsum__test_8cc_a195d3f5576f1c8b039cff255b07a3aee}{axis}}]\ >\ 0)\ \{}
+\DoxyCodeLine{00157\ \ \ \ \ \ \ \textcolor{comment}{//\ Forward\ iteration\ -\/\ use\ the\ first\ element.\ These\ values\ will\ get}}
+\DoxyCodeLine{00158\ \ \ \ \ \ \ \textcolor{comment}{//\ clamped\ below\ (Note:\ We\ could\ have\ set\ them\ to\ 0\ and\ axis\_size-\/1,\ but}}
+\DoxyCodeLine{00159\ \ \ \ \ \ \ \textcolor{comment}{//\ use\ lowest()\ and\ max()\ to\ maintain\ symmetry\ with\ StopForAxis())}}
+\DoxyCodeLine{00160\ \ \ \ \ \ \ \mbox{\hyperlink{namespace_training___c_i_f_a_r_a960122f99a22c403ea381857cb4d73ae}{start}}\ =\ std::numeric\_limits<int>::lowest();}
+\DoxyCodeLine{00161\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00162\ \ \ \ \ \ \ \textcolor{comment}{//\ Backward\ iteration\ -\/\ use\ the\ last\ element.}}
+\DoxyCodeLine{00163\ \ \ \ \ \ \ \mbox{\hyperlink{namespace_training___c_i_f_a_r_a960122f99a22c403ea381857cb4d73ae}{start}}\ =\ std::numeric\_limits<int>::max();}
+\DoxyCodeLine{00164\ \ \ \ \ \}}
+\DoxyCodeLine{00165\ \ \ \}}
+\DoxyCodeLine{00166\ }
+\DoxyCodeLine{00167\ \ \ \textcolor{comment}{//\ Handle\ negative\ indices}}
+\DoxyCodeLine{00168\ \ \ \textcolor{keywordflow}{if}\ (start\ <\ 0)\ \{}
+\DoxyCodeLine{00169\ \ \ \ \ \mbox{\hyperlink{namespace_training___c_i_f_a_r_a960122f99a22c403ea381857cb4d73ae}{start}}\ +=\ axis\_size;}
+\DoxyCodeLine{00170\ \ \ \}}
+\DoxyCodeLine{00171\ }
+\DoxyCodeLine{00172\ \ \ \textcolor{comment}{//\ Clamping}}
+\DoxyCodeLine{00173\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{strided__slice_8cpp_a0f79ebb17e0c702e870c706595d6e1c2}{strides}}[\mbox{\hyperlink{cumsum__test_8cc_a195d3f5576f1c8b039cff255b07a3aee}{axis}}]\ >\ 0)\ \{}
+\DoxyCodeLine{00174\ \ \ \ \ \textcolor{comment}{//\ Forward\ iteration}}
+\DoxyCodeLine{00175\ \ \ \ \ \mbox{\hyperlink{namespace_training___c_i_f_a_r_a960122f99a22c403ea381857cb4d73ae}{start}}\ =\ \mbox{\hyperlink{namespacetflite_1_1strided__slice_ad27293051e91a6a0fe299813738361be}{Clamp}}(start,\ 0,\ axis\_size);}
+\DoxyCodeLine{00176\ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00177\ \ \ \ \ \textcolor{comment}{//\ Backward\ iteration}}
+\DoxyCodeLine{00178\ \ \ \ \ \mbox{\hyperlink{namespace_training___c_i_f_a_r_a960122f99a22c403ea381857cb4d73ae}{start}}\ =\ \mbox{\hyperlink{namespacetflite_1_1strided__slice_ad27293051e91a6a0fe299813738361be}{Clamp}}(start,\ -\/1,\ axis\_size\ -\/\ 1);}
+\DoxyCodeLine{00179\ \ \ \}}
+\DoxyCodeLine{00180\ }
+\DoxyCodeLine{00181\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespace_training___c_i_f_a_r_a960122f99a22c403ea381857cb4d73ae}{start}};}
+\DoxyCodeLine{00182\ \}}
+\DoxyCodeLine{00183\ }
+\DoxyCodeLine{00184\ \textcolor{comment}{//\ Return\ the\ "{}real"{}\ index\ for\ the\ end\ of\ iteration\ along\ that\ axis.\ This\ is\ an}}
+\DoxyCodeLine{00185\ \textcolor{comment}{//\ "{}end"{}\ in\ the\ traditional\ C\ sense,\ in\ that\ it\ points\ to\ one\ past\ the\ last}}
+\DoxyCodeLine{00186\ \textcolor{comment}{//\ element.\ ie.\ So\ if\ you\ were\ iterating\ through\ all\ elements\ of\ a\ 1D\ array\ of}}
+\DoxyCodeLine{00187\ \textcolor{comment}{//\ size\ 4,\ this\ function\ would\ return\ 4\ as\ the\ stop,\ because\ it\ is\ one\ past\ the}}
+\DoxyCodeLine{00188\ \textcolor{comment}{//\ "{}real"{}\ indices\ of\ 0,\ 1,\ 2\ \&\ 3.}}
+\DoxyCodeLine{00189\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{namespacetflite_1_1strided__slice_a4e9f380be696fa3aad5ec76e9dc9a5a5}{StopForAxis}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structtflite_1_1_strided_slice_params}{tflite::StridedSliceParams}}\&\ \mbox{\hyperlink{comparisons_8cpp_a434686eb00eea897154eb5c3f9364ef7}{params}},}
+\DoxyCodeLine{00190\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ RuntimeShape\&\ input\_shape,\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{cumsum__test_8cc_a195d3f5576f1c8b039cff255b07a3aee}{axis}},}
+\DoxyCodeLine{00191\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ start\_for\_axis)\ \{}
+\DoxyCodeLine{00192\ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ end\_mask\ =\ \mbox{\hyperlink{comparisons_8cpp_a434686eb00eea897154eb5c3f9364ef7}{params}}.end\_mask;}
+\DoxyCodeLine{00193\ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ shrink\_axis\_mask\ =\ \mbox{\hyperlink{comparisons_8cpp_a434686eb00eea897154eb5c3f9364ef7}{params}}.shrink\_axis\_mask;}
+\DoxyCodeLine{00194\ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}*\ stop\_indices\ =\ \mbox{\hyperlink{comparisons_8cpp_a434686eb00eea897154eb5c3f9364ef7}{params}}.stop\_indices;}
+\DoxyCodeLine{00195\ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}*\ \mbox{\hyperlink{strided__slice_8cpp_a0f79ebb17e0c702e870c706595d6e1c2}{strides}}\ =\ \mbox{\hyperlink{comparisons_8cpp_a434686eb00eea897154eb5c3f9364ef7}{params}}.strides;}
+\DoxyCodeLine{00196\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ axis\_size\ =\ \mbox{\hyperlink{namespace_m_n_i_s_t_afa2c1de24d40248bcf9a833cf7e9e0bc}{input\_shape}}.Dims(\mbox{\hyperlink{cumsum__test_8cc_a195d3f5576f1c8b039cff255b07a3aee}{axis}});}
+\DoxyCodeLine{00197\ \ \ \textcolor{keywordflow}{if}\ (axis\_size\ ==\ 0)\ \{}
+\DoxyCodeLine{00198\ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00199\ \ \ \}}
+\DoxyCodeLine{00200\ }
+\DoxyCodeLine{00201\ \ \ \textcolor{comment}{//\ Begin\ with\ the\ specified\ index}}
+\DoxyCodeLine{00202\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{bool}\ shrink\_axis\ =\ shrink\_axis\_mask\ \&\ (1\ <<\ \mbox{\hyperlink{cumsum__test_8cc_a195d3f5576f1c8b039cff255b07a3aee}{axis}});}
+\DoxyCodeLine{00203\ \ \ \textcolor{keywordtype}{int}\ stop\ =\ stop\_indices[\mbox{\hyperlink{cumsum__test_8cc_a195d3f5576f1c8b039cff255b07a3aee}{axis}}];}
+\DoxyCodeLine{00204\ }
+\DoxyCodeLine{00205\ \ \ \textcolor{comment}{//\ When\ shrinking\ an\ axis,\ the\ end\ position\ does\ not\ matter\ (and\ can\ be}}
+\DoxyCodeLine{00206\ \ \ \textcolor{comment}{//\ incorrect\ when\ negative\ indexing\ is\ used,\ see\ Issue\ \#19260).\ Always\ use}}
+\DoxyCodeLine{00207\ \ \ \textcolor{comment}{//\ start\_for\_axis\ +\ 1\ to\ generate\ a\ length\ 1\ slice,\ since\ start\_for\_axis\ has}}
+\DoxyCodeLine{00208\ \ \ \textcolor{comment}{//\ already\ been\ adjusted\ for\ negative\ indices.}}
+\DoxyCodeLine{00209\ \ \ \textcolor{keywordflow}{if}\ (shrink\_axis)\ \{}
+\DoxyCodeLine{00210\ \ \ \ \ \textcolor{keywordflow}{return}\ start\_for\_axis\ +\ 1;}
+\DoxyCodeLine{00211\ \ \ \}}
+\DoxyCodeLine{00212\ }
+\DoxyCodeLine{00213\ \ \ \textcolor{comment}{//\ end\_mask\ override}}
+\DoxyCodeLine{00214\ \ \ \textcolor{keywordflow}{if}\ (end\_mask\ \&\ (1\ <<\ \mbox{\hyperlink{cumsum__test_8cc_a195d3f5576f1c8b039cff255b07a3aee}{axis}}))\ \{}
+\DoxyCodeLine{00215\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{strided__slice_8cpp_a0f79ebb17e0c702e870c706595d6e1c2}{strides}}[\mbox{\hyperlink{cumsum__test_8cc_a195d3f5576f1c8b039cff255b07a3aee}{axis}}]\ >\ 0)\ \{}
+\DoxyCodeLine{00216\ \ \ \ \ \ \ \textcolor{comment}{//\ Forward\ iteration\ -\/\ use\ the\ last\ element.\ These\ values\ will\ get}}
+\DoxyCodeLine{00217\ \ \ \ \ \ \ \textcolor{comment}{//\ clamped\ below}}
+\DoxyCodeLine{00218\ \ \ \ \ \ \ stop\ =\ std::numeric\_limits<int>::max();}
+\DoxyCodeLine{00219\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00220\ \ \ \ \ \ \ \textcolor{comment}{//\ Backward\ iteration\ -\/\ use\ the\ first\ element.}}
+\DoxyCodeLine{00221\ \ \ \ \ \ \ stop\ =\ std::numeric\_limits<int>::lowest();}
+\DoxyCodeLine{00222\ \ \ \ \ \}}
+\DoxyCodeLine{00223\ \ \ \}}
+\DoxyCodeLine{00224\ }
+\DoxyCodeLine{00225\ \ \ \textcolor{comment}{//\ Handle\ negative\ indices}}
+\DoxyCodeLine{00226\ \ \ \textcolor{keywordflow}{if}\ (stop\ <\ 0)\ \{}
+\DoxyCodeLine{00227\ \ \ \ \ stop\ +=\ axis\_size;}
+\DoxyCodeLine{00228\ \ \ \}}
+\DoxyCodeLine{00229\ }
+\DoxyCodeLine{00230\ \ \ \textcolor{comment}{//\ Clamping}}
+\DoxyCodeLine{00231\ \ \ \textcolor{comment}{//\ Because\ the\ end\ index\ points\ one\ past\ the\ last\ element,\ we\ need\ slightly}}
+\DoxyCodeLine{00232\ \ \ \textcolor{comment}{//\ different\ clamping\ ranges\ depending\ on\ the\ direction.}}
+\DoxyCodeLine{00233\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{strided__slice_8cpp_a0f79ebb17e0c702e870c706595d6e1c2}{strides}}[\mbox{\hyperlink{cumsum__test_8cc_a195d3f5576f1c8b039cff255b07a3aee}{axis}}]\ >\ 0)\ \{}
+\DoxyCodeLine{00234\ \ \ \ \ \textcolor{comment}{//\ Forward\ iteration}}
+\DoxyCodeLine{00235\ \ \ \ \ stop\ =\ \mbox{\hyperlink{namespacetflite_1_1strided__slice_ad27293051e91a6a0fe299813738361be}{Clamp}}(stop,\ 0,\ axis\_size);}
+\DoxyCodeLine{00236\ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00237\ \ \ \ \ \textcolor{comment}{//\ Backward\ iteration}}
+\DoxyCodeLine{00238\ \ \ \ \ stop\ =\ \mbox{\hyperlink{namespacetflite_1_1strided__slice_ad27293051e91a6a0fe299813738361be}{Clamp}}(stop,\ -\/1,\ axis\_size\ -\/\ 1);}
+\DoxyCodeLine{00239\ \ \ \}}
+\DoxyCodeLine{00240\ }
+\DoxyCodeLine{00241\ \ \ \textcolor{keywordflow}{return}\ stop;}
+\DoxyCodeLine{00242\ \}}
+\DoxyCodeLine{00243\ }
+\DoxyCodeLine{00244\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespacetflite_1_1strided__slice_a2ba717fe543819833a4f22ea6c65ace0}{LoopCondition}}(\textcolor{keywordtype}{int}\ index,\ \textcolor{keywordtype}{int}\ stop,\ \textcolor{keywordtype}{int}\ stride)\ \{}
+\DoxyCodeLine{00245\ \ \ \textcolor{comment}{//\ True\ when\ we\ have\ reached\ the\ end\ of\ an\ axis\ and\ should\ loop.}}
+\DoxyCodeLine{00246\ \ \ \textcolor{keywordflow}{return}\ stride\ >\ 0\ ?\ \mbox{\hyperlink{namespace_arduino_tinyml_workshop_a230c8eac09a3338f6adcc073d97bc4a1}{index}}\ >=\ stop\ :\ \mbox{\hyperlink{namespace_arduino_tinyml_workshop_a230c8eac09a3338f6adcc073d97bc4a1}{index}}\ <=\ stop;}
+\DoxyCodeLine{00247\ \}}
+\DoxyCodeLine{00248\ }
+\DoxyCodeLine{00249\ \textcolor{keyword}{inline}\ \mbox{\hyperlink{structtflite_1_1_strided_slice_params}{tflite::StridedSliceParams}}\ \mbox{\hyperlink{namespacetflite_1_1strided__slice_a76e755c88c6fc1eec4a25c0353db8236}{BuildStridedSliceParams}}(}
+\DoxyCodeLine{00250\ \ \ \ \ \textcolor{keywordtype}{int}\ begin\_mask,\ \textcolor{keywordtype}{int}\ end\_mask,\ \textcolor{keywordtype}{int}\ shrink\_axis\_mask,}
+\DoxyCodeLine{00251\ \ \ \ \ \textcolor{keyword}{const}\ std::vector<int>\&\ start\_indices,\ \textcolor{keyword}{const}\ std::vector<int>\&\ stop\_indices,}
+\DoxyCodeLine{00252\ \ \ \ \ \textcolor{keyword}{const}\ std::vector<int>\&\ \mbox{\hyperlink{strided__slice_8cpp_a0f79ebb17e0c702e870c706595d6e1c2}{strides}})\ \{}
+\DoxyCodeLine{00253\ \ \ \mbox{\hyperlink{structtflite_1_1_strided_slice_params}{tflite::StridedSliceParams}}\ op\_params\{\};}
+\DoxyCodeLine{00254\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ dims\_count\ =\ start\_indices.size();}
+\DoxyCodeLine{00255\ }
+\DoxyCodeLine{00256\ \ \ op\_params.\mbox{\hyperlink{structtflite_1_1_strided_slice_params_a39955128fb1541831367cf91c21704e9}{start\_indices\_count}}\ =\ dims\_count;}
+\DoxyCodeLine{00257\ \ \ op\_params.stop\_indices\_count\ =\ dims\_count;}
+\DoxyCodeLine{00258\ \ \ op\_params.strides\_count\ =\ dims\_count;}
+\DoxyCodeLine{00259\ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ dims\_count;\ ++i)\ \{}
+\DoxyCodeLine{00260\ \ \ \ \ op\_params.start\_indices[i]\ =\ start\_indices[i];}
+\DoxyCodeLine{00261\ \ \ \ \ op\_params.stop\_indices[i]\ =\ stop\_indices[i];}
+\DoxyCodeLine{00262\ \ \ \ \ op\_params.strides[i]\ =\ \mbox{\hyperlink{strided__slice_8cpp_a0f79ebb17e0c702e870c706595d6e1c2}{strides}}[i];}
+\DoxyCodeLine{00263\ \ \ \}}
+\DoxyCodeLine{00264\ }
+\DoxyCodeLine{00265\ \ \ op\_params.begin\_mask\ =\ begin\_mask;}
+\DoxyCodeLine{00266\ \ \ op\_params.ellipsis\_mask\ =\ 0;}
+\DoxyCodeLine{00267\ \ \ op\_params.end\_mask\ =\ end\_mask;}
+\DoxyCodeLine{00268\ \ \ op\_params.new\_axis\_mask\ =\ 0;}
+\DoxyCodeLine{00269\ \ \ op\_params.shrink\_axis\_mask\ =\ shrink\_axis\_mask;}
+\DoxyCodeLine{00270\ }
+\DoxyCodeLine{00271\ \ \ \textcolor{keywordflow}{return}\ op\_params;}
+\DoxyCodeLine{00272\ \}}
+\DoxyCodeLine{00273\ }
+\DoxyCodeLine{00274\ \}\ \ \textcolor{comment}{//\ namespace\ strided\_slice}}
+\DoxyCodeLine{00275\ }
+\DoxyCodeLine{00276\ \}\ \ \textcolor{comment}{//\ namespace\ tflite}}
+\DoxyCodeLine{00277\ }
+\DoxyCodeLine{00278\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ TENSORFLOW\_LITE\_KERNELS\_INTERNAL\_STRIDED\_SLICE\_LOGIC\_H\_}}
+
+\end{DoxyCode}

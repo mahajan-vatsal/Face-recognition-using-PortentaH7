@@ -1,0 +1,263 @@
+\chapter{Person Detection Training}
+\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_ca8345ff527d94f05cca82eab8ef1df9}{}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_ca8345ff527d94f05cca82eab8ef1df9}\index{Person Detection Training@{Person Detection Training}}
+\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_ca8345ff527d94f05cca82eab8ef1df9_autotoc_md298}%
+\Hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_ca8345ff527d94f05cca82eab8ef1df9_autotoc_md298}%
+
+
+In this document, you will learn how to generate a 250 KB binary classification model to detect if a person is present in an input image or not.\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_ca8345ff527d94f05cca82eab8ef1df9_autotoc_md299}{}\doxysection{\texorpdfstring{Resources}{Resources}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_ca8345ff527d94f05cca82eab8ef1df9_autotoc_md299}
+\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_ca8345ff527d94f05cca82eab8ef1df9_autotoc_md300}{}\doxysubsection{\texorpdfstring{Trained model}{Trained model}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_ca8345ff527d94f05cca82eab8ef1df9_autotoc_md300}
+The trained model file (C source file {\ttfamily person\+\_\+detect\+\_\+model\+\_\+data.\+cc}) used in this example to run person detection on various microcontrollers is available in \href{https://storage.googleapis.com/download.tensorflow.org/data/tf_lite_micro_person_data_int8_grayscale_2020_01_13.zip}{\texttt{ person\+\_\+detection.\+zip}}. This document shows you how to generate the model file.\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_ca8345ff527d94f05cca82eab8ef1df9_autotoc_md301}{}\doxysubsection{\texorpdfstring{Dataset}{Dataset}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_ca8345ff527d94f05cca82eab8ef1df9_autotoc_md301}
+We use the \href{https://arxiv.org/abs/1906.05721}{\texttt{ Visual Wake Words dataset}} which contains images that belong to two classes (person or not-\/person). This dataset is designed to be useful for benchmarking and testing embedded computer vision, since it represents a very common task, i.\+e, binary classification, that we need to accomplish with tight resource constraints. We\textquotesingle{}re hoping to see it drive even better models for this and similar tasks.
+
+This is a large download (\texorpdfstring{$\sim$}{\string~}40\+GB), so you\textquotesingle{}ll need to make sure you have at least 100GB free on your drive to allow space for unpacking and further processing.\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_ca8345ff527d94f05cca82eab8ef1df9_autotoc_md302}{}\doxysubsection{\texorpdfstring{Model Architecture}{Model Architecture}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_ca8345ff527d94f05cca82eab8ef1df9_autotoc_md302}
+\href{https://arxiv.org/abs/1704.04861}{\texttt{ Mobile\+Nets}} are a family of efficient Convolutional Neural Networks for Mobile Vision, designed to provide good accuracy for as few weight parameters and arithmetic operations as possible.\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_ca8345ff527d94f05cca82eab8ef1df9_autotoc_md303}{}\doxysubsection{\texorpdfstring{Compute}{Compute}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_ca8345ff527d94f05cca82eab8ef1df9_autotoc_md303}
+This model will take several hours to train on a powerful machine with GPUs and several days with CPUs. Alternatively, we recommend using a \href{https://cloud.google.com/deep-learning-vm/}{\texttt{ Google Cloud Deep Learning VM}} or \href{https://colab.research.google.com/signup}{\texttt{ Google Colab Pro}} for faster training.\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_ca8345ff527d94f05cca82eab8ef1df9_autotoc_md304}{}\doxysubsection{\texorpdfstring{Framework}{Framework}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_ca8345ff527d94f05cca82eab8ef1df9_autotoc_md304}
+We\textquotesingle{}ll be training the models using the Slim library in Tensor\+Flow 1. It is still widely used but deprecated, so future versions of Tensor\+Flow may not support this approach.
+
+Keras is the recommended interface for building models in Tensor\+Flow 2 and future versions, but does not support all the features we need to build the person detection model. We hope to publish Keras instructions in the future.\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_ca8345ff527d94f05cca82eab8ef1df9_autotoc_md305}{}\doxysection{\texorpdfstring{Code}{Code}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_ca8345ff527d94f05cca82eab8ef1df9_autotoc_md305}
+\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_ca8345ff527d94f05cca82eab8ef1df9_autotoc_md306}{}\doxysubsection{\texorpdfstring{Setup}{Setup}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_ca8345ff527d94f05cca82eab8ef1df9_autotoc_md306}
+We will be running all commands from your home directory. You can place the repository somewhere else, but you\textquotesingle{}ll need to update all references to it. Now run this step initially\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{!\ cd\ \string~}
+
+\end{DoxyCode}
+
+
+Clone the \href{https://github.com/tensorflow/models}{\texttt{ Tensor\+Flow models}} github repository\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{!\ git\ clone\ https://github.com/tensorflow/models.git}
+
+\end{DoxyCode}
+
+
+Specifically, we will be using {\ttfamily \texorpdfstring{$\sim$}{\string~}/models/research/slim} a \href{https://github.com/tensorflow/models/tree/master/research/slim}{\texttt{ library}} for defining, training and evaluating models. However, in order to use it, you\textquotesingle{}ll need to make sure its modules can be found by Python, and install one dependency. Here\textquotesingle{}s how to do this in an i\+Python notebook\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{!\ pip\ install\ contextlib2}
+\DoxyCodeLine{import\ os}
+\DoxyCodeLine{new\_python\_path\ =\ (os.environ.get("{}PYTHONPATH"{})\ or\ '')\ +\ "{}:models/research/slim"{}}
+\DoxyCodeLine{\%env\ PYTHONPATH=\$new\_python\_path}
+
+\end{DoxyCode}
+\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_ca8345ff527d94f05cca82eab8ef1df9_autotoc_md307}{}\doxysubsection{\texorpdfstring{Download the Dataset}{Download the Dataset}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_ca8345ff527d94f05cca82eab8ef1df9_autotoc_md307}
+The \href{https://arxiv.org/abs/1906.05721}{\texttt{ Visual Wake Words dataset}} contains images which belong to two classes\+: person (labelled as 1) and not-\/person (labelled as 0) and it is derived from the \href{http://cocodataset.org/\#explore}{\texttt{ COCO dataset}} containing 80 categories (eg\+: cat, dog, umbrella, etc). You can download the dataset by running this script\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{!\ python\ models/research/slim/download\_and\_convert\_data.py\ \(\backslash\)}
+\DoxyCodeLine{-\/-\/logtostderr\ \(\backslash\)}
+\DoxyCodeLine{-\/-\/dataset\_name=visualwakewords\ \(\backslash\)}
+\DoxyCodeLine{-\/-\/dataset\_dir=person\_detection\_dataset\ \(\backslash\)}
+\DoxyCodeLine{-\/-\/foreground\_class\_of\_interest='person'\ \(\backslash\)}
+\DoxyCodeLine{-\/-\/small\_object\_area\_threshold=0.005}
+
+\end{DoxyCode}
+
+
+This will take several minutes (\texorpdfstring{$\sim$}{\string~}20 minutes or more) so you may have to wait for a while before you proceed onto the next part. When it\textquotesingle{}s done, you\textquotesingle{}ll have a set of TFRecords in the {\ttfamily person\+\_\+detection\+\_\+dataset/} directory holding the labeled image information.
+
+The script takes a long time as the COCO dataset does not have a label for each image, instead each image comes with a list of labelled bounding boxes. To create the Visual Wake\+Words dataset, we loop over every image and its bounding boxes and if an image has at least one bounding box labelled as \textquotesingle{}person\textquotesingle{} with an area greater than 0.\+5\% of the area of the image, then the entire image is labelled as "{}person"{}, otherwise it is labelled as "{}non-\/person"{}.\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_ca8345ff527d94f05cca82eab8ef1df9_autotoc_md308}{}\doxysubsection{\texorpdfstring{Train the model}{Train the model}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_ca8345ff527d94f05cca82eab8ef1df9_autotoc_md308}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{!\ python\ models/research/slim/train\_image\_classifier.py\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ -\/-\/alsologtostderr\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ -\/-\/dataset\_name=visualwakewords\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ -\/-\/dataset\_dir=person\_detection\_dataset\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ -\/-\/dataset\_split\_name=train\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ -\/-\/train\_image\_size=96\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ -\/-\/use\_grayscale=True\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ -\/-\/preprocessing\_name=mobilenet\_v1\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ -\/-\/model\_name=mobilenet\_v1\_025\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ -\/-\/train\_dir=person\_detection\_train\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ -\/-\/save\_summaries\_secs=300\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ -\/-\/learning\_rate=0.045\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ -\/-\/label\_smoothing=0.1\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ -\/-\/learning\_rate\_decay\_factor=0.98\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ -\/-\/num\_epochs\_per\_decay=2.5\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ -\/-\/moving\_average\_decay=0.9999\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ -\/-\/batch\_size=96\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ -\/-\/max\_number\_of\_steps=1000000}
+
+\end{DoxyCode}
+
+
+This will take a couple of days on a single-\/\+GPU v100 instance to complete all one-\/million steps, but you should be able to get a fairly accurate model after a few hours if you want to experiment early.
+
+
+\begin{DoxyItemize}
+\item {\ttfamily -\/-\/dataset\+\_\+dir} parameter should match the one where you saved the TFRecords from the Visual Wake Words build script from the previous step.
+\item {\ttfamily -\/-\/preprocessing\+\_\+name} controls how input images are modified before they\textquotesingle{}re fed into the model. It reduces each image to the size specified by {\ttfamily -\/-\/train\+\_\+image\+\_\+size} (here 96), convert them to grayscale using {\ttfamily -\/-\/use\+\_\+grayscale=True} which is compatible with the monochrome \href{https://himax.com.tw/products/cmos-image-sensor/image-sensors/hm01b0/}{\texttt{ HM01\+B0}} camera we\textquotesingle{}re using on the Spark\+Fun Edge board and scale the pixel values from 0 to 255 integers into -\/1.\+0 to +1.\+0 floating point numbers (which will be \href{https://en.wikipedia.org/wiki/Quantization}{\texttt{ quantized}} after training).
+\item {\ttfamily -\/-\/model\+\_\+name} is the model architecture we\textquotesingle{}ll be using; here it\textquotesingle{}s {\ttfamily mobilenet\+\_\+v1\+\_\+025}. The \textquotesingle{}mobilenet\+\_\+v1\textquotesingle{} prefix tells the script to use the first version of Mobile\+Net. We use V1 as it uses the least amount of RAM for its intermediate activation buffers compared to later versions. The \textquotesingle{}025\textquotesingle{} is the depth multiplier, which reduces the number of weight parameters. This low setting ensures the model fits within 250KB of Flash.
+\item {\ttfamily -\/-\/train\+\_\+dir} will contain the trained checkpoints and summaries.
+\item The {\ttfamily -\/-\/learning\+\_\+rate}, {\ttfamily -\/-\/label\+\_\+smoothing}, {\ttfamily -\/-\/learning\+\_\+rate\+\_\+decay\+\_\+factor}, {\ttfamily -\/-\/num\+\_\+epochs\+\_\+per\+\_\+decay}, {\ttfamily -\/-\/moving\+\_\+average\+\_\+decay} and {\ttfamily -\/-\/batch\+\_\+size} are all parameters that control how weights are updated during the training process. Training deep networks is still a bit of a dark art, so these exact values we found through experimentation for this particular model. You can try tweaking them to speed up training or gain a small boost in accuracy, but we can\textquotesingle{}t give much guidance for how to make those changes, and it\textquotesingle{}s easy to get combinations where the training accuracy never converges.
+\item The {\ttfamily -\/-\/max\+\_\+number\+\_\+of\+\_\+steps} defines how long the training should continue. There\textquotesingle{}s no good way to figure out this threshold in advance, you have to experiment to tell when the accuracy of the model is no longer improving to tell when to cut it off. In our case we default to a million steps, since with this particular model we know that\textquotesingle{}s a good point to stop.
+\end{DoxyItemize}
+
+Once you start the script, you should see output that looks something like this\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{INFO:tensorflow:global\ step\ 4670:\ loss\ =\ 0.7112\ (0.251\ sec/step)}
+\DoxyCodeLine{I0928\ 00:16:21.774756\ 140518023943616\ learning.py:507]\ global\ step\ 4670:\ loss\ =}
+\DoxyCodeLine{0.7112\ (0.251\ sec/step)}
+\DoxyCodeLine{INFO:tensorflow:global\ step\ 4680:\ loss\ =\ 0.6596\ (0.227\ sec/step)}
+\DoxyCodeLine{I0928\ 00:16:24.365901\ 140518023943616\ learning.py:507]\ global\ step\ 4680:\ loss\ =}
+\DoxyCodeLine{0.6596\ (0.227\ sec/step)}
+
+\end{DoxyCode}
+
+
+Don\textquotesingle{}t worry about the line duplication, this is just a side-\/effect of the way Tensor\+Flow log printing interacts with Python. Each line has two key bits of information about the training process.
+\begin{DoxyEnumerate}
+\item The {\ttfamily global step} is a count of how far through the training we are. Since we\textquotesingle{}ve set the limit as a million steps, in this case we\textquotesingle{}re nearly five percent complete. The steps per second estimate is also useful, since you can use it to estimate a rough duration for the whole training process. In this case, we\textquotesingle{}re completing about four steps a second, so a million steps will take about 70 hours, or three days.
+\item The {\ttfamily loss} is a measure of how close the partially-\/trained model\textquotesingle{}s predictions are to the correct values, and lower values are {\itshape better}. This will show a lot of variation but should on an average decrease during training if the model is learning. This kind of variation is a lot easier to see in a graph, which is one of the main reasons to try Tensor\+Board.
+\end{DoxyEnumerate}\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_ca8345ff527d94f05cca82eab8ef1df9_autotoc_md309}{}\doxysubsubsection{\texorpdfstring{Tensor\+Board}{Tensor\+Board}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_ca8345ff527d94f05cca82eab8ef1df9_autotoc_md309}
+Tensor\+Board is a web application that lets you view data visualizations from Tensor\+Flow training sessions. You can start Tensorboard using the command line\+: Run\+: {\ttfamily tensorboard -\/-\/logdir person\+\_\+detection\+\_\+train}. Go to the URL it provides.
+
+It may take a little while for the graphs to have anything useful in them, since the script only saves summaries every five minutes (or 300 seconds). The most important graph is called {\ttfamily clone\+\_\+loss} and this shows the progression of the same loss value that\textquotesingle{}s displayed on the logging output. It fluctuates a lot, but the overall trend is downwards over time. If you don\textquotesingle{}t see this sort of progression after a few hours of training, it\textquotesingle{}s a sign that your model isn\textquotesingle{}t converging to a good solution, and you may need to debug what\textquotesingle{}s going wrong either with your dataset or the training parameters.
+
+Tensor\+Board defaults to the \textquotesingle{}Scalars\textquotesingle{} tab when it opens, but the other section that can be useful during training is \textquotesingle{}Images\textquotesingle{}. This shows a random selection of the pictures the model is currently being trained on, including any distortions and other preprocessing. This information isn\textquotesingle{}t as essential as the loss graphs, but it can be useful to ensure the dataset is what you expect, and it is interesting to see the examples updating as training progresses.\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_ca8345ff527d94f05cca82eab8ef1df9_autotoc_md310}{}\doxysubsection{\texorpdfstring{Evaluate the model}{Evaluate the model}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_ca8345ff527d94f05cca82eab8ef1df9_autotoc_md310}
+(You don\textquotesingle{}t need to wait until the model is fully trained, you can check the accuracy of any checkpoints in the {\ttfamily -\/-\/train\+\_\+dir} folder.)
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{!\ python\ models/research/slim/eval\_image\_classifier.py\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ -\/-\/alsologtostderr\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ -\/-\/dataset\_name=visualwakewords\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ -\/-\/dataset\_dir=person\_detection\_train\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ -\/-\/dataset\_split\_name=val\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ -\/-\/eval\_image\_size=96\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ -\/-\/use\_grayscale=True\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ -\/-\/preprocessing\_name=mobilenet\_v1\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ -\/-\/model\_name=mobilenet\_v1\_025\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ -\/-\/train\_dir=person\_detection\_train\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ -\/-\/checkpoint\_path=person\_detection\_train/model.ckpt-\/123456}
+
+\end{DoxyCode}
+
+
+You\textquotesingle{}ll need to make sure that {\ttfamily -\/-\/checkpoint\+\_\+path} is pointing to a valid set of checkpoint data. Checkpoints are stored in three separate files, so the value should be their common prefix. For example if you have a checkpoint file called \textquotesingle{}model.\+ckpt-\/5179.\+data-\/00000-\/of-\/00001\textquotesingle{}, the prefix would be \textquotesingle{}model.\+ckpt-\/5179\textquotesingle{}. The script should produce output that looks something like this\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{INFO:tensorflow:Evaluation\ [406/406]}
+\DoxyCodeLine{I0929\ 22:52:59.936022\ 140225887045056\ evaluation.py:167]\ Evaluation\ [406/406]}
+\DoxyCodeLine{eval/Accuracy[0.717438412]eval/Recall\_5[1]}
+
+\end{DoxyCode}
+
+
+The important number here is the accuracy. It shows the proportion of the images that were classified correctly, which is 72\% in this case, after converting to a percentage. If you follow the example script, you should expect a fully-\/trained model to achieve an accuracy of around 84\% after one million steps, and show a loss of around 0.\+4.\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_ca8345ff527d94f05cca82eab8ef1df9_autotoc_md311}{}\doxysubsection{\texorpdfstring{Convert the TF model to a TF Lite model for Inference}{Convert the TF model to a TF Lite model for Inference}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_ca8345ff527d94f05cca82eab8ef1df9_autotoc_md311}
+When the model has trained to an accuracy you\textquotesingle{}re happy with, you\textquotesingle{}ll need to convert the results from the Tensor\+Flow training environment into a form you can run on an embedded device. As we\textquotesingle{}ve seen in previous chapters, this can be a complex process, and tf.\+slim adds a few of its own wrinkles too.\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_ca8345ff527d94f05cca82eab8ef1df9_autotoc_md312}{}\doxysubsubsection{\texorpdfstring{Generate the model graph}{Generate the model graph}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_ca8345ff527d94f05cca82eab8ef1df9_autotoc_md312}
+Slim generates the architecture from the {\ttfamily model\+\_\+name} every time one of its scripts is run, so for a model to be used outside of Slim it needs to be saved in a common format. We\textquotesingle{}re going to use the Graph\+Def protobuf serialization format, since that\textquotesingle{}s understood by both Slim and the rest of Tensor\+Flow. This contains the layout of the operations in the model, but doesn\textquotesingle{}t yet have any of the weight data.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{!\ python\ models/research/slim/export\_inference\_graph.py\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ -\/-\/alsologtostderr\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ -\/-\/dataset\_name=visualwakewords\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ -\/-\/image\_size=96\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ -\/-\/use\_grayscale=True\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ -\/-\/model\_name=mobilenet\_v1\_025\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ -\/-\/output\_file=person\_detection\_graph.pb}
+
+\end{DoxyCode}
+
+
+You should have a new \textquotesingle{}person\+\_\+detection\+\_\+graph.\+pb\textquotesingle{} file in your home folder.\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_ca8345ff527d94f05cca82eab8ef1df9_autotoc_md313}{}\doxysubsubsection{\texorpdfstring{Generate the frozen model graph (combine model graph and trained weights)}{Generate the frozen model graph (combine model graph and trained weights)}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_ca8345ff527d94f05cca82eab8ef1df9_autotoc_md313}
+The process of storing the trained weights together with the operation graph is known as freezing. This converts all of the variables in the graph to constants, after loading their values from a checkpoint file. The command below uses a checkpoint from the millionth training step, but you can supply any valid checkpoint path. The graph freezing script is stored inside the main Tensor\+Flow repository, so we have to download this from Git\+Hub before running this command.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{!\ git\ clone\ https://github.com/tensorflow/tensorflow}
+\DoxyCodeLine{!\ python\ tensorflow/tensorflow/python/tools/freeze\_graph.py\ \(\backslash\)}
+\DoxyCodeLine{-\/-\/input\_graph=person\_detection\_graph.pb\ \(\backslash\)}
+\DoxyCodeLine{-\/-\/input\_checkpoint=person\_detection\_train/model.ckpt-\/1000000\ \(\backslash\)}
+\DoxyCodeLine{-\/-\/input\_binary=true\ \(\backslash\)}
+\DoxyCodeLine{-\/-\/output\_node\_names=MobilenetV1/Predictions/Reshape\_1\ \(\backslash\)}
+\DoxyCodeLine{-\/-\/output\_graph=person\_detection\_frozen\_graph.pb}
+
+\end{DoxyCode}
+
+
+After this, you should see a file called {\ttfamily person\+\_\+detection\+\_\+frozen\+\_\+graph.\+pb}\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_ca8345ff527d94f05cca82eab8ef1df9_autotoc_md314}{}\doxysubsubsection{\texorpdfstring{Generate the Tensor\+Flow Lite File with Quantization}{Generate the Tensor\+Flow Lite File with Quantization}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_ca8345ff527d94f05cca82eab8ef1df9_autotoc_md314}
+\href{https://en.wikipedia.org/wiki/Quantization}{\texttt{ Quantization}} is a tricky and involved process, and it\textquotesingle{}s still very much an active area of research, so taking the float graph that we\textquotesingle{}ve trained so far and converting it down to eight bit takes quite a bit of code. You can find more of an explanation of what quantization is and how it works in the chapter on latency optimization, but here we\textquotesingle{}ll show you how to use it with the model we\textquotesingle{}ve trained. The majority of the code is preparing example images to feed into the trained network, so that the ranges of the activation layers in typical use can be measured. We rely on the TFLite\+Converter class to handle the quantization and conversion into the Tensor\+Flow Lite Flat\+Buffer file that we need for the on-\/device inference engine.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{import\ tensorflow.compat.v1\ as\ tf}
+\DoxyCodeLine{import\ io}
+\DoxyCodeLine{import\ PIL}
+\DoxyCodeLine{import\ numpy\ as\ np}
+\DoxyCodeLine{}
+\DoxyCodeLine{def\ representative\_dataset\_gen():}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ record\_iterator\ =}
+\DoxyCodeLine{tf.python\_io.tf\_record\_iterator(path='person\_detection\_dataset/val.record-\/00000-\/of-\/00010')}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ for\ \_\ in\ range(250):}
+\DoxyCodeLine{\ \ \ \ string\_record\ =\ next(record\_iterator)}
+\DoxyCodeLine{\ \ \ \ example\ =\ tf.train.Example()}
+\DoxyCodeLine{\ \ \ \ example.ParseFromString(string\_record)}
+\DoxyCodeLine{\ \ \ \ image\_stream\ =}
+\DoxyCodeLine{io.BytesIO(example.features.feature['image/encoded'].bytes\_list.value[0])}
+\DoxyCodeLine{\ \ \ \ image\ =\ PIL.Image.open(image\_stream)}
+\DoxyCodeLine{\ \ \ \ image\ =\ image.resize((96,\ 96))}
+\DoxyCodeLine{\ \ \ \ image\ =\ image.convert('L')}
+\DoxyCodeLine{\ \ \ \ array\ =\ np.array(image)}
+\DoxyCodeLine{\ \ \ \ array\ =\ np.expand\_dims(array,\ axis=2)}
+\DoxyCodeLine{\ \ \ \ array\ =\ np.expand\_dims(array,\ axis=0)}
+\DoxyCodeLine{\ \ \ \ array\ =\ ((array\ /\ 127.5)\ -\/\ 1.0).astype(np.float32)}
+\DoxyCodeLine{\ \ \ \ yield([array])}
+\DoxyCodeLine{}
+\DoxyCodeLine{converter\ =}
+\DoxyCodeLine{tf.lite.TFLiteConverter.from\_frozen\_graph('person\_detection\_frozen\_graph.pb',}
+\DoxyCodeLine{['input'],\ ['MobilenetV1/Predictions/Reshape\_1'])}
+\DoxyCodeLine{converter.optimizations\ =\ [tf.lite.Optimize.DEFAULT]}
+\DoxyCodeLine{converter.representative\_dataset\ =\ representative\_dataset\_gen}
+\DoxyCodeLine{converter.target\_spec.supported\_ops\ =\ [tf.lite.OpsSet.TFLITE\_BUILTINS\_INT8]}
+\DoxyCodeLine{converter.inference\_input\_type\ =\ tf.int8}
+\DoxyCodeLine{converter.inference\_output\_type\ =\ tf.int8}
+\DoxyCodeLine{}
+\DoxyCodeLine{tflite\_quant\_model\ =\ converter.convert()}
+\DoxyCodeLine{open("{}person\_detection\_model.tflite"{},\ "{}wb"{}).write(tflite\_quant\_model)}
+
+\end{DoxyCode}
+\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_ca8345ff527d94f05cca82eab8ef1df9_autotoc_md315}{}\doxysubsubsection{\texorpdfstring{Generate the C source file}{Generate the C source file}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_ca8345ff527d94f05cca82eab8ef1df9_autotoc_md315}
+The converter writes out a file, but most embedded devices don\textquotesingle{}t have a file system. To access the serialized data from our program, we have to compile it into the executable and store it in Flash. The easiest way to do that is to convert the file into a C data array.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\#\ Install\ xxd\ if\ it\ is\ not\ available}
+\DoxyCodeLine{!\ apt-\/get\ -\/qq\ install\ xxd}
+\DoxyCodeLine{\#\ Save\ the\ file\ as\ a\ C\ source\ file}
+\DoxyCodeLine{!\ xxd\ -\/i\ person\_detection\_model.tflite\ >\ person\_detect\_model\_data.cc}
+
+\end{DoxyCode}
+
+
+You can now replace the existing {\ttfamily person\+\_\+detect\+\_\+model\+\_\+data.\+cc} file with the version you\textquotesingle{}ve trained, and be able to run your own model on embedded devices.\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_ca8345ff527d94f05cca82eab8ef1df9_autotoc_md316}{}\doxysection{\texorpdfstring{Other resources}{Other resources}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_ca8345ff527d94f05cca82eab8ef1df9_autotoc_md316}
+\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_ca8345ff527d94f05cca82eab8ef1df9_autotoc_md317}{}\doxysubsection{\texorpdfstring{Training for a different category}{Training for a different category}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_ca8345ff527d94f05cca82eab8ef1df9_autotoc_md317}
+To customize your model you can update the {\ttfamily foreground\+\_\+class\+\_\+of\+\_\+interest} to one of the 80 categories from the COCO dataset and adjust the threshold by modifying {\ttfamily small\+\_\+object\+\_\+area\+\_\+threshold}. Here\textquotesingle{}s an example that looks for cars\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{!\ python\ models/research/slim/download\_and\_convert\_data.py\ \(\backslash\)}
+\DoxyCodeLine{-\/-\/logtostderr\ \(\backslash\)}
+\DoxyCodeLine{-\/-\/dataset\_name=visualwakewords\ \(\backslash\)}
+\DoxyCodeLine{-\/-\/dataset\_dir=car\_dataset\ \(\backslash\)}
+\DoxyCodeLine{-\/-\/foreground\_class\_of\_interest='car'\ \(\backslash\)}
+\DoxyCodeLine{-\/-\/small\_object\_area\_threshold=0.005}
+
+\end{DoxyCode}
+
+
+If the kind of object you\textquotesingle{}re interested in isn\textquotesingle{}t present in MS-\/\+COCO, you may be able to use transfer learning to help you train on a custom dataset you\textquotesingle{}ve gathered, even if it\textquotesingle{}s much smaller. We don\textquotesingle{}t have an example of this yet, but we hope to share one soon.\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_ca8345ff527d94f05cca82eab8ef1df9_autotoc_md318}{}\doxysubsection{\texorpdfstring{Understanding the Model Architecture}{Understanding the Model Architecture}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_ca8345ff527d94f05cca82eab8ef1df9_autotoc_md318}
+\href{https://arxiv.org/abs/1704.04861}{\texttt{ Mobile\+Nets}} are a family of architectures designed to provide good accuracy for as few weight parameters and arithmetic operations as possible. There are now multiple versions, but in our case we\textquotesingle{}re using the original v1 since it required the smallest amount of RAM at runtime. The core concept behind the architecture is depthwise separable convolution. This is a variant of classical two-\/dimensional convolutions that works in a much more efficient way, without sacrificing very much accuracy. Regular convolution calculates an output value based on applying a filter of a particular size across all channels of the input. This means the number of calculations involved in each output is width of the filter multiplied by height, multiplied by the number of input channels. Depthwise convolution breaks this large calculation into separate parts. First each input channel is filtered by one or more rectangular filters to produce intermediate values. These values are then combined using pointwise convolutions. This dramatically reduces the number of calculations needed, and in practice produces similar results to regular convolution.
+
+Mobile\+Net v1 is a stack of 14 of these depthwise separable convolution layers with an average pool, then a fully-\/connected layer followed by a softmax at the end. We\textquotesingle{}ve specified a \textquotesingle{}width multiplier\textquotesingle{} of 0.\+25, which has the effect of reducing the number of computations down to around 60 million per inference, by shrinking the number of channels in each activation layer by 75\% compared to the standard model. In essence it\textquotesingle{}s very similar to a normal convolutional neural network in operation, with each layer learning patterns in the input. Earlier layers act more like edge recognition filters, spotting low-\/level structure in the image, and later layers synthesize that information into more abstract patterns that help with the final object classification. 

@@ -1,0 +1,197 @@
+\doxysection{ethosu\+\_\+driver.\+h}
+\hypertarget{ethosu__driver_8h_source}{}\label{ethosu__driver_8h_source}\index{Face\_Access\_inferencing/src/edge-\/impulse-\/sdk/porting/ethos-\/core-\/driver/include/ethosu\_driver.h@{Face\_Access\_inferencing/src/edge-\/impulse-\/sdk/porting/ethos-\/core-\/driver/include/ethosu\_driver.h}}
+\mbox{\hyperlink{ethosu__driver_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{00002\ \textcolor{comment}{\ *\ SPDX-\/FileCopyrightText:\ Copyright\ 2019-\/2023\ Arm\ Limited\ and/or\ its\ affiliates\ <open-\/source-\/office@arm.com>}}
+\DoxyCodeLine{00003\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00004\ \textcolor{comment}{\ *\ SPDX-\/License-\/Identifier:\ Apache-\/2.0}}
+\DoxyCodeLine{00005\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00006\ \textcolor{comment}{\ *\ Licensed\ under\ the\ Apache\ License,\ Version\ 2.0\ (the\ License);\ you\ may}}
+\DoxyCodeLine{00007\ \textcolor{comment}{\ *\ not\ use\ this\ file\ except\ in\ compliance\ with\ the\ License.}}
+\DoxyCodeLine{00008\ \textcolor{comment}{\ *\ You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{00009\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00010\ \textcolor{comment}{\ *\ www.apache.org/licenses/LICENSE-\/2.0}}
+\DoxyCodeLine{00011\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00012\ \textcolor{comment}{\ *\ Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ software}}
+\DoxyCodeLine{00013\ \textcolor{comment}{\ *\ distributed\ under\ the\ License\ is\ distributed\ on\ an\ AS\ IS\ BASIS,\ WITHOUT}}
+\DoxyCodeLine{00014\ \textcolor{comment}{\ *\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,\ either\ express\ or\ implied.}}
+\DoxyCodeLine{00015\ \textcolor{comment}{\ *\ See\ the\ License\ for\ the\ specific\ language\ governing\ permissions\ and}}
+\DoxyCodeLine{00016\ \textcolor{comment}{\ *\ limitations\ under\ the\ License.}}
+\DoxyCodeLine{00017\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{00018\ }
+\DoxyCodeLine{00019\ \textcolor{preprocessor}{\#ifndef\ ETHOSU\_DRIVER\_H}}
+\DoxyCodeLine{00020\ \textcolor{preprocessor}{\#define\ ETHOSU\_DRIVER\_H}}
+\DoxyCodeLine{00021\ }
+\DoxyCodeLine{00022\ \textcolor{comment}{/******************************************************************************}}
+\DoxyCodeLine{00023\ \textcolor{comment}{\ *\ Includes}}
+\DoxyCodeLine{00024\ \textcolor{comment}{\ ******************************************************************************/}}
+\DoxyCodeLine{00025\ }
+\DoxyCodeLine{00026\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{ethosu__types_8h}{ethosu\_types.h}}"{}}}
+\DoxyCodeLine{00027\ }
+\DoxyCodeLine{00028\ \textcolor{preprocessor}{\#include\ <stdbool.h>}}
+\DoxyCodeLine{00029\ \textcolor{preprocessor}{\#include\ <stddef.h>}}
+\DoxyCodeLine{00030\ \textcolor{preprocessor}{\#include\ <stdint.h>}}
+\DoxyCodeLine{00031\ }
+\DoxyCodeLine{00032\ \textcolor{preprocessor}{\#ifdef\ \_\_cplusplus}}
+\DoxyCodeLine{00033\ \textcolor{keyword}{extern}\ \textcolor{stringliteral}{"{}C"{}}\ \{}
+\DoxyCodeLine{00034\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00035\ }
+\DoxyCodeLine{00036\ \textcolor{comment}{/******************************************************************************}}
+\DoxyCodeLine{00037\ \textcolor{comment}{\ *\ Defines}}
+\DoxyCodeLine{00038\ \textcolor{comment}{\ ******************************************************************************/}}
+\DoxyCodeLine{00039\ }
+\DoxyCodeLine{00040\ \textcolor{preprocessor}{\#define\ ETHOSU\_DRIVER\_VERSION\_MAJOR\ 0\ \ }}
+\DoxyCodeLine{00041\ \textcolor{preprocessor}{\#define\ ETHOSU\_DRIVER\_VERSION\_MINOR\ 16\ }}
+\DoxyCodeLine{00042\ \textcolor{preprocessor}{\#define\ ETHOSU\_DRIVER\_VERSION\_PATCH\ 0\ \ }}
+\DoxyCodeLine{00043\ }
+\DoxyCodeLine{00044\ \textcolor{comment}{/******************************************************************************}}
+\DoxyCodeLine{00045\ \textcolor{comment}{\ *\ Types}}
+\DoxyCodeLine{00046\ \textcolor{comment}{\ ******************************************************************************/}}
+\DoxyCodeLine{00047\ }
+\DoxyCodeLine{00048\ \textcolor{comment}{//\ Forward\ declare}}
+\DoxyCodeLine{00049\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structethosu__device}{ethosu\_device}};}
+\DoxyCodeLine{00050\ }
+\DoxyCodeLine{00051\ \textcolor{keyword}{enum}\ \mbox{\hyperlink{ethosu__driver_8h_af325d0e0c079dbaa52529641a9493b29}{ethosu\_job\_state}}}
+\DoxyCodeLine{00052\ \{}
+\DoxyCodeLine{00053\ \ \ \ \ \mbox{\hyperlink{ethosu__driver_8h_af325d0e0c079dbaa52529641a9493b29aa2ced89e403159b4e31a00afb554c842}{ETHOSU\_JOB\_IDLE}}\ =\ 0,}
+\DoxyCodeLine{00054\ \ \ \ \ \mbox{\hyperlink{ethosu__driver_8h_af325d0e0c079dbaa52529641a9493b29aad90c4bcae1504f34767fceb1a5b0378}{ETHOSU\_JOB\_RUNNING}},}
+\DoxyCodeLine{00055\ \ \ \ \ \mbox{\hyperlink{ethosu__driver_8h_af325d0e0c079dbaa52529641a9493b29af32aeedb3760945b7c437112d1c90e64}{ETHOSU\_JOB\_DONE}}}
+\DoxyCodeLine{00056\ \};}
+\DoxyCodeLine{00057\ }
+\DoxyCodeLine{00058\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structethosu__job}{ethosu\_job}}}
+\DoxyCodeLine{00059\ \{}
+\DoxyCodeLine{00060\ \ \ \ \ \textcolor{keyword}{volatile}\ \textcolor{keyword}{enum}\ \mbox{\hyperlink{ethosu__driver_8h_af325d0e0c079dbaa52529641a9493b29}{ethosu\_job\_state}}\ \mbox{\hyperlink{structethosu__job_ac350c440923cc16a3619e4b15b5ea89c}{state}};}
+\DoxyCodeLine{00061\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{void}\ *\mbox{\hyperlink{structethosu__job_a7620d40fa71e321b9f8c9acf8aa46dfa}{custom\_data\_ptr}};}
+\DoxyCodeLine{00062\ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{structethosu__job_a072966e7a337dd4b11603bfa1a167834}{custom\_data\_size}};}
+\DoxyCodeLine{00063\ \ \ \ \ \textcolor{keyword}{const}\ uint64\_t\ *\mbox{\hyperlink{structethosu__job_ac5ad79a7801e300440b68eed626a486b}{base\_addr}};}
+\DoxyCodeLine{00064\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ *\mbox{\hyperlink{structethosu__job_ab63582540b07a561e6d47c565672e835}{base\_addr\_size}};}
+\DoxyCodeLine{00065\ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{structethosu__job_ab2ed1b451e76fe7edb1f92ba2ebb9ccd}{num\_base\_addr}};}
+\DoxyCodeLine{00066\ \ \ \ \ \textcolor{keywordtype}{void}\ *\mbox{\hyperlink{structethosu__job_a6e40c4df7af878732f2d2039b8daed9f}{user\_arg}};}
+\DoxyCodeLine{00067\ \};}
+\DoxyCodeLine{00068\ }
+\DoxyCodeLine{00069\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structethosu__driver}{ethosu\_driver}}}
+\DoxyCodeLine{00070\ \{}
+\DoxyCodeLine{00071\ \ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structethosu__device}{ethosu\_device}}\ *\mbox{\hyperlink{structethosu__driver_abc9a3dcc442213481dc70b6b995d4678}{dev}};}
+\DoxyCodeLine{00072\ \ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structethosu__driver}{ethosu\_driver}}\ *\mbox{\hyperlink{structethosu__driver_ab43e1ed2cae9b14a6cd6316e629cd049}{next}};}
+\DoxyCodeLine{00073\ \ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structethosu__job}{ethosu\_job}}\ \mbox{\hyperlink{structethosu__driver_a25a58f6dd22befbeb50d97e776d12916}{job}};}
+\DoxyCodeLine{00074\ \ \ \ \ \textcolor{keywordtype}{void}\ *\mbox{\hyperlink{structethosu__driver_aef7b0ef3c2435e9d126047ab41914d70}{semaphore}};}
+\DoxyCodeLine{00075\ \ \ \ \ uint64\_t\ \mbox{\hyperlink{structethosu__driver_a7291bf3d74c6e81ead211cdc6bf1e584}{fast\_memory}};}
+\DoxyCodeLine{00076\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{structethosu__driver_a89e8d0f364387f482c55e9494ecd47d5}{fast\_memory\_size}};}
+\DoxyCodeLine{00077\ \ \ \ \ uint32\_t\ \mbox{\hyperlink{structethosu__driver_ac1aa538fdc11b93ed13a92506629803b}{power\_request\_counter}};}
+\DoxyCodeLine{00078\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{structethosu__driver_a4ca6284e72e9a8c9a8665aea1e0f4e7a}{status\_error}};}
+\DoxyCodeLine{00079\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{structethosu__driver_a83f40539998c4475d64bafc353502e56}{reserved}};}
+\DoxyCodeLine{00080\ \};}
+\DoxyCodeLine{00081\ }
+\DoxyCodeLine{00082\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structethosu__driver__version}{ethosu\_driver\_version}}}
+\DoxyCodeLine{00083\ \{}
+\DoxyCodeLine{00084\ \ \ \ \ uint8\_t\ \mbox{\hyperlink{structethosu__driver__version_adb886f9e2250e685210532ab68e48f24}{major}};}
+\DoxyCodeLine{00085\ \ \ \ \ uint8\_t\ \mbox{\hyperlink{structethosu__driver__version_a28baeab8c1333b14b5b64d42176024ed}{minor}};}
+\DoxyCodeLine{00086\ \ \ \ \ uint8\_t\ \mbox{\hyperlink{structethosu__driver__version_a343ea468961d75bbaaf9a7af2f6ce2f9}{patch}};}
+\DoxyCodeLine{00087\ \};}
+\DoxyCodeLine{00088\ }
+\DoxyCodeLine{00089\ \textcolor{keyword}{enum}\ \mbox{\hyperlink{ethosu__driver_8h_a54833c422d75738d6d1aa595398038a6}{ethosu\_request\_clients}}}
+\DoxyCodeLine{00090\ \{}
+\DoxyCodeLine{00091\ \ \ \ \ \mbox{\hyperlink{ethosu__driver_8h_a54833c422d75738d6d1aa595398038a6af99fc50d5ae6302d46f4eab1db852cd9}{ETHOSU\_PMU\_REQUEST}}\ \ \ \ \ \ \ =\ 0,}
+\DoxyCodeLine{00092\ \ \ \ \ \mbox{\hyperlink{ethosu__driver_8h_a54833c422d75738d6d1aa595398038a6ae171d784a6be566ccf81c6b38c2bc508}{ETHOSU\_INFERENCE\_REQUEST}}\ =\ 1,}
+\DoxyCodeLine{00093\ \};}
+\DoxyCodeLine{00094\ }
+\DoxyCodeLine{00095\ \textcolor{comment}{/******************************************************************************}}
+\DoxyCodeLine{00096\ \textcolor{comment}{\ *\ Prototypes\ (weak\ functions\ in\ driver)}}
+\DoxyCodeLine{00097\ \textcolor{comment}{\ ******************************************************************************/}}
+\DoxyCodeLine{00098\ }
+\DoxyCodeLine{00104\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{ethosu__driver_8h_a55fec2a7ca5b5b51dc7c3d18914a3f03}{ethosu\_irq\_handler}}(\textcolor{keyword}{struct}\ \mbox{\hyperlink{structethosu__driver}{ethosu\_driver}}\ *drv);}
+\DoxyCodeLine{00105\ }
+\DoxyCodeLine{00115\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{ethosu__driver_8h_a7b987defaaf902770c8c0ea9fa8ac591}{ethosu\_flush\_dcache}}(uint32\_t\ *p,\ \textcolor{keywordtype}{size\_t}\ bytes);}
+\DoxyCodeLine{00116\ }
+\DoxyCodeLine{00126\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{ethosu__driver_8h_a57f77addf22bcd9edfdbb4b68a2363ef}{ethosu\_invalidate\_dcache}}(uint32\_t\ *p,\ \textcolor{keywordtype}{size\_t}\ bytes);}
+\DoxyCodeLine{00127\ }
+\DoxyCodeLine{00134\ \textcolor{keywordtype}{void}\ *\mbox{\hyperlink{ethosu__driver_8h_a263037460610168af74801efae3385a2}{ethosu\_mutex\_create}}(\textcolor{keywordtype}{void});}
+\DoxyCodeLine{00135\ }
+\DoxyCodeLine{00142\ \textcolor{keywordtype}{void}\ *\mbox{\hyperlink{ethosu__driver_8h_a4bb4d49e7ba5ec009af2796fe77e349a}{ethosu\_semaphore\_create}}(\textcolor{keywordtype}{void});}
+\DoxyCodeLine{00143\ }
+\DoxyCodeLine{00150\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{ethosu__driver_8h_a17827ea06a500bad6bda5aa9e751f4f1}{ethosu\_mutex\_lock}}(\textcolor{keywordtype}{void}\ *mutex);}
+\DoxyCodeLine{00151\ }
+\DoxyCodeLine{00158\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{ethosu__driver_8h_aa0075944c4284c6ced884698e560eea4}{ethosu\_mutex\_unlock}}(\textcolor{keywordtype}{void}\ *mutex);}
+\DoxyCodeLine{00159\ }
+\DoxyCodeLine{00166\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{ethosu__driver_8h_a316d572123877e0466647652854ddaa7}{ethosu\_semaphore\_take}}(\textcolor{keywordtype}{void}\ *sem);}
+\DoxyCodeLine{00167\ }
+\DoxyCodeLine{00174\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{ethosu__driver_8h_a71614f92cb653bed7b7632b0362939b4}{ethosu\_semaphore\_give}}(\textcolor{keywordtype}{void}\ *sem);}
+\DoxyCodeLine{00175\ }
+\DoxyCodeLine{00182\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{ethosu__driver_8h_a04b34ee5d2328ecdfc7d464761f6cb7f}{ethosu\_inference\_begin}}(\textcolor{keyword}{struct}\ \mbox{\hyperlink{structethosu__driver}{ethosu\_driver}}\ *drv,\ \textcolor{keywordtype}{void}\ *user\_arg);}
+\DoxyCodeLine{00183\ }
+\DoxyCodeLine{00190\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{ethosu__driver_8h_abe0e7014df596c89393c3bce70c4ee0c}{ethosu\_inference\_end}}(\textcolor{keyword}{struct}\ \mbox{\hyperlink{structethosu__driver}{ethosu\_driver}}\ *drv,\ \textcolor{keywordtype}{void}\ *user\_arg);}
+\DoxyCodeLine{00191\ }
+\DoxyCodeLine{00200\ uint64\_t\ \mbox{\hyperlink{ethosu__driver_8h_aada1c421a052cbdcfd5f1c8c31cd8c4a}{ethosu\_address\_remap}}(uint64\_t\ address,\ \textcolor{keywordtype}{int}\ index);}
+\DoxyCodeLine{00201\ }
+\DoxyCodeLine{00202\ \textcolor{comment}{/******************************************************************************}}
+\DoxyCodeLine{00203\ \textcolor{comment}{\ *\ Prototypes}}
+\DoxyCodeLine{00204\ \textcolor{comment}{\ ******************************************************************************/}}
+\DoxyCodeLine{00205\ }
+\DoxyCodeLine{00217\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{ethosu__driver_8h_ae021e7e1e40a33303dcc17041a1f2911}{ethosu\_init}}(\textcolor{keyword}{struct}\ \mbox{\hyperlink{structethosu__driver}{ethosu\_driver}}\ *drv,}
+\DoxyCodeLine{00218\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ *\textcolor{keyword}{const}\ base\_address,}
+\DoxyCodeLine{00219\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{void}\ *fast\_memory,}
+\DoxyCodeLine{00220\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ fast\_memory\_size,}
+\DoxyCodeLine{00221\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ uint32\_t\ secure\_enable,}
+\DoxyCodeLine{00222\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ uint32\_t\ privilege\_enable);}
+\DoxyCodeLine{00223\ }
+\DoxyCodeLine{00229\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{ethosu__driver_8h_a7d07a2c3e7c66236d31986c191c7c6e1}{ethosu\_deinit}}(\textcolor{keyword}{struct}\ \mbox{\hyperlink{structethosu__driver}{ethosu\_driver}}\ *drv);}
+\DoxyCodeLine{00230\ }
+\DoxyCodeLine{00237\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{ethosu__driver_8h_a480a7f7b324b3be61c1a9ffc92be9f3a}{ethosu\_soft\_reset}}(\textcolor{keyword}{struct}\ \mbox{\hyperlink{structethosu__driver}{ethosu\_driver}}\ *drv);}
+\DoxyCodeLine{00238\ }
+\DoxyCodeLine{00247\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{ethosu__driver_8h_a296ee3333eec28a0aa57940af26664c9}{ethosu\_request\_power}}(\textcolor{keyword}{struct}\ \mbox{\hyperlink{structethosu__driver}{ethosu\_driver}}\ *drv);}
+\DoxyCodeLine{00248\ }
+\DoxyCodeLine{00255\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{ethosu__driver_8h_aa7aa51e0c8d7757f3ca28b0ad4303558}{ethosu\_release\_power}}(\textcolor{keyword}{struct}\ \mbox{\hyperlink{structethosu__driver}{ethosu\_driver}}\ *drv);}
+\DoxyCodeLine{00256\ }
+\DoxyCodeLine{00262\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{ethosu__driver_8h_a061d3040dbd395073b51968bc2e91d55}{ethosu\_get\_driver\_version}}(\textcolor{keyword}{struct}\ \mbox{\hyperlink{structethosu__driver__version}{ethosu\_driver\_version}}\ *ver);}
+\DoxyCodeLine{00263\ }
+\DoxyCodeLine{00270\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{ethosu__driver_8h_a583bd9f7a0ae2cabfecf6b2843adcc56}{ethosu\_get\_hw\_info}}(\textcolor{keyword}{struct}\ \mbox{\hyperlink{structethosu__driver}{ethosu\_driver}}\ *drv,\ \textcolor{keyword}{struct}\ \mbox{\hyperlink{structethosu__hw__info}{ethosu\_hw\_info}}\ *hw);}
+\DoxyCodeLine{00271\ }
+\DoxyCodeLine{00285\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{ethosu__driver_8h_a6965f708d5951842cd6f8cfe26a35868}{ethosu\_invoke\_v3}}(\textcolor{keyword}{struct}\ \mbox{\hyperlink{structethosu__driver}{ethosu\_driver}}\ *drv,}
+\DoxyCodeLine{00286\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{void}\ *custom\_data\_ptr,}
+\DoxyCodeLine{00287\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ custom\_data\_size,}
+\DoxyCodeLine{00288\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ uint64\_t\ *\textcolor{keyword}{const}\ base\_addr,}
+\DoxyCodeLine{00289\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ *base\_addr\_size,}
+\DoxyCodeLine{00290\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ num\_base\_addr,}
+\DoxyCodeLine{00291\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ *user\_arg);}
+\DoxyCodeLine{00292\ }
+\DoxyCodeLine{00293\ \textcolor{preprocessor}{\#define\ ethosu\_invoke(drv,\ custom\_data\_ptr,\ custom\_data\_size,\ base\_addr,\ base\_addr\_size,\ num\_base\_addr)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00294\ \textcolor{preprocessor}{\ \ \ \ ethosu\_invoke\_v3(drv,\ custom\_data\_ptr,\ custom\_data\_size,\ base\_addr,\ base\_addr\_size,\ num\_base\_addr,\ 0)}}
+\DoxyCodeLine{00295\ }
+\DoxyCodeLine{00302\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{ethosu__driver_8h_a7a052a3c7ea0c14992b3dc2cd6e20d0b}{ethosu\_invoke\_async}}(\textcolor{keyword}{struct}\ \mbox{\hyperlink{structethosu__driver}{ethosu\_driver}}\ *drv,}
+\DoxyCodeLine{00303\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{void}\ *custom\_data\_ptr,}
+\DoxyCodeLine{00304\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ custom\_data\_size,}
+\DoxyCodeLine{00305\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ uint64\_t\ *\textcolor{keyword}{const}\ base\_addr,}
+\DoxyCodeLine{00306\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ *base\_addr\_size,}
+\DoxyCodeLine{00307\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ num\_base\_addr,}
+\DoxyCodeLine{00308\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ *user\_arg);}
+\DoxyCodeLine{00309\ }
+\DoxyCodeLine{00319\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{ethosu__driver_8h_a33e63dcf2625e5b10d07193490b6323b}{ethosu\_wait}}(\textcolor{keyword}{struct}\ \mbox{\hyperlink{structethosu__driver}{ethosu\_driver}}\ *drv,\ \textcolor{keywordtype}{bool}\ block);}
+\DoxyCodeLine{00320\ }
+\DoxyCodeLine{00327\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structethosu__driver}{ethosu\_driver}}\ *\mbox{\hyperlink{ethosu__driver_8h_a92c30eeceb5152d6f06ff9c5859a1381}{ethosu\_reserve\_driver}}(\textcolor{keywordtype}{void});}
+\DoxyCodeLine{00328\ }
+\DoxyCodeLine{00334\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{ethosu__driver_8h_a6e97d1e64ca7d2cbaa89230bce0a2dde}{ethosu\_release\_driver}}(\textcolor{keyword}{struct}\ \mbox{\hyperlink{structethosu__driver}{ethosu\_driver}}\ *drv);}
+\DoxyCodeLine{00335\ }
+\DoxyCodeLine{00341\ \textcolor{keyword}{static}\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{ethosu__driver_8h_a6575dfaa69fcd2ed61ed72f767acc007}{ethosu\_invoke\_v2}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{void}\ *custom\_data\_ptr,}
+\DoxyCodeLine{00342\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ custom\_data\_size,}
+\DoxyCodeLine{00343\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ uint64\_t\ *\textcolor{keyword}{const}\ base\_addr,}
+\DoxyCodeLine{00344\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ *base\_addr\_size,}
+\DoxyCodeLine{00345\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ num\_base\_addr)}
+\DoxyCodeLine{00346\ \{}
+\DoxyCodeLine{00347\ \ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structethosu__driver}{ethosu\_driver}}\ *drv\ =\ \mbox{\hyperlink{ethosu__driver_8h_a92c30eeceb5152d6f06ff9c5859a1381}{ethosu\_reserve\_driver}}();}
+\DoxyCodeLine{00348\ \ \ \ \ \textcolor{keywordflow}{if}\ (!drv)}
+\DoxyCodeLine{00349\ \ \ \ \ \{}
+\DoxyCodeLine{00350\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ -\/1;}
+\DoxyCodeLine{00351\ \ \ \ \ \}}
+\DoxyCodeLine{00352\ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}}\ =\ \mbox{\hyperlink{ethosu__driver_8h_a6965f708d5951842cd6f8cfe26a35868}{ethosu\_invoke\_v3}}(drv,\ custom\_data\_ptr,\ custom\_data\_size,\ base\_addr,\ base\_addr\_size,\ num\_base\_addr,\ 0);}
+\DoxyCodeLine{00353\ \ \ \ \ \mbox{\hyperlink{ethosu__driver_8h_a6e97d1e64ca7d2cbaa89230bce0a2dde}{ethosu\_release\_driver}}(drv);}
+\DoxyCodeLine{00354\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{group__ei__functions_gaf4ad914acba713176b1f00a800e781ba}{result}};}
+\DoxyCodeLine{00355\ \}}
+\DoxyCodeLine{00356\ }
+\DoxyCodeLine{00357\ \textcolor{preprocessor}{\#ifdef\ \_\_cplusplus}}
+\DoxyCodeLine{00358\ \}}
+\DoxyCodeLine{00359\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00360\ }
+\DoxyCodeLine{00361\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ ETHOSU\_DRIVER\_H}}
+
+\end{DoxyCode}

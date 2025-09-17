@@ -1,0 +1,174 @@
+\doxysection{\+\_\+kiss\+\_\+fft\+\_\+guts.\+h}
+\hypertarget{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src881099158a8a67d34a3d3f8a6b7b88f0_source}{}\label{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src881099158a8a67d34a3d3f8a6b7b88f0_source}\index{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/arduino-\/examples-\/main/src/third\_party/kissfft/\_kiss\_fft\_guts.h@{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/arduino-\/examples-\/main/src/third\_party/kissfft/\_kiss\_fft\_guts.h}}
+\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src881099158a8a67d34a3d3f8a6b7b88f0}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{preprocessor}{\#ifndef\ \_KISS\_FFT\_GUTS\_H}}
+\DoxyCodeLine{00002\ \textcolor{preprocessor}{\#define\ \_KISS\_FFT\_GUTS\_H}}
+\DoxyCodeLine{00003\ }
+\DoxyCodeLine{00004\ \textcolor{comment}{/*}}
+\DoxyCodeLine{00005\ \textcolor{comment}{Copyright\ (c)\ 2003-\/2010,\ Mark\ Borgerding}}
+\DoxyCodeLine{00006\ \textcolor{comment}{}}
+\DoxyCodeLine{00007\ \textcolor{comment}{All\ rights\ reserved.}}
+\DoxyCodeLine{00008\ \textcolor{comment}{}}
+\DoxyCodeLine{00009\ \textcolor{comment}{Redistribution\ and\ use\ in\ source\ and\ binary\ forms,\ with\ or\ without\ modification,\ are\ permitted\ provided\ that\ the\ following\ conditions\ are\ met:}}
+\DoxyCodeLine{00010\ \textcolor{comment}{}}
+\DoxyCodeLine{00011\ \textcolor{comment}{\ \ \ \ *\ Redistributions\ of\ source\ code\ must\ retain\ the\ above\ copyright\ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer.}}
+\DoxyCodeLine{00012\ \textcolor{comment}{\ \ \ \ *\ Redistributions\ in\ binary\ form\ must\ reproduce\ the\ above\ copyright\ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer\ in\ the\ documentation\ and/or\ other\ materials\ provided\ with\ the\ distribution.}}
+\DoxyCodeLine{00013\ \textcolor{comment}{\ \ \ \ *\ Neither\ the\ author\ nor\ the\ names\ of\ any\ contributors\ may\ be\ used\ to\ endorse\ or\ promote\ products\ derived\ from\ this\ software\ without\ specific\ prior\ written\ permission.}}
+\DoxyCodeLine{00014\ \textcolor{comment}{}}
+\DoxyCodeLine{00015\ \textcolor{comment}{THIS\ SOFTWARE\ IS\ PROVIDED\ BY\ THE\ COPYRIGHT\ HOLDERS\ AND\ CONTRIBUTORS\ "{}AS\ IS"{}\ AND\ ANY\ EXPRESS\ OR\ IMPLIED\ WARRANTIES,\ INCLUDING,\ BUT\ NOT\ LIMITED\ TO,\ THE\ IMPLIED\ WARRANTIES\ OF\ MERCHANTABILITY\ AND\ FITNESS\ FOR\ A\ PARTICULAR\ PURPOSE\ ARE\ DISCLAIMED.\ IN\ NO\ EVENT\ SHALL\ THE\ COPYRIGHT\ OWNER\ OR\ CONTRIBUTORS\ BE\ LIABLE\ FOR\ ANY\ DIRECT,\ INDIRECT,\ INCIDENTAL,\ SPECIAL,\ EXEMPLARY,\ OR\ CONSEQUENTIAL\ DAMAGES\ (INCLUDING,\ BUT\ NOT\ LIMITED\ TO,\ PROCUREMENT\ OF\ SUBSTITUTE\ GOODS\ OR\ SERVICES;\ LOSS\ OF\ USE,\ DATA,\ OR\ PROFITS;\ OR\ BUSINESS\ INTERRUPTION)\ HOWEVER\ CAUSED\ AND\ ON\ ANY\ THEORY\ OF\ LIABILITY,\ WHETHER\ IN\ CONTRACT,\ STRICT\ LIABILITY,\ OR\ TORT\ (INCLUDING\ NEGLIGENCE\ OR\ OTHERWISE)\ ARISING\ IN\ ANY\ WAY\ OUT\ OF\ THE\ USE\ OF\ THIS\ SOFTWARE,\ EVEN\ IF\ ADVISED\ OF\ THE\ POSSIBILITY\ OF\ SUCH\ DAMAGE.}}
+\DoxyCodeLine{00016\ \textcolor{comment}{*/}}
+\DoxyCodeLine{00017\ }
+\DoxyCodeLine{00018\ \textcolor{comment}{/*\ kiss\_fft.h}}
+\DoxyCodeLine{00019\ \textcolor{comment}{\ \ \ defines\ kiss\_fft\_scalar\ as\ either\ short\ or\ a\ float\ type}}
+\DoxyCodeLine{00020\ \textcolor{comment}{\ \ \ and\ defines}}
+\DoxyCodeLine{00021\ \textcolor{comment}{\ \ \ typedef\ struct\ \{\ kiss\_fft\_scalar\ r;\ kiss\_fft\_scalar\ i;\ \}kiss\_fft\_cpx;\ */}}
+\DoxyCodeLine{00022\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcd60fd2c96e0a236dfb5f77629fb99d4f}{third\_party/kissfft/kiss\_fft.h}}"{}}}
+\DoxyCodeLine{00023\ \textcolor{preprocessor}{\#include\ <limits.h>}}
+\DoxyCodeLine{00024\ }
+\DoxyCodeLine{00025\ \textcolor{preprocessor}{\#define\ MAXFACTORS\ 32}}
+\DoxyCodeLine{00026\ \textcolor{comment}{/*\ e.g.\ an\ fft\ of\ length\ 128\ has\ 4\ factors\ }}
+\DoxyCodeLine{00027\ \textcolor{comment}{\ as\ far\ as\ kissfft\ is\ concerned}}
+\DoxyCodeLine{00028\ \textcolor{comment}{\ 4*4*4*2}}
+\DoxyCodeLine{00029\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{00030\ }
+\DoxyCodeLine{00031\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structkiss__fft__state}{kiss\_fft\_state}}\{}
+\DoxyCodeLine{00032\ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{structkiss__fft__state_aa7446bded329a40e13aef0826e349791}{nfft}};}
+\DoxyCodeLine{00033\ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{structkiss__fft__state_a8faed935610ffb08bf7ad9ea8d6c81d2}{inverse}};}
+\DoxyCodeLine{00034\ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{structkiss__fft__state_a8b4697091dd4aff319a875f7fd3488d4}{factors}}[2*\mbox{\hyperlink{_face___access__inferencing_2src_2edge-impulse-sdk_2dsp_2kissfft_2__kiss__fft__guts_8h_af176a125e008eb443996cf0f83cc135c}{MAXFACTORS}}];}
+\DoxyCodeLine{00035\ \ \ \ \ \mbox{\hyperlink{structkiss__fft__cpx}{kiss\_fft\_cpx}}\ \mbox{\hyperlink{structkiss__fft__state_ab8dc20b362c8632617eac13c8a7d12cb}{twiddles}}[1];}
+\DoxyCodeLine{00036\ \};}
+\DoxyCodeLine{00037\ }
+\DoxyCodeLine{00038\ \textcolor{comment}{/*}}
+\DoxyCodeLine{00039\ \textcolor{comment}{\ \ Explanation\ of\ macros\ dealing\ with\ complex\ math:}}
+\DoxyCodeLine{00040\ \textcolor{comment}{}}
+\DoxyCodeLine{00041\ \textcolor{comment}{\ \ \ C\_MUL(m,a,b)\ \ \ \ \ \ \ \ \ :\ m\ =\ a*b}}
+\DoxyCodeLine{00042\ \textcolor{comment}{\ \ \ C\_FIXDIV(\ c\ ,\ div\ )\ \ :\ if\ a\ fixed\ point\ impl.,\ c\ /=\ div.\ noop\ otherwise}}
+\DoxyCodeLine{00043\ \textcolor{comment}{\ \ \ C\_SUB(\ res,\ a,b)\ \ \ \ \ :\ res\ =\ a\ -\/\ b}}
+\DoxyCodeLine{00044\ \textcolor{comment}{\ \ \ C\_SUBFROM(\ res\ ,\ a)\ \ :\ res\ -\/=\ a}}
+\DoxyCodeLine{00045\ \textcolor{comment}{\ \ \ C\_ADDTO(\ res\ ,\ a)\ \ \ \ :\ res\ +=\ a}}
+\DoxyCodeLine{00046\ \textcolor{comment}{\ *\ */}}
+\DoxyCodeLine{00047\ \textcolor{preprocessor}{\#ifdef\ FIXED\_POINT}}
+\DoxyCodeLine{00048\ \textcolor{preprocessor}{\#if\ (FIXED\_POINT==32)}}
+\DoxyCodeLine{00049\ \textcolor{preprocessor}{\#\ define\ FRACBITS\ 31}}
+\DoxyCodeLine{00050\ \textcolor{preprocessor}{\#\ define\ SAMPPROD\ int64\_t}}
+\DoxyCodeLine{00051\ \textcolor{preprocessor}{\#define\ SAMP\_MAX\ 2147483647}}
+\DoxyCodeLine{00052\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00053\ \textcolor{preprocessor}{\#\ define\ FRACBITS\ 15}}
+\DoxyCodeLine{00054\ \textcolor{preprocessor}{\#\ define\ SAMPPROD\ int32\_t\ }}
+\DoxyCodeLine{00055\ \textcolor{preprocessor}{\#define\ SAMP\_MAX\ 32767}}
+\DoxyCodeLine{00056\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00057\ }
+\DoxyCodeLine{00058\ \textcolor{preprocessor}{\#define\ SAMP\_MIN\ -\/SAMP\_MAX}}
+\DoxyCodeLine{00059\ }
+\DoxyCodeLine{00060\ \textcolor{preprocessor}{\#if\ defined(CHECK\_OVERFLOW)}}
+\DoxyCodeLine{00061\ \textcolor{preprocessor}{\#\ \ define\ CHECK\_OVERFLOW\_OP(a,op,b)\ \ \(\backslash\)}}
+\DoxyCodeLine{00062\ \textcolor{preprocessor}{\ \ \ \ if\ (\ (SAMPPROD)(a)\ op\ (SAMPPROD)(b)\ >\ SAMP\_MAX\ ||\ (SAMPPROD)(a)\ op\ (SAMPPROD)(b)\ <\ SAMP\_MIN\ )\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00063\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ fprintf(stderr,"{}WARNING:overflow\ @\ "{}\ \_\_FILE\_\_\ "{}(\%d):\ (\%d\ "{}\ \#op"{}\ \%d)\ =\ \%ld\(\backslash\)n"{},\_\_LINE\_\_,(a),(b),(SAMPPROD)(a)\ op\ (SAMPPROD)(b)\ );\ \ \}}}
+\DoxyCodeLine{00064\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00065\ }
+\DoxyCodeLine{00066\ }
+\DoxyCodeLine{00067\ \textcolor{preprocessor}{\#\ \ \ define\ smul(a,b)\ (\ (SAMPPROD)(a)*(b)\ )}}
+\DoxyCodeLine{00068\ \textcolor{preprocessor}{\#\ \ \ define\ sround(\ x\ )\ \ (kiss\_fft\_scalar)(\ (\ (x)\ +\ (1<<(FRACBITS-\/1))\ )\ >>\ FRACBITS\ )}}
+\DoxyCodeLine{00069\ }
+\DoxyCodeLine{00070\ \textcolor{preprocessor}{\#\ \ \ define\ S\_MUL(a,b)\ sround(\ smul(a,b)\ )}}
+\DoxyCodeLine{00071\ }
+\DoxyCodeLine{00072\ \textcolor{preprocessor}{\#\ \ \ define\ C\_MUL(m,a,b)\ \(\backslash\)}}
+\DoxyCodeLine{00073\ \textcolor{preprocessor}{\ \ \ \ \ \ do\{\ (m).r\ =\ sround(\ smul((a).r,(b).r)\ -\/\ smul((a).i,(b).i)\ );\ \(\backslash\)}}
+\DoxyCodeLine{00074\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ (m).i\ =\ sround(\ smul((a).r,(b).i)\ +\ smul((a).i,(b).r)\ );\ \}while(0)}}
+\DoxyCodeLine{00075\ }
+\DoxyCodeLine{00076\ \textcolor{preprocessor}{\#\ \ \ define\ DIVSCALAR(x,k)\ \(\backslash\)}}
+\DoxyCodeLine{00077\ \textcolor{preprocessor}{\ \ \ \ (x)\ =\ sround(\ smul(\ \ x,\ SAMP\_MAX/k\ )\ )}}
+\DoxyCodeLine{00078\ }
+\DoxyCodeLine{00079\ \textcolor{preprocessor}{\#\ \ \ define\ C\_FIXDIV(c,div)\ \(\backslash\)}}
+\DoxyCodeLine{00080\ \textcolor{preprocessor}{\ \ \ \ do\ \{\ \ \ \ DIVSCALAR(\ (c).r\ ,\ div);\ \ \(\backslash\)}}
+\DoxyCodeLine{00081\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ DIVSCALAR(\ (c).i\ \ ,\ div);\ \}while\ (0)}}
+\DoxyCodeLine{00082\ }
+\DoxyCodeLine{00083\ \textcolor{preprocessor}{\#\ \ \ define\ C\_MULBYSCALAR(\ c,\ s\ )\ \(\backslash\)}}
+\DoxyCodeLine{00084\ \textcolor{preprocessor}{\ \ \ \ do\{\ (c).r\ =\ \ sround(\ smul(\ (c).r\ ,\ s\ )\ )\ ;\(\backslash\)}}
+\DoxyCodeLine{00085\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ (c).i\ =\ \ sround(\ smul(\ (c).i\ ,\ s\ )\ )\ ;\ \}while(0)}}
+\DoxyCodeLine{00086\ }
+\DoxyCodeLine{00087\ \textcolor{preprocessor}{\#else\ \ }\textcolor{comment}{/*\ not\ FIXED\_POINT*/}\textcolor{preprocessor}{}}
+\DoxyCodeLine{00088\ }
+\DoxyCodeLine{00089\ \textcolor{preprocessor}{\#\ \ \ define\ S\_MUL(a,b)\ (\ (a)*(b)\ )}}
+\DoxyCodeLine{00090\ \textcolor{preprocessor}{\#define\ C\_MUL(m,a,b)\ \(\backslash\)}}
+\DoxyCodeLine{00091\ \textcolor{preprocessor}{\ \ \ \ do\{\ (m).r\ =\ (a).r*(b).r\ -\/\ (a).i*(b).i;\(\backslash\)}}
+\DoxyCodeLine{00092\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ (m).i\ =\ (a).r*(b).i\ +\ (a).i*(b).r;\ \}while(0)}}
+\DoxyCodeLine{00093\ \textcolor{preprocessor}{\#\ \ \ define\ C\_FIXDIV(c,div)\ }\textcolor{comment}{/*\ NOOP\ */}\textcolor{preprocessor}{}}
+\DoxyCodeLine{00094\ \textcolor{preprocessor}{\#\ \ \ define\ C\_MULBYSCALAR(\ c,\ s\ )\ \(\backslash\)}}
+\DoxyCodeLine{00095\ \textcolor{preprocessor}{\ \ \ \ do\{\ (c).r\ *=\ (s);\(\backslash\)}}
+\DoxyCodeLine{00096\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ (c).i\ *=\ (s);\ \}while(0)}}
+\DoxyCodeLine{00097\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00098\ }
+\DoxyCodeLine{00099\ \textcolor{preprocessor}{\#ifndef\ CHECK\_OVERFLOW\_OP}}
+\DoxyCodeLine{00100\ \textcolor{preprocessor}{\#\ \ define\ CHECK\_OVERFLOW\_OP(a,op,b)\ }\textcolor{comment}{/*\ noop\ */}\textcolor{preprocessor}{}}
+\DoxyCodeLine{00101\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00102\ }
+\DoxyCodeLine{00103\ \textcolor{preprocessor}{\#define\ \ C\_ADD(\ res,\ a,b)\(\backslash\)}}
+\DoxyCodeLine{00104\ \textcolor{preprocessor}{\ \ \ \ do\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00105\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ CHECK\_OVERFLOW\_OP((a).r,+,(b).r)\(\backslash\)}}
+\DoxyCodeLine{00106\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ CHECK\_OVERFLOW\_OP((a).i,+,(b).i)\(\backslash\)}}
+\DoxyCodeLine{00107\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ (res).r=(a).r+(b).r;\ \ (res).i=(a).i+(b).i;\ \(\backslash\)}}
+\DoxyCodeLine{00108\ \textcolor{preprocessor}{\ \ \ \ \}while(0)}}
+\DoxyCodeLine{00109\ \textcolor{preprocessor}{\#define\ \ C\_SUB(\ res,\ a,b)\(\backslash\)}}
+\DoxyCodeLine{00110\ \textcolor{preprocessor}{\ \ \ \ do\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00111\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ CHECK\_OVERFLOW\_OP((a).r,-\/,(b).r)\(\backslash\)}}
+\DoxyCodeLine{00112\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ CHECK\_OVERFLOW\_OP((a).i,-\/,(b).i)\(\backslash\)}}
+\DoxyCodeLine{00113\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ (res).r=(a).r-\/(b).r;\ \ (res).i=(a).i-\/(b).i;\ \(\backslash\)}}
+\DoxyCodeLine{00114\ \textcolor{preprocessor}{\ \ \ \ \}while(0)}}
+\DoxyCodeLine{00115\ \textcolor{preprocessor}{\#define\ C\_ADDTO(\ res\ ,\ a)\(\backslash\)}}
+\DoxyCodeLine{00116\ \textcolor{preprocessor}{\ \ \ \ do\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00117\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ CHECK\_OVERFLOW\_OP((res).r,+,(a).r)\(\backslash\)}}
+\DoxyCodeLine{00118\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ CHECK\_OVERFLOW\_OP((res).i,+,(a).i)\(\backslash\)}}
+\DoxyCodeLine{00119\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ (res).r\ +=\ (a).r;\ \ (res).i\ +=\ (a).i;\(\backslash\)}}
+\DoxyCodeLine{00120\ \textcolor{preprocessor}{\ \ \ \ \}while(0)}}
+\DoxyCodeLine{00121\ }
+\DoxyCodeLine{00122\ \textcolor{preprocessor}{\#define\ C\_SUBFROM(\ res\ ,\ a)\(\backslash\)}}
+\DoxyCodeLine{00123\ \textcolor{preprocessor}{\ \ \ \ do\ \{\(\backslash\)}}
+\DoxyCodeLine{00124\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ CHECK\_OVERFLOW\_OP((res).r,-\/,(a).r)\(\backslash\)}}
+\DoxyCodeLine{00125\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ CHECK\_OVERFLOW\_OP((res).i,-\/,(a).i)\(\backslash\)}}
+\DoxyCodeLine{00126\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ (res).r\ -\/=\ (a).r;\ \ (res).i\ -\/=\ (a).i;\ \(\backslash\)}}
+\DoxyCodeLine{00127\ \textcolor{preprocessor}{\ \ \ \ \}while(0)}}
+\DoxyCodeLine{00128\ }
+\DoxyCodeLine{00129\ }
+\DoxyCodeLine{00130\ \textcolor{preprocessor}{\#ifdef\ FIXED\_POINT}}
+\DoxyCodeLine{00131\ \textcolor{preprocessor}{\#\ \ define\ KISS\_FFT\_COS(phase)\ \ floor(.5+SAMP\_MAX\ *\ cos\ (phase))}}
+\DoxyCodeLine{00132\ \textcolor{preprocessor}{\#\ \ define\ KISS\_FFT\_SIN(phase)\ \ floor(.5+SAMP\_MAX\ *\ sin\ (phase))}}
+\DoxyCodeLine{00133\ \textcolor{preprocessor}{\#\ \ define\ HALF\_OF(x)\ ((x)>>1)}}
+\DoxyCodeLine{00134\ \textcolor{preprocessor}{\#elif\ defined(USE\_SIMD)}}
+\DoxyCodeLine{00135\ \textcolor{preprocessor}{\#\ \ define\ KISS\_FFT\_COS(phase)\ \_mm\_set1\_ps(\ cos(phase)\ )}}
+\DoxyCodeLine{00136\ \textcolor{preprocessor}{\#\ \ define\ KISS\_FFT\_SIN(phase)\ \_mm\_set1\_ps(\ sin(phase)\ )}}
+\DoxyCodeLine{00137\ \textcolor{preprocessor}{\#\ \ define\ HALF\_OF(x)\ ((x)*\_mm\_set1\_ps(.5))}}
+\DoxyCodeLine{00138\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00139\ \textcolor{preprocessor}{\#\ \ define\ KISS\_FFT\_COS(phase)\ (kiss\_fft\_scalar)\ cos(phase)}}
+\DoxyCodeLine{00140\ \textcolor{preprocessor}{\#\ \ define\ KISS\_FFT\_SIN(phase)\ (kiss\_fft\_scalar)\ sin(phase)}}
+\DoxyCodeLine{00141\ \textcolor{preprocessor}{\#\ \ define\ HALF\_OF(x)\ ((x)*(kiss\_fft\_scalar).5)}}
+\DoxyCodeLine{00142\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00143\ }
+\DoxyCodeLine{00144\ \textcolor{preprocessor}{\#define\ \ kf\_cexp(x,phase)\ \(\backslash\)}}
+\DoxyCodeLine{00145\ \textcolor{preprocessor}{\ \ \ \ do\{\ \(\backslash\)}}
+\DoxyCodeLine{00146\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ (x)-\/>r\ =\ KISS\_FFT\_COS(phase);\(\backslash\)}}
+\DoxyCodeLine{00147\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ (x)-\/>i\ =\ KISS\_FFT\_SIN(phase);\(\backslash\)}}
+\DoxyCodeLine{00148\ \textcolor{preprocessor}{\ \ \ \ \}while(0)}}
+\DoxyCodeLine{00149\ }
+\DoxyCodeLine{00150\ }
+\DoxyCodeLine{00151\ \textcolor{comment}{/*\ a\ debugging\ function\ */}}
+\DoxyCodeLine{00152\ \textcolor{preprocessor}{\#define\ pcpx(c)\(\backslash\)}}
+\DoxyCodeLine{00153\ \textcolor{preprocessor}{\ \ \ \ fprintf(stderr,"{}\%g\ +\ \%gi\(\backslash\)n"{},(double)((c)-\/>r),(double)((c)-\/>i)\ )}}
+\DoxyCodeLine{00154\ }
+\DoxyCodeLine{00155\ }
+\DoxyCodeLine{00156\ \textcolor{preprocessor}{\#ifdef\ KISS\_FFT\_USE\_ALLOCA}}
+\DoxyCodeLine{00157\ \textcolor{comment}{//\ define\ this\ to\ allow\ use\ of\ alloca\ instead\ of\ malloc\ for\ temporary\ buffers}}
+\DoxyCodeLine{00158\ \textcolor{comment}{//\ Temporary\ buffers\ are\ used\ in\ two\ case:\ }}
+\DoxyCodeLine{00159\ \textcolor{comment}{//\ 1.\ FFT\ sizes\ that\ have\ "{}bad"{}\ factors.\ i.e.\ not\ 2,3\ and\ 5}}
+\DoxyCodeLine{00160\ \textcolor{comment}{//\ 2.\ "{}in-\/place"{}\ FFTs.\ \ Notice\ the\ quotes,\ since\ kissfft\ does\ not\ really\ do\ an\ in-\/place\ transform.}}
+\DoxyCodeLine{00161\ \textcolor{preprocessor}{\#include\ <alloca.h>}}
+\DoxyCodeLine{00162\ \textcolor{preprocessor}{\#define\ \ KISS\_FFT\_TMP\_ALLOC(nbytes)\ alloca(nbytes)}}
+\DoxyCodeLine{00163\ \textcolor{preprocessor}{\#define\ \ KISS\_FFT\_TMP\_FREE(ptr)\ }}
+\DoxyCodeLine{00164\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00165\ \textcolor{preprocessor}{\#define\ \ KISS\_FFT\_TMP\_ALLOC(nbytes)\ KISS\_FFT\_MALLOC(nbytes)}}
+\DoxyCodeLine{00166\ \textcolor{preprocessor}{\#define\ \ KISS\_FFT\_TMP\_FREE(ptr)\ KISS\_FFT\_FREE(ptr)}}
+\DoxyCodeLine{00167\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00168\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ \_KISS\_FFT\_GUTS\_H}}
+
+\end{DoxyCode}

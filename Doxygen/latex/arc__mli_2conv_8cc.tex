@@ -1,0 +1,136 @@
+\doxysection{Arduino/\+Get\+Started\+With\+Machine\+Learning\+On\+Arduino/tflite-\/micro-\/main/tensorflow/lite/micro/kernels/arc\+\_\+mli/conv.cc File Reference}
+\hypertarget{arc__mli_2conv_8cc}{}\label{arc__mli_2conv_8cc}\index{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/main/tensorflow/lite/micro/kernels/arc\_mli/conv.cc@{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/main/tensorflow/lite/micro/kernels/arc\_mli/conv.cc}}
+{\ttfamily \#include "{}tensorflow/lite/kernels/internal/reference/conv.\+h"{}}\newline
+{\ttfamily \#include "{}mli\+\_\+api.\+h"{}}\newline
+{\ttfamily \#include "{}tensorflow/lite/c/builtin\+\_\+op\+\_\+data.\+h"{}}\newline
+{\ttfamily \#include "{}tensorflow/lite/c/common.\+h"{}}\newline
+{\ttfamily \#include "{}tensorflow/lite/kernels/internal/common.\+h"{}}\newline
+{\ttfamily \#include "{}tensorflow/lite/kernels/internal/quantization\+\_\+util.\+h"{}}\newline
+{\ttfamily \#include "{}tensorflow/lite/kernels/internal/reference/integer\+\_\+ops/conv.\+h"{}}\newline
+{\ttfamily \#include "{}tensorflow/lite/kernels/internal/tensor\+\_\+ctypes.\+h"{}}\newline
+{\ttfamily \#include "{}tensorflow/lite/kernels/kernel\+\_\+util.\+h"{}}\newline
+{\ttfamily \#include "{}tensorflow/lite/kernels/padding.\+h"{}}\newline
+{\ttfamily \#include "{}tensorflow/lite/micro/kernels/arc\+\_\+mli/mli\+\_\+function\+\_\+specializations.\+h"{}}\newline
+{\ttfamily \#include "{}tensorflow/lite/micro/kernels/arc\+\_\+mli/mli\+\_\+slicers.\+h"{}}\newline
+{\ttfamily \#include "{}tensorflow/lite/micro/kernels/arc\+\_\+mli/mli\+\_\+tf\+\_\+utils.\+h"{}}\newline
+{\ttfamily \#include "{}tensorflow/lite/micro/kernels/arc\+\_\+mli/scratch\+\_\+buf\+\_\+mgr.\+h"{}}\newline
+{\ttfamily \#include "{}tensorflow/lite/micro/kernels/arc\+\_\+mli/scratch\+\_\+buffers.\+h"{}}\newline
+{\ttfamily \#include "{}tensorflow/lite/micro/kernels/kernel\+\_\+util.\+h"{}}\newline
+{\ttfamily \#include "{}tensorflow/lite/micro/micro\+\_\+log.\+h"{}}\newline
+Include dependency graph for conv.\+cc\+:
+% FIG 0
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacetflite}{tflite}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{struct_tf_lite_registration}{Tf\+Lite\+Registration}} \mbox{\hyperlink{namespacetflite_a0a04ef19c5130d41acc31df1695b8af0}{tflite\+::\+Register\+\_\+\+CONV\+\_\+2D}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Variable Documentation}
+\Hypertarget{arc__mli_2conv_8cc_adf2a9cd16accb576c21e71252ae8ceba}\index{conv.cc@{conv.cc}!cfg@{cfg}}
+\index{cfg@{cfg}!conv.cc@{conv.cc}}
+\doxysubsubsection{\texorpdfstring{cfg}{cfg}}
+{\footnotesize\ttfamily \label{arc__mli_2conv_8cc_adf2a9cd16accb576c21e71252ae8ceba} 
+mli\+\_\+conv2d\+\_\+cfg\texorpdfstring{$\ast$}{*} cfg}
+
+\Hypertarget{arc__mli_2conv_8cc_a34bc6dbca70005a12d6f7058f7a6d03f}\index{conv.cc@{conv.cc}!filter\_zero\_point@{filter\_zero\_point}}
+\index{filter\_zero\_point@{filter\_zero\_point}!conv.cc@{conv.cc}}
+\doxysubsubsection{\texorpdfstring{filter\_zero\_point}{filter\_zero\_point}}
+{\footnotesize\ttfamily \label{arc__mli_2conv_8cc_a34bc6dbca70005a12d6f7058f7a6d03f} 
+int32\+\_\+t filter\+\_\+zero\+\_\+point}
+
+\Hypertarget{arc__mli_2conv_8cc_a3d0e49fe7ae38f6479154745fcddfdd1}\index{conv.cc@{conv.cc}!input\_zero\_point@{input\_zero\_point}}
+\index{input\_zero\_point@{input\_zero\_point}!conv.cc@{conv.cc}}
+\doxysubsubsection{\texorpdfstring{input\_zero\_point}{input\_zero\_point}}
+{\footnotesize\ttfamily \label{arc__mli_2conv_8cc_a3d0e49fe7ae38f6479154745fcddfdd1} 
+int32\+\_\+t input\+\_\+zero\+\_\+point}
+
+\Hypertarget{arc__mli_2conv_8cc_a5662360dbe6a551b11af514196ea054d}\index{conv.cc@{conv.cc}!is\_mli\_applicable@{is\_mli\_applicable}}
+\index{is\_mli\_applicable@{is\_mli\_applicable}!conv.cc@{conv.cc}}
+\doxysubsubsection{\texorpdfstring{is\_mli\_applicable}{is\_mli\_applicable}}
+{\footnotesize\ttfamily \label{arc__mli_2conv_8cc_a5662360dbe6a551b11af514196ea054d} 
+bool is\+\_\+mli\+\_\+applicable}
+
+\Hypertarget{arc__mli_2conv_8cc_ace68274e50765f6f529adb88460de748}\index{conv.cc@{conv.cc}!mli\_bias@{mli\_bias}}
+\index{mli\_bias@{mli\_bias}!conv.cc@{conv.cc}}
+\doxysubsubsection{\texorpdfstring{mli\_bias}{mli\_bias}}
+{\footnotesize\ttfamily \label{arc__mli_2conv_8cc_ace68274e50765f6f529adb88460de748} 
+ops\+::micro\+::\+Mli\+Tensor\+Interface mli\+\_\+bias\hspace{0.3cm}{\ttfamily [mutable]}}
+
+\Hypertarget{arc__mli_2conv_8cc_a8ce9cb85bd5ffd78844b12a81dbb2651}\index{conv.cc@{conv.cc}!mli\_in@{mli\_in}}
+\index{mli\_in@{mli\_in}!conv.cc@{conv.cc}}
+\doxysubsubsection{\texorpdfstring{mli\_in}{mli\_in}}
+{\footnotesize\ttfamily \label{arc__mli_2conv_8cc_a8ce9cb85bd5ffd78844b12a81dbb2651} 
+ops\+::micro\+::\+Mli\+Tensor\+Interface mli\+\_\+in\hspace{0.3cm}{\ttfamily [mutable]}}
+
+\Hypertarget{arc__mli_2conv_8cc_a68b177460be6b8a6180fc04fa20b12c5}\index{conv.cc@{conv.cc}!mli\_out@{mli\_out}}
+\index{mli\_out@{mli\_out}!conv.cc@{conv.cc}}
+\doxysubsubsection{\texorpdfstring{mli\_out}{mli\_out}}
+{\footnotesize\ttfamily \label{arc__mli_2conv_8cc_a68b177460be6b8a6180fc04fa20b12c5} 
+ops\+::micro\+::\+Mli\+Tensor\+Interface mli\+\_\+out\hspace{0.3cm}{\ttfamily [mutable]}}
+
+\Hypertarget{arc__mli_2conv_8cc_a246a6c557c2c2362afbd91778ce4126a}\index{conv.cc@{conv.cc}!mli\_weights@{mli\_weights}}
+\index{mli\_weights@{mli\_weights}!conv.cc@{conv.cc}}
+\doxysubsubsection{\texorpdfstring{mli\_weights}{mli\_weights}}
+{\footnotesize\ttfamily \label{arc__mli_2conv_8cc_a246a6c557c2c2362afbd91778ce4126a} 
+ops\+::micro\+::\+Mli\+Tensor\+Interface mli\+\_\+weights\hspace{0.3cm}{\ttfamily [mutable]}}
+
+\Hypertarget{arc__mli_2conv_8cc_aa889d7b51a3f84357d44f05993ac08a1}\index{conv.cc@{conv.cc}!output\_activation\_max@{output\_activation\_max}}
+\index{output\_activation\_max@{output\_activation\_max}!conv.cc@{conv.cc}}
+\doxysubsubsection{\texorpdfstring{output\_activation\_max}{output\_activation\_max}}
+{\footnotesize\ttfamily \label{arc__mli_2conv_8cc_aa889d7b51a3f84357d44f05993ac08a1} 
+int32\+\_\+t output\+\_\+activation\+\_\+max}
+
+\Hypertarget{arc__mli_2conv_8cc_a2e6a27b448848b3057c45363e04b7d0d}\index{conv.cc@{conv.cc}!output\_activation\_min@{output\_activation\_min}}
+\index{output\_activation\_min@{output\_activation\_min}!conv.cc@{conv.cc}}
+\doxysubsubsection{\texorpdfstring{output\_activation\_min}{output\_activation\_min}}
+{\footnotesize\ttfamily \label{arc__mli_2conv_8cc_a2e6a27b448848b3057c45363e04b7d0d} 
+int32\+\_\+t output\+\_\+activation\+\_\+min}
+
+\Hypertarget{arc__mli_2conv_8cc_a23e9f0626e0fdd28687b85e5065f904a}\index{conv.cc@{conv.cc}!output\_multiplier@{output\_multiplier}}
+\index{output\_multiplier@{output\_multiplier}!conv.cc@{conv.cc}}
+\doxysubsubsection{\texorpdfstring{output\_multiplier}{output\_multiplier}}
+{\footnotesize\ttfamily \label{arc__mli_2conv_8cc_a23e9f0626e0fdd28687b85e5065f904a} 
+int32\+\_\+t output\+\_\+multiplier}
+
+\Hypertarget{arc__mli_2conv_8cc_a239169c76410c3a81fd9cba67cc0bc8f}\index{conv.cc@{conv.cc}!output\_shift@{output\_shift}}
+\index{output\_shift@{output\_shift}!conv.cc@{conv.cc}}
+\doxysubsubsection{\texorpdfstring{output\_shift}{output\_shift}}
+{\footnotesize\ttfamily \label{arc__mli_2conv_8cc_a239169c76410c3a81fd9cba67cc0bc8f} 
+int output\+\_\+shift}
+
+\Hypertarget{arc__mli_2conv_8cc_a01779cbc43b9b8996d7f980787aa369a}\index{conv.cc@{conv.cc}!output\_zero\_point@{output\_zero\_point}}
+\index{output\_zero\_point@{output\_zero\_point}!conv.cc@{conv.cc}}
+\doxysubsubsection{\texorpdfstring{output\_zero\_point}{output\_zero\_point}}
+{\footnotesize\ttfamily \label{arc__mli_2conv_8cc_a01779cbc43b9b8996d7f980787aa369a} 
+int32\+\_\+t output\+\_\+zero\+\_\+point}
+
+\Hypertarget{arc__mli_2conv_8cc_a94e117bca7a6537c9ee79760cc2cf662}\index{conv.cc@{conv.cc}!p\_mli\_krn\_conv2d\_sa8\_sa8\_sa32@{p\_mli\_krn\_conv2d\_sa8\_sa8\_sa32}}
+\index{p\_mli\_krn\_conv2d\_sa8\_sa8\_sa32@{p\_mli\_krn\_conv2d\_sa8\_sa8\_sa32}!conv.cc@{conv.cc}}
+\doxysubsubsection{\texorpdfstring{p\_mli\_krn\_conv2d\_sa8\_sa8\_sa32}{p\_mli\_krn\_conv2d\_sa8\_sa8\_sa32}}
+{\footnotesize\ttfamily \label{arc__mli_2conv_8cc_a94e117bca7a6537c9ee79760cc2cf662} 
+conv\+\_\+func\+\_\+ptr p\+\_\+mli\+\_\+krn\+\_\+conv2d\+\_\+sa8\+\_\+sa8\+\_\+sa32}
+
+\Hypertarget{arc__mli_2conv_8cc_ad870e8457a2c13cdb2d9a3566118bb4e}\index{conv.cc@{conv.cc}!padding@{padding}}
+\index{padding@{padding}!conv.cc@{conv.cc}}
+\doxysubsubsection{\texorpdfstring{padding}{padding}}
+{\footnotesize\ttfamily \label{arc__mli_2conv_8cc_ad870e8457a2c13cdb2d9a3566118bb4e} 
+\mbox{\hyperlink{struct_tf_lite_padding_values}{Tf\+Lite\+Padding\+Values}} padding}
+
+\Hypertarget{arc__mli_2conv_8cc_ab92220b3b842bfb91d3d7bea5883b18d}\index{conv.cc@{conv.cc}!per\_channel\_output\_multiplier@{per\_channel\_output\_multiplier}}
+\index{per\_channel\_output\_multiplier@{per\_channel\_output\_multiplier}!conv.cc@{conv.cc}}
+\doxysubsubsection{\texorpdfstring{per\_channel\_output\_multiplier}{per\_channel\_output\_multiplier}}
+{\footnotesize\ttfamily \label{arc__mli_2conv_8cc_ab92220b3b842bfb91d3d7bea5883b18d} 
+int32\+\_\+t\texorpdfstring{$\ast$}{*} per\+\_\+channel\+\_\+output\+\_\+multiplier}
+
+\Hypertarget{arc__mli_2conv_8cc_a7ef0b3343d185f18b32fb55236d283d2}\index{conv.cc@{conv.cc}!per\_channel\_output\_shift@{per\_channel\_output\_shift}}
+\index{per\_channel\_output\_shift@{per\_channel\_output\_shift}!conv.cc@{conv.cc}}
+\doxysubsubsection{\texorpdfstring{per\_channel\_output\_shift}{per\_channel\_output\_shift}}
+{\footnotesize\ttfamily \label{arc__mli_2conv_8cc_a7ef0b3343d185f18b32fb55236d283d2} 
+int32\+\_\+t\texorpdfstring{$\ast$}{*} per\+\_\+channel\+\_\+output\+\_\+shift}
+

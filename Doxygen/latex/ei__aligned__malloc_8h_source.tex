@@ -1,0 +1,97 @@
+\doxysection{ei\+\_\+aligned\+\_\+malloc.\+h}
+\hypertarget{ei__aligned__malloc_8h_source}{}\label{ei__aligned__malloc_8h_source}\index{Face\_Access\_inferencing/src/edge-\/impulse-\/sdk/classifier/ei\_aligned\_malloc.h@{Face\_Access\_inferencing/src/edge-\/impulse-\/sdk/classifier/ei\_aligned\_malloc.h}}
+\mbox{\hyperlink{ei__aligned__malloc_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{00002\ \textcolor{comment}{\ *\ Copyright\ (c)\ 2022\ EdgeImpulse\ Inc.}}
+\DoxyCodeLine{00003\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00004\ \textcolor{comment}{\ *\ Licensed\ under\ the\ Apache\ License,\ Version\ 2.0\ (the\ "{}License"{});}}
+\DoxyCodeLine{00005\ \textcolor{comment}{\ *\ you\ may\ not\ use\ this\ file\ except\ in\ compliance\ with\ the\ License.}}
+\DoxyCodeLine{00006\ \textcolor{comment}{\ *\ You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{00007\ \textcolor{comment}{\ *\ http://www.apache.org/licenses/LICENSE-\/2.0}}
+\DoxyCodeLine{00008\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00009\ \textcolor{comment}{\ *\ Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,}}
+\DoxyCodeLine{00010\ \textcolor{comment}{\ *\ software\ distributed\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS}}
+\DoxyCodeLine{00011\ \textcolor{comment}{\ *\ IS"{}\ BASIS,\ WITHOUT\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,\ either}}
+\DoxyCodeLine{00012\ \textcolor{comment}{\ *\ express\ or\ implied.\ See\ the\ License\ for\ the\ specific\ language}}
+\DoxyCodeLine{00013\ \textcolor{comment}{\ *\ governing\ permissions\ and\ limitations\ under\ the\ License.}}
+\DoxyCodeLine{00014\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00015\ \textcolor{comment}{\ *\ SPDX-\/License-\/Identifier:\ Apache-\/2.0}}
+\DoxyCodeLine{00016\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{00017\ }
+\DoxyCodeLine{00018\ \textcolor{preprocessor}{\#ifndef\ \_EDGE\_IMPULSE\_ALIGNED\_MALLOC\_H\_}}
+\DoxyCodeLine{00019\ \textcolor{preprocessor}{\#define\ \_EDGE\_IMPULSE\_ALIGNED\_MALLOC\_H\_}}
+\DoxyCodeLine{00020\ }
+\DoxyCodeLine{00021\ \textcolor{preprocessor}{\#include\ <assert.h>}}
+\DoxyCodeLine{00022\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{ei__classifier__porting_8h}{../porting/ei\_classifier\_porting.h}}"{}}}
+\DoxyCodeLine{00023\ }
+\DoxyCodeLine{00024\ \textcolor{preprocessor}{\#ifdef\ \_\_cplusplus}}
+\DoxyCodeLine{00025\ \textcolor{keyword}{namespace\ }\{}
+\DoxyCodeLine{00026\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ \_\_cplusplus}}
+\DoxyCodeLine{00027\ }
+\DoxyCodeLine{00036\ \textcolor{preprocessor}{\#ifndef\ align\_up}}
+\DoxyCodeLine{00037\ \textcolor{preprocessor}{\#define\ align\_up(num,\ align)\ \(\backslash\)}}
+\DoxyCodeLine{00038\ \textcolor{preprocessor}{\ \ \ \ (((num)\ +\ ((align)\ -\/\ 1))\ \&\ \string~((align)\ -\/\ 1))}}
+\DoxyCodeLine{00039\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00040\ }
+\DoxyCodeLine{00041\ \textcolor{comment}{//Number\ of\ bytes\ we're\ using\ for\ storing\ the\ aligned\ pointer\ offset}}
+\DoxyCodeLine{00042\ \textcolor{keyword}{typedef}\ uint16\_t\ \mbox{\hyperlink{ei__aligned__malloc_8h_a310df0c401bac7455ba4512bf170044a}{offset\_t}};}
+\DoxyCodeLine{00043\ \textcolor{preprocessor}{\#define\ PTR\_OFFSET\_SZ\ sizeof(offset\_t)}}
+\DoxyCodeLine{00044\ }
+\DoxyCodeLine{00050\ \mbox{\hyperlink{ei__aligned__malloc_8h_ga8f5c7143bf386c91e3210280ebc152d6}{\_\_attribute\_\_}}((unused))\ \textcolor{keywordtype}{void}\ *\ ei\_aligned\_calloc(\textcolor{keywordtype}{size\_t}\ align,\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{ei__aligned__malloc_8h_a854352f53b148adc24983a58a1866d66}{size}})}
+\DoxyCodeLine{00051\ \{}
+\DoxyCodeLine{00052\ \ \ \ \ \textcolor{keywordtype}{void}\ *\ \mbox{\hyperlink{ei__aligned__malloc_8h_a0619a76ea2d4e6cce18b93ddf5082a36}{ptr}}\ =\ NULL;}
+\DoxyCodeLine{00053\ }
+\DoxyCodeLine{00054\ \ \ \ \ \textcolor{comment}{//We\ want\ it\ to\ be\ a\ power\ of\ two\ since\ align\_up\ operates\ on\ powers\ of\ two}}
+\DoxyCodeLine{00055\ \ \ \ \ \mbox{\hyperlink{ei__aligned__malloc_8h_a95cd4fa643ce672b347744b35c5b7056}{assert}}((align\ \&\ (align\ -\/\ 1))\ ==\ 0);}
+\DoxyCodeLine{00056\ }
+\DoxyCodeLine{00057\ \ \ \ \ \textcolor{keywordflow}{if}(align\ \&\&\ \mbox{\hyperlink{ei__aligned__malloc_8h_a854352f53b148adc24983a58a1866d66}{size}})}
+\DoxyCodeLine{00058\ \ \ \ \ \{}
+\DoxyCodeLine{00059\ \ \ \ \ \ \ \ \ \textcolor{comment}{/*}}
+\DoxyCodeLine{00060\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ *\ We\ know\ we\ have\ to\ fit\ an\ offset\ value}}
+\DoxyCodeLine{00061\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ *\ We\ also\ allocate\ extra\ bytes\ to\ ensure\ we\ can\ meet\ the\ alignment}}
+\DoxyCodeLine{00062\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ */}}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ uint32\_t\ hdr\_size\ =\ \mbox{\hyperlink{ei__aligned__malloc_8h_ae270c0b6ce92c0334142b6ac81ea047d}{PTR\_OFFSET\_SZ}}\ +\ (align\ -\/\ 1);}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ *\ p\ =\ \mbox{\hyperlink{group__ei__user__functions_gac69361ca85cf888be2ad7a700d5ff9cb}{ei\_calloc}}(\mbox{\hyperlink{ei__aligned__malloc_8h_a854352f53b148adc24983a58a1866d66}{size}}\ +\ hdr\_size,\ 1);}
+\DoxyCodeLine{00065\ }
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(p)}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{/*}}
+\DoxyCodeLine{00069\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ \ \ *\ Add\ the\ offset\ size\ to\ malloc's\ pointer\ (we\ will\ always\ store\ that)}}
+\DoxyCodeLine{00070\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ \ \ *\ Then\ align\ the\ resulting\ value\ to\ the\ arget\ alignment}}
+\DoxyCodeLine{00071\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ \ \ */}}
+\DoxyCodeLine{00072\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__aligned__malloc_8h_a0619a76ea2d4e6cce18b93ddf5082a36}{ptr}}\ =\ (\textcolor{keywordtype}{void}\ *)\ \mbox{\hyperlink{ei__aligned__malloc_8h_ad7cedda95a9788a1df13133fabd15ce5}{align\_up}}(((uintptr\_t)p\ +\ \mbox{\hyperlink{ei__aligned__malloc_8h_ae270c0b6ce92c0334142b6ac81ea047d}{PTR\_OFFSET\_SZ}}),\ align);}
+\DoxyCodeLine{00073\ }
+\DoxyCodeLine{00074\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//Calculate\ the\ offset\ and\ store\ it\ behind\ our\ aligned\ pointer}}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \ \ \ \ \ \ *((\mbox{\hyperlink{ei__aligned__malloc_8h_a310df0c401bac7455ba4512bf170044a}{offset\_t}}\ *)\mbox{\hyperlink{ei__aligned__malloc_8h_a0619a76ea2d4e6cce18b93ddf5082a36}{ptr}}\ -\/\ 1)\ =\ (\mbox{\hyperlink{ei__aligned__malloc_8h_a310df0c401bac7455ba4512bf170044a}{offset\_t}})((uintptr\_t)\mbox{\hyperlink{ei__aligned__malloc_8h_a0619a76ea2d4e6cce18b93ddf5082a36}{ptr}}\ -\/\ (uintptr\_t)p);}
+\DoxyCodeLine{00076\ }
+\DoxyCodeLine{00077\ \ \ \ \ \ \ \ \ \}\ \textcolor{comment}{//\ else\ NULL,\ could\ not\ malloc}}
+\DoxyCodeLine{00078\ \ \ \ \ \}\ \textcolor{comment}{//else\ NULL,\ invalid\ arguments}}
+\DoxyCodeLine{00079\ }
+\DoxyCodeLine{00080\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{ei__aligned__malloc_8h_a0619a76ea2d4e6cce18b93ddf5082a36}{ptr}};}
+\DoxyCodeLine{00081\ \}}
+\DoxyCodeLine{00082\ }
+\DoxyCodeLine{00088\ \mbox{\hyperlink{ei__aligned__malloc_8h_ga8f5c7143bf386c91e3210280ebc152d6}{\_\_attribute\_\_}}((unused))\ \textcolor{keywordtype}{void}\ ei\_aligned\_free(\textcolor{keywordtype}{void}\ *\ \mbox{\hyperlink{ei__aligned__malloc_8h_a0619a76ea2d4e6cce18b93ddf5082a36}{ptr}})}
+\DoxyCodeLine{00089\ \{}
+\DoxyCodeLine{00090\ \ \ \ \ \mbox{\hyperlink{ei__aligned__malloc_8h_a95cd4fa643ce672b347744b35c5b7056}{assert}}(\mbox{\hyperlink{ei__aligned__malloc_8h_a0619a76ea2d4e6cce18b93ddf5082a36}{ptr}});}
+\DoxyCodeLine{00091\ }
+\DoxyCodeLine{00092\ \ \ \ \ \textcolor{comment}{/*}}
+\DoxyCodeLine{00093\ \textcolor{comment}{\ \ \ \ *\ Walk\ backwards\ from\ the\ passed-\/in\ pointer\ to\ get\ the\ pointer\ offset}}
+\DoxyCodeLine{00094\ \textcolor{comment}{\ \ \ \ *\ We\ convert\ to\ an\ offset\_t\ pointer\ and\ rely\ on\ pointer\ math\ to\ get\ the\ data}}
+\DoxyCodeLine{00095\ \textcolor{comment}{\ \ \ \ */}}
+\DoxyCodeLine{00096\ \ \ \ \ \mbox{\hyperlink{ei__aligned__malloc_8h_a310df0c401bac7455ba4512bf170044a}{offset\_t}}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcaf138809236f667e9686fdd4aaf17705_aed7ea92f45bd273dde380a45ddced592}{offset}}\ =\ *((\mbox{\hyperlink{ei__aligned__malloc_8h_a310df0c401bac7455ba4512bf170044a}{offset\_t}}\ *)\mbox{\hyperlink{ei__aligned__malloc_8h_a0619a76ea2d4e6cce18b93ddf5082a36}{ptr}}\ -\/\ 1);}
+\DoxyCodeLine{00097\ }
+\DoxyCodeLine{00098\ \ \ \ \ \textcolor{comment}{/*}}
+\DoxyCodeLine{00099\ \textcolor{comment}{\ \ \ \ *\ Once\ we\ have\ the\ offset,\ we\ can\ get\ our\ original\ pointer\ and\ call\ free}}
+\DoxyCodeLine{00100\ \textcolor{comment}{\ \ \ \ */}}
+\DoxyCodeLine{00101\ \ \ \ \ \textcolor{keywordtype}{void}\ *\ p\ =\ (\textcolor{keywordtype}{void}\ *)((uint8\_t\ *)\mbox{\hyperlink{ei__aligned__malloc_8h_a0619a76ea2d4e6cce18b93ddf5082a36}{ptr}}\ -\/\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcaf138809236f667e9686fdd4aaf17705_aed7ea92f45bd273dde380a45ddced592}{offset}});}
+\DoxyCodeLine{00102\ \ \ \ \ \mbox{\hyperlink{group__ei__user__functions_ga7a6a70833407ff1870c12396ce2c4aa3}{ei\_free}}(p);}
+\DoxyCodeLine{00103\ \}}
+\DoxyCodeLine{00104\ }
+\DoxyCodeLine{00105\ \textcolor{preprocessor}{\#ifdef\ \_\_cplusplus}}
+\DoxyCodeLine{00106\ \}}
+\DoxyCodeLine{00107\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ \_\_cplusplus}}
+\DoxyCodeLine{00108\ }
+\DoxyCodeLine{00109\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ \_EDGE\_IMPULSE\_ALIGNED\_MALLOC\_H\_}}
+
+\end{DoxyCode}

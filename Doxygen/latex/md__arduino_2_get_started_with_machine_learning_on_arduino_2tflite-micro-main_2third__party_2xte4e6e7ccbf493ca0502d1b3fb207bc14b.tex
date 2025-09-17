@@ -1,0 +1,66 @@
+\chapter{Mini Speech Training with LSTM}
+\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2third__party_2xte4e6e7ccbf493ca0502d1b3fb207bc14b}{}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2third__party_2xte4e6e7ccbf493ca0502d1b3fb207bc14b}\index{Mini Speech Training with LSTM@{Mini Speech Training with LSTM}}
+\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2third__party_2xte4e6e7ccbf493ca0502d1b3fb207bc14b_autotoc_md365}%
+\Hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2third__party_2xte4e6e7ccbf493ca0502d1b3fb207bc14b_autotoc_md365}%
+
+
+This example shows how to train a 125 kB model that can recognize any of 2 keywords from the below 8 keywords chosen by the user, classify all other commands as an "{}unknown"{} keyword, and predict the chosen keywords from speech data.
+
+You can retrain it to recognize any combination of words (2 or more) from this list (all other words would be passed to "{}unknown"{} keyword set)\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{"{}down"{},\ "{}go"{},\ "{}left"{},\ "{}no"{},\ "{}right"{},\ "{}stop"{},\ "{}up"{}\ and\ "{}yes"{}.}
+
+\end{DoxyCode}
+
+
+The scripts used in training the model have been sourced from the \href{https://www.tensorflow.org/tutorials/audio/simple_audio}{\texttt{ Simple Audio Recognition}} tutorial.\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2third__party_2xte4e6e7ccbf493ca0502d1b3fb207bc14b_autotoc_md366}{}\doxysection{\texorpdfstring{Table of contents}{Table of contents}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2third__party_2xte4e6e7ccbf493ca0502d1b3fb207bc14b_autotoc_md366}
+
+\begin{DoxyItemize}
+\item Overview
+\item Training
+\item Trained Models
+\item Model Architecture
+\item Dataset
+\item Preprocessing Speech Input
+\end{DoxyItemize}\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2third__party_2xte4e6e7ccbf493ca0502d1b3fb207bc14b_autotoc_md367}{}\doxysection{\texorpdfstring{Overview}{Overview}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2third__party_2xte4e6e7ccbf493ca0502d1b3fb207bc14b_autotoc_md367}
+
+\begin{DoxyEnumerate}
+\item Dataset\+: \href{http://storage.googleapis.com/download.tensorflow.org/data/mini_speech_commands.zip}{\texttt{ Mini Speech Commands}}
+\item Dataset Type\+: {\bfseries{Mini\+\_\+\+Speech\+\_\+\+Commands}}
+\item Deep Learning Framework\+: {\bfseries{Tensor\+Flow 2.\+5.\+0}}
+\item Language\+: {\bfseries{Python 3.\+7}}
+\item Model Size\+: \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$<$}{<}125 k\+B\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}
+\item Model Category\+: \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\+Multiclass Classification\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}
+\end{DoxyEnumerate}\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2third__party_2xte4e6e7ccbf493ca0502d1b3fb207bc14b_autotoc_md368}{}\doxysection{\texorpdfstring{Training}{Training}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2third__party_2xte4e6e7ccbf493ca0502d1b3fb207bc14b_autotoc_md368}
+Train the model in the cloud using Google Colaboratory.
+
+\tabulinesep=1mm
+\begin{longtabu}spread 0pt [c]{*{0}{|X[-1]}|}
+\hline
+\end{longtabu}
+\href{https://colab.research.google.com/github/tensorflow/tflite-micro/blob/main/third_party/xtensa/examples/micro_speech_lstm/train/micro_speech_with_lstm_op.ipynb}{\texttt{ Google Colaboratory}}  
+
+{\itshape Estimated Training Time\+: \texorpdfstring{$\sim$}{\string~}2 Minutes.}\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2third__party_2xte4e6e7ccbf493ca0502d1b3fb207bc14b_autotoc_md369}{}\doxysection{\texorpdfstring{autotoc\+\_\+md369}{autotoc\+\_\+md369}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2third__party_2xte4e6e7ccbf493ca0502d1b3fb207bc14b_autotoc_md369}
+\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2third__party_2xte4e6e7ccbf493ca0502d1b3fb207bc14b_autotoc_md370}{}\doxysection{\texorpdfstring{Trained Models}{Trained Models}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2third__party_2xte4e6e7ccbf493ca0502d1b3fb207bc14b_autotoc_md370}
+The flatbuffer model generated as a result of the traning can be found \href{../micro_speech_lstm.tflite}{\texttt{ here}}. This model is quantized to int8 precision, i.\+e. all the activations and weights are int8.\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2third__party_2xte4e6e7ccbf493ca0502d1b3fb207bc14b_autotoc_md371}{}\doxysection{\texorpdfstring{Model Architecture}{Model Architecture}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2third__party_2xte4e6e7ccbf493ca0502d1b3fb207bc14b_autotoc_md371}
+This is a simple model comprising of a Unidirectional Sequence LSTM layer, a Reshape layer, a Fully Connected Layer or a Mat\+Mul Layer (output\+: logits) and a Softmax layer (output\+: probabilities) as shown below. Refer to the below model architecture.
+
+
+
+{\itshape This image was derived from visualizing the \textquotesingle{}micro\+\_\+speech\+\_\+model.\+tflite\textquotesingle{} file in \href{https://github.com/lutzroeder/netron}{\texttt{ Netron}}}
+
+This produces a model with an accuracy of \texorpdfstring{$\sim$}{\string~}93\%, but it\textquotesingle{}s designed to be used as the first stage of a pipeline, running on a low-\/energy piece of hardware that can always be on, and then wake higher-\/power chips when a possible utterance has been found, so that more accurate analysis can be done. Additionally, the model takes in preprocessed speech input as a result of which we can leverage a simpler model for accurate results.\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2third__party_2xte4e6e7ccbf493ca0502d1b3fb207bc14b_autotoc_md372}{}\doxysection{\texorpdfstring{Dataset}{Dataset}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2third__party_2xte4e6e7ccbf493ca0502d1b3fb207bc14b_autotoc_md372}
+The \href{http://storage.googleapis.com/download.tensorflow.org/data/mini_speech_commands.zip}{\texttt{ Mini Speech Commands Dataset}} consists of over 8,000 WAVE audio files of people saying 8 different words. This data was collected by Google and released under a CC BY license. You can help improve it by contributing five minutes of your own voice. The archive is over 2GB, so this part may take a while, but you should see progress logs, and once it\textquotesingle{}s been downloaded you won\textquotesingle{}t need to do this again.\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2third__party_2xte4e6e7ccbf493ca0502d1b3fb207bc14b_autotoc_md373}{}\doxysection{\texorpdfstring{Preprocessing Speech Input}{Preprocessing Speech Input}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2third__party_2xte4e6e7ccbf493ca0502d1b3fb207bc14b_autotoc_md373}
+In this section we discuss spectrograms, the preprocessed speech input to the model. Here\textquotesingle{}s an illustration of the process\+:
+
+
+
+The model doesn\textquotesingle{}t take in raw audio sample data, instead it works with spectrograms which are two dimensional arrays that are made up of slices of frequency information, each taken from a different time window.
+
+The recipe for creating the spectrogram data is that each frequency slice is created by running an FFT across a 30ms section of the audio sample data. The input samples are treated as being between -\/1 and +1 as real values (encoded as -\/32,768 and 32,767 in 16-\/bit signed integer samples).
+
+This results in an FFT with 257 entries.
+
+In a complete application these spectrograms would be calculated at runtime from microphone inputs, but the code for doing that is not yet included in this sample code. The test uses spectrograms that have been pre-\/calculated from one-\/second WAV files. 

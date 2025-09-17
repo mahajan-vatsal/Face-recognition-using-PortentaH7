@@ -1,0 +1,456 @@
+\doxysection{flatbuffer\+\_\+conversions.\+h}
+\hypertarget{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_2coe37dd6812122abb3b519aa77ddb965fe_source}{}\label{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_2coe37dd6812122abb3b519aa77ddb965fe_source}\index{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/main/tensorflow/lite/core/api/flatbuffer\_conversions.h@{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/main/tensorflow/lite/core/api/flatbuffer\_conversions.h}}
+\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_2coe37dd6812122abb3b519aa77ddb965fe}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{/*\ Copyright\ 2021\ The\ TensorFlow\ Authors.\ All\ Rights\ Reserved.}}
+\DoxyCodeLine{00002\ \textcolor{comment}{}}
+\DoxyCodeLine{00003\ \textcolor{comment}{Licensed\ under\ the\ Apache\ License,\ Version\ 2.0\ (the\ "{}License"{});}}
+\DoxyCodeLine{00004\ \textcolor{comment}{you\ may\ not\ use\ this\ file\ except\ in\ compliance\ with\ the\ License.}}
+\DoxyCodeLine{00005\ \textcolor{comment}{You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{00006\ \textcolor{comment}{}}
+\DoxyCodeLine{00007\ \textcolor{comment}{\ \ \ \ http://www.apache.org/licenses/LICENSE-\/2.0}}
+\DoxyCodeLine{00008\ \textcolor{comment}{}}
+\DoxyCodeLine{00009\ \textcolor{comment}{Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ software}}
+\DoxyCodeLine{00010\ \textcolor{comment}{distributed\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,}}
+\DoxyCodeLine{00011\ \textcolor{comment}{WITHOUT\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,\ either\ express\ or\ implied.}}
+\DoxyCodeLine{00012\ \textcolor{comment}{See\ the\ License\ for\ the\ specific\ language\ governing\ permissions\ and}}
+\DoxyCodeLine{00013\ \textcolor{comment}{limitations\ under\ the\ License.}}
+\DoxyCodeLine{00014\ \textcolor{comment}{==============================================================================*/}}
+\DoxyCodeLine{00015\ \textcolor{preprocessor}{\#ifndef\ TENSORFLOW\_LITE\_CORE\_API\_FLATBUFFER\_CONVERSIONS\_H\_}}
+\DoxyCodeLine{00016\ \textcolor{preprocessor}{\#define\ TENSORFLOW\_LITE\_CORE\_API\_FLATBUFFER\_CONVERSIONS\_H\_}}
+\DoxyCodeLine{00017\ }
+\DoxyCodeLine{00018\ \textcolor{comment}{//\ These\ functions\ transform\ codes\ and\ data\ structures\ that\ are\ defined\ in\ the}}
+\DoxyCodeLine{00019\ \textcolor{comment}{//\ flatbuffer\ serialization\ format\ into\ in-\/memory\ values\ that\ are\ used\ by\ the}}
+\DoxyCodeLine{00020\ \textcolor{comment}{//\ runtime\ API\ and\ interpreter.}}
+\DoxyCodeLine{00021\ }
+\DoxyCodeLine{00022\ \textcolor{preprocessor}{\#include\ <cstddef>}}
+\DoxyCodeLine{00023\ \textcolor{preprocessor}{\#include\ <new>}}
+\DoxyCodeLine{00024\ \textcolor{preprocessor}{\#include\ <type\_traits>}}
+\DoxyCodeLine{00025\ }
+\DoxyCodeLine{00026\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/core/api/error\_reporter.h"{}}}
+\DoxyCodeLine{00027\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/core/c/common.h"{}}}
+\DoxyCodeLine{00028\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/schema/schema\_generated.h"{}}}
+\DoxyCodeLine{00029\ }
+\DoxyCodeLine{00030\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacetflite}{tflite}}\ \{}
+\DoxyCodeLine{00031\ }
+\DoxyCodeLine{00032\ \textcolor{comment}{//\ Interface\ class\ for\ builtin\ data\ allocations.}}
+\DoxyCodeLine{00033\ \textcolor{keyword}{class\ }BuiltinDataAllocator\ \{}
+\DoxyCodeLine{00034\ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00035\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}*\ \mbox{\hyperlink{classtflite_1_1_builtin_data_allocator_aca37fb55ad25e2e82a4b427d1139a2b5}{Allocate}}(\textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{hello__world__model_8cc_a439227feff9d7f55384e8780cfc2eb82}{size}},\ \textcolor{keywordtype}{size\_t}\ alignment\_hint)\ =\ 0;}
+\DoxyCodeLine{00036\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classtflite_1_1_builtin_data_allocator_a6c26280f19b4adb917ec05dc7ec4a52e}{Deallocate}}(\textcolor{keywordtype}{void}*\ \mbox{\hyperlink{hello__world__model_8cc_ab2a9259b73b53c0bb06a6b242aa7ae32}{data}})\ =\ 0;}
+\DoxyCodeLine{00037\ }
+\DoxyCodeLine{00038\ \ \ \textcolor{comment}{//\ Allocate\ a\ structure,\ but\ make\ sure\ it\ is\ a\ POD\ structure\ that\ doesn't}}
+\DoxyCodeLine{00039\ \ \ \textcolor{comment}{//\ require\ constructors\ to\ run.\ The\ reason\ we\ do\ this,\ is\ that\ Interpreter's\ C}}
+\DoxyCodeLine{00040\ \ \ \textcolor{comment}{//\ extension\ part\ will\ take\ ownership\ so\ destructors\ \ will\ not\ be\ run\ during}}
+\DoxyCodeLine{00041\ \ \ \textcolor{comment}{//\ deallocation.}}
+\DoxyCodeLine{00042\ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{00043\ \ \ T*\ \mbox{\hyperlink{classtflite_1_1_builtin_data_allocator_a282ad6a8af7957bbccdb9ea20cd87403}{AllocatePOD}}()\ \{}
+\DoxyCodeLine{00044\ \ \ \ \ \textcolor{comment}{//\ TODO(b/154346074):\ Change\ this\ to\ is\_trivially\_destructible\ when\ all}}
+\DoxyCodeLine{00045\ \ \ \ \ \textcolor{comment}{//\ platform\ targets\ support\ that\ properly.}}
+\DoxyCodeLine{00046\ \ \ \ \ \textcolor{keyword}{static\_assert}(std::is\_pod<T>::value,\ \textcolor{stringliteral}{"{}Builtin\ data\ structure\ must\ be\ POD."{}});}
+\DoxyCodeLine{00047\ \ \ \ \ \textcolor{keywordtype}{void}*\ allocated\_memory\ =\ this-\/>\mbox{\hyperlink{classtflite_1_1_builtin_data_allocator_aca37fb55ad25e2e82a4b427d1139a2b5}{Allocate}}(\textcolor{keyword}{sizeof}(T),\ \textcolor{keyword}{alignof}(T));}
+\DoxyCodeLine{00048\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{new}\ (allocated\_memory)\ T();}
+\DoxyCodeLine{00049\ \ \ \}}
+\DoxyCodeLine{00050\ }
+\DoxyCodeLine{00051\ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{classtflite_1_1_builtin_data_allocator_af0295bd8c44612461b862ee268d8823a}{\string~BuiltinDataAllocator}}()\ \{\}}
+\DoxyCodeLine{00052\ \};}
+\DoxyCodeLine{00053\ }
+\DoxyCodeLine{00054\ \textcolor{comment}{//\ Parse\ the\ appropriate\ data\ out\ of\ the\ op.}}
+\DoxyCodeLine{00055\ \textcolor{comment}{//}}
+\DoxyCodeLine{00056\ \textcolor{comment}{//\ This\ handles\ builtin\ data\ explicitly\ as\ there\ are\ flatbuffer\ schemas.}}
+\DoxyCodeLine{00057\ \textcolor{comment}{//\ If\ it\ returns\ kTfLiteOk,\ it\ passes\ the\ data\ out\ with\ \`{}builtin\_data`.\ The}}
+\DoxyCodeLine{00058\ \textcolor{comment}{//\ calling\ function\ has\ to\ pass\ in\ an\ allocator\ object,\ and\ this\ allocator}}
+\DoxyCodeLine{00059\ \textcolor{comment}{//\ will\ be\ called\ to\ reserve\ space\ for\ the\ output\ data.\ If\ the\ calling}}
+\DoxyCodeLine{00060\ \textcolor{comment}{//\ function's\ allocator\ reserves\ memory\ on\ the\ heap,\ then\ it's\ the\ calling}}
+\DoxyCodeLine{00061\ \textcolor{comment}{//\ function's\ responsibility\ to\ free\ it.}}
+\DoxyCodeLine{00062\ \textcolor{comment}{//\ If\ it\ returns\ kTfLiteError,\ \`{}builtin\_data`\ will\ be\ \`{}nullptr`.}}
+\DoxyCodeLine{00063\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_a392ff54631c195e2b01e407da296ffb7}{ParseOpData}}(\textcolor{keyword}{const}\ Operator*\ op,\ \mbox{\hyperlink{namespacetflite_ab29efbedf49bccb2d2259fd931ba06ac}{BuiltinOperator}}\ op\_type,}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ErrorReporter*\ error\_reporter,}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BuiltinDataAllocator*\ allocator,\ \textcolor{keywordtype}{void}**\ \mbox{\hyperlink{hello__world__model_8cc_ac78b3db8b592b472b8ea2ffd2b194737}{builtin\_data}});}
+\DoxyCodeLine{00066\ }
+\DoxyCodeLine{00067\ \textcolor{comment}{//\ Converts\ the\ tensor\ data\ type\ used\ in\ the\ flat\ buffer\ to\ the\ representation}}
+\DoxyCodeLine{00068\ \textcolor{comment}{//\ used\ by\ the\ runtime.}}
+\DoxyCodeLine{00069\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_a2925a5c33bc25c5c71aebdfe0e4dad39}{ConvertTensorType}}(TensorType\ tensor\_type,\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_a8a47ba81bdef28b5c479ee7928a7d123}{TfLiteType}}*\ \mbox{\hyperlink{micro_2kernels_2overlap__add_8cc_a231b67310ea6e901bd0df1bded3963cf}{type}},}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ErrorReporter*\ error\_reporter);}
+\DoxyCodeLine{00071\ }
+\DoxyCodeLine{00072\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_a133fc926093d88b5edf528502ce6bbe9}{ParseAbs}}(\textcolor{keyword}{const}\ Operator*\ op,\ ErrorReporter*\ error\_reporter,}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BuiltinDataAllocator*\ allocator,\ \textcolor{keywordtype}{void}**\ \mbox{\hyperlink{hello__world__model_8cc_ac78b3db8b592b472b8ea2ffd2b194737}{builtin\_data}});}
+\DoxyCodeLine{00074\ }
+\DoxyCodeLine{00075\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_a954eee0d973eae243741c5451db0a6d6}{ParseAdd}}(\textcolor{keyword}{const}\ Operator*\ op,\ ErrorReporter*\ error\_reporter,}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BuiltinDataAllocator*\ allocator,\ \textcolor{keywordtype}{void}**\ \mbox{\hyperlink{hello__world__model_8cc_ac78b3db8b592b472b8ea2ffd2b194737}{builtin\_data}});}
+\DoxyCodeLine{00077\ }
+\DoxyCodeLine{00078\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_ad6905373175d4f2e5f4cae4abe3c874b}{ParseAddN}}(\textcolor{keyword}{const}\ Operator*\ op,\ ErrorReporter*\ error\_reporter,}
+\DoxyCodeLine{00079\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BuiltinDataAllocator*\ allocator,\ \textcolor{keywordtype}{void}**\ \mbox{\hyperlink{hello__world__model_8cc_ac78b3db8b592b472b8ea2ffd2b194737}{builtin\_data}});}
+\DoxyCodeLine{00080\ }
+\DoxyCodeLine{00081\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_a182660d2655697970cc90b8f8450c965}{ParseArgMax}}(\textcolor{keyword}{const}\ Operator*\ op,\ ErrorReporter*\ error\_reporter,}
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BuiltinDataAllocator*\ allocator,\ \textcolor{keywordtype}{void}**\ \mbox{\hyperlink{hello__world__model_8cc_ac78b3db8b592b472b8ea2ffd2b194737}{builtin\_data}});}
+\DoxyCodeLine{00083\ }
+\DoxyCodeLine{00084\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_a59b71d37c1f1ec9ed7ad896e758fe5c8}{ParseArgMin}}(\textcolor{keyword}{const}\ Operator*\ op,\ ErrorReporter*\ error\_reporter,}
+\DoxyCodeLine{00085\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BuiltinDataAllocator*\ allocator,\ \textcolor{keywordtype}{void}**\ \mbox{\hyperlink{hello__world__model_8cc_ac78b3db8b592b472b8ea2ffd2b194737}{builtin\_data}});}
+\DoxyCodeLine{00086\ }
+\DoxyCodeLine{00087\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_a460200ae858298de48104b32aa92abb3}{ParseAssignVariable}}(\textcolor{keyword}{const}\ Operator*\ op,}
+\DoxyCodeLine{00088\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ErrorReporter*\ error\_reporter,}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BuiltinDataAllocator*\ allocator,}
+\DoxyCodeLine{00090\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}**\ \mbox{\hyperlink{hello__world__model_8cc_ac78b3db8b592b472b8ea2ffd2b194737}{builtin\_data}});}
+\DoxyCodeLine{00091\ }
+\DoxyCodeLine{00092\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_ab348003fea475ac16a7128e79812c7e9}{ParseBatchMatMul}}(\textcolor{keyword}{const}\ Operator*\ op,\ ErrorReporter*\ error\_reporter,}
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BuiltinDataAllocator*\ allocator,}
+\DoxyCodeLine{00094\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}**\ \mbox{\hyperlink{hello__world__model_8cc_ac78b3db8b592b472b8ea2ffd2b194737}{builtin\_data}});}
+\DoxyCodeLine{00095\ }
+\DoxyCodeLine{00096\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_ab65aa8c56defb4b5b806c03f11781698}{ParseBatchToSpaceNd}}(\textcolor{keyword}{const}\ Operator*\ op,}
+\DoxyCodeLine{00097\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ErrorReporter*\ error\_reporter,}
+\DoxyCodeLine{00098\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BuiltinDataAllocator*\ allocator,}
+\DoxyCodeLine{00099\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}**\ \mbox{\hyperlink{hello__world__model_8cc_ac78b3db8b592b472b8ea2ffd2b194737}{builtin\_data}});}
+\DoxyCodeLine{00100\ }
+\DoxyCodeLine{00101\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_a57b09b3f6ddd611f8140e16341ed526f}{ParseBroadcastArgs}}(\textcolor{keyword}{const}\ Operator*\ op,}
+\DoxyCodeLine{00102\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ErrorReporter*\ error\_reporter,}
+\DoxyCodeLine{00103\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BuiltinDataAllocator*\ allocator,}
+\DoxyCodeLine{00104\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}**\ \mbox{\hyperlink{hello__world__model_8cc_ac78b3db8b592b472b8ea2ffd2b194737}{builtin\_data}});}
+\DoxyCodeLine{00105\ }
+\DoxyCodeLine{00106\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_a31ec75ccd1dddcece054ef8a2b5173fc}{ParseBroadcastTo}}(\textcolor{keyword}{const}\ Operator*\ op,\ ErrorReporter*\ error\_reporter,}
+\DoxyCodeLine{00107\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BuiltinDataAllocator*\ allocator,}
+\DoxyCodeLine{00108\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}**\ \mbox{\hyperlink{hello__world__model_8cc_ac78b3db8b592b472b8ea2ffd2b194737}{builtin\_data}});}
+\DoxyCodeLine{00109\ }
+\DoxyCodeLine{00110\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_a549678b6188728cad5f70742d05e36a6}{ParseCallOnce}}(\textcolor{keyword}{const}\ Operator*\ op,\ ErrorReporter*\ error\_reporter,}
+\DoxyCodeLine{00111\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BuiltinDataAllocator*\ allocator,}
+\DoxyCodeLine{00112\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}**\ \mbox{\hyperlink{hello__world__model_8cc_ac78b3db8b592b472b8ea2ffd2b194737}{builtin\_data}});}
+\DoxyCodeLine{00113\ }
+\DoxyCodeLine{00114\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_a7884eb1c04f2de97d0bcac94e0ca885b}{ParseCeil}}(\textcolor{keyword}{const}\ Operator*\ op,\ ErrorReporter*\ error\_reporter,}
+\DoxyCodeLine{00115\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BuiltinDataAllocator*\ allocator,\ \textcolor{keywordtype}{void}**\ \mbox{\hyperlink{hello__world__model_8cc_ac78b3db8b592b472b8ea2ffd2b194737}{builtin\_data}});}
+\DoxyCodeLine{00116\ }
+\DoxyCodeLine{00117\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_aeb6794f2206b51b34fb682ca01e6ccf5}{ParseCast}}(\textcolor{keyword}{const}\ Operator*\ op,\ ErrorReporter*\ error\_reporter,}
+\DoxyCodeLine{00118\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BuiltinDataAllocator*\ allocator,\ \textcolor{keywordtype}{void}**\ \mbox{\hyperlink{hello__world__model_8cc_ac78b3db8b592b472b8ea2ffd2b194737}{builtin\_data}});}
+\DoxyCodeLine{00119\ }
+\DoxyCodeLine{00120\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_af819e5e84c5938dc717f9199f4677c4c}{ParseConcatenation}}(\textcolor{keyword}{const}\ Operator*\ op,}
+\DoxyCodeLine{00121\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ErrorReporter*\ error\_reporter,}
+\DoxyCodeLine{00122\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BuiltinDataAllocator*\ allocator,}
+\DoxyCodeLine{00123\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}**\ \mbox{\hyperlink{hello__world__model_8cc_ac78b3db8b592b472b8ea2ffd2b194737}{builtin\_data}});}
+\DoxyCodeLine{00124\ }
+\DoxyCodeLine{00125\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_a1e9b00b14c9db6861eb4aa112aceaff9}{ParseConv2D}}(\textcolor{keyword}{const}\ Operator*\ op,\ ErrorReporter*\ error\_reporter,}
+\DoxyCodeLine{00126\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BuiltinDataAllocator*\ allocator,\ \textcolor{keywordtype}{void}**\ \mbox{\hyperlink{hello__world__model_8cc_ac78b3db8b592b472b8ea2ffd2b194737}{builtin\_data}});}
+\DoxyCodeLine{00127\ }
+\DoxyCodeLine{00128\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_a3616729916c9295b10e68f89d272fd80}{ParseCos}}(\textcolor{keyword}{const}\ Operator*\ op,\ ErrorReporter*\ error\_reporter,}
+\DoxyCodeLine{00129\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BuiltinDataAllocator*\ allocator,\ \textcolor{keywordtype}{void}**\ \mbox{\hyperlink{hello__world__model_8cc_ac78b3db8b592b472b8ea2ffd2b194737}{builtin\_data}});}
+\DoxyCodeLine{00130\ }
+\DoxyCodeLine{00131\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_a2c64f4c3f3b1c4fd9615e381c6259a18}{ParseCumsum}}(\textcolor{keyword}{const}\ Operator*\ op,\ ErrorReporter*\ error\_reporter,}
+\DoxyCodeLine{00132\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BuiltinDataAllocator*\ allocator,\ \textcolor{keywordtype}{void}**\ \mbox{\hyperlink{hello__world__model_8cc_ac78b3db8b592b472b8ea2ffd2b194737}{builtin\_data}});}
+\DoxyCodeLine{00133\ }
+\DoxyCodeLine{00134\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_a1045639ecf83257c69eff636bdc6f226}{ParseDepthToSpace}}(\textcolor{keyword}{const}\ Operator*\ op,}
+\DoxyCodeLine{00135\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ErrorReporter*\ error\_reporter,}
+\DoxyCodeLine{00136\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BuiltinDataAllocator*\ allocator,}
+\DoxyCodeLine{00137\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}**\ \mbox{\hyperlink{hello__world__model_8cc_ac78b3db8b592b472b8ea2ffd2b194737}{builtin\_data}});}
+\DoxyCodeLine{00138\ }
+\DoxyCodeLine{00139\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_ad9ae3645f30037393f52376cafb39e30}{ParseDepthwiseConv2D}}(\textcolor{keyword}{const}\ Operator*\ op,}
+\DoxyCodeLine{00140\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ErrorReporter*\ error\_reporter,}
+\DoxyCodeLine{00141\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BuiltinDataAllocator*\ allocator,}
+\DoxyCodeLine{00142\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}**\ \mbox{\hyperlink{hello__world__model_8cc_ac78b3db8b592b472b8ea2ffd2b194737}{builtin\_data}});}
+\DoxyCodeLine{00143\ }
+\DoxyCodeLine{00144\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_a94c589ceb55eeea06bd7f51ed8896d07}{ParseDequantize}}(\textcolor{keyword}{const}\ Operator*\ op,\ ErrorReporter*\ error\_reporter,}
+\DoxyCodeLine{00145\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BuiltinDataAllocator*\ allocator,}
+\DoxyCodeLine{00146\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}**\ \mbox{\hyperlink{hello__world__model_8cc_ac78b3db8b592b472b8ea2ffd2b194737}{builtin\_data}});}
+\DoxyCodeLine{00147\ }
+\DoxyCodeLine{00148\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_a24dc4828a3a4b456bd62dffbff5b4f80}{ParseDiv}}(\textcolor{keyword}{const}\ Operator*\ op,\ ErrorReporter*\ error\_reporter,}
+\DoxyCodeLine{00149\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BuiltinDataAllocator*\ allocator,\ \textcolor{keywordtype}{void}**\ \mbox{\hyperlink{hello__world__model_8cc_ac78b3db8b592b472b8ea2ffd2b194737}{builtin\_data}});}
+\DoxyCodeLine{00150\ }
+\DoxyCodeLine{00151\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_ac988f377b09e6ffc0d7ad155f0a15499}{ParseElu}}(\textcolor{keyword}{const}\ Operator*\ op,\ ErrorReporter*\ error\_reporter,}
+\DoxyCodeLine{00152\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BuiltinDataAllocator*\ allocator,\ \textcolor{keywordtype}{void}**\ \mbox{\hyperlink{hello__world__model_8cc_ac78b3db8b592b472b8ea2ffd2b194737}{builtin\_data}});}
+\DoxyCodeLine{00153\ }
+\DoxyCodeLine{00154\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_ac9aeab4be669f0e05f4b94ef45c8cfd2}{ParseEmbeddingLookup}}(\textcolor{keyword}{const}\ Operator*\ op,}
+\DoxyCodeLine{00155\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ErrorReporter*\ error\_reporter,}
+\DoxyCodeLine{00156\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BuiltinDataAllocator*\ allocator,}
+\DoxyCodeLine{00157\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}**\ \mbox{\hyperlink{hello__world__model_8cc_ac78b3db8b592b472b8ea2ffd2b194737}{builtin\_data}});}
+\DoxyCodeLine{00158\ }
+\DoxyCodeLine{00159\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_af130b4f610181a67b5e4c1976be35610}{ParseEqual}}(\textcolor{keyword}{const}\ Operator*\ op,\ ErrorReporter*\ error\_reporter,}
+\DoxyCodeLine{00160\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BuiltinDataAllocator*\ allocator,\ \textcolor{keywordtype}{void}**\ \mbox{\hyperlink{hello__world__model_8cc_ac78b3db8b592b472b8ea2ffd2b194737}{builtin\_data}});}
+\DoxyCodeLine{00161\ }
+\DoxyCodeLine{00162\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_a669ae36a98270aa65ddf2a441be3a248}{ParseExp}}(\textcolor{keyword}{const}\ Operator*\ op,\ ErrorReporter*\ error\_reporter,}
+\DoxyCodeLine{00163\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BuiltinDataAllocator*\ allocator,\ \textcolor{keywordtype}{void}**\ \mbox{\hyperlink{hello__world__model_8cc_ac78b3db8b592b472b8ea2ffd2b194737}{builtin\_data}});}
+\DoxyCodeLine{00164\ }
+\DoxyCodeLine{00165\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_a9cbb774b2d3e48ff51fb7c91c4b79137}{ParseExpandDims}}(\textcolor{keyword}{const}\ Operator*\ op,\ ErrorReporter*\ error\_reporter,}
+\DoxyCodeLine{00166\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BuiltinDataAllocator*\ allocator,}
+\DoxyCodeLine{00167\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}**\ \mbox{\hyperlink{hello__world__model_8cc_ac78b3db8b592b472b8ea2ffd2b194737}{builtin\_data}});}
+\DoxyCodeLine{00168\ }
+\DoxyCodeLine{00169\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_a3c6d21d700f668653befe6c1f81cbe65}{ParseFill}}(\textcolor{keyword}{const}\ Operator*\ op,\ ErrorReporter*\ error\_reporter,}
+\DoxyCodeLine{00170\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BuiltinDataAllocator*\ allocator,\ \textcolor{keywordtype}{void}**\ \mbox{\hyperlink{hello__world__model_8cc_ac78b3db8b592b472b8ea2ffd2b194737}{builtin\_data}});}
+\DoxyCodeLine{00171\ }
+\DoxyCodeLine{00172\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_a1a0b9d9cfc7fd813a416ba186a1ee8cc}{ParseFloor}}(\textcolor{keyword}{const}\ Operator*\ op,\ ErrorReporter*\ error\_reporter,}
+\DoxyCodeLine{00173\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BuiltinDataAllocator*\ allocator,\ \textcolor{keywordtype}{void}**\ \mbox{\hyperlink{hello__world__model_8cc_ac78b3db8b592b472b8ea2ffd2b194737}{builtin\_data}});}
+\DoxyCodeLine{00174\ }
+\DoxyCodeLine{00175\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_a5b68437408ad0eb6c3108bd73e3d30fb}{ParseFloorDiv}}(\textcolor{keyword}{const}\ Operator*\ op,\ ErrorReporter*\ error\_reporter,}
+\DoxyCodeLine{00176\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BuiltinDataAllocator*\ allocator,}
+\DoxyCodeLine{00177\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}**\ \mbox{\hyperlink{hello__world__model_8cc_ac78b3db8b592b472b8ea2ffd2b194737}{builtin\_data}});}
+\DoxyCodeLine{00178\ }
+\DoxyCodeLine{00179\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_ac46cd5b7a7f1f3886ee3ffc978ae9591}{ParseFloorMod}}(\textcolor{keyword}{const}\ Operator*\ op,\ ErrorReporter*\ error\_reporter,}
+\DoxyCodeLine{00180\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BuiltinDataAllocator*\ allocator,}
+\DoxyCodeLine{00181\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}**\ \mbox{\hyperlink{hello__world__model_8cc_ac78b3db8b592b472b8ea2ffd2b194737}{builtin\_data}});}
+\DoxyCodeLine{00182\ }
+\DoxyCodeLine{00183\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_a6898d65e334274b56c15f28797876e8d}{ParseFullyConnected}}(\textcolor{keyword}{const}\ Operator*\ op,}
+\DoxyCodeLine{00184\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ErrorReporter*\ error\_reporter,}
+\DoxyCodeLine{00185\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BuiltinDataAllocator*\ allocator,}
+\DoxyCodeLine{00186\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}**\ \mbox{\hyperlink{hello__world__model_8cc_ac78b3db8b592b472b8ea2ffd2b194737}{builtin\_data}});}
+\DoxyCodeLine{00187\ }
+\DoxyCodeLine{00188\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_af32c2e87d19394b6bf3b0613c5aed914}{ParseGather}}(\textcolor{keyword}{const}\ Operator*\ op,\ ErrorReporter*\ error\_reporter,}
+\DoxyCodeLine{00189\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BuiltinDataAllocator*\ allocator,\ \textcolor{keywordtype}{void}**\ \mbox{\hyperlink{hello__world__model_8cc_ac78b3db8b592b472b8ea2ffd2b194737}{builtin\_data}});}
+\DoxyCodeLine{00190\ }
+\DoxyCodeLine{00191\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_a76d7786af54d3047a9239b1100de2935}{ParseGatherNd}}(\textcolor{keyword}{const}\ Operator*\ op,\ ErrorReporter*\ error\_reporter,}
+\DoxyCodeLine{00192\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BuiltinDataAllocator*\ allocator,}
+\DoxyCodeLine{00193\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}**\ \mbox{\hyperlink{hello__world__model_8cc_ac78b3db8b592b472b8ea2ffd2b194737}{builtin\_data}});}
+\DoxyCodeLine{00194\ }
+\DoxyCodeLine{00195\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_a2601eee31ed27603dcd59fb2815b2ec3}{ParseGreater}}(\textcolor{keyword}{const}\ Operator*\ op,\ ErrorReporter*\ error\_reporter,}
+\DoxyCodeLine{00196\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BuiltinDataAllocator*\ allocator,\ \textcolor{keywordtype}{void}**\ \mbox{\hyperlink{hello__world__model_8cc_ac78b3db8b592b472b8ea2ffd2b194737}{builtin\_data}});}
+\DoxyCodeLine{00197\ }
+\DoxyCodeLine{00198\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_af3c07a4e7c9345c516e8b10435cdf49e}{ParseGreaterEqual}}(\textcolor{keyword}{const}\ Operator*\ op,}
+\DoxyCodeLine{00199\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ErrorReporter*\ error\_reporter,}
+\DoxyCodeLine{00200\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BuiltinDataAllocator*\ allocator,}
+\DoxyCodeLine{00201\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}**\ \mbox{\hyperlink{hello__world__model_8cc_ac78b3db8b592b472b8ea2ffd2b194737}{builtin\_data}});}
+\DoxyCodeLine{00202\ }
+\DoxyCodeLine{00203\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_a23c55f6877c3f9c0932199137709f9fa}{ParseHardSwish}}(\textcolor{keyword}{const}\ Operator*\ op,\ ErrorReporter*\ error\_reporter,}
+\DoxyCodeLine{00204\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BuiltinDataAllocator*\ allocator,}
+\DoxyCodeLine{00205\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}**\ \mbox{\hyperlink{hello__world__model_8cc_ac78b3db8b592b472b8ea2ffd2b194737}{builtin\_data}});}
+\DoxyCodeLine{00206\ }
+\DoxyCodeLine{00207\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_a85229733d7faa59cd4a87f315bc7b950}{ParseIf}}(\textcolor{keyword}{const}\ Operator*\ op,\ ErrorReporter*\ error\_reporter,}
+\DoxyCodeLine{00208\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BuiltinDataAllocator*\ allocator,\ \textcolor{keywordtype}{void}**\ \mbox{\hyperlink{hello__world__model_8cc_ac78b3db8b592b472b8ea2ffd2b194737}{builtin\_data}});}
+\DoxyCodeLine{00209\ }
+\DoxyCodeLine{00210\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_a1e6a37a2168c72268aeda9e908d69d83}{ParseL2Normalization}}(\textcolor{keyword}{const}\ Operator*\ op,}
+\DoxyCodeLine{00211\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ErrorReporter*\ error\_reporter,}
+\DoxyCodeLine{00212\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BuiltinDataAllocator*\ allocator,}
+\DoxyCodeLine{00213\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}**\ \mbox{\hyperlink{hello__world__model_8cc_ac78b3db8b592b472b8ea2ffd2b194737}{builtin\_data}});}
+\DoxyCodeLine{00214\ }
+\DoxyCodeLine{00215\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_aea53435c08b6fc5969d0bc8e41b24985}{ParseLeakyRelu}}(\textcolor{keyword}{const}\ Operator*\ op,\ ErrorReporter*\ error\_reporter,}
+\DoxyCodeLine{00216\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BuiltinDataAllocator*\ allocator,}
+\DoxyCodeLine{00217\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}**\ \mbox{\hyperlink{hello__world__model_8cc_ac78b3db8b592b472b8ea2ffd2b194737}{builtin\_data}});}
+\DoxyCodeLine{00218\ }
+\DoxyCodeLine{00219\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_a839b6260212bffd78d7fc91eeefffc84}{ParseLess}}(\textcolor{keyword}{const}\ Operator*\ op,\ ErrorReporter*\ error\_reporter,}
+\DoxyCodeLine{00220\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BuiltinDataAllocator*\ allocator,\ \textcolor{keywordtype}{void}**\ \mbox{\hyperlink{hello__world__model_8cc_ac78b3db8b592b472b8ea2ffd2b194737}{builtin\_data}});}
+\DoxyCodeLine{00221\ }
+\DoxyCodeLine{00222\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_a68c9b511af5bfefb75c9f0f79a8ce60e}{ParseLessEqual}}(\textcolor{keyword}{const}\ Operator*\ op,\ ErrorReporter*\ error\_reporter,}
+\DoxyCodeLine{00223\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BuiltinDataAllocator*\ allocator,}
+\DoxyCodeLine{00224\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}**\ \mbox{\hyperlink{hello__world__model_8cc_ac78b3db8b592b472b8ea2ffd2b194737}{builtin\_data}});}
+\DoxyCodeLine{00225\ }
+\DoxyCodeLine{00226\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_ab8f1a3746557bf30da076bafc73f8670}{ParseLog}}(\textcolor{keyword}{const}\ Operator*\ op,\ ErrorReporter*\ error\_reporter,}
+\DoxyCodeLine{00227\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BuiltinDataAllocator*\ allocator,\ \textcolor{keywordtype}{void}**\ \mbox{\hyperlink{hello__world__model_8cc_ac78b3db8b592b472b8ea2ffd2b194737}{builtin\_data}});}
+\DoxyCodeLine{00228\ }
+\DoxyCodeLine{00229\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_aa1d0374d561babc17bce7f58081c83cb}{ParseLogicalAnd}}(\textcolor{keyword}{const}\ Operator*\ op,\ ErrorReporter*\ error\_reporter,}
+\DoxyCodeLine{00230\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BuiltinDataAllocator*\ allocator,}
+\DoxyCodeLine{00231\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}**\ \mbox{\hyperlink{hello__world__model_8cc_ac78b3db8b592b472b8ea2ffd2b194737}{builtin\_data}});}
+\DoxyCodeLine{00232\ }
+\DoxyCodeLine{00233\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_a3972430fffdd068e9d8eb223c13e1797}{ParseLogicalNot}}(\textcolor{keyword}{const}\ Operator*\ op,\ ErrorReporter*\ error\_reporter,}
+\DoxyCodeLine{00234\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BuiltinDataAllocator*\ allocator,}
+\DoxyCodeLine{00235\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}**\ \mbox{\hyperlink{hello__world__model_8cc_ac78b3db8b592b472b8ea2ffd2b194737}{builtin\_data}});}
+\DoxyCodeLine{00236\ }
+\DoxyCodeLine{00237\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_a15c5092732ea1569c361aadb0926e3c0}{ParseLogicalOr}}(\textcolor{keyword}{const}\ Operator*\ op,\ ErrorReporter*\ error\_reporter,}
+\DoxyCodeLine{00238\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BuiltinDataAllocator*\ allocator,}
+\DoxyCodeLine{00239\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}**\ \mbox{\hyperlink{hello__world__model_8cc_ac78b3db8b592b472b8ea2ffd2b194737}{builtin\_data}});}
+\DoxyCodeLine{00240\ }
+\DoxyCodeLine{00241\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_a7c28747f6eae7aafbf0538890d18e9da}{ParseLogistic}}(\textcolor{keyword}{const}\ Operator*\ op,\ ErrorReporter*\ error\_reporter,}
+\DoxyCodeLine{00242\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BuiltinDataAllocator*\ allocator,}
+\DoxyCodeLine{00243\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}**\ \mbox{\hyperlink{hello__world__model_8cc_ac78b3db8b592b472b8ea2ffd2b194737}{builtin\_data}});}
+\DoxyCodeLine{00244\ }
+\DoxyCodeLine{00245\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_af178d59bdf70b7943e8bb4397df5c963}{ParseLogSoftmax}}(\textcolor{keyword}{const}\ Operator*\ op,\ ErrorReporter*\ error\_reporter,}
+\DoxyCodeLine{00246\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BuiltinDataAllocator*\ allocator,}
+\DoxyCodeLine{00247\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}**\ \mbox{\hyperlink{hello__world__model_8cc_ac78b3db8b592b472b8ea2ffd2b194737}{builtin\_data}});}
+\DoxyCodeLine{00248\ }
+\DoxyCodeLine{00249\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_a4fe586d235ef8f9c39e07a5be9a84bcd}{ParseLSTM}}(\textcolor{keyword}{const}\ Operator*\ op,\ ErrorReporter*\ error\_reporter,}
+\DoxyCodeLine{00250\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BuiltinDataAllocator*\ allocator,\ \textcolor{keywordtype}{void}**\ \mbox{\hyperlink{hello__world__model_8cc_ac78b3db8b592b472b8ea2ffd2b194737}{builtin\_data}});}
+\DoxyCodeLine{00251\ }
+\DoxyCodeLine{00252\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_a4c7adca98756c0c039dcd478f9b0bca7}{ParseMaximum}}(\textcolor{keyword}{const}\ Operator*\ op,\ ErrorReporter*\ error\_reporter,}
+\DoxyCodeLine{00253\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BuiltinDataAllocator*\ allocator,\ \textcolor{keywordtype}{void}**\ \mbox{\hyperlink{hello__world__model_8cc_ac78b3db8b592b472b8ea2ffd2b194737}{builtin\_data}});}
+\DoxyCodeLine{00254\ }
+\DoxyCodeLine{00255\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_a5360e6a4b927db659e317f736dc66318}{ParseMinimum}}(\textcolor{keyword}{const}\ Operator*\ op,\ ErrorReporter*\ error\_reporter,}
+\DoxyCodeLine{00256\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BuiltinDataAllocator*\ allocator,\ \textcolor{keywordtype}{void}**\ \mbox{\hyperlink{hello__world__model_8cc_ac78b3db8b592b472b8ea2ffd2b194737}{builtin\_data}});}
+\DoxyCodeLine{00257\ }
+\DoxyCodeLine{00258\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_ad85373b2995fb7524f3fcd362b978e27}{ParseMirrorPad}}(\textcolor{keyword}{const}\ Operator*\ op,\ ErrorReporter*\ error\_reporter,}
+\DoxyCodeLine{00259\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BuiltinDataAllocator*\ allocator,}
+\DoxyCodeLine{00260\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}**\ \mbox{\hyperlink{hello__world__model_8cc_ac78b3db8b592b472b8ea2ffd2b194737}{builtin\_data}});}
+\DoxyCodeLine{00261\ }
+\DoxyCodeLine{00262\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_a56ca1687708a1edd7f9e8f6e9859ae44}{ParseMul}}(\textcolor{keyword}{const}\ Operator*\ op,\ ErrorReporter*\ error\_reporter,}
+\DoxyCodeLine{00263\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BuiltinDataAllocator*\ allocator,\ \textcolor{keywordtype}{void}**\ \mbox{\hyperlink{hello__world__model_8cc_ac78b3db8b592b472b8ea2ffd2b194737}{builtin\_data}});}
+\DoxyCodeLine{00264\ }
+\DoxyCodeLine{00265\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_a4a8526336bd6756a250002de5f421801}{ParseNeg}}(\textcolor{keyword}{const}\ Operator*\ op,\ ErrorReporter*\ error\_reporter,}
+\DoxyCodeLine{00266\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BuiltinDataAllocator*\ allocator,\ \textcolor{keywordtype}{void}**\ \mbox{\hyperlink{hello__world__model_8cc_ac78b3db8b592b472b8ea2ffd2b194737}{builtin\_data}});}
+\DoxyCodeLine{00267\ }
+\DoxyCodeLine{00268\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_a539176ecf4b25895ee132b322a0d4d08}{ParseNotEqual}}(\textcolor{keyword}{const}\ Operator*\ op,\ ErrorReporter*\ error\_reporter,}
+\DoxyCodeLine{00269\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BuiltinDataAllocator*\ allocator,}
+\DoxyCodeLine{00270\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}**\ \mbox{\hyperlink{hello__world__model_8cc_ac78b3db8b592b472b8ea2ffd2b194737}{builtin\_data}});}
+\DoxyCodeLine{00271\ }
+\DoxyCodeLine{00272\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_ae66feb674d6b63d157af5a186ddad569}{ParsePack}}(\textcolor{keyword}{const}\ Operator*\ op,\ ErrorReporter*\ error\_reporter,}
+\DoxyCodeLine{00273\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BuiltinDataAllocator*\ allocator,\ \textcolor{keywordtype}{void}**\ \mbox{\hyperlink{hello__world__model_8cc_ac78b3db8b592b472b8ea2ffd2b194737}{builtin\_data}});}
+\DoxyCodeLine{00274\ }
+\DoxyCodeLine{00275\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_ae3a660c8a6724bee5a0b76a59ca018f5}{ParsePad}}(\textcolor{keyword}{const}\ Operator*\ op,\ ErrorReporter*\ error\_reporter,}
+\DoxyCodeLine{00276\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BuiltinDataAllocator*\ allocator,\ \textcolor{keywordtype}{void}**\ \mbox{\hyperlink{hello__world__model_8cc_ac78b3db8b592b472b8ea2ffd2b194737}{builtin\_data}});}
+\DoxyCodeLine{00277\ }
+\DoxyCodeLine{00278\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_abc9417e163461d5891834498d0e31e12}{ParsePadV2}}(\textcolor{keyword}{const}\ Operator*\ op,\ ErrorReporter*\ error\_reporter,}
+\DoxyCodeLine{00279\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BuiltinDataAllocator*\ allocator,\ \textcolor{keywordtype}{void}**\ \mbox{\hyperlink{hello__world__model_8cc_ac78b3db8b592b472b8ea2ffd2b194737}{builtin\_data}});}
+\DoxyCodeLine{00280\ }
+\DoxyCodeLine{00281\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_aa6a0d85db4ca64a478622bb2b428371f}{ParsePool}}(\textcolor{keyword}{const}\ Operator*\ op,\ ErrorReporter*\ error\_reporter,}
+\DoxyCodeLine{00282\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BuiltinDataAllocator*\ allocator,\ \textcolor{keywordtype}{void}**\ \mbox{\hyperlink{hello__world__model_8cc_ac78b3db8b592b472b8ea2ffd2b194737}{builtin\_data}});}
+\DoxyCodeLine{00283\ }
+\DoxyCodeLine{00284\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_a65dce2539b570bb1858ba185eb91b6cb}{ParsePow}}(\textcolor{keyword}{const}\ Operator*\ op,\ ErrorReporter*\ error\_reporter,}
+\DoxyCodeLine{00285\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BuiltinDataAllocator*\ allocator,\ \textcolor{keywordtype}{void}**\ \mbox{\hyperlink{hello__world__model_8cc_ac78b3db8b592b472b8ea2ffd2b194737}{builtin\_data}});}
+\DoxyCodeLine{00286\ }
+\DoxyCodeLine{00287\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_ae7913a724a1262a1d69a66cdb2cb8086}{ParsePrelu}}(\textcolor{keyword}{const}\ Operator*\ op,\ ErrorReporter*\ error\_reporter,}
+\DoxyCodeLine{00288\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BuiltinDataAllocator*\ allocator,\ \textcolor{keywordtype}{void}**\ \mbox{\hyperlink{hello__world__model_8cc_ac78b3db8b592b472b8ea2ffd2b194737}{builtin\_data}});}
+\DoxyCodeLine{00289\ }
+\DoxyCodeLine{00290\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_ac669492768feec3b7da9f198be107a8f}{ParseQuantize}}(\textcolor{keyword}{const}\ Operator*\ op,\ ErrorReporter*\ error\_reporter,}
+\DoxyCodeLine{00291\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BuiltinDataAllocator*\ allocator,}
+\DoxyCodeLine{00292\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}**\ \mbox{\hyperlink{hello__world__model_8cc_ac78b3db8b592b472b8ea2ffd2b194737}{builtin\_data}});}
+\DoxyCodeLine{00293\ }
+\DoxyCodeLine{00294\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_a696ed0401c5d2b27dd038d713cbb5f87}{ParseReadVariable}}(\textcolor{keyword}{const}\ Operator*\ op,}
+\DoxyCodeLine{00295\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ErrorReporter*\ error\_reporter,}
+\DoxyCodeLine{00296\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BuiltinDataAllocator*\ allocator,}
+\DoxyCodeLine{00297\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}**\ \mbox{\hyperlink{hello__world__model_8cc_ac78b3db8b592b472b8ea2ffd2b194737}{builtin\_data}});}
+\DoxyCodeLine{00298\ }
+\DoxyCodeLine{00299\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_ab2000f9bbef67669673169c3126b2e03}{ParseReducer}}(\textcolor{keyword}{const}\ Operator*\ op,\ ErrorReporter*\ error\_reporter,}
+\DoxyCodeLine{00300\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BuiltinDataAllocator*\ allocator,\ \textcolor{keywordtype}{void}**\ \mbox{\hyperlink{hello__world__model_8cc_ac78b3db8b592b472b8ea2ffd2b194737}{builtin\_data}});}
+\DoxyCodeLine{00301\ }
+\DoxyCodeLine{00302\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_ab2a601df8abd2247155d646d6d04f3f6}{ParseRelu}}(\textcolor{keyword}{const}\ Operator*\ op,\ ErrorReporter*\ error\_reporter,}
+\DoxyCodeLine{00303\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BuiltinDataAllocator*\ allocator,\ \textcolor{keywordtype}{void}**\ \mbox{\hyperlink{hello__world__model_8cc_ac78b3db8b592b472b8ea2ffd2b194737}{builtin\_data}});}
+\DoxyCodeLine{00304\ }
+\DoxyCodeLine{00305\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_a93e133ecbb6809b4df383671cf93511a}{ParseRelu6}}(\textcolor{keyword}{const}\ Operator*\ op,\ ErrorReporter*\ error\_reporter,}
+\DoxyCodeLine{00306\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BuiltinDataAllocator*\ allocator,\ \textcolor{keywordtype}{void}**\ \mbox{\hyperlink{hello__world__model_8cc_ac78b3db8b592b472b8ea2ffd2b194737}{builtin\_data}});}
+\DoxyCodeLine{00307\ }
+\DoxyCodeLine{00308\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_af2324f6fb3d7ed2bf2845020597ddc95}{ParseReshape}}(\textcolor{keyword}{const}\ Operator*\ op,\ ErrorReporter*\ error\_reporter,}
+\DoxyCodeLine{00309\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BuiltinDataAllocator*\ allocator,\ \textcolor{keywordtype}{void}**\ \mbox{\hyperlink{hello__world__model_8cc_ac78b3db8b592b472b8ea2ffd2b194737}{builtin\_data}});}
+\DoxyCodeLine{00310\ }
+\DoxyCodeLine{00311\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_a22a126923e152c616e723c5c4cd77a38}{ParseResizeBilinear}}(\textcolor{keyword}{const}\ Operator*\ op,}
+\DoxyCodeLine{00312\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ErrorReporter*\ error\_reporter,}
+\DoxyCodeLine{00313\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BuiltinDataAllocator*\ allocator,}
+\DoxyCodeLine{00314\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}**\ \mbox{\hyperlink{hello__world__model_8cc_ac78b3db8b592b472b8ea2ffd2b194737}{builtin\_data}});}
+\DoxyCodeLine{00315\ }
+\DoxyCodeLine{00316\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_a27e5be3972f3395a2a3723b245e60621}{ParseResizeNearestNeighbor}}(\textcolor{keyword}{const}\ Operator*\ op,}
+\DoxyCodeLine{00317\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ErrorReporter*\ error\_reporter,}
+\DoxyCodeLine{00318\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BuiltinDataAllocator*\ allocator,}
+\DoxyCodeLine{00319\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}**\ \mbox{\hyperlink{hello__world__model_8cc_ac78b3db8b592b472b8ea2ffd2b194737}{builtin\_data}});}
+\DoxyCodeLine{00320\ }
+\DoxyCodeLine{00321\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_a79153e92fbba1d9e910e877e93ce7be2}{ParseRound}}(\textcolor{keyword}{const}\ Operator*\ op,\ ErrorReporter*\ error\_reporter,}
+\DoxyCodeLine{00322\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BuiltinDataAllocator*\ allocator,\ \textcolor{keywordtype}{void}**\ \mbox{\hyperlink{hello__world__model_8cc_ac78b3db8b592b472b8ea2ffd2b194737}{builtin\_data}});}
+\DoxyCodeLine{00323\ }
+\DoxyCodeLine{00324\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_a72f719b99f44565a5116d2df59a4f39a}{ParseRsqrt}}(\textcolor{keyword}{const}\ Operator*\ op,\ ErrorReporter*\ error\_reporter,}
+\DoxyCodeLine{00325\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BuiltinDataAllocator*\ allocator,\ \textcolor{keywordtype}{void}**\ \mbox{\hyperlink{hello__world__model_8cc_ac78b3db8b592b472b8ea2ffd2b194737}{builtin\_data}});}
+\DoxyCodeLine{00326\ }
+\DoxyCodeLine{00327\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_a66b890e84164c039d1fb3ebca5fea7b9}{ParseSelectV2}}(\textcolor{keyword}{const}\ Operator*\ op,\ ErrorReporter*\ error\_reporter,}
+\DoxyCodeLine{00328\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BuiltinDataAllocator*\ allocator,}
+\DoxyCodeLine{00329\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}**\ \mbox{\hyperlink{hello__world__model_8cc_ac78b3db8b592b472b8ea2ffd2b194737}{builtin\_data}});}
+\DoxyCodeLine{00330\ }
+\DoxyCodeLine{00331\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_a3420e2bfc70230f6535b67f937a4b05a}{ParseShape}}(\textcolor{keyword}{const}\ Operator*\ op,\ ErrorReporter*\ error\_reporter,}
+\DoxyCodeLine{00332\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BuiltinDataAllocator*\ allocator,\ \textcolor{keywordtype}{void}**\ \mbox{\hyperlink{hello__world__model_8cc_ac78b3db8b592b472b8ea2ffd2b194737}{builtin\_data}});}
+\DoxyCodeLine{00333\ }
+\DoxyCodeLine{00334\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_aae0eccd0897b4899cc403adcc69568f5}{ParseSin}}(\textcolor{keyword}{const}\ Operator*\ op,\ ErrorReporter*\ error\_reporter,}
+\DoxyCodeLine{00335\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BuiltinDataAllocator*\ allocator,\ \textcolor{keywordtype}{void}**\ \mbox{\hyperlink{hello__world__model_8cc_ac78b3db8b592b472b8ea2ffd2b194737}{builtin\_data}});}
+\DoxyCodeLine{00336\ }
+\DoxyCodeLine{00337\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_a703261990cdfc2aeebb3d4f4633f6d20}{ParseSlice}}(\textcolor{keyword}{const}\ Operator*\ op,\ ErrorReporter*\ error\_reporter,}
+\DoxyCodeLine{00338\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BuiltinDataAllocator*\ allocator,\ \textcolor{keywordtype}{void}**\ \mbox{\hyperlink{hello__world__model_8cc_ac78b3db8b592b472b8ea2ffd2b194737}{builtin\_data}});}
+\DoxyCodeLine{00339\ }
+\DoxyCodeLine{00340\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_ab7d48a7d757c98c9eee261c106ee55ec}{ParseSoftmax}}(\textcolor{keyword}{const}\ Operator*\ op,\ ErrorReporter*\ error\_reporter,}
+\DoxyCodeLine{00341\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BuiltinDataAllocator*\ allocator,\ \textcolor{keywordtype}{void}**\ \mbox{\hyperlink{hello__world__model_8cc_ac78b3db8b592b472b8ea2ffd2b194737}{builtin\_data}});}
+\DoxyCodeLine{00342\ }
+\DoxyCodeLine{00343\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_a62c4fdc5e248ba3d11a145874cdd6622}{ParseSpaceToBatchNd}}(\textcolor{keyword}{const}\ Operator*\ op,}
+\DoxyCodeLine{00344\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ErrorReporter*\ error\_reporter,}
+\DoxyCodeLine{00345\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BuiltinDataAllocator*\ allocator,}
+\DoxyCodeLine{00346\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}**\ \mbox{\hyperlink{hello__world__model_8cc_ac78b3db8b592b472b8ea2ffd2b194737}{builtin\_data}});}
+\DoxyCodeLine{00347\ }
+\DoxyCodeLine{00348\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_a5f53a57c81e20a9458c3e6195c1c9174}{ParseSpaceToDepth}}(\textcolor{keyword}{const}\ Operator*\ op,}
+\DoxyCodeLine{00349\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ErrorReporter*\ error\_reporter,}
+\DoxyCodeLine{00350\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BuiltinDataAllocator*\ allocator,}
+\DoxyCodeLine{00351\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}**\ \mbox{\hyperlink{hello__world__model_8cc_ac78b3db8b592b472b8ea2ffd2b194737}{builtin\_data}});}
+\DoxyCodeLine{00352\ }
+\DoxyCodeLine{00353\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_aea6b942ca474f7e39c4ad7de6a25dddf}{ParseSplit}}(\textcolor{keyword}{const}\ Operator*\ op,\ ErrorReporter*\ error\_reporter,}
+\DoxyCodeLine{00354\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BuiltinDataAllocator*\ allocator,\ \textcolor{keywordtype}{void}**\ \mbox{\hyperlink{hello__world__model_8cc_ac78b3db8b592b472b8ea2ffd2b194737}{builtin\_data}});}
+\DoxyCodeLine{00355\ }
+\DoxyCodeLine{00356\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_a5e66a8d52dea5e541d21c73bd1492796}{ParseSplitV}}(\textcolor{keyword}{const}\ Operator*\ op,\ ErrorReporter*\ error\_reporter,}
+\DoxyCodeLine{00357\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BuiltinDataAllocator*\ allocator,\ \textcolor{keywordtype}{void}**\ \mbox{\hyperlink{hello__world__model_8cc_ac78b3db8b592b472b8ea2ffd2b194737}{builtin\_data}});}
+\DoxyCodeLine{00358\ }
+\DoxyCodeLine{00359\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_a0356dfca6616bbfc5cbf1e6d0b7c42f2}{ParseSqueeze}}(\textcolor{keyword}{const}\ Operator*\ op,\ ErrorReporter*\ error\_reporter,}
+\DoxyCodeLine{00360\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BuiltinDataAllocator*\ allocator,\ \textcolor{keywordtype}{void}**\ \mbox{\hyperlink{hello__world__model_8cc_ac78b3db8b592b472b8ea2ffd2b194737}{builtin\_data}});}
+\DoxyCodeLine{00361\ }
+\DoxyCodeLine{00362\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_a9c8270573363cd418a21e3eddc56d396}{ParseSqrt}}(\textcolor{keyword}{const}\ Operator*\ op,\ ErrorReporter*\ error\_reporter,}
+\DoxyCodeLine{00363\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BuiltinDataAllocator*\ allocator,\ \textcolor{keywordtype}{void}**\ \mbox{\hyperlink{hello__world__model_8cc_ac78b3db8b592b472b8ea2ffd2b194737}{builtin\_data}});}
+\DoxyCodeLine{00364\ }
+\DoxyCodeLine{00365\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_a6070cee78c1d20ba79228653a8408737}{ParseSquare}}(\textcolor{keyword}{const}\ Operator*\ op,\ ErrorReporter*\ error\_reporter,}
+\DoxyCodeLine{00366\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BuiltinDataAllocator*\ allocator,\ \textcolor{keywordtype}{void}**\ \mbox{\hyperlink{hello__world__model_8cc_ac78b3db8b592b472b8ea2ffd2b194737}{builtin\_data}});}
+\DoxyCodeLine{00367\ }
+\DoxyCodeLine{00368\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_a35c2a4c8ac8b0838c4ab161f803fc801}{ParseSquaredDifference}}(\textcolor{keyword}{const}\ Operator*\ op,}
+\DoxyCodeLine{00369\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ErrorReporter*\ error\_reporter,}
+\DoxyCodeLine{00370\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BuiltinDataAllocator*\ allocator,}
+\DoxyCodeLine{00371\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}**\ \mbox{\hyperlink{hello__world__model_8cc_ac78b3db8b592b472b8ea2ffd2b194737}{builtin\_data}});}
+\DoxyCodeLine{00372\ }
+\DoxyCodeLine{00373\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_a9852b082572ee2985060e8a48fca96ea}{ParseStridedSlice}}(\textcolor{keyword}{const}\ Operator*\ op,}
+\DoxyCodeLine{00374\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ErrorReporter*\ error\_reporter,}
+\DoxyCodeLine{00375\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BuiltinDataAllocator*\ allocator,}
+\DoxyCodeLine{00376\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}**\ \mbox{\hyperlink{hello__world__model_8cc_ac78b3db8b592b472b8ea2ffd2b194737}{builtin\_data}});}
+\DoxyCodeLine{00377\ }
+\DoxyCodeLine{00378\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_a7f34dfe09b3a38d8058bc03254d077b0}{ParseSub}}(\textcolor{keyword}{const}\ Operator*\ op,\ ErrorReporter*\ error\_reporter,}
+\DoxyCodeLine{00379\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BuiltinDataAllocator*\ allocator,\ \textcolor{keywordtype}{void}**\ \mbox{\hyperlink{hello__world__model_8cc_ac78b3db8b592b472b8ea2ffd2b194737}{builtin\_data}});}
+\DoxyCodeLine{00380\ }
+\DoxyCodeLine{00381\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_a9d474533f479b48604bf178cde3c5129}{ParseSvdf}}(\textcolor{keyword}{const}\ Operator*\ op,\ ErrorReporter*\ error\_reporter,}
+\DoxyCodeLine{00382\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BuiltinDataAllocator*\ allocator,\ \textcolor{keywordtype}{void}**\ \mbox{\hyperlink{hello__world__model_8cc_ac78b3db8b592b472b8ea2ffd2b194737}{builtin\_data}});}
+\DoxyCodeLine{00383\ }
+\DoxyCodeLine{00384\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_a803d51dc730a7a9a82bb27a827d0da51}{ParseTanh}}(\textcolor{keyword}{const}\ Operator*\ op,\ ErrorReporter*\ error\_reporter,}
+\DoxyCodeLine{00385\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BuiltinDataAllocator*\ allocator,\ \textcolor{keywordtype}{void}**\ \mbox{\hyperlink{hello__world__model_8cc_ac78b3db8b592b472b8ea2ffd2b194737}{builtin\_data}});}
+\DoxyCodeLine{00386\ }
+\DoxyCodeLine{00387\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_a3bc0dde0ebc6bb51dd3dcc2e4ae85db2}{ParseTranspose}}(\textcolor{keyword}{const}\ Operator*\ op,\ ErrorReporter*\ error\_reporter,}
+\DoxyCodeLine{00388\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BuiltinDataAllocator*\ allocator,}
+\DoxyCodeLine{00389\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}**\ \mbox{\hyperlink{hello__world__model_8cc_ac78b3db8b592b472b8ea2ffd2b194737}{builtin\_data}});}
+\DoxyCodeLine{00390\ }
+\DoxyCodeLine{00391\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_a6f639fde603b98ac57fd7363a10cdb47}{ParseTransposeConv}}(\textcolor{keyword}{const}\ Operator*\ op,}
+\DoxyCodeLine{00392\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ErrorReporter*\ error\_reporter,}
+\DoxyCodeLine{00393\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BuiltinDataAllocator*\ allocator,}
+\DoxyCodeLine{00394\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}**\ \mbox{\hyperlink{hello__world__model_8cc_ac78b3db8b592b472b8ea2ffd2b194737}{builtin\_data}});}
+\DoxyCodeLine{00395\ }
+\DoxyCodeLine{00396\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_aaa922e26e89b7c25b0b21fcc76305607}{ParseUnpack}}(\textcolor{keyword}{const}\ Operator*\ op,\ ErrorReporter*\ error\_reporter,}
+\DoxyCodeLine{00397\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BuiltinDataAllocator*\ allocator,\ \textcolor{keywordtype}{void}**\ \mbox{\hyperlink{hello__world__model_8cc_ac78b3db8b592b472b8ea2ffd2b194737}{builtin\_data}});}
+\DoxyCodeLine{00398\ }
+\DoxyCodeLine{00399\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_abf10c94c6e0d4aeed88f94e2934cd558}{ParseUnidirectionalSequenceLSTM}}(\textcolor{keyword}{const}\ Operator*\ op,}
+\DoxyCodeLine{00400\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ErrorReporter*\ error\_reporter,}
+\DoxyCodeLine{00401\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BuiltinDataAllocator*\ allocator,}
+\DoxyCodeLine{00402\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}**\ \mbox{\hyperlink{hello__world__model_8cc_ac78b3db8b592b472b8ea2ffd2b194737}{builtin\_data}});}
+\DoxyCodeLine{00403\ }
+\DoxyCodeLine{00404\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_a8a4fafccdcede7fa9472e485787ce90e}{ParseVarHandle}}(\textcolor{keyword}{const}\ Operator*\ op,\ ErrorReporter*\ error\_reporter,}
+\DoxyCodeLine{00405\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BuiltinDataAllocator*\ allocator,}
+\DoxyCodeLine{00406\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}**\ \mbox{\hyperlink{hello__world__model_8cc_ac78b3db8b592b472b8ea2ffd2b194737}{builtin\_data}});}
+\DoxyCodeLine{00407\ }
+\DoxyCodeLine{00408\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_a75e74e244dcb1d1077c5ed27f92de4c2}{ParseWhile}}(\textcolor{keyword}{const}\ Operator*\ op,\ ErrorReporter*\ error\_reporter,}
+\DoxyCodeLine{00409\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BuiltinDataAllocator*\ allocator,\ \textcolor{keywordtype}{void}**\ \mbox{\hyperlink{hello__world__model_8cc_ac78b3db8b592b472b8ea2ffd2b194737}{builtin\_data}});}
+\DoxyCodeLine{00410\ }
+\DoxyCodeLine{00411\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_a03257982dd9c47776cb91636258ac626}{ParseZerosLike}}(\textcolor{keyword}{const}\ Operator*\ op,\ ErrorReporter*\ error\_reporter,}
+\DoxyCodeLine{00412\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BuiltinDataAllocator*\ allocator,}
+\DoxyCodeLine{00413\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}**\ \mbox{\hyperlink{hello__world__model_8cc_ac78b3db8b592b472b8ea2ffd2b194737}{builtin\_data}});}
+\DoxyCodeLine{00414\ }
+\DoxyCodeLine{00415\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_a5101896aca4e535e53c237af518cd8ba}{ParseBitwiseXor}}(\textcolor{keyword}{const}\ Operator*\ op,\ ErrorReporter*\ error\_reporter,}
+\DoxyCodeLine{00416\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BuiltinDataAllocator*\ allocator,}
+\DoxyCodeLine{00417\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}**\ \mbox{\hyperlink{hello__world__model_8cc_ac78b3db8b592b472b8ea2ffd2b194737}{builtin\_data}});}
+\DoxyCodeLine{00418\ }
+\DoxyCodeLine{00419\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_abea9ce89d37635db60fdf2c4e45723ff}{ParseRightShift}}(\textcolor{keyword}{const}\ Operator*\ op,\ ErrorReporter*\ error\_reporter,}
+\DoxyCodeLine{00420\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BuiltinDataAllocator*\ allocator,}
+\DoxyCodeLine{00421\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}**\ \mbox{\hyperlink{hello__world__model_8cc_ac78b3db8b592b472b8ea2ffd2b194737}{builtin\_data}});}
+\DoxyCodeLine{00422\ }
+\DoxyCodeLine{00423\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_a611a92a71bc0615ac2c53e20addf503f}{ParseStablehloScatter}}(\textcolor{keyword}{const}\ Operator*\ op,}
+\DoxyCodeLine{00424\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ErrorReporter*\ error\_reporter,}
+\DoxyCodeLine{00425\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BuiltinDataAllocator*\ allocator,}
+\DoxyCodeLine{00426\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}**\ \mbox{\hyperlink{hello__world__model_8cc_ac78b3db8b592b472b8ea2ffd2b194737}{builtin\_data}});}
+\DoxyCodeLine{00427\ }
+\DoxyCodeLine{00428\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_a66b45feef0c1cfa16632b818dc33a516}{ParseStablehloRngBitGenerator}}(\textcolor{keyword}{const}\ Operator*\ op,}
+\DoxyCodeLine{00429\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ErrorReporter*\ error\_reporter,}
+\DoxyCodeLine{00430\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BuiltinDataAllocator*\ allocator,}
+\DoxyCodeLine{00431\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}**\ \mbox{\hyperlink{hello__world__model_8cc_ac78b3db8b592b472b8ea2ffd2b194737}{builtin\_data}});}
+\DoxyCodeLine{00432\ }
+\DoxyCodeLine{00433\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_a4ba7ac41d54afdb8c4b6f02116d99b66}{ParseStablehloGather}}(\textcolor{keyword}{const}\ Operator*\ op,}
+\DoxyCodeLine{00434\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ErrorReporter*\ error\_reporter,}
+\DoxyCodeLine{00435\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BuiltinDataAllocator*\ allocator,}
+\DoxyCodeLine{00436\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}**\ \mbox{\hyperlink{hello__world__model_8cc_ac78b3db8b592b472b8ea2ffd2b194737}{builtin\_data}});}
+\DoxyCodeLine{00437\ }
+\DoxyCodeLine{00438\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_a0fff170b3ca67e056fa5ecf0b73752e3}{ParseStablehloReduceWindow}}(\textcolor{keyword}{const}\ Operator*\ op,}
+\DoxyCodeLine{00439\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ErrorReporter*\ error\_reporter,}
+\DoxyCodeLine{00440\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BuiltinDataAllocator*\ allocator,}
+\DoxyCodeLine{00441\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}**\ \mbox{\hyperlink{hello__world__model_8cc_ac78b3db8b592b472b8ea2ffd2b194737}{builtin\_data}});}
+\DoxyCodeLine{00442\ }
+\DoxyCodeLine{00443\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcf7df9e575f8a1f1a49c58fb0f49428b8_acf79d2fb5fa520303014d1303f1f6361}{TfLiteStatus}}\ \mbox{\hyperlink{namespacetflite_a9822a81cf810d324150c129545c22ba5}{ParseStablehloPad}}(\textcolor{keyword}{const}\ Operator*\ op,}
+\DoxyCodeLine{00444\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ErrorReporter*\ error\_reporter,}
+\DoxyCodeLine{00445\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BuiltinDataAllocator*\ allocator,}
+\DoxyCodeLine{00446\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}**\ \mbox{\hyperlink{hello__world__model_8cc_ac78b3db8b592b472b8ea2ffd2b194737}{builtin\_data}});}
+\DoxyCodeLine{00447\ }
+\DoxyCodeLine{00448\ \}\ \ \textcolor{comment}{//\ namespace\ tflite}}
+\DoxyCodeLine{00449\ }
+\DoxyCodeLine{00450\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ TENSORFLOW\_LITE\_CORE\_API\_FLATBUFFER\_CONVERSIONS\_H\_}}
+
+\end{DoxyCode}

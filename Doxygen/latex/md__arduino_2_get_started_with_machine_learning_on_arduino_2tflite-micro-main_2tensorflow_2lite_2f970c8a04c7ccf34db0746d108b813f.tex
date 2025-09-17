@@ -1,0 +1,57 @@
+\chapter{online\+\_\+memory\+\_\+allocation\+\_\+overview}
+\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_2f970c8a04c7ccf34db0746d108b813f}{}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_2f970c8a04c7ccf34db0746d108b813f}\index{online\_memory\_allocation\_overview@{online\_memory\_allocation\_overview}}
+
+\begin{DoxyItemize}
+\item Online Memory Allocation Overview in Tensor\+Flow Lite Micro
+\begin{DoxyItemize}
+\item Arena
+\item Existing buffers in the flatbuffer
+\item Model Init Phase
+\item Model Prepare Phase
+\item Finish Model Allocation Phase
+\end{DoxyItemize}
+\end{DoxyItemize}\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_2f970c8a04c7ccf34db0746d108b813f_autotoc_md181}{}\doxysection{\texorpdfstring{Online Memory Allocation Overview in Tensor\+Flow Lite Micro}{Online Memory Allocation Overview in Tensor\+Flow Lite Micro}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_2f970c8a04c7ccf34db0746d108b813f_autotoc_md181}
+This document outlines how "{}online"{} memory is managed in Tensor\+Flow Lite Micro (TFLM).\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_2f970c8a04c7ccf34db0746d108b813f_autotoc_md182}{}\doxysubsection{\texorpdfstring{Arena}{Arena}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_2f970c8a04c7ccf34db0746d108b813f_autotoc_md182}
+Online memory planning strategically places allocations in a single {\ttfamily uint8\+\_\+t} buffer array. The buffer is split into two main sections\+: the “head” and the “tail”. Generally, non-\/persistent allocations are placed in the “head” and persistent allocations are placed in the “tail”. More details about the arena can be \href{memory_management.md\#tensor-arena}{\texttt{ found here}}.\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_2f970c8a04c7ccf34db0746d108b813f_autotoc_md183}{}\doxysubsection{\texorpdfstring{Existing buffers in the flatbuffer}{Existing buffers in the flatbuffer}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_2f970c8a04c7ccf34db0746d108b813f_autotoc_md183}
+The TFLite flatbuffer model contains a variety of information required to run a model in TFLite or TFLM. The TFLM online memory planner will walk the main subgraph and find all tensors required for the model (represented as {\ttfamily \doxylink{struct_tf_lite_tensor}{Tf\+Lite\+Tensor}} and {\ttfamily \doxylink{struct_tf_lite_eval_tensor}{Tf\+Lite\+Eval\+Tensor}} C structs at runtime). Persistent tensors in the flatbuffer (e.\+g. weight tensors) will point at a buffer inlined in the flatbuffer. These buffers are reused during online memory planning. The corresponding C structures will point back at the buffer packed into the flatbuffer.\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_2f970c8a04c7ccf34db0746d108b813f_autotoc_md184}{}\doxysubsection{\texorpdfstring{Model Init Phase}{Model Init Phase}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_2f970c8a04c7ccf34db0746d108b813f_autotoc_md184}
+Either through the first call of {\ttfamily Micro\+Interpreter\+::\+Invoke()} or an explicit call to {\ttfamily Micro\+Interpreter\+::\+Allocate\+Tensors()} the online model allocation will begin. The {\ttfamily Micro\+Interpreter} instance will invoke {\ttfamily Micro\+Allocator\+::\+Start\+Model\+Allocation()}. This function will begin pulling data out of the serialized flatbuffer and begin walking through the main subgraph.
+
+The method {\ttfamily Micro\+Allocator\+::\+Start\+Model\+Allocation()} begins allocation in the following order\+:
+\begin{DoxyItemize}
+\item Initializes internal state for scratch buffer allocations
+\item Allocates a list of {\ttfamily \doxylink{struct_tf_lite_eval_tensor}{Tf\+Lite\+Eval\+Tensor}} C structs based on the number of tensors in the subgraph.
+\item Allocations are persistent and stored in the tail section.
+\item Tensors that reference buffers in the flatbuffer are assigned at this point.
+\item Allocates a list of {\ttfamily \doxylink{struct_tf_lite_registration}{Tf\+Lite\+Registration}} and {\ttfamily \doxylink{struct_tf_lite_node}{Tf\+Lite\+Node}} C structs for every operator in the model subgraph
+\item Allocations are persistent and stored in the tail section.
+\item Walks back through the list of subgraph operators and assigns all C structs with relevant information from the flatbuffer.
+\end{DoxyItemize}
+
+At the conclusion of this phase, the operator kernel implementations are ready for calls to the {\ttfamily \doxylink{struct_tf_lite_registration_af9f2e4b18f45f23a6d41c1896389f337}{Tf\+Lite\+Registration\+::init()}} function. The {\ttfamily Micro\+Interpreter} walks through the operator list and invokes all operator implementations that have this function. Typically, operator implementations return the object to store in the {\ttfamily user\+\_\+data} field of a {\ttfamily \doxylink{struct_tf_lite_node}{Tf\+Lite\+Node}} struct.\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_2f970c8a04c7ccf34db0746d108b813f_autotoc_md185}{}\doxysubsection{\texorpdfstring{Model Prepare Phase}{Model Prepare Phase}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_2f970c8a04c7ccf34db0746d108b813f_autotoc_md185}
+After the interpreter has initialized all operator kernels, another pass through the subgraph is done. This time, each operator implementations that provides a {\ttfamily \doxylink{struct_tf_lite_registration_a6ecffde4e6466f86aa8f28d25de553d7}{Tf\+Lite\+Registration\+::prepare()}} function is called. This phase in TFLM is used for kernels to verify capabilities from model information, validate shapes, allocate any scratch buffers requested (through {\ttfamily \doxylink{struct_tf_lite_context_a79a5ae043ca55b703fe6f4cf8c571217}{Tf\+Lite\+Context\+::\+Get\+Scratch\+Buffer()}}), and calculate quantization runtime data.
+
+At this time, operator implementation will request tensor data through the {\ttfamily \doxylink{struct_tf_lite_tensor}{Tf\+Lite\+Tensor}} C struct. This struct is heavier and contains more information that operators will need during this phase of initialization. Internally, TFLM will allocate these instances per request in the temp section. The temp section is the space between the head and the tail in the arena. During the prepare phase, nothing is yet been placed in the head section. This extra space between the head and tail is used to allocate buffers that are available until {\ttfamily Micro\+Allocator\+::\+Reset\+Temp\+Allocations()} is called. Additional information \href{memory_management.md\#temporary-section}{\texttt{ available here}}.
+
+NOTE\+: The {\ttfamily \doxylink{struct_tf_lite_tensor}{Tf\+Lite\+Tensor}} struct is only available in TFLM during {\ttfamily \doxylink{struct_tf_lite_registration_a6ecffde4e6466f86aa8f28d25de553d7}{Tf\+Lite\+Registration\+::prepare()}}, after this allocation phase tensor data can only be accessed via a {\ttfamily \doxylink{struct_tf_lite_eval_tensor}{Tf\+Lite\+Eval\+Tensor}} struct.
+
+Additionally, at this time each operator implementation may request scratch buffer requests through {\ttfamily \doxylink{struct_tf_lite_context_a7a3778903dc181d98fe1f10a4f6e15c9}{Tf\+Lite\+Context\+::\+Request\+Scratch\+Buffer\+In\+Arena()}}. These requests are limited to {\ttfamily k\+Max\+Scratch\+Buffers\+Per\+Op} and are stored in an instance variable for each operator prepare block. All requests are eventually moved to the head section when the interpreter moves to the next operator.
+
+After each call to {\ttfamily \doxylink{struct_tf_lite_registration_a6ecffde4e6466f86aa8f28d25de553d7}{Tf\+Lite\+Registration\+::prepare()}} the {\ttfamily Micro\+Interpreter} calls {\ttfamily Micro\+Allocator\+::\+Finish\+Prepare\+Node\+Allocations()}. This method resets temp allocations and begins to store all scratch buffer requests inside the head section of the arena.
+
+After all operators have been prepared, the {\ttfamily Micro\+Interpreter} calls {\ttfamily Micro\+Allocator\+::\+Finish\+Model\+Allocation()} to begin finalizing the online memory plan.\hypertarget{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_2f970c8a04c7ccf34db0746d108b813f_autotoc_md186}{}\doxysubsection{\texorpdfstring{Finish Model Allocation Phase}{Finish Model Allocation Phase}}\label{md__arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-main_2tensorflow_2lite_2f970c8a04c7ccf34db0746d108b813f_autotoc_md186}
+The last phase of online memory planning is handled in {\ttfamily Micro\+Allocator\+::\+Finish\+Model\+Allocation()}. This function performs the following tasks
+
+
+\begin{DoxyItemize}
+\item Allocates space in the tail for all persistent buffer requests that are currently in the head.
+\item Commits Static Memory Plan
+\begin{DoxyItemize}
+\item Uses the {\ttfamily Greedy\+Memory\+Planner} to optimize the non-\/persistent space in the head.
+\item Optimizes for the operator that requires the largest byte-\/width buffer.
+\item Allocates pointers in the tail that provide pointers into shared space and offsets in the head.
+\item Sets the size of the head based on the result of {\ttfamily Greedy\+Memory\+Planner\+::\+Get\+Maxium\+Memory\+Size()}.
+\end{DoxyItemize}
+\item Allocates variable tensor buffers in the tail section.
+\end{DoxyItemize}
+
+Once TFLM has finalized online model allocation, all buffers are prepared and ready for optimal speed for inference. The system no longer enables operator implementations to allocate scratch buffers after this point. 

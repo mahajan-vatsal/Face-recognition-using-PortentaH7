@@ -1,0 +1,181 @@
+\doxysection{cumsum.\+h}
+\hypertarget{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcad15e160cba778aa788bbf63d5c54e29_source}{}\label{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcad15e160cba778aa788bbf63d5c54e29_source}\index{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/arduino-\/examples-\/main/src/tensorflow/lite/kernels/internal/reference/cumsum.h@{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/arduino-\/examples-\/main/src/tensorflow/lite/kernels/internal/reference/cumsum.h}}
+\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcad15e160cba778aa788bbf63d5c54e29}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{/*\ Copyright\ 2021\ The\ TensorFlow\ Authors.\ All\ Rights\ Reserved.}}
+\DoxyCodeLine{00002\ \textcolor{comment}{}}
+\DoxyCodeLine{00003\ \textcolor{comment}{Licensed\ under\ the\ Apache\ License,\ Version\ 2.0\ (the\ "{}License"{});}}
+\DoxyCodeLine{00004\ \textcolor{comment}{you\ may\ not\ use\ this\ file\ except\ in\ compliance\ with\ the\ License.}}
+\DoxyCodeLine{00005\ \textcolor{comment}{You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{00006\ \textcolor{comment}{}}
+\DoxyCodeLine{00007\ \textcolor{comment}{\ \ \ \ http://www.apache.org/licenses/LICENSE-\/2.0}}
+\DoxyCodeLine{00008\ \textcolor{comment}{}}
+\DoxyCodeLine{00009\ \textcolor{comment}{Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ software}}
+\DoxyCodeLine{00010\ \textcolor{comment}{distributed\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,}}
+\DoxyCodeLine{00011\ \textcolor{comment}{WITHOUT\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,\ either\ express\ or\ implied.}}
+\DoxyCodeLine{00012\ \textcolor{comment}{See\ the\ License\ for\ the\ specific\ language\ governing\ permissions\ and}}
+\DoxyCodeLine{00013\ \textcolor{comment}{limitations\ under\ the\ License.}}
+\DoxyCodeLine{00014\ \textcolor{comment}{==============================================================================*/}}
+\DoxyCodeLine{00015\ \textcolor{preprocessor}{\#ifndef\ TENSORFLOW\_LITE\_KERNELS\_INTERNAL\_REFERENCE\_CUMSUM\_H\_}}
+\DoxyCodeLine{00016\ \textcolor{preprocessor}{\#define\ TENSORFLOW\_LITE\_KERNELS\_INTERNAL\_REFERENCE\_CUMSUM\_H\_}}
+\DoxyCodeLine{00017\ }
+\DoxyCodeLine{00018\ \textcolor{preprocessor}{\#include\ <algorithm>}}
+\DoxyCodeLine{00019\ \textcolor{preprocessor}{\#include\ <cstdint>}}
+\DoxyCodeLine{00020\ \textcolor{preprocessor}{\#include\ <limits>}}
+\DoxyCodeLine{00021\ }
+\DoxyCodeLine{00022\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/kernels/internal/common.h"{}}}
+\DoxyCodeLine{00023\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/kernels/internal/compatibility.h"{}}}
+\DoxyCodeLine{00024\ }
+\DoxyCodeLine{00025\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacetflite}{tflite}}\ \{}
+\DoxyCodeLine{00026\ \textcolor{keyword}{namespace\ }reference\_ops\ \{}
+\DoxyCodeLine{00027\ }
+\DoxyCodeLine{00028\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{00029\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1reference__ops_a764975cb94e9092d7656732308b67ac7}{CumSum}}(\textcolor{keyword}{const}\ T*\ \mbox{\hyperlink{add__n__test_8cc_a5612ba79d1f0b544c7aeae4621166fea}{input\_data}},\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classtflite_1_1_runtime_shape}{RuntimeShape}}\&\ shape,\ int32\_t\ \mbox{\hyperlink{cumsum__test_8cc_a195d3f5576f1c8b039cff255b07a3aee}{axis}},}
+\DoxyCodeLine{00030\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{cumsum__test_8cc_a123ab21256237bd7a895a114add1c78c}{exclusive}},\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{cumsum__test_8cc_a455cbdac659b075dec33e2da705aaa20}{reverse}},\ T*\ \mbox{\hyperlink{add__n__test_8cc_a3305b43869c4b837b0a33c12cff5069b}{output\_data}})\ \{}
+\DoxyCodeLine{00031\ \ \ \textcolor{keyword}{const}\ int32\_t\ rank\ =\ shape.\mbox{\hyperlink{classtflite_1_1_runtime_shape_a9de8e21fa79a2a74e69578f0240f4ebe}{DimensionsCount}}();}
+\DoxyCodeLine{00032\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src82599f02174ce2f1c2fd003f3eee8b73_ae45cce3e44eefbb5a09cea1b3baba0e3}{TFLITE\_DCHECK\_GE}}(rank,\ 1);}
+\DoxyCodeLine{00033\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src82599f02174ce2f1c2fd003f3eee8b73_ae45cce3e44eefbb5a09cea1b3baba0e3}{TFLITE\_DCHECK\_GE}}(\mbox{\hyperlink{cumsum__test_8cc_a195d3f5576f1c8b039cff255b07a3aee}{axis}},\ 0);}
+\DoxyCodeLine{00034\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src82599f02174ce2f1c2fd003f3eee8b73_a8d050e4dccce9da457a5aaa90add5c09}{TFLITE\_DCHECK\_LT}}(\mbox{\hyperlink{cumsum__test_8cc_a195d3f5576f1c8b039cff255b07a3aee}{axis}},\ rank);}
+\DoxyCodeLine{00035\ }
+\DoxyCodeLine{00036\ \ \ \textcolor{keywordtype}{size\_t}\ inner\ =\ 1;}
+\DoxyCodeLine{00037\ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{tinyekf__custom_8h_a20c450a62f5edf272452bf8abc579ae0}{outer}}\ =\ 1;}
+\DoxyCodeLine{00038\ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src22d562cad0a0e140a9fafc1c6a662e94_a820c167ceaaa9759b0ca2695d22db55c}{depth}}\ =\ 1;}
+\DoxyCodeLine{00039\ \ \ \textcolor{keywordflow}{for}\ (int32\_t\ i\ =\ 0;\ i\ <\ rank;\ i++)\ \{}
+\DoxyCodeLine{00040\ \ \ \ \ \textcolor{keywordflow}{if}\ (i\ <\ \mbox{\hyperlink{cumsum__test_8cc_a195d3f5576f1c8b039cff255b07a3aee}{axis}})}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ inner\ *=\ shape.\mbox{\hyperlink{classtflite_1_1_runtime_shape_a2039ed030a02c05b73a0ea723339a808}{Dims}}(i);}
+\DoxyCodeLine{00042\ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (i\ >\ \mbox{\hyperlink{cumsum__test_8cc_a195d3f5576f1c8b039cff255b07a3aee}{axis}})}
+\DoxyCodeLine{00043\ \ \ \ \ \ \ \mbox{\hyperlink{tinyekf__custom_8h_a20c450a62f5edf272452bf8abc579ae0}{outer}}\ *=\ shape.\mbox{\hyperlink{classtflite_1_1_runtime_shape_a2039ed030a02c05b73a0ea723339a808}{Dims}}(i);}
+\DoxyCodeLine{00044\ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src22d562cad0a0e140a9fafc1c6a662e94_a820c167ceaaa9759b0ca2695d22db55c}{depth}}\ =\ shape.\mbox{\hyperlink{classtflite_1_1_runtime_shape_a2039ed030a02c05b73a0ea723339a808}{Dims}}(i);}
+\DoxyCodeLine{00046\ \ \ \}}
+\DoxyCodeLine{00047\ }
+\DoxyCodeLine{00048\ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ outer\_index\ =\ 0;\ outer\_index\ <\ \mbox{\hyperlink{tinyekf__custom_8h_a20c450a62f5edf272452bf8abc579ae0}{outer}};\ outer\_index++)\ \{}
+\DoxyCodeLine{00049\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ outer\_index\_adj;}
+\DoxyCodeLine{00050\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{cumsum__test_8cc_a455cbdac659b075dec33e2da705aaa20}{reverse}})}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ outer\_index\_adj\ =\ (\mbox{\hyperlink{tinyekf__custom_8h_a20c450a62f5edf272452bf8abc579ae0}{outer}}\ -\/\ 1)\ -\/\ outer\_index;}
+\DoxyCodeLine{00052\ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ outer\_index\_adj\ =\ outer\_index;}
+\DoxyCodeLine{00054\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ inner\_index\ =\ 0;\ inner\_index\ <\ inner;\ inner\_index++)\ \{}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ T\ accumulator\ =\ 0;}
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ inner\_index\_adj;}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{cumsum__test_8cc_a455cbdac659b075dec33e2da705aaa20}{reverse}})}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \ \ inner\_index\_adj\ =\ (inner\ -\/\ 1)\ -\/\ inner\_index;}
+\DoxyCodeLine{00059\ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \ \ inner\_index\_adj\ =\ inner\_index;}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ depth\_index\ =\ 0;\ depth\_index\ <\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src22d562cad0a0e140a9fafc1c6a662e94_a820c167ceaaa9759b0ca2695d22db55c}{depth}};\ depth\_index++)\ \{}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ depth\_index\_adj;}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{cumsum__test_8cc_a455cbdac659b075dec33e2da705aaa20}{reverse}})}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \ \ \ \ depth\_index\_adj\ =\ (\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src22d562cad0a0e140a9fafc1c6a662e94_a820c167ceaaa9759b0ca2695d22db55c}{depth}}\ -\/\ 1)\ -\/\ depth\_index;}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ \ \ depth\_index\_adj\ =\ depth\_index;}
+\DoxyCodeLine{00067\ }
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ index\ =\ outer\_index\_adj;}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ index\ +=\ inner\_index\_adj\ *\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src22d562cad0a0e140a9fafc1c6a662e94_a820c167ceaaa9759b0ca2695d22db55c}{depth}}\ *\ \mbox{\hyperlink{tinyekf__custom_8h_a20c450a62f5edf272452bf8abc579ae0}{outer}};}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \ \ index\ +=\ depth\_index\_adj\ *\ \mbox{\hyperlink{tinyekf__custom_8h_a20c450a62f5edf272452bf8abc579ae0}{outer}};}
+\DoxyCodeLine{00071\ }
+\DoxyCodeLine{00072\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{cumsum__test_8cc_a123ab21256237bd7a895a114add1c78c}{exclusive}})\ \{}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{add__n__test_8cc_a3305b43869c4b837b0a33c12cff5069b}{output\_data}}[index]\ =\ accumulator;}
+\DoxyCodeLine{00074\ \ \ \ \ \ \ \ \ \ \ accumulator\ +=\ \mbox{\hyperlink{add__n__test_8cc_a5612ba79d1f0b544c7aeae4621166fea}{input\_data}}[index];}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ \ \ accumulator\ +=\ \mbox{\hyperlink{add__n__test_8cc_a5612ba79d1f0b544c7aeae4621166fea}{input\_data}}[index];}
+\DoxyCodeLine{00077\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{add__n__test_8cc_a3305b43869c4b837b0a33c12cff5069b}{output\_data}}[index]\ =\ accumulator;}
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00079\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00080\ \ \ \ \ \}}
+\DoxyCodeLine{00081\ \ \ \}}
+\DoxyCodeLine{00082\ \}}
+\DoxyCodeLine{00083\ }
+\DoxyCodeLine{00084\ \textcolor{comment}{//}}
+\DoxyCodeLine{00085\ \textcolor{comment}{//\ Quantized\ INT8\ CUMSUM}}
+\DoxyCodeLine{00086\ \textcolor{comment}{//}}
+\DoxyCodeLine{00087\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_1_1reference__ops_a764975cb94e9092d7656732308b67ac7}{CumSum}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structtflite_1_1_arithmetic_params}{ArithmeticParams}}\&\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src4cbee0bfdfed30e8771023cedb1bab0d_a434686eb00eea897154eb5c3f9364ef7}{params}},\ \textcolor{keyword}{const}\ int8\_t*\ \mbox{\hyperlink{add__n__test_8cc_a5612ba79d1f0b544c7aeae4621166fea}{input\_data}},}
+\DoxyCodeLine{00088\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classtflite_1_1_runtime_shape}{RuntimeShape}}\&\ shape,\ int32\_t\ \mbox{\hyperlink{cumsum__test_8cc_a195d3f5576f1c8b039cff255b07a3aee}{axis}},\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{cumsum__test_8cc_a123ab21256237bd7a895a114add1c78c}{exclusive}},}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{cumsum__test_8cc_a455cbdac659b075dec33e2da705aaa20}{reverse}},\ int8\_t*\ \mbox{\hyperlink{add__n__test_8cc_a3305b43869c4b837b0a33c12cff5069b}{output\_data}})\ \{}
+\DoxyCodeLine{00090\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src82599f02174ce2f1c2fd003f3eee8b73_a153a4c7bc866139ad88ebf7cb7f4c400}{TFLITE\_DCHECK\_LE}}(\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src4cbee0bfdfed30e8771023cedb1bab0d_a434686eb00eea897154eb5c3f9364ef7}{params}}.quantized\_activation\_min,}
+\DoxyCodeLine{00091\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src4cbee0bfdfed30e8771023cedb1bab0d_a434686eb00eea897154eb5c3f9364ef7}{params}}.quantized\_activation\_max);}
+\DoxyCodeLine{00092\ \ \ \textcolor{comment}{//\ Input\ offset\ is\ negative\ input\ zero\ point.\ Activation\ tensors\ are}}
+\DoxyCodeLine{00093\ \ \ \textcolor{comment}{//\ asymmetric\ quantized\ so\ they\ span\ the\ full\ int8\ range.}}
+\DoxyCodeLine{00094\ \ \ \textcolor{comment}{//\ All\ inputs\ should\ have\ same\ zero-\/point\ and\ scale,\ this\ is\ checked\ during}}
+\DoxyCodeLine{00095\ \ \ \textcolor{comment}{//\ Prepare\ stage.}}
+\DoxyCodeLine{00096\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src82599f02174ce2f1c2fd003f3eee8b73_ae45cce3e44eefbb5a09cea1b3baba0e3}{TFLITE\_DCHECK\_GE}}(-\/\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src4cbee0bfdfed30e8771023cedb1bab0d_a434686eb00eea897154eb5c3f9364ef7}{params}}.input1\_offset,\ std::numeric\_limits<int8\_t>::min());}
+\DoxyCodeLine{00097\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src82599f02174ce2f1c2fd003f3eee8b73_a153a4c7bc866139ad88ebf7cb7f4c400}{TFLITE\_DCHECK\_LE}}(-\/\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src4cbee0bfdfed30e8771023cedb1bab0d_a434686eb00eea897154eb5c3f9364ef7}{params}}.input1\_offset,\ std::numeric\_limits<int8\_t>::max());}
+\DoxyCodeLine{00098\ }
+\DoxyCodeLine{00099\ \ \ \textcolor{keyword}{const}\ int32\_t\ rank\ =\ shape.\mbox{\hyperlink{classtflite_1_1_runtime_shape_a9de8e21fa79a2a74e69578f0240f4ebe}{DimensionsCount}}();}
+\DoxyCodeLine{00100\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src82599f02174ce2f1c2fd003f3eee8b73_ae45cce3e44eefbb5a09cea1b3baba0e3}{TFLITE\_DCHECK\_GE}}(rank,\ 1);}
+\DoxyCodeLine{00101\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src82599f02174ce2f1c2fd003f3eee8b73_ae45cce3e44eefbb5a09cea1b3baba0e3}{TFLITE\_DCHECK\_GE}}(\mbox{\hyperlink{cumsum__test_8cc_a195d3f5576f1c8b039cff255b07a3aee}{axis}},\ 0);}
+\DoxyCodeLine{00102\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src82599f02174ce2f1c2fd003f3eee8b73_a8d050e4dccce9da457a5aaa90add5c09}{TFLITE\_DCHECK\_LT}}(\mbox{\hyperlink{cumsum__test_8cc_a195d3f5576f1c8b039cff255b07a3aee}{axis}},\ rank);}
+\DoxyCodeLine{00103\ }
+\DoxyCodeLine{00104\ \ \ \textcolor{keywordtype}{size\_t}\ inner\ =\ 1;}
+\DoxyCodeLine{00105\ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{tinyekf__custom_8h_a20c450a62f5edf272452bf8abc579ae0}{outer}}\ =\ 1;}
+\DoxyCodeLine{00106\ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src22d562cad0a0e140a9fafc1c6a662e94_a820c167ceaaa9759b0ca2695d22db55c}{depth}}\ =\ 1;}
+\DoxyCodeLine{00107\ \ \ \textcolor{keywordflow}{for}\ (int32\_t\ i\ =\ 0;\ i\ <\ rank;\ i++)\ \{}
+\DoxyCodeLine{00108\ \ \ \ \ \textcolor{keywordflow}{if}\ (i\ <\ \mbox{\hyperlink{cumsum__test_8cc_a195d3f5576f1c8b039cff255b07a3aee}{axis}})}
+\DoxyCodeLine{00109\ \ \ \ \ \ \ inner\ *=\ shape.\mbox{\hyperlink{classtflite_1_1_runtime_shape_a2039ed030a02c05b73a0ea723339a808}{Dims}}(i);}
+\DoxyCodeLine{00110\ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (i\ >\ \mbox{\hyperlink{cumsum__test_8cc_a195d3f5576f1c8b039cff255b07a3aee}{axis}})}
+\DoxyCodeLine{00111\ \ \ \ \ \ \ \mbox{\hyperlink{tinyekf__custom_8h_a20c450a62f5edf272452bf8abc579ae0}{outer}}\ *=\ shape.\mbox{\hyperlink{classtflite_1_1_runtime_shape_a2039ed030a02c05b73a0ea723339a808}{Dims}}(i);}
+\DoxyCodeLine{00112\ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00113\ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src22d562cad0a0e140a9fafc1c6a662e94_a820c167ceaaa9759b0ca2695d22db55c}{depth}}\ =\ shape.\mbox{\hyperlink{classtflite_1_1_runtime_shape_a2039ed030a02c05b73a0ea723339a808}{Dims}}(i);}
+\DoxyCodeLine{00114\ \ \ \}}
+\DoxyCodeLine{00115\ }
+\DoxyCodeLine{00116\ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ outer\_index\ =\ 0;\ outer\_index\ <\ \mbox{\hyperlink{tinyekf__custom_8h_a20c450a62f5edf272452bf8abc579ae0}{outer}};\ outer\_index++)\ \{}
+\DoxyCodeLine{00117\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ outer\_index\_adj;}
+\DoxyCodeLine{00118\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{cumsum__test_8cc_a455cbdac659b075dec33e2da705aaa20}{reverse}})}
+\DoxyCodeLine{00119\ \ \ \ \ \ \ outer\_index\_adj\ =\ (\mbox{\hyperlink{tinyekf__custom_8h_a20c450a62f5edf272452bf8abc579ae0}{outer}}\ -\/\ 1)\ -\/\ outer\_index;}
+\DoxyCodeLine{00120\ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00121\ \ \ \ \ \ \ outer\_index\_adj\ =\ outer\_index;}
+\DoxyCodeLine{00122\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ inner\_index\ =\ 0;\ inner\_index\ <\ inner;\ inner\_index++)\ \{}
+\DoxyCodeLine{00123\ \ \ \ \ \ \ int32\_t\ accumulator\ =\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src4cbee0bfdfed30e8771023cedb1bab0d_a434686eb00eea897154eb5c3f9364ef7}{params}}.input1\_offset;\ \ \textcolor{comment}{//\ accumulator\ =\ 0}}
+\DoxyCodeLine{00124\ \ \ \ \ \ \ accumulator\ *=\ (1\ <<\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src4cbee0bfdfed30e8771023cedb1bab0d_a434686eb00eea897154eb5c3f9364ef7}{params}}.left\_shift);}
+\DoxyCodeLine{00125\ \ \ \ \ \ \ accumulator\ =\ \mbox{\hyperlink{namespacetflite_a871ed2eb866b2abcfa5d3ea59f8115cc}{MultiplyByQuantizedMultiplierSmallerThanOneExp}}(}
+\DoxyCodeLine{00126\ \ \ \ \ \ \ \ \ \ \ accumulator,\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src4cbee0bfdfed30e8771023cedb1bab0d_a434686eb00eea897154eb5c3f9364ef7}{params}}.input1\_multiplier,\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src4cbee0bfdfed30e8771023cedb1bab0d_a434686eb00eea897154eb5c3f9364ef7}{params}}.input1\_shift);}
+\DoxyCodeLine{00127\ }
+\DoxyCodeLine{00128\ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ inner\_index\_adj;}
+\DoxyCodeLine{00129\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{cumsum__test_8cc_a455cbdac659b075dec33e2da705aaa20}{reverse}})}
+\DoxyCodeLine{00130\ \ \ \ \ \ \ \ \ inner\_index\_adj\ =\ (inner\ -\/\ 1)\ -\/\ inner\_index;}
+\DoxyCodeLine{00131\ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00132\ \ \ \ \ \ \ \ \ inner\_index\_adj\ =\ inner\_index;}
+\DoxyCodeLine{00133\ }
+\DoxyCodeLine{00134\ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ depth\_index\ =\ 0;\ depth\_index\ <\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src22d562cad0a0e140a9fafc1c6a662e94_a820c167ceaaa9759b0ca2695d22db55c}{depth}};\ depth\_index++)\ \{}
+\DoxyCodeLine{00135\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ depth\_index\_adj;}
+\DoxyCodeLine{00136\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{cumsum__test_8cc_a455cbdac659b075dec33e2da705aaa20}{reverse}})}
+\DoxyCodeLine{00137\ \ \ \ \ \ \ \ \ \ \ depth\_index\_adj\ =\ (\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src22d562cad0a0e140a9fafc1c6a662e94_a820c167ceaaa9759b0ca2695d22db55c}{depth}}\ -\/\ 1)\ -\/\ depth\_index;}
+\DoxyCodeLine{00138\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00139\ \ \ \ \ \ \ \ \ \ \ depth\_index\_adj\ =\ depth\_index;}
+\DoxyCodeLine{00140\ }
+\DoxyCodeLine{00141\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ index\ =\ outer\_index\_adj;}
+\DoxyCodeLine{00142\ \ \ \ \ \ \ \ \ index\ +=\ inner\_index\_adj\ *\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src22d562cad0a0e140a9fafc1c6a662e94_a820c167ceaaa9759b0ca2695d22db55c}{depth}}\ *\ \mbox{\hyperlink{tinyekf__custom_8h_a20c450a62f5edf272452bf8abc579ae0}{outer}};}
+\DoxyCodeLine{00143\ \ \ \ \ \ \ \ \ index\ +=\ depth\_index\_adj\ *\ \mbox{\hyperlink{tinyekf__custom_8h_a20c450a62f5edf272452bf8abc579ae0}{outer}};}
+\DoxyCodeLine{00144\ }
+\DoxyCodeLine{00145\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ int32\_t\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_aa4f0d3eebc3c443f9be81bf48561a217}{y}}\ =\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src4cbee0bfdfed30e8771023cedb1bab0d_a434686eb00eea897154eb5c3f9364ef7}{params}}.input1\_offset\ +\ \mbox{\hyperlink{add__n__test_8cc_a5612ba79d1f0b544c7aeae4621166fea}{input\_data}}[index];}
+\DoxyCodeLine{00146\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ int32\_t\ shifted\_y\ =\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbb3c8e6cb6b1b9e60f2136ee8b58a8b6_aa4f0d3eebc3c443f9be81bf48561a217}{y}}\ *\ (1\ <<\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src4cbee0bfdfed30e8771023cedb1bab0d_a434686eb00eea897154eb5c3f9364ef7}{params}}.left\_shift);}
+\DoxyCodeLine{00147\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ int32\_t\ scaled\_y\ =\ \mbox{\hyperlink{namespacetflite_a871ed2eb866b2abcfa5d3ea59f8115cc}{MultiplyByQuantizedMultiplierSmallerThanOneExp}}(}
+\DoxyCodeLine{00148\ \ \ \ \ \ \ \ \ \ \ \ \ shifted\_y,\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src4cbee0bfdfed30e8771023cedb1bab0d_a434686eb00eea897154eb5c3f9364ef7}{params}}.input1\_multiplier,\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src4cbee0bfdfed30e8771023cedb1bab0d_a434686eb00eea897154eb5c3f9364ef7}{params}}.input1\_shift);}
+\DoxyCodeLine{00149\ }
+\DoxyCodeLine{00150\ \ \ \ \ \ \ \ \ int32\_t\ scaled\_output;}
+\DoxyCodeLine{00151\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{cumsum__test_8cc_a123ab21256237bd7a895a114add1c78c}{exclusive}})\ \{}
+\DoxyCodeLine{00152\ \ \ \ \ \ \ \ \ \ \ scaled\_output\ =\ accumulator;}
+\DoxyCodeLine{00153\ \ \ \ \ \ \ \ \ \ \ accumulator\ +=\ scaled\_y;}
+\DoxyCodeLine{00154\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00155\ \ \ \ \ \ \ \ \ \ \ accumulator\ +=\ scaled\_y;}
+\DoxyCodeLine{00156\ \ \ \ \ \ \ \ \ \ \ scaled\_output\ =\ accumulator;}
+\DoxyCodeLine{00157\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00158\ }
+\DoxyCodeLine{00159\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ int32\_t\ raw\_output\ =}
+\DoxyCodeLine{00160\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_a871ed2eb866b2abcfa5d3ea59f8115cc}{MultiplyByQuantizedMultiplierSmallerThanOneExp}}(}
+\DoxyCodeLine{00161\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ scaled\_output,\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src4cbee0bfdfed30e8771023cedb1bab0d_a434686eb00eea897154eb5c3f9364ef7}{params}}.output\_multiplier,\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src4cbee0bfdfed30e8771023cedb1bab0d_a434686eb00eea897154eb5c3f9364ef7}{params}}.output\_shift)\ +}
+\DoxyCodeLine{00162\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src4cbee0bfdfed30e8771023cedb1bab0d_a434686eb00eea897154eb5c3f9364ef7}{params}}.output\_offset;}
+\DoxyCodeLine{00163\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ int32\_t\ clamped\_output\ =}
+\DoxyCodeLine{00164\ \ \ \ \ \ \ \ \ \ \ \ \ std::min(\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src4cbee0bfdfed30e8771023cedb1bab0d_a434686eb00eea897154eb5c3f9364ef7}{params}}.quantized\_activation\_max,}
+\DoxyCodeLine{00165\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::max(\mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src4cbee0bfdfed30e8771023cedb1bab0d_a434686eb00eea897154eb5c3f9364ef7}{params}}.quantized\_activation\_min,\ raw\_output));}
+\DoxyCodeLine{00166\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{add__n__test_8cc_a3305b43869c4b837b0a33c12cff5069b}{output\_data}}[index]\ =\ \textcolor{keyword}{static\_cast<}int8\_t\textcolor{keyword}{>}(clamped\_output);}
+\DoxyCodeLine{00167\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00168\ \ \ \ \ \}}
+\DoxyCodeLine{00169\ \ \ \}}
+\DoxyCodeLine{00170\ \}}
+\DoxyCodeLine{00171\ }
+\DoxyCodeLine{00172\ \}\ \ \textcolor{comment}{//\ namespace\ reference\_ops}}
+\DoxyCodeLine{00173\ \}\ \ \textcolor{comment}{//\ namespace\ tflite}}
+\DoxyCodeLine{00174\ }
+\DoxyCodeLine{00175\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ TENSORFLOW\_LITE\_KERNELS\_INTERNAL\_REFERENCE\_CUMSUM\_H\_}}
+
+\end{DoxyCode}

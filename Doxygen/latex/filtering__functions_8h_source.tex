@@ -1,0 +1,1502 @@
+\doxysection{filtering\+\_\+functions.\+h}
+\hypertarget{filtering__functions_8h_source}{}\label{filtering__functions_8h_source}\index{Face\_Access\_inferencing/src/edge-\/impulse-\/sdk/CMSIS/DSP/Include/dsp/filtering\_functions.h@{Face\_Access\_inferencing/src/edge-\/impulse-\/sdk/CMSIS/DSP/Include/dsp/filtering\_functions.h}}
+\mbox{\hyperlink{filtering__functions_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{/******************************************************************************}}
+\DoxyCodeLine{00002\ \textcolor{comment}{\ *\ @file\ \ \ \ \ filtering\_functions.h}}
+\DoxyCodeLine{00003\ \textcolor{comment}{\ *\ @brief\ \ \ \ Public\ header\ file\ for\ CMSIS\ DSP\ Library}}
+\DoxyCodeLine{00004\ \textcolor{comment}{\ *\ @version\ \ V1.10.0}}
+\DoxyCodeLine{00005\ \textcolor{comment}{\ *\ @date\ \ \ \ \ 08\ July\ 2021}}
+\DoxyCodeLine{00006\ \textcolor{comment}{\ *\ Target\ Processor:\ Cortex-\/M\ and\ Cortex-\/A\ cores}}
+\DoxyCodeLine{00007\ \textcolor{comment}{\ ******************************************************************************/}}
+\DoxyCodeLine{00008\ \textcolor{comment}{/*}}
+\DoxyCodeLine{00009\ \textcolor{comment}{\ *\ Copyright\ (c)\ 2010-\/2020\ Arm\ Limited\ or\ its\ affiliates.\ All\ rights\ reserved.}}
+\DoxyCodeLine{00010\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00011\ \textcolor{comment}{\ *\ SPDX-\/License-\/Identifier:\ Apache-\/2.0}}
+\DoxyCodeLine{00012\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00013\ \textcolor{comment}{\ *\ Licensed\ under\ the\ Apache\ License,\ Version\ 2.0\ (the\ License);\ you\ may}}
+\DoxyCodeLine{00014\ \textcolor{comment}{\ *\ not\ use\ this\ file\ except\ in\ compliance\ with\ the\ License.}}
+\DoxyCodeLine{00015\ \textcolor{comment}{\ *\ You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{00016\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00017\ \textcolor{comment}{\ *\ www.apache.org/licenses/LICENSE-\/2.0}}
+\DoxyCodeLine{00018\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00019\ \textcolor{comment}{\ *\ Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ software}}
+\DoxyCodeLine{00020\ \textcolor{comment}{\ *\ distributed\ under\ the\ License\ is\ distributed\ on\ an\ AS\ IS\ BASIS,\ WITHOUT}}
+\DoxyCodeLine{00021\ \textcolor{comment}{\ *\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,\ either\ express\ or\ implied.}}
+\DoxyCodeLine{00022\ \textcolor{comment}{\ *\ See\ the\ License\ for\ the\ specific\ language\ governing\ permissions\ and}}
+\DoxyCodeLine{00023\ \textcolor{comment}{\ *\ limitations\ under\ the\ License.}}
+\DoxyCodeLine{00024\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{00025\ }
+\DoxyCodeLine{00026\ \ }
+\DoxyCodeLine{00027\ \textcolor{preprocessor}{\#ifndef\ \_FILTERING\_FUNCTIONS\_H\_}}
+\DoxyCodeLine{00028\ \textcolor{preprocessor}{\#define\ \_FILTERING\_FUNCTIONS\_H\_}}
+\DoxyCodeLine{00029\ }
+\DoxyCodeLine{00030\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{arm__math__types_8h}{edge-\/impulse-\/sdk/CMSIS/DSP/Include/arm\_math\_types.h}}"{}}}
+\DoxyCodeLine{00031\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{arm__math__memory_8h}{edge-\/impulse-\/sdk/CMSIS/DSP/Include/arm\_math\_memory.h}}"{}}}
+\DoxyCodeLine{00032\ }
+\DoxyCodeLine{00033\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{none_8h}{edge-\/impulse-\/sdk/CMSIS/DSP/Include/dsp/none.h}}"{}}}
+\DoxyCodeLine{00034\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{utils_8h}{edge-\/impulse-\/sdk/CMSIS/DSP/Include/dsp/utils.h}}"{}}}
+\DoxyCodeLine{00035\ }
+\DoxyCodeLine{00036\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{support__functions_8h}{edge-\/impulse-\/sdk/CMSIS/DSP/Include/dsp/support\_functions.h}}"{}}}
+\DoxyCodeLine{00037\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{fast__math__functions_8h}{edge-\/impulse-\/sdk/CMSIS/DSP/Include/dsp/fast\_math\_functions.h}}"{}}}
+\DoxyCodeLine{00038\ }
+\DoxyCodeLine{00039\ \textcolor{preprocessor}{\#ifdef\ \ \ \_\_cplusplus}}
+\DoxyCodeLine{00040\ \textcolor{keyword}{extern}\ \textcolor{stringliteral}{"{}C"{}}}
+\DoxyCodeLine{00041\ \{}
+\DoxyCodeLine{00042\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00043\ }
+\DoxyCodeLine{00044\ }
+\DoxyCodeLine{00045\ }
+\DoxyCodeLine{00046\ \textcolor{preprocessor}{\#define\ DELTA\_Q31\ \ \ \ \ \ \ \ \ \ ((q31\_t)(0x100))}}
+\DoxyCodeLine{00047\ \textcolor{preprocessor}{\#define\ DELTA\_Q15\ \ \ \ \ \ \ \ \ \ ((q15\_t)0x5)}}
+\DoxyCodeLine{00048\ }
+\DoxyCodeLine{00056\ \ \ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct}}
+\DoxyCodeLine{00057\ \ \ \{}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \ \ \ \ uint16\_t\ \mbox{\hyperlink{structarm__fir__instance__q7_a9b50840e2c5ef5b17e1a584fb4cf0d06}{numTaps}};\ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00059\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ae541b6f232c305361e9b416fc9eed263}{q7\_t}}\ *\mbox{\hyperlink{structarm__fir__instance__q7_aaddea3b9c7e16ddfd9428b7bf9f9c200}{pState}};\ \ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00060\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ae541b6f232c305361e9b416fc9eed263}{q7\_t}}\ *\mbox{\hyperlink{structarm__fir__instance__q7_a6947bd695db2d5f8e198e68ca0c72026}{pCoeffs}};\ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00061\ \ \ \}\ \mbox{\hyperlink{structarm__fir__instance__q7}{arm\_fir\_instance\_q7}};}
+\DoxyCodeLine{00062\ }
+\DoxyCodeLine{00066\ \ \ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct}}
+\DoxyCodeLine{00067\ \ \ \{}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ \ \ uint16\_t\ \mbox{\hyperlink{structarm__fir__instance__q15_a0e46f93cf51bfb18b1be808be9c5bfc9}{numTaps}};\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\mbox{\hyperlink{structarm__fir__instance__q15_aa8d25f44f45b6a6c4cf38c31569b8a01}{pState}};\ \ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00070\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\mbox{\hyperlink{structarm__fir__instance__q15_ac7f6e5f1b0be8d07c4c35b4be07157b0}{pCoeffs}};\ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00071\ \ \ \}\ \mbox{\hyperlink{structarm__fir__instance__q15}{arm\_fir\_instance\_q15}};}
+\DoxyCodeLine{00072\ }
+\DoxyCodeLine{00076\ \ \ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct}}
+\DoxyCodeLine{00077\ \ \ \{}
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \ \ \ \ uint16\_t\ \mbox{\hyperlink{structarm__fir__instance__q31_a918fadd775b7a0482b21bf34dae2f094}{numTaps}};\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00079\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_adc89a3547f5324b7b3b95adec3806bc0}{q31\_t}}\ *\mbox{\hyperlink{structarm__fir__instance__q31_a409f39c93b744784648bdc365541444d}{pState}};\ \ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00080\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_adc89a3547f5324b7b3b95adec3806bc0}{q31\_t}}\ *\mbox{\hyperlink{structarm__fir__instance__q31_ae8bb1e9787be4578a23671bf53d3b7cb}{pCoeffs}};\ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00081\ \ \ \}\ \mbox{\hyperlink{structarm__fir__instance__q31}{arm\_fir\_instance\_q31}};}
+\DoxyCodeLine{00082\ }
+\DoxyCodeLine{00086\ \ \ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct}}
+\DoxyCodeLine{00087\ \ \ \{}
+\DoxyCodeLine{00088\ \ \ \ \ \ \ \ \ \ \ uint16\_t\ \mbox{\hyperlink{structarm__fir__instance__f32_a20cf98c92b5323799b7881c9ff4d2f7c}{numTaps}};\ \ \ \ \ }
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{arm__math__types_8h_a4611b605e45ab401f02cab15c5e38715}{float32\_t}}\ *\mbox{\hyperlink{structarm__fir__instance__f32_a7afcf4022e8560db9b8fd28b0d090a15}{pState}};\ \ \ \ }
+\DoxyCodeLine{00090\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{arm__math__types_8h_a4611b605e45ab401f02cab15c5e38715}{float32\_t}}\ *\mbox{\hyperlink{structarm__fir__instance__f32_aa590e6c845fcb19e027d77307c8ef016}{pCoeffs}};\ \ \ }
+\DoxyCodeLine{00091\ \ \ \}\ \mbox{\hyperlink{structarm__fir__instance__f32}{arm\_fir\_instance\_f32}};}
+\DoxyCodeLine{00092\ }
+\DoxyCodeLine{00096\ \ \ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct}}
+\DoxyCodeLine{00097\ \ \ \{}
+\DoxyCodeLine{00098\ \ \ \ \ \ \ \ \ \ \ uint16\_t\ \mbox{\hyperlink{structarm__fir__instance__f64_a54372ad2d84de3b251848baedd76797e}{numTaps}};\ \ \ \ \ }
+\DoxyCodeLine{00099\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{arm__math__types_8h_ac55f3ae81b5bc9053760baacf57e47f4}{float64\_t}}\ *\mbox{\hyperlink{structarm__fir__instance__f64_a557ee7be37477a6901813b6ed6be522d}{pState}};\ \ \ \ }
+\DoxyCodeLine{00100\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{arm__math__types_8h_ac55f3ae81b5bc9053760baacf57e47f4}{float64\_t}}\ *\mbox{\hyperlink{structarm__fir__instance__f64_a78ed216a9de17aeddd9ab3fa40566385}{pCoeffs}};\ \ \ }
+\DoxyCodeLine{00101\ \ \ \}\ \mbox{\hyperlink{structarm__fir__instance__f64}{arm\_fir\_instance\_f64}};}
+\DoxyCodeLine{00102\ }
+\DoxyCodeLine{00110\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{filtering__functions_8h_ac333f1139ef35124e89b0ee7494ad0a2}{arm\_fir\_q7}}(}
+\DoxyCodeLine{00111\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structarm__fir__instance__q7}{arm\_fir\_instance\_q7}}\ *\ S,}
+\DoxyCodeLine{00112\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ae541b6f232c305361e9b416fc9eed263}{q7\_t}}\ *\ pSrc,}
+\DoxyCodeLine{00113\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ae541b6f232c305361e9b416fc9eed263}{q7\_t}}\ *\ pDst,}
+\DoxyCodeLine{00114\ \ \ \ \ \ \ \ \ uint32\_t\ blockSize);}
+\DoxyCodeLine{00115\ }
+\DoxyCodeLine{00127\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{filtering__functions_8h_abd62c4543b243c25e315e7acb57f726c}{arm\_fir\_init\_q7}}(}
+\DoxyCodeLine{00128\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structarm__fir__instance__q7}{arm\_fir\_instance\_q7}}\ *\ S,}
+\DoxyCodeLine{00129\ \ \ \ \ \ \ \ \ uint16\_t\ numTaps,}
+\DoxyCodeLine{00130\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ae541b6f232c305361e9b416fc9eed263}{q7\_t}}\ *\ pCoeffs,}
+\DoxyCodeLine{00131\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ae541b6f232c305361e9b416fc9eed263}{q7\_t}}\ *\ pState,}
+\DoxyCodeLine{00132\ \ \ \ \ \ \ \ \ uint32\_t\ blockSize);}
+\DoxyCodeLine{00133\ }
+\DoxyCodeLine{00141\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{filtering__functions_8h_ad9f84fdadbb59292592c7fac81adb09c}{arm\_fir\_q15}}(}
+\DoxyCodeLine{00142\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structarm__fir__instance__q15}{arm\_fir\_instance\_q15}}\ *\ S,}
+\DoxyCodeLine{00143\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\ pSrc,}
+\DoxyCodeLine{00144\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\ pDst,}
+\DoxyCodeLine{00145\ \ \ \ \ \ \ \ \ uint32\_t\ blockSize);}
+\DoxyCodeLine{00146\ }
+\DoxyCodeLine{00154\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{filtering__functions_8h_af58eee6c38f0b666897b24ca02f9d58d}{arm\_fir\_fast\_q15}}(}
+\DoxyCodeLine{00155\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structarm__fir__instance__q15}{arm\_fir\_instance\_q15}}\ *\ S,}
+\DoxyCodeLine{00156\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\ pSrc,}
+\DoxyCodeLine{00157\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\ pDst,}
+\DoxyCodeLine{00158\ \ \ \ \ \ \ \ \ uint32\_t\ blockSize);}
+\DoxyCodeLine{00159\ }
+\DoxyCodeLine{00175\ \ \ \mbox{\hyperlink{arm__math__types_8h_a5e459c6409dfcd2927bb8a57491d7cf6}{arm\_status}}\ \mbox{\hyperlink{filtering__functions_8h_af4bfa7e20520f3b6e9f03a52ad6d0e41}{arm\_fir\_init\_q15}}(}
+\DoxyCodeLine{00176\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structarm__fir__instance__q15}{arm\_fir\_instance\_q15}}\ *\ S,}
+\DoxyCodeLine{00177\ \ \ \ \ \ \ \ \ uint16\_t\ numTaps,}
+\DoxyCodeLine{00178\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\ pCoeffs,}
+\DoxyCodeLine{00179\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\ pState,}
+\DoxyCodeLine{00180\ \ \ \ \ \ \ \ \ uint32\_t\ blockSize);}
+\DoxyCodeLine{00181\ }
+\DoxyCodeLine{00189\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{filtering__functions_8h_a2f6fc6582ab4491b3ea8c038c5247ecf}{arm\_fir\_q31}}(}
+\DoxyCodeLine{00190\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structarm__fir__instance__q31}{arm\_fir\_instance\_q31}}\ *\ S,}
+\DoxyCodeLine{00191\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_adc89a3547f5324b7b3b95adec3806bc0}{q31\_t}}\ *\ pSrc,}
+\DoxyCodeLine{00192\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_adc89a3547f5324b7b3b95adec3806bc0}{q31\_t}}\ *\ pDst,}
+\DoxyCodeLine{00193\ \ \ \ \ \ \ \ \ uint32\_t\ blockSize);}
+\DoxyCodeLine{00194\ }
+\DoxyCodeLine{00202\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{filtering__functions_8h_ad3fb62ddee4115af0dd53f242fc7e0ef}{arm\_fir\_fast\_q31}}(}
+\DoxyCodeLine{00203\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structarm__fir__instance__q31}{arm\_fir\_instance\_q31}}\ *\ S,}
+\DoxyCodeLine{00204\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_adc89a3547f5324b7b3b95adec3806bc0}{q31\_t}}\ *\ pSrc,}
+\DoxyCodeLine{00205\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_adc89a3547f5324b7b3b95adec3806bc0}{q31\_t}}\ *\ pDst,}
+\DoxyCodeLine{00206\ \ \ \ \ \ \ \ \ uint32\_t\ blockSize);}
+\DoxyCodeLine{00207\ }
+\DoxyCodeLine{00219\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{filtering__functions_8h_a23ef4b2597aecc4d43cce7c4b456ae71}{arm\_fir\_init\_q31}}(}
+\DoxyCodeLine{00220\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structarm__fir__instance__q31}{arm\_fir\_instance\_q31}}\ *\ S,}
+\DoxyCodeLine{00221\ \ \ \ \ \ \ \ \ uint16\_t\ numTaps,}
+\DoxyCodeLine{00222\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_adc89a3547f5324b7b3b95adec3806bc0}{q31\_t}}\ *\ pCoeffs,}
+\DoxyCodeLine{00223\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_adc89a3547f5324b7b3b95adec3806bc0}{q31\_t}}\ *\ pState,}
+\DoxyCodeLine{00224\ \ \ \ \ \ \ \ \ uint32\_t\ blockSize);}
+\DoxyCodeLine{00225\ }
+\DoxyCodeLine{00233\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{filtering__functions_8h_a0cf008f650a75f5e2cf82d10691b64d9}{arm\_fir\_f32}}(}
+\DoxyCodeLine{00234\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structarm__fir__instance__f32}{arm\_fir\_instance\_f32}}\ *\ S,}
+\DoxyCodeLine{00235\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{arm__math__types_8h_a4611b605e45ab401f02cab15c5e38715}{float32\_t}}\ *\ pSrc,}
+\DoxyCodeLine{00236\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{arm__math__types_8h_a4611b605e45ab401f02cab15c5e38715}{float32\_t}}\ *\ pDst,}
+\DoxyCodeLine{00237\ \ \ \ \ \ \ \ \ uint32\_t\ blockSize);}
+\DoxyCodeLine{00238\ }
+\DoxyCodeLine{00246\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{filtering__functions_8h_a5dc62ca436f6f9c26377e284a2ff025f}{arm\_fir\_f64}}(}
+\DoxyCodeLine{00247\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structarm__fir__instance__f64}{arm\_fir\_instance\_f64}}\ *\ S,}
+\DoxyCodeLine{00248\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{arm__math__types_8h_ac55f3ae81b5bc9053760baacf57e47f4}{float64\_t}}\ *\ pSrc,}
+\DoxyCodeLine{00249\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{arm__math__types_8h_ac55f3ae81b5bc9053760baacf57e47f4}{float64\_t}}\ *\ pDst,}
+\DoxyCodeLine{00250\ \ \ \ \ \ \ \ \ uint32\_t\ blockSize);}
+\DoxyCodeLine{00251\ }
+\DoxyCodeLine{00260\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{filtering__functions_8h_a5afaa7b8e6735bbc19e582aa9755b0e1}{arm\_fir\_init\_f32}}(}
+\DoxyCodeLine{00261\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structarm__fir__instance__f32}{arm\_fir\_instance\_f32}}\ *\ S,}
+\DoxyCodeLine{00262\ \ \ \ \ \ \ \ \ uint16\_t\ numTaps,}
+\DoxyCodeLine{00263\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{arm__math__types_8h_a4611b605e45ab401f02cab15c5e38715}{float32\_t}}\ *\ pCoeffs,}
+\DoxyCodeLine{00264\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{arm__math__types_8h_a4611b605e45ab401f02cab15c5e38715}{float32\_t}}\ *\ pState,}
+\DoxyCodeLine{00265\ \ \ \ \ \ \ \ \ uint32\_t\ blockSize);}
+\DoxyCodeLine{00266\ }
+\DoxyCodeLine{00275\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{filtering__functions_8h_a68c4b5e8b6503553250d1dc8a6bedc72}{arm\_fir\_init\_f64}}(}
+\DoxyCodeLine{00276\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structarm__fir__instance__f64}{arm\_fir\_instance\_f64}}\ *\ S,}
+\DoxyCodeLine{00277\ \ \ \ \ \ \ \ \ uint16\_t\ numTaps,}
+\DoxyCodeLine{00278\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{arm__math__types_8h_ac55f3ae81b5bc9053760baacf57e47f4}{float64\_t}}\ *\ pCoeffs,}
+\DoxyCodeLine{00279\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{arm__math__types_8h_ac55f3ae81b5bc9053760baacf57e47f4}{float64\_t}}\ *\ pState,}
+\DoxyCodeLine{00280\ \ \ \ \ \ \ \ \ uint32\_t\ blockSize);}
+\DoxyCodeLine{00281\ }
+\DoxyCodeLine{00285\ \ \ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct}}
+\DoxyCodeLine{00286\ \ \ \{}
+\DoxyCodeLine{00287\ \ \ \ \ \ \ \ \ \ \ int8\_t\ \mbox{\hyperlink{structarm__biquad__casd__df1__inst__q15_ad6d95e70abcf4ff1300181415ad92153}{numStages}};\ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00288\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\mbox{\hyperlink{structarm__biquad__casd__df1__inst__q15_a5481104ef2f8f81360b80b47d69ae932}{pState}};\ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00289\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\mbox{\hyperlink{structarm__biquad__casd__df1__inst__q15_a9219b50b6ca227c92da85f2151ea362e}{pCoeffs}};\ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00290\ \ \ \ \ \ \ \ \ \ \ int8\_t\ \mbox{\hyperlink{structarm__biquad__casd__df1__inst__q15_ada7e9d6269e6ed4eacf8f68729e9832d}{postShift}};\ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00291\ \ \ \}\ \mbox{\hyperlink{structarm__biquad__casd__df1__inst__q15}{arm\_biquad\_casd\_df1\_inst\_q15}};}
+\DoxyCodeLine{00292\ }
+\DoxyCodeLine{00296\ \ \ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct}}
+\DoxyCodeLine{00297\ \ \ \{}
+\DoxyCodeLine{00298\ \ \ \ \ \ \ \ \ \ \ uint32\_t\ \mbox{\hyperlink{structarm__biquad__casd__df1__inst__q31_a2c2b579f1df1d8273a5d9d945c27e1b2}{numStages}};\ \ \ \ \ \ }
+\DoxyCodeLine{00299\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_adc89a3547f5324b7b3b95adec3806bc0}{q31\_t}}\ *\mbox{\hyperlink{structarm__biquad__casd__df1__inst__q31_a5dcf4727f58eb4e8e8b392508d8657bb}{pState}};\ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00300\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_adc89a3547f5324b7b3b95adec3806bc0}{q31\_t}}\ *\mbox{\hyperlink{structarm__biquad__casd__df1__inst__q31_aee29599a6db153ff0e9a5de18b6af73d}{pCoeffs}};\ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00301\ \ \ \ \ \ \ \ \ \ \ uint8\_t\ \mbox{\hyperlink{structarm__biquad__casd__df1__inst__q31_a636c7fbe09ec4bef0bc0a4b4e2151cbe}{postShift}};\ \ \ \ \ \ \ }
+\DoxyCodeLine{00302\ \ \ \}\ \mbox{\hyperlink{structarm__biquad__casd__df1__inst__q31}{arm\_biquad\_casd\_df1\_inst\_q31}};}
+\DoxyCodeLine{00303\ }
+\DoxyCodeLine{00307\ \ \ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct}}
+\DoxyCodeLine{00308\ \ \ \{}
+\DoxyCodeLine{00309\ \ \ \ \ \ \ \ \ \ \ uint32\_t\ \mbox{\hyperlink{structarm__biquad__casd__df1__inst__f32_af69820c37a87252c46453e4cfe120585}{numStages}};\ \ \ \ \ \ }
+\DoxyCodeLine{00310\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{arm__math__types_8h_a4611b605e45ab401f02cab15c5e38715}{float32\_t}}\ *\mbox{\hyperlink{structarm__biquad__casd__df1__inst__f32_a8c245d79e0d8cfabc82409d4b54fb682}{pState}};\ \ \ \ \ \ \ }
+\DoxyCodeLine{00311\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{arm__math__types_8h_a4611b605e45ab401f02cab15c5e38715}{float32\_t}}\ *\mbox{\hyperlink{structarm__biquad__casd__df1__inst__f32_a4e873ff8bb6273858481cfd4c7f8f6d5}{pCoeffs}};\ \ \ \ \ \ }
+\DoxyCodeLine{00312\ \ \ \}\ \mbox{\hyperlink{structarm__biquad__casd__df1__inst__f32}{arm\_biquad\_casd\_df1\_inst\_f32}};}
+\DoxyCodeLine{00313\ }
+\DoxyCodeLine{00314\ \textcolor{preprocessor}{\#if\ defined(ARM\_MATH\_MVEF)\ \&\&\ !defined(ARM\_MATH\_AUTOVECTORIZE)}}
+\DoxyCodeLine{00318\ \ \ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct}}
+\DoxyCodeLine{00319\ \ \ \{}
+\DoxyCodeLine{00320\ \ \ \ \ \ \ \mbox{\hyperlink{arm__math__types_8h_a4611b605e45ab401f02cab15c5e38715}{float32\_t}}\ coeffs[8][4];\ }
+\DoxyCodeLine{00321\ \ \ \}\ arm\_biquad\_mod\_coef\_f32;}
+\DoxyCodeLine{00322\ \textcolor{preprocessor}{\#endif\ }}
+\DoxyCodeLine{00323\ }
+\DoxyCodeLine{00331\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{filtering__functions_8h_a27af5bfa40dad7c877e48eedc8d67558}{arm\_biquad\_cascade\_df1\_q15}}(}
+\DoxyCodeLine{00332\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structarm__biquad__casd__df1__inst__q15}{arm\_biquad\_casd\_df1\_inst\_q15}}\ *\ S,}
+\DoxyCodeLine{00333\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\ pSrc,}
+\DoxyCodeLine{00334\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\ pDst,}
+\DoxyCodeLine{00335\ \ \ \ \ \ \ \ \ uint32\_t\ blockSize);}
+\DoxyCodeLine{00336\ }
+\DoxyCodeLine{00345\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{filtering__functions_8h_a1115256c79a0e22a3a54f8e627ac256f}{arm\_biquad\_cascade\_df1\_init\_q15}}(}
+\DoxyCodeLine{00346\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structarm__biquad__casd__df1__inst__q15}{arm\_biquad\_casd\_df1\_inst\_q15}}\ *\ S,}
+\DoxyCodeLine{00347\ \ \ \ \ \ \ \ \ uint8\_t\ numStages,}
+\DoxyCodeLine{00348\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\ pCoeffs,}
+\DoxyCodeLine{00349\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\ pState,}
+\DoxyCodeLine{00350\ \ \ \ \ \ \ \ \ int8\_t\ postShift);}
+\DoxyCodeLine{00351\ }
+\DoxyCodeLine{00359\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{filtering__functions_8h_a5008df017b9ce4046f35b61482009cbc}{arm\_biquad\_cascade\_df1\_fast\_q15}}(}
+\DoxyCodeLine{00360\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structarm__biquad__casd__df1__inst__q15}{arm\_biquad\_casd\_df1\_inst\_q15}}\ *\ S,}
+\DoxyCodeLine{00361\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\ pSrc,}
+\DoxyCodeLine{00362\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\ pDst,}
+\DoxyCodeLine{00363\ \ \ \ \ \ \ \ \ uint32\_t\ blockSize);}
+\DoxyCodeLine{00364\ }
+\DoxyCodeLine{00372\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{filtering__functions_8h_a4e7dad0ee6949005909fd4fcf1249b79}{arm\_biquad\_cascade\_df1\_q31}}(}
+\DoxyCodeLine{00373\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structarm__biquad__casd__df1__inst__q31}{arm\_biquad\_casd\_df1\_inst\_q31}}\ *\ S,}
+\DoxyCodeLine{00374\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_adc89a3547f5324b7b3b95adec3806bc0}{q31\_t}}\ *\ pSrc,}
+\DoxyCodeLine{00375\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_adc89a3547f5324b7b3b95adec3806bc0}{q31\_t}}\ *\ pDst,}
+\DoxyCodeLine{00376\ \ \ \ \ \ \ \ \ uint32\_t\ blockSize);}
+\DoxyCodeLine{00377\ }
+\DoxyCodeLine{00385\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{filtering__functions_8h_aa09ea758c0b24eed9ef92b8d1e5c80c2}{arm\_biquad\_cascade\_df1\_fast\_q31}}(}
+\DoxyCodeLine{00386\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structarm__biquad__casd__df1__inst__q31}{arm\_biquad\_casd\_df1\_inst\_q31}}\ *\ S,}
+\DoxyCodeLine{00387\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_adc89a3547f5324b7b3b95adec3806bc0}{q31\_t}}\ *\ pSrc,}
+\DoxyCodeLine{00388\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_adc89a3547f5324b7b3b95adec3806bc0}{q31\_t}}\ *\ pDst,}
+\DoxyCodeLine{00389\ \ \ \ \ \ \ \ \ uint32\_t\ blockSize);}
+\DoxyCodeLine{00390\ }
+\DoxyCodeLine{00399\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{filtering__functions_8h_a5563b156af44d1be2a7548626988bf4e}{arm\_biquad\_cascade\_df1\_init\_q31}}(}
+\DoxyCodeLine{00400\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structarm__biquad__casd__df1__inst__q31}{arm\_biquad\_casd\_df1\_inst\_q31}}\ *\ S,}
+\DoxyCodeLine{00401\ \ \ \ \ \ \ \ \ uint8\_t\ numStages,}
+\DoxyCodeLine{00402\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_adc89a3547f5324b7b3b95adec3806bc0}{q31\_t}}\ *\ pCoeffs,}
+\DoxyCodeLine{00403\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_adc89a3547f5324b7b3b95adec3806bc0}{q31\_t}}\ *\ pState,}
+\DoxyCodeLine{00404\ \ \ \ \ \ \ \ \ int8\_t\ postShift);}
+\DoxyCodeLine{00405\ }
+\DoxyCodeLine{00413\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{filtering__functions_8h_a812eb9769adde4fed6d5ff4968a011d3}{arm\_biquad\_cascade\_df1\_f32}}(}
+\DoxyCodeLine{00414\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structarm__biquad__casd__df1__inst__f32}{arm\_biquad\_casd\_df1\_inst\_f32}}\ *\ S,}
+\DoxyCodeLine{00415\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{arm__math__types_8h_a4611b605e45ab401f02cab15c5e38715}{float32\_t}}\ *\ pSrc,}
+\DoxyCodeLine{00416\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{arm__math__types_8h_a4611b605e45ab401f02cab15c5e38715}{float32\_t}}\ *\ pDst,}
+\DoxyCodeLine{00417\ \ \ \ \ \ \ \ \ uint32\_t\ blockSize);}
+\DoxyCodeLine{00418\ }
+\DoxyCodeLine{00427\ \textcolor{preprocessor}{\#if\ defined(ARM\_MATH\_MVEF)\ \&\&\ !defined(ARM\_MATH\_AUTOVECTORIZE)}}
+\DoxyCodeLine{00428\ \ \ \textcolor{keywordtype}{void}\ arm\_biquad\_cascade\_df1\_mve\_init\_f32(}
+\DoxyCodeLine{00429\ \ \ \ \ \ \ \mbox{\hyperlink{structarm__biquad__casd__df1__inst__f32}{arm\_biquad\_casd\_df1\_inst\_f32}}\ *\ S,}
+\DoxyCodeLine{00430\ \ \ \ \ \ \ uint8\_t\ numStages,}
+\DoxyCodeLine{00431\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{arm__math__types_8h_a4611b605e45ab401f02cab15c5e38715}{float32\_t}}\ *\ pCoeffs,\ }
+\DoxyCodeLine{00432\ \ \ \ \ \ \ arm\_biquad\_mod\_coef\_f32\ *\ pCoeffsMod,\ }
+\DoxyCodeLine{00433\ \ \ \ \ \ \ \mbox{\hyperlink{arm__math__types_8h_a4611b605e45ab401f02cab15c5e38715}{float32\_t}}\ *\ pState);}
+\DoxyCodeLine{00434\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00435\ \ \ }
+\DoxyCodeLine{00436\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{filtering__functions_8h_ad0b680d1c529d941e939d265b3c6ae59}{arm\_biquad\_cascade\_df1\_init\_f32}}(}
+\DoxyCodeLine{00437\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structarm__biquad__casd__df1__inst__f32}{arm\_biquad\_casd\_df1\_inst\_f32}}\ *\ S,}
+\DoxyCodeLine{00438\ \ \ \ \ \ \ \ \ uint8\_t\ numStages,}
+\DoxyCodeLine{00439\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{arm__math__types_8h_a4611b605e45ab401f02cab15c5e38715}{float32\_t}}\ *\ pCoeffs,}
+\DoxyCodeLine{00440\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{arm__math__types_8h_a4611b605e45ab401f02cab15c5e38715}{float32\_t}}\ *\ pState);}
+\DoxyCodeLine{00441\ }
+\DoxyCodeLine{00442\ }
+\DoxyCodeLine{00451\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{filtering__functions_8h_a2e977f76e873bd47c6c41c7d940fdf7e}{arm\_conv\_f32}}(}
+\DoxyCodeLine{00452\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{arm__math__types_8h_a4611b605e45ab401f02cab15c5e38715}{float32\_t}}\ *\ pSrcA,}
+\DoxyCodeLine{00453\ \ \ \ \ \ \ \ \ uint32\_t\ srcALen,}
+\DoxyCodeLine{00454\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{arm__math__types_8h_a4611b605e45ab401f02cab15c5e38715}{float32\_t}}\ *\ pSrcB,}
+\DoxyCodeLine{00455\ \ \ \ \ \ \ \ \ uint32\_t\ srcBLen,}
+\DoxyCodeLine{00456\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{arm__math__types_8h_a4611b605e45ab401f02cab15c5e38715}{float32\_t}}\ *\ pDst);}
+\DoxyCodeLine{00457\ }
+\DoxyCodeLine{00458\ }
+\DoxyCodeLine{00469\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{filtering__functions_8h_a0d60c7a8349c6235d88bf87b04172252}{arm\_conv\_opt\_q15}}(}
+\DoxyCodeLine{00470\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\ pSrcA,}
+\DoxyCodeLine{00471\ \ \ \ \ \ \ \ \ uint32\_t\ srcALen,}
+\DoxyCodeLine{00472\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\ pSrcB,}
+\DoxyCodeLine{00473\ \ \ \ \ \ \ \ \ uint32\_t\ srcBLen,}
+\DoxyCodeLine{00474\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\ pDst,}
+\DoxyCodeLine{00475\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\ pScratch1,}
+\DoxyCodeLine{00476\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\ pScratch2);}
+\DoxyCodeLine{00477\ }
+\DoxyCodeLine{00478\ }
+\DoxyCodeLine{00487\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{filtering__functions_8h_a372d3fd79b107dc6b12163a00c22da18}{arm\_conv\_q15}}(}
+\DoxyCodeLine{00488\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\ pSrcA,}
+\DoxyCodeLine{00489\ \ \ \ \ \ \ \ \ uint32\_t\ srcALen,}
+\DoxyCodeLine{00490\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\ pSrcB,}
+\DoxyCodeLine{00491\ \ \ \ \ \ \ \ \ uint32\_t\ srcBLen,}
+\DoxyCodeLine{00492\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\ pDst);}
+\DoxyCodeLine{00493\ }
+\DoxyCodeLine{00494\ }
+\DoxyCodeLine{00503\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{filtering__functions_8h_af6bc2c8d655ef8c9b66affdae489f366}{arm\_conv\_fast\_q15}}(}
+\DoxyCodeLine{00504\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\ pSrcA,}
+\DoxyCodeLine{00505\ \ \ \ \ \ \ \ \ uint32\_t\ srcALen,}
+\DoxyCodeLine{00506\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\ pSrcB,}
+\DoxyCodeLine{00507\ \ \ \ \ \ \ \ \ uint32\_t\ srcBLen,}
+\DoxyCodeLine{00508\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\ pDst);}
+\DoxyCodeLine{00509\ }
+\DoxyCodeLine{00510\ }
+\DoxyCodeLine{00521\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{filtering__functions_8h_a8ecd292b8e74c8f05b208e7948d05a90}{arm\_conv\_fast\_opt\_q15}}(}
+\DoxyCodeLine{00522\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\ pSrcA,}
+\DoxyCodeLine{00523\ \ \ \ \ \ \ \ \ uint32\_t\ srcALen,}
+\DoxyCodeLine{00524\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\ pSrcB,}
+\DoxyCodeLine{00525\ \ \ \ \ \ \ \ \ uint32\_t\ srcBLen,}
+\DoxyCodeLine{00526\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\ pDst,}
+\DoxyCodeLine{00527\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\ pScratch1,}
+\DoxyCodeLine{00528\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\ pScratch2);}
+\DoxyCodeLine{00529\ }
+\DoxyCodeLine{00530\ }
+\DoxyCodeLine{00539\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{filtering__functions_8h_a08ce299fb5c3329505cb8ce4bf4f6e06}{arm\_conv\_q31}}(}
+\DoxyCodeLine{00540\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_adc89a3547f5324b7b3b95adec3806bc0}{q31\_t}}\ *\ pSrcA,}
+\DoxyCodeLine{00541\ \ \ \ \ \ \ \ \ uint32\_t\ srcALen,}
+\DoxyCodeLine{00542\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_adc89a3547f5324b7b3b95adec3806bc0}{q31\_t}}\ *\ pSrcB,}
+\DoxyCodeLine{00543\ \ \ \ \ \ \ \ \ uint32\_t\ srcBLen,}
+\DoxyCodeLine{00544\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_adc89a3547f5324b7b3b95adec3806bc0}{q31\_t}}\ *\ pDst);}
+\DoxyCodeLine{00545\ }
+\DoxyCodeLine{00546\ }
+\DoxyCodeLine{00555\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{filtering__functions_8h_a2d2b29b1f7f00a8651f1bc7f0560464b}{arm\_conv\_fast\_q31}}(}
+\DoxyCodeLine{00556\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_adc89a3547f5324b7b3b95adec3806bc0}{q31\_t}}\ *\ pSrcA,}
+\DoxyCodeLine{00557\ \ \ \ \ \ \ \ \ uint32\_t\ srcALen,}
+\DoxyCodeLine{00558\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_adc89a3547f5324b7b3b95adec3806bc0}{q31\_t}}\ *\ pSrcB,}
+\DoxyCodeLine{00559\ \ \ \ \ \ \ \ \ uint32\_t\ srcBLen,}
+\DoxyCodeLine{00560\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_adc89a3547f5324b7b3b95adec3806bc0}{q31\_t}}\ *\ pDst);}
+\DoxyCodeLine{00561\ }
+\DoxyCodeLine{00562\ }
+\DoxyCodeLine{00573\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{filtering__functions_8h_af23966af04840f17c26c93849986baeb}{arm\_conv\_opt\_q7}}(}
+\DoxyCodeLine{00574\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ae541b6f232c305361e9b416fc9eed263}{q7\_t}}\ *\ pSrcA,}
+\DoxyCodeLine{00575\ \ \ \ \ \ \ \ \ uint32\_t\ srcALen,}
+\DoxyCodeLine{00576\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ae541b6f232c305361e9b416fc9eed263}{q7\_t}}\ *\ pSrcB,}
+\DoxyCodeLine{00577\ \ \ \ \ \ \ \ \ uint32\_t\ srcBLen,}
+\DoxyCodeLine{00578\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ae541b6f232c305361e9b416fc9eed263}{q7\_t}}\ *\ pDst,}
+\DoxyCodeLine{00579\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\ pScratch1,}
+\DoxyCodeLine{00580\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\ pScratch2);}
+\DoxyCodeLine{00581\ }
+\DoxyCodeLine{00582\ }
+\DoxyCodeLine{00591\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{filtering__functions_8h_a625b30107443b6d145350bc242749764}{arm\_conv\_q7}}(}
+\DoxyCodeLine{00592\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ae541b6f232c305361e9b416fc9eed263}{q7\_t}}\ *\ pSrcA,}
+\DoxyCodeLine{00593\ \ \ \ \ \ \ \ \ uint32\_t\ srcALen,}
+\DoxyCodeLine{00594\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ae541b6f232c305361e9b416fc9eed263}{q7\_t}}\ *\ pSrcB,}
+\DoxyCodeLine{00595\ \ \ \ \ \ \ \ \ uint32\_t\ srcBLen,}
+\DoxyCodeLine{00596\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ae541b6f232c305361e9b416fc9eed263}{q7\_t}}\ *\ pDst);}
+\DoxyCodeLine{00597\ }
+\DoxyCodeLine{00598\ }
+\DoxyCodeLine{00610\ \ \ \mbox{\hyperlink{arm__math__types_8h_a5e459c6409dfcd2927bb8a57491d7cf6}{arm\_status}}\ \mbox{\hyperlink{filtering__functions_8h_a4e65902884d148ebcbecc260e0dffdd9}{arm\_conv\_partial\_f32}}(}
+\DoxyCodeLine{00611\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{arm__math__types_8h_a4611b605e45ab401f02cab15c5e38715}{float32\_t}}\ *\ pSrcA,}
+\DoxyCodeLine{00612\ \ \ \ \ \ \ \ \ uint32\_t\ srcALen,}
+\DoxyCodeLine{00613\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{arm__math__types_8h_a4611b605e45ab401f02cab15c5e38715}{float32\_t}}\ *\ pSrcB,}
+\DoxyCodeLine{00614\ \ \ \ \ \ \ \ \ uint32\_t\ srcBLen,}
+\DoxyCodeLine{00615\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{arm__math__types_8h_a4611b605e45ab401f02cab15c5e38715}{float32\_t}}\ *\ pDst,}
+\DoxyCodeLine{00616\ \ \ \ \ \ \ \ \ uint32\_t\ firstIndex,}
+\DoxyCodeLine{00617\ \ \ \ \ \ \ \ \ uint32\_t\ numPoints);}
+\DoxyCodeLine{00618\ }
+\DoxyCodeLine{00619\ }
+\DoxyCodeLine{00633\ \ \ \mbox{\hyperlink{arm__math__types_8h_a5e459c6409dfcd2927bb8a57491d7cf6}{arm\_status}}\ \mbox{\hyperlink{filtering__functions_8h_aa82f8213533529e9b9252b37fd3b39e4}{arm\_conv\_partial\_opt\_q15}}(}
+\DoxyCodeLine{00634\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\ pSrcA,}
+\DoxyCodeLine{00635\ \ \ \ \ \ \ \ \ uint32\_t\ srcALen,}
+\DoxyCodeLine{00636\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\ pSrcB,}
+\DoxyCodeLine{00637\ \ \ \ \ \ \ \ \ uint32\_t\ srcBLen,}
+\DoxyCodeLine{00638\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\ pDst,}
+\DoxyCodeLine{00639\ \ \ \ \ \ \ \ \ uint32\_t\ firstIndex,}
+\DoxyCodeLine{00640\ \ \ \ \ \ \ \ \ uint32\_t\ numPoints,}
+\DoxyCodeLine{00641\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\ pScratch1,}
+\DoxyCodeLine{00642\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\ pScratch2);}
+\DoxyCodeLine{00643\ }
+\DoxyCodeLine{00644\ }
+\DoxyCodeLine{00656\ \ \ \mbox{\hyperlink{arm__math__types_8h_a5e459c6409dfcd2927bb8a57491d7cf6}{arm\_status}}\ \mbox{\hyperlink{filtering__functions_8h_a09b1f207980df75c2dcf01b1d3c2006f}{arm\_conv\_partial\_q15}}(}
+\DoxyCodeLine{00657\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\ pSrcA,}
+\DoxyCodeLine{00658\ \ \ \ \ \ \ \ \ uint32\_t\ srcALen,}
+\DoxyCodeLine{00659\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\ pSrcB,}
+\DoxyCodeLine{00660\ \ \ \ \ \ \ \ \ uint32\_t\ srcBLen,}
+\DoxyCodeLine{00661\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\ pDst,}
+\DoxyCodeLine{00662\ \ \ \ \ \ \ \ \ uint32\_t\ firstIndex,}
+\DoxyCodeLine{00663\ \ \ \ \ \ \ \ \ uint32\_t\ numPoints);}
+\DoxyCodeLine{00664\ }
+\DoxyCodeLine{00665\ }
+\DoxyCodeLine{00677\ \ \ \mbox{\hyperlink{arm__math__types_8h_a5e459c6409dfcd2927bb8a57491d7cf6}{arm\_status}}\ \mbox{\hyperlink{filtering__functions_8h_a30eb5ce84581f2d0532a17cdf8a20fc5}{arm\_conv\_partial\_fast\_q15}}(}
+\DoxyCodeLine{00678\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\ pSrcA,}
+\DoxyCodeLine{00679\ \ \ \ \ \ \ \ \ uint32\_t\ srcALen,}
+\DoxyCodeLine{00680\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\ pSrcB,}
+\DoxyCodeLine{00681\ \ \ \ \ \ \ \ \ uint32\_t\ srcBLen,}
+\DoxyCodeLine{00682\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\ pDst,}
+\DoxyCodeLine{00683\ \ \ \ \ \ \ \ \ uint32\_t\ firstIndex,}
+\DoxyCodeLine{00684\ \ \ \ \ \ \ \ \ uint32\_t\ numPoints);}
+\DoxyCodeLine{00685\ }
+\DoxyCodeLine{00686\ }
+\DoxyCodeLine{00700\ \ \ \mbox{\hyperlink{arm__math__types_8h_a5e459c6409dfcd2927bb8a57491d7cf6}{arm\_status}}\ \mbox{\hyperlink{filtering__functions_8h_a0cdb871f952b8c1305342ae499affa41}{arm\_conv\_partial\_fast\_opt\_q15}}(}
+\DoxyCodeLine{00701\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\ pSrcA,}
+\DoxyCodeLine{00702\ \ \ \ \ \ \ \ \ uint32\_t\ srcALen,}
+\DoxyCodeLine{00703\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\ pSrcB,}
+\DoxyCodeLine{00704\ \ \ \ \ \ \ \ \ uint32\_t\ srcBLen,}
+\DoxyCodeLine{00705\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\ pDst,}
+\DoxyCodeLine{00706\ \ \ \ \ \ \ \ \ uint32\_t\ firstIndex,}
+\DoxyCodeLine{00707\ \ \ \ \ \ \ \ \ uint32\_t\ numPoints,}
+\DoxyCodeLine{00708\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\ pScratch1,}
+\DoxyCodeLine{00709\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\ pScratch2);}
+\DoxyCodeLine{00710\ }
+\DoxyCodeLine{00711\ }
+\DoxyCodeLine{00723\ \ \ \mbox{\hyperlink{arm__math__types_8h_a5e459c6409dfcd2927bb8a57491d7cf6}{arm\_status}}\ \mbox{\hyperlink{filtering__functions_8h_adc48f14ae5ca8bf4b026916db0765afa}{arm\_conv\_partial\_q31}}(}
+\DoxyCodeLine{00724\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_adc89a3547f5324b7b3b95adec3806bc0}{q31\_t}}\ *\ pSrcA,}
+\DoxyCodeLine{00725\ \ \ \ \ \ \ \ \ uint32\_t\ srcALen,}
+\DoxyCodeLine{00726\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_adc89a3547f5324b7b3b95adec3806bc0}{q31\_t}}\ *\ pSrcB,}
+\DoxyCodeLine{00727\ \ \ \ \ \ \ \ \ uint32\_t\ srcBLen,}
+\DoxyCodeLine{00728\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_adc89a3547f5324b7b3b95adec3806bc0}{q31\_t}}\ *\ pDst,}
+\DoxyCodeLine{00729\ \ \ \ \ \ \ \ \ uint32\_t\ firstIndex,}
+\DoxyCodeLine{00730\ \ \ \ \ \ \ \ \ uint32\_t\ numPoints);}
+\DoxyCodeLine{00731\ }
+\DoxyCodeLine{00732\ }
+\DoxyCodeLine{00744\ \ \ \mbox{\hyperlink{arm__math__types_8h_a5e459c6409dfcd2927bb8a57491d7cf6}{arm\_status}}\ \mbox{\hyperlink{filtering__functions_8h_aaf207e31aa081cea624713aec65d0e77}{arm\_conv\_partial\_fast\_q31}}(}
+\DoxyCodeLine{00745\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_adc89a3547f5324b7b3b95adec3806bc0}{q31\_t}}\ *\ pSrcA,}
+\DoxyCodeLine{00746\ \ \ \ \ \ \ \ \ uint32\_t\ srcALen,}
+\DoxyCodeLine{00747\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_adc89a3547f5324b7b3b95adec3806bc0}{q31\_t}}\ *\ pSrcB,}
+\DoxyCodeLine{00748\ \ \ \ \ \ \ \ \ uint32\_t\ srcBLen,}
+\DoxyCodeLine{00749\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_adc89a3547f5324b7b3b95adec3806bc0}{q31\_t}}\ *\ pDst,}
+\DoxyCodeLine{00750\ \ \ \ \ \ \ \ \ uint32\_t\ firstIndex,}
+\DoxyCodeLine{00751\ \ \ \ \ \ \ \ \ uint32\_t\ numPoints);}
+\DoxyCodeLine{00752\ }
+\DoxyCodeLine{00753\ }
+\DoxyCodeLine{00767\ \ \ \mbox{\hyperlink{arm__math__types_8h_a5e459c6409dfcd2927bb8a57491d7cf6}{arm\_status}}\ \mbox{\hyperlink{filtering__functions_8h_adfc0cd0290793c790ccaa1c73eda0694}{arm\_conv\_partial\_opt\_q7}}(}
+\DoxyCodeLine{00768\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ae541b6f232c305361e9b416fc9eed263}{q7\_t}}\ *\ pSrcA,}
+\DoxyCodeLine{00769\ \ \ \ \ \ \ \ \ uint32\_t\ srcALen,}
+\DoxyCodeLine{00770\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ae541b6f232c305361e9b416fc9eed263}{q7\_t}}\ *\ pSrcB,}
+\DoxyCodeLine{00771\ \ \ \ \ \ \ \ \ uint32\_t\ srcBLen,}
+\DoxyCodeLine{00772\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ae541b6f232c305361e9b416fc9eed263}{q7\_t}}\ *\ pDst,}
+\DoxyCodeLine{00773\ \ \ \ \ \ \ \ \ uint32\_t\ firstIndex,}
+\DoxyCodeLine{00774\ \ \ \ \ \ \ \ \ uint32\_t\ numPoints,}
+\DoxyCodeLine{00775\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\ pScratch1,}
+\DoxyCodeLine{00776\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\ pScratch2);}
+\DoxyCodeLine{00777\ }
+\DoxyCodeLine{00778\ }
+\DoxyCodeLine{00790\ \ \ \mbox{\hyperlink{arm__math__types_8h_a5e459c6409dfcd2927bb8a57491d7cf6}{arm\_status}}\ \mbox{\hyperlink{filtering__functions_8h_aa1bf3428dbe6beb5c9957bff0d00fa19}{arm\_conv\_partial\_q7}}(}
+\DoxyCodeLine{00791\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ae541b6f232c305361e9b416fc9eed263}{q7\_t}}\ *\ pSrcA,}
+\DoxyCodeLine{00792\ \ \ \ \ \ \ \ \ uint32\_t\ srcALen,}
+\DoxyCodeLine{00793\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ae541b6f232c305361e9b416fc9eed263}{q7\_t}}\ *\ pSrcB,}
+\DoxyCodeLine{00794\ \ \ \ \ \ \ \ \ uint32\_t\ srcBLen,}
+\DoxyCodeLine{00795\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ae541b6f232c305361e9b416fc9eed263}{q7\_t}}\ *\ pDst,}
+\DoxyCodeLine{00796\ \ \ \ \ \ \ \ \ uint32\_t\ firstIndex,}
+\DoxyCodeLine{00797\ \ \ \ \ \ \ \ \ uint32\_t\ numPoints);}
+\DoxyCodeLine{00798\ }
+\DoxyCodeLine{00799\ }
+\DoxyCodeLine{00803\ \ \ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct}}
+\DoxyCodeLine{00804\ \ \ \{}
+\DoxyCodeLine{00805\ \ \ \ \ \ \ \ \ \ \ uint8\_t\ \mbox{\hyperlink{structarm__fir__decimate__instance__q15_aad9320284218b3aa378527ea518cf093}{M}};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00806\ \ \ \ \ \ \ \ \ \ \ uint16\_t\ \mbox{\hyperlink{structarm__fir__decimate__instance__q15_ac1e9844488ec717da334fbd4c4f41990}{numTaps}};\ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00807\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\mbox{\hyperlink{structarm__fir__decimate__instance__q15_a44ba13cf8aa4425c34adc82dc468ad54}{pCoeffs}};\ \ \ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00808\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\mbox{\hyperlink{structarm__fir__decimate__instance__q15_a3f7b5184bb28853ef401b001df121047}{pState}};\ \ \ \ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00809\ \ \ \}\ \mbox{\hyperlink{structarm__fir__decimate__instance__q15}{arm\_fir\_decimate\_instance\_q15}};}
+\DoxyCodeLine{00810\ }
+\DoxyCodeLine{00814\ \ \ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct}}
+\DoxyCodeLine{00815\ \ \ \{}
+\DoxyCodeLine{00816\ \ \ \ \ \ \ \ \ \ \ uint8\_t\ \mbox{\hyperlink{structarm__fir__decimate__instance__q31_ad3d6936c36303b30dd38f1eddf248ae5}{M}};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00817\ \ \ \ \ \ \ \ \ \ \ uint16\_t\ \mbox{\hyperlink{structarm__fir__decimate__instance__q31_a37915d42b0dc5e3057ebe83110798482}{numTaps}};\ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00818\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_adc89a3547f5324b7b3b95adec3806bc0}{q31\_t}}\ *\mbox{\hyperlink{structarm__fir__decimate__instance__q31_a530ab6a5d1a39367b281206cd7201dae}{pCoeffs}};\ \ \ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00819\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_adc89a3547f5324b7b3b95adec3806bc0}{q31\_t}}\ *\mbox{\hyperlink{structarm__fir__decimate__instance__q31_a0ef0ef9e265f7ab873cfc6daa7593fdb}{pState}};\ \ \ \ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00820\ \ \ \}\ \mbox{\hyperlink{structarm__fir__decimate__instance__q31}{arm\_fir\_decimate\_instance\_q31}};}
+\DoxyCodeLine{00821\ }
+\DoxyCodeLine{00825\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct}}
+\DoxyCodeLine{00826\ \ \ \{}
+\DoxyCodeLine{00827\ \ \ \ \ \ \ \ \ \ \ uint8\_t\ \mbox{\hyperlink{structarm__fir__decimate__instance__f32_a76a8b2161731638eb3d67f277919f95d}{M}};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00828\ \ \ \ \ \ \ \ \ \ \ uint16\_t\ \mbox{\hyperlink{structarm__fir__decimate__instance__f32_a2aa2986129db8affef03ede88dd45a03}{numTaps}};\ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00829\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{arm__math__types_8h_a4611b605e45ab401f02cab15c5e38715}{float32\_t}}\ *\mbox{\hyperlink{structarm__fir__decimate__instance__f32_a1aef1d796b60749d87ff36e282284628}{pCoeffs}};\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00830\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{arm__math__types_8h_a4611b605e45ab401f02cab15c5e38715}{float32\_t}}\ *\mbox{\hyperlink{structarm__fir__decimate__instance__f32_a5bddf29aaaf2011d2e3bcec59a83f633}{pState}};\ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00831\ \ \ \}\ \mbox{\hyperlink{structarm__fir__decimate__instance__f32}{arm\_fir\_decimate\_instance\_f32}};}
+\DoxyCodeLine{00832\ }
+\DoxyCodeLine{00833\ }
+\DoxyCodeLine{00841\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{filtering__functions_8h_ab9402a0d9b0fffc0b50083a7d56c5905}{arm\_fir\_decimate\_f32}}(}
+\DoxyCodeLine{00842\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structarm__fir__decimate__instance__f32}{arm\_fir\_decimate\_instance\_f32}}\ *\ S,}
+\DoxyCodeLine{00843\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{arm__math__types_8h_a4611b605e45ab401f02cab15c5e38715}{float32\_t}}\ *\ pSrc,}
+\DoxyCodeLine{00844\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{arm__math__types_8h_a4611b605e45ab401f02cab15c5e38715}{float32\_t}}\ *\ pDst,}
+\DoxyCodeLine{00845\ \ \ \ \ \ \ \ \ uint32\_t\ blockSize);}
+\DoxyCodeLine{00846\ }
+\DoxyCodeLine{00847\ }
+\DoxyCodeLine{00860\ \mbox{\hyperlink{arm__math__types_8h_a5e459c6409dfcd2927bb8a57491d7cf6}{arm\_status}}\ \mbox{\hyperlink{filtering__functions_8h_a67c80582fc296552fef2bd1f208d853b}{arm\_fir\_decimate\_init\_f32}}(}
+\DoxyCodeLine{00861\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structarm__fir__decimate__instance__f32}{arm\_fir\_decimate\_instance\_f32}}\ *\ S,}
+\DoxyCodeLine{00862\ \ \ \ \ \ \ \ \ uint16\_t\ numTaps,}
+\DoxyCodeLine{00863\ \ \ \ \ \ \ \ \ uint8\_t\ M,}
+\DoxyCodeLine{00864\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{arm__math__types_8h_a4611b605e45ab401f02cab15c5e38715}{float32\_t}}\ *\ pCoeffs,}
+\DoxyCodeLine{00865\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{arm__math__types_8h_a4611b605e45ab401f02cab15c5e38715}{float32\_t}}\ *\ pState,}
+\DoxyCodeLine{00866\ \ \ \ \ \ \ \ \ uint32\_t\ blockSize);}
+\DoxyCodeLine{00867\ }
+\DoxyCodeLine{00868\ }
+\DoxyCodeLine{00876\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{filtering__functions_8h_a262636462d9e24dab67ec792160afcbf}{arm\_fir\_decimate\_q15}}(}
+\DoxyCodeLine{00877\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structarm__fir__decimate__instance__q15}{arm\_fir\_decimate\_instance\_q15}}\ *\ S,}
+\DoxyCodeLine{00878\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\ pSrc,}
+\DoxyCodeLine{00879\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\ pDst,}
+\DoxyCodeLine{00880\ \ \ \ \ \ \ \ \ uint32\_t\ blockSize);}
+\DoxyCodeLine{00881\ }
+\DoxyCodeLine{00882\ }
+\DoxyCodeLine{00890\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{filtering__functions_8h_ab43fa1edb45d3b2e875dc8cd381770cc}{arm\_fir\_decimate\_fast\_q15}}(}
+\DoxyCodeLine{00891\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structarm__fir__decimate__instance__q15}{arm\_fir\_decimate\_instance\_q15}}\ *\ S,}
+\DoxyCodeLine{00892\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\ pSrc,}
+\DoxyCodeLine{00893\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\ pDst,}
+\DoxyCodeLine{00894\ \ \ \ \ \ \ \ \ uint32\_t\ blockSize);}
+\DoxyCodeLine{00895\ }
+\DoxyCodeLine{00896\ }
+\DoxyCodeLine{00908\ \ \ \mbox{\hyperlink{arm__math__types_8h_a5e459c6409dfcd2927bb8a57491d7cf6}{arm\_status}}\ \mbox{\hyperlink{filtering__functions_8h_a3b01ec9df00d759f79c934b239cead73}{arm\_fir\_decimate\_init\_q15}}(}
+\DoxyCodeLine{00909\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structarm__fir__decimate__instance__q15}{arm\_fir\_decimate\_instance\_q15}}\ *\ S,}
+\DoxyCodeLine{00910\ \ \ \ \ \ \ \ \ uint16\_t\ numTaps,}
+\DoxyCodeLine{00911\ \ \ \ \ \ \ \ \ uint8\_t\ M,}
+\DoxyCodeLine{00912\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\ pCoeffs,}
+\DoxyCodeLine{00913\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\ pState,}
+\DoxyCodeLine{00914\ \ \ \ \ \ \ \ \ uint32\_t\ blockSize);}
+\DoxyCodeLine{00915\ }
+\DoxyCodeLine{00916\ }
+\DoxyCodeLine{00924\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{filtering__functions_8h_a27c05d7892f8a327aab86fbfee9b0f29}{arm\_fir\_decimate\_q31}}(}
+\DoxyCodeLine{00925\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structarm__fir__decimate__instance__q31}{arm\_fir\_decimate\_instance\_q31}}\ *\ S,}
+\DoxyCodeLine{00926\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_adc89a3547f5324b7b3b95adec3806bc0}{q31\_t}}\ *\ pSrc,}
+\DoxyCodeLine{00927\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_adc89a3547f5324b7b3b95adec3806bc0}{q31\_t}}\ *\ pDst,}
+\DoxyCodeLine{00928\ \ \ \ \ \ \ \ \ uint32\_t\ blockSize);}
+\DoxyCodeLine{00929\ }
+\DoxyCodeLine{00937\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{filtering__functions_8h_ac03b837d289c8bc4a86a34a89e44afdf}{arm\_fir\_decimate\_fast\_q31}}(}
+\DoxyCodeLine{00938\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structarm__fir__decimate__instance__q31}{arm\_fir\_decimate\_instance\_q31}}\ *\ S,}
+\DoxyCodeLine{00939\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_adc89a3547f5324b7b3b95adec3806bc0}{q31\_t}}\ *\ pSrc,}
+\DoxyCodeLine{00940\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_adc89a3547f5324b7b3b95adec3806bc0}{q31\_t}}\ *\ pDst,}
+\DoxyCodeLine{00941\ \ \ \ \ \ \ \ \ uint32\_t\ blockSize);}
+\DoxyCodeLine{00942\ }
+\DoxyCodeLine{00943\ }
+\DoxyCodeLine{00955\ \ \ \mbox{\hyperlink{arm__math__types_8h_a5e459c6409dfcd2927bb8a57491d7cf6}{arm\_status}}\ \mbox{\hyperlink{filtering__functions_8h_a6a19d62083e85b3f5e34e8a8283c1ea0}{arm\_fir\_decimate\_init\_q31}}(}
+\DoxyCodeLine{00956\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structarm__fir__decimate__instance__q31}{arm\_fir\_decimate\_instance\_q31}}\ *\ S,}
+\DoxyCodeLine{00957\ \ \ \ \ \ \ \ \ uint16\_t\ numTaps,}
+\DoxyCodeLine{00958\ \ \ \ \ \ \ \ \ uint8\_t\ M,}
+\DoxyCodeLine{00959\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_adc89a3547f5324b7b3b95adec3806bc0}{q31\_t}}\ *\ pCoeffs,}
+\DoxyCodeLine{00960\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_adc89a3547f5324b7b3b95adec3806bc0}{q31\_t}}\ *\ pState,}
+\DoxyCodeLine{00961\ \ \ \ \ \ \ \ \ uint32\_t\ blockSize);}
+\DoxyCodeLine{00962\ }
+\DoxyCodeLine{00963\ }
+\DoxyCodeLine{00967\ \ \ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct}}
+\DoxyCodeLine{00968\ \ \ \{}
+\DoxyCodeLine{00969\ \ \ \ \ \ \ \ \ uint8\_t\ \mbox{\hyperlink{structarm__fir__interpolate__instance__q15_a5431bdc079e72a973b51d359f7f13603}{L}};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00970\ \ \ \ \ \ \ \ \ uint16\_t\ \mbox{\hyperlink{structarm__fir__interpolate__instance__q15_ad5178a02a697a77e0d0e60705d9f0a19}{phaseLength}};\ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00971\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\mbox{\hyperlink{structarm__fir__interpolate__instance__q15_a239cee528ee8f79188fc34a94c86673b}{pCoeffs}};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00972\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\mbox{\hyperlink{structarm__fir__interpolate__instance__q15_a26b864363fa47954248f2590e3a82a3c}{pState}};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00973\ \ \ \}\ \mbox{\hyperlink{structarm__fir__interpolate__instance__q15}{arm\_fir\_interpolate\_instance\_q15}};}
+\DoxyCodeLine{00974\ }
+\DoxyCodeLine{00978\ \ \ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct}}
+\DoxyCodeLine{00979\ \ \ \{}
+\DoxyCodeLine{00980\ \ \ \ \ \ \ \ \ uint8\_t\ \mbox{\hyperlink{structarm__fir__interpolate__instance__q31_a5cdf0a631cb74e0e9588c388abe5235c}{L}};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00981\ \ \ \ \ \ \ \ \ uint16\_t\ \mbox{\hyperlink{structarm__fir__interpolate__instance__q31_a5d243796584afc7cd6c557f00b7acca5}{phaseLength}};\ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00982\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_adc89a3547f5324b7b3b95adec3806bc0}{q31\_t}}\ *\mbox{\hyperlink{structarm__fir__interpolate__instance__q31_a89c871637896a08168e87ec13691f020}{pCoeffs}};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00983\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_adc89a3547f5324b7b3b95adec3806bc0}{q31\_t}}\ *\mbox{\hyperlink{structarm__fir__interpolate__instance__q31_addde04514b6e6ac72be3d609f0398b1a}{pState}};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00984\ \ \ \}\ \mbox{\hyperlink{structarm__fir__interpolate__instance__q31}{arm\_fir\_interpolate\_instance\_q31}};}
+\DoxyCodeLine{00985\ }
+\DoxyCodeLine{00989\ \ \ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct}}
+\DoxyCodeLine{00990\ \ \ \{}
+\DoxyCodeLine{00991\ \ \ \ \ \ \ \ \ uint8\_t\ \mbox{\hyperlink{structarm__fir__interpolate__instance__f32_ae6f94dcc0ccd8aa4bc699b20985d9df5}{L}};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00992\ \ \ \ \ \ \ \ \ uint16\_t\ \mbox{\hyperlink{structarm__fir__interpolate__instance__f32_a389e669e13ec56292a70db8e92194b12}{phaseLength}};\ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00993\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{arm__math__types_8h_a4611b605e45ab401f02cab15c5e38715}{float32\_t}}\ *\mbox{\hyperlink{structarm__fir__interpolate__instance__f32_a9e1258a3dbe84fde28d5ee67311337f4}{pCoeffs}};\ \ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00994\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{arm__math__types_8h_a4611b605e45ab401f02cab15c5e38715}{float32\_t}}\ *\mbox{\hyperlink{structarm__fir__interpolate__instance__f32_a42a8ba1bda85fa86d7b6c84d3da4c75b}{pState}};\ \ \ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00995\ \ \ \}\ \mbox{\hyperlink{structarm__fir__interpolate__instance__f32}{arm\_fir\_interpolate\_instance\_f32}};}
+\DoxyCodeLine{00996\ }
+\DoxyCodeLine{00997\ }
+\DoxyCodeLine{01005\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{filtering__functions_8h_a026a02cda40616476e33b82e4eaf855d}{arm\_fir\_interpolate\_q15}}(}
+\DoxyCodeLine{01006\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structarm__fir__interpolate__instance__q15}{arm\_fir\_interpolate\_instance\_q15}}\ *\ S,}
+\DoxyCodeLine{01007\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\ pSrc,}
+\DoxyCodeLine{01008\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\ pDst,}
+\DoxyCodeLine{01009\ \ \ \ \ \ \ \ \ uint32\_t\ blockSize);}
+\DoxyCodeLine{01010\ }
+\DoxyCodeLine{01011\ }
+\DoxyCodeLine{01023\ \ \ \mbox{\hyperlink{arm__math__types_8h_a5e459c6409dfcd2927bb8a57491d7cf6}{arm\_status}}\ \mbox{\hyperlink{filtering__functions_8h_a9d6a3c53991f1dca4da31dc400ed9eec}{arm\_fir\_interpolate\_init\_q15}}(}
+\DoxyCodeLine{01024\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structarm__fir__interpolate__instance__q15}{arm\_fir\_interpolate\_instance\_q15}}\ *\ S,}
+\DoxyCodeLine{01025\ \ \ \ \ \ \ \ \ uint8\_t\ L,}
+\DoxyCodeLine{01026\ \ \ \ \ \ \ \ \ uint16\_t\ numTaps,}
+\DoxyCodeLine{01027\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\ pCoeffs,}
+\DoxyCodeLine{01028\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\ pState,}
+\DoxyCodeLine{01029\ \ \ \ \ \ \ \ \ uint32\_t\ blockSize);}
+\DoxyCodeLine{01030\ }
+\DoxyCodeLine{01031\ }
+\DoxyCodeLine{01039\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{filtering__functions_8h_adf65923ede13284c769b5621709e8135}{arm\_fir\_interpolate\_q31}}(}
+\DoxyCodeLine{01040\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structarm__fir__interpolate__instance__q31}{arm\_fir\_interpolate\_instance\_q31}}\ *\ S,}
+\DoxyCodeLine{01041\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_adc89a3547f5324b7b3b95adec3806bc0}{q31\_t}}\ *\ pSrc,}
+\DoxyCodeLine{01042\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_adc89a3547f5324b7b3b95adec3806bc0}{q31\_t}}\ *\ pDst,}
+\DoxyCodeLine{01043\ \ \ \ \ \ \ \ \ uint32\_t\ blockSize);}
+\DoxyCodeLine{01044\ }
+\DoxyCodeLine{01045\ }
+\DoxyCodeLine{01057\ \ \ \mbox{\hyperlink{arm__math__types_8h_a5e459c6409dfcd2927bb8a57491d7cf6}{arm\_status}}\ \mbox{\hyperlink{filtering__functions_8h_a2f2288aa947fea3e8bcda3d5e01c1f6d}{arm\_fir\_interpolate\_init\_q31}}(}
+\DoxyCodeLine{01058\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structarm__fir__interpolate__instance__q31}{arm\_fir\_interpolate\_instance\_q31}}\ *\ S,}
+\DoxyCodeLine{01059\ \ \ \ \ \ \ \ \ uint8\_t\ L,}
+\DoxyCodeLine{01060\ \ \ \ \ \ \ \ \ uint16\_t\ numTaps,}
+\DoxyCodeLine{01061\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_adc89a3547f5324b7b3b95adec3806bc0}{q31\_t}}\ *\ pCoeffs,}
+\DoxyCodeLine{01062\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_adc89a3547f5324b7b3b95adec3806bc0}{q31\_t}}\ *\ pState,}
+\DoxyCodeLine{01063\ \ \ \ \ \ \ \ \ uint32\_t\ blockSize);}
+\DoxyCodeLine{01064\ }
+\DoxyCodeLine{01065\ }
+\DoxyCodeLine{01073\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{filtering__functions_8h_a62d0757246bbbe5bfaf67b9a95c16c51}{arm\_fir\_interpolate\_f32}}(}
+\DoxyCodeLine{01074\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structarm__fir__interpolate__instance__f32}{arm\_fir\_interpolate\_instance\_f32}}\ *\ S,}
+\DoxyCodeLine{01075\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{arm__math__types_8h_a4611b605e45ab401f02cab15c5e38715}{float32\_t}}\ *\ pSrc,}
+\DoxyCodeLine{01076\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{arm__math__types_8h_a4611b605e45ab401f02cab15c5e38715}{float32\_t}}\ *\ pDst,}
+\DoxyCodeLine{01077\ \ \ \ \ \ \ \ \ uint32\_t\ blockSize);}
+\DoxyCodeLine{01078\ }
+\DoxyCodeLine{01079\ }
+\DoxyCodeLine{01091\ \ \ \mbox{\hyperlink{arm__math__types_8h_a5e459c6409dfcd2927bb8a57491d7cf6}{arm\_status}}\ \mbox{\hyperlink{filtering__functions_8h_a1416bcc1bcf6e2b18ff15261b6e04345}{arm\_fir\_interpolate\_init\_f32}}(}
+\DoxyCodeLine{01092\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structarm__fir__interpolate__instance__f32}{arm\_fir\_interpolate\_instance\_f32}}\ *\ S,}
+\DoxyCodeLine{01093\ \ \ \ \ \ \ \ \ uint8\_t\ L,}
+\DoxyCodeLine{01094\ \ \ \ \ \ \ \ \ uint16\_t\ numTaps,}
+\DoxyCodeLine{01095\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{arm__math__types_8h_a4611b605e45ab401f02cab15c5e38715}{float32\_t}}\ *\ pCoeffs,}
+\DoxyCodeLine{01096\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{arm__math__types_8h_a4611b605e45ab401f02cab15c5e38715}{float32\_t}}\ *\ pState,}
+\DoxyCodeLine{01097\ \ \ \ \ \ \ \ \ uint32\_t\ blockSize);}
+\DoxyCodeLine{01098\ }
+\DoxyCodeLine{01099\ }
+\DoxyCodeLine{01103\ \ \ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct}}
+\DoxyCodeLine{01104\ \ \ \{}
+\DoxyCodeLine{01105\ \ \ \ \ \ \ \ \ \ \ uint8\_t\ \mbox{\hyperlink{structarm__biquad__cas__df1__32x64__ins__q31_ad7cb9a9f5df8f4fcfc7a0b633672e574}{numStages}};\ \ \ \ \ \ \ }
+\DoxyCodeLine{01106\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_a5aea1cb12fc02d9d44c8abf217eaa5c6}{q63\_t}}\ *\mbox{\hyperlink{structarm__biquad__cas__df1__32x64__ins__q31_a4c899cdfaf2bb955323e93637bd662e0}{pState}};\ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{01107\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_adc89a3547f5324b7b3b95adec3806bc0}{q31\_t}}\ *\mbox{\hyperlink{structarm__biquad__cas__df1__32x64__ins__q31_a9cd8b5e514cd3af2537af13ae37125c4}{pCoeffs}};\ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{01108\ \ \ \ \ \ \ \ \ \ \ uint8\_t\ \mbox{\hyperlink{structarm__biquad__cas__df1__32x64__ins__q31_a8e9d58e8dba5aa3b2fc4f36d2ed07996}{postShift}};\ \ \ \ \ \ \ }
+\DoxyCodeLine{01109\ \ \ \}\ \mbox{\hyperlink{structarm__biquad__cas__df1__32x64__ins__q31}{arm\_biquad\_cas\_df1\_32x64\_ins\_q31}};}
+\DoxyCodeLine{01110\ }
+\DoxyCodeLine{01111\ }
+\DoxyCodeLine{01118\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{filtering__functions_8h_ae71a3095b94939418618ddf83caf739a}{arm\_biquad\_cas\_df1\_32x64\_q31}}(}
+\DoxyCodeLine{01119\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structarm__biquad__cas__df1__32x64__ins__q31}{arm\_biquad\_cas\_df1\_32x64\_ins\_q31}}\ *\ S,}
+\DoxyCodeLine{01120\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_adc89a3547f5324b7b3b95adec3806bc0}{q31\_t}}\ *\ pSrc,}
+\DoxyCodeLine{01121\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_adc89a3547f5324b7b3b95adec3806bc0}{q31\_t}}\ *\ pDst,}
+\DoxyCodeLine{01122\ \ \ \ \ \ \ \ \ uint32\_t\ blockSize);}
+\DoxyCodeLine{01123\ }
+\DoxyCodeLine{01124\ }
+\DoxyCodeLine{01132\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{filtering__functions_8h_a426cd78591a717e87d66d1eaa9a3d074}{arm\_biquad\_cas\_df1\_32x64\_init\_q31}}(}
+\DoxyCodeLine{01133\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structarm__biquad__cas__df1__32x64__ins__q31}{arm\_biquad\_cas\_df1\_32x64\_ins\_q31}}\ *\ S,}
+\DoxyCodeLine{01134\ \ \ \ \ \ \ \ \ uint8\_t\ numStages,}
+\DoxyCodeLine{01135\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_adc89a3547f5324b7b3b95adec3806bc0}{q31\_t}}\ *\ pCoeffs,}
+\DoxyCodeLine{01136\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_a5aea1cb12fc02d9d44c8abf217eaa5c6}{q63\_t}}\ *\ pState,}
+\DoxyCodeLine{01137\ \ \ \ \ \ \ \ \ uint8\_t\ postShift);}
+\DoxyCodeLine{01138\ }
+\DoxyCodeLine{01139\ }
+\DoxyCodeLine{01143\ \ \ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct}}
+\DoxyCodeLine{01144\ \ \ \{}
+\DoxyCodeLine{01145\ \ \ \ \ \ \ \ \ \ \ uint8\_t\ \mbox{\hyperlink{structarm__biquad__cascade__df2_t__instance__f32_a4d17958c33c3d0a905f974bac50f033f}{numStages}};\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{01146\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{arm__math__types_8h_a4611b605e45ab401f02cab15c5e38715}{float32\_t}}\ *\mbox{\hyperlink{structarm__biquad__cascade__df2_t__instance__f32_a24d223addfd926a7177088cf2efe76b1}{pState}};\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{01147\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{arm__math__types_8h_a4611b605e45ab401f02cab15c5e38715}{float32\_t}}\ *\mbox{\hyperlink{structarm__biquad__cascade__df2_t__instance__f32_a79de9be61b9e572e02f1774e9899cfb8}{pCoeffs}};\ \ \ \ \ \ \ \ }
+\DoxyCodeLine{01148\ \ \ \}\ \mbox{\hyperlink{structarm__biquad__cascade__df2_t__instance__f32}{arm\_biquad\_cascade\_df2T\_instance\_f32}};}
+\DoxyCodeLine{01149\ }
+\DoxyCodeLine{01153\ \ \ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct}}
+\DoxyCodeLine{01154\ \ \ \{}
+\DoxyCodeLine{01155\ \ \ \ \ \ \ \ \ \ \ uint8\_t\ \mbox{\hyperlink{structarm__biquad__cascade__stereo__df2_t__instance__f32_a5655328252da5c2c2425ceed253bc4f1}{numStages}};\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{01156\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{arm__math__types_8h_a4611b605e45ab401f02cab15c5e38715}{float32\_t}}\ *\mbox{\hyperlink{structarm__biquad__cascade__stereo__df2_t__instance__f32_a2cb00048bb1fe957a03c1ff56dfaf8f0}{pState}};\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{01157\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{arm__math__types_8h_a4611b605e45ab401f02cab15c5e38715}{float32\_t}}\ *\mbox{\hyperlink{structarm__biquad__cascade__stereo__df2_t__instance__f32_a68a22132ff134715ed2cc8d0f8225bc0}{pCoeffs}};\ \ \ \ \ \ \ \ }
+\DoxyCodeLine{01158\ \ \ \}\ \mbox{\hyperlink{structarm__biquad__cascade__stereo__df2_t__instance__f32}{arm\_biquad\_cascade\_stereo\_df2T\_instance\_f32}};}
+\DoxyCodeLine{01159\ }
+\DoxyCodeLine{01163\ \ \ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct}}
+\DoxyCodeLine{01164\ \ \ \{}
+\DoxyCodeLine{01165\ \ \ \ \ \ \ \ \ \ \ uint8\_t\ \mbox{\hyperlink{structarm__biquad__cascade__df2_t__instance__f64_ad55380ff835b533aa5168f836db8a4de}{numStages}};\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{01166\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{arm__math__types_8h_ac55f3ae81b5bc9053760baacf57e47f4}{float64\_t}}\ *\mbox{\hyperlink{structarm__biquad__cascade__df2_t__instance__f64_a0bde57b618e3f9059b23b0de64e12ce3}{pState}};\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{01167\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{arm__math__types_8h_ac55f3ae81b5bc9053760baacf57e47f4}{float64\_t}}\ *\mbox{\hyperlink{structarm__biquad__cascade__df2_t__instance__f64_a522c49eda9716512dba47255d5decba3}{pCoeffs}};\ \ \ \ \ \ \ \ }
+\DoxyCodeLine{01168\ \ \ \}\ \mbox{\hyperlink{structarm__biquad__cascade__df2_t__instance__f64}{arm\_biquad\_cascade\_df2T\_instance\_f64}};}
+\DoxyCodeLine{01169\ }
+\DoxyCodeLine{01170\ }
+\DoxyCodeLine{01178\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{filtering__functions_8h_a93e62f2e5db1f4c5878f2f9458023115}{arm\_biquad\_cascade\_df2T\_f32}}(}
+\DoxyCodeLine{01179\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structarm__biquad__cascade__df2_t__instance__f32}{arm\_biquad\_cascade\_df2T\_instance\_f32}}\ *\ S,}
+\DoxyCodeLine{01180\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{arm__math__types_8h_a4611b605e45ab401f02cab15c5e38715}{float32\_t}}\ *\ pSrc,}
+\DoxyCodeLine{01181\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{arm__math__types_8h_a4611b605e45ab401f02cab15c5e38715}{float32\_t}}\ *\ pDst,}
+\DoxyCodeLine{01182\ \ \ \ \ \ \ \ \ uint32\_t\ blockSize);}
+\DoxyCodeLine{01183\ }
+\DoxyCodeLine{01184\ }
+\DoxyCodeLine{01192\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{filtering__functions_8h_a14b45a551f73483474d8c7a5bd384442}{arm\_biquad\_cascade\_stereo\_df2T\_f32}}(}
+\DoxyCodeLine{01193\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structarm__biquad__cascade__stereo__df2_t__instance__f32}{arm\_biquad\_cascade\_stereo\_df2T\_instance\_f32}}\ *\ S,}
+\DoxyCodeLine{01194\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{arm__math__types_8h_a4611b605e45ab401f02cab15c5e38715}{float32\_t}}\ *\ pSrc,}
+\DoxyCodeLine{01195\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{arm__math__types_8h_a4611b605e45ab401f02cab15c5e38715}{float32\_t}}\ *\ pDst,}
+\DoxyCodeLine{01196\ \ \ \ \ \ \ \ \ uint32\_t\ blockSize);}
+\DoxyCodeLine{01197\ }
+\DoxyCodeLine{01198\ }
+\DoxyCodeLine{01206\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{filtering__functions_8h_ade498eb0ebe48a304973f46a2ceec991}{arm\_biquad\_cascade\_df2T\_f64}}(}
+\DoxyCodeLine{01207\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structarm__biquad__cascade__df2_t__instance__f64}{arm\_biquad\_cascade\_df2T\_instance\_f64}}\ *\ S,}
+\DoxyCodeLine{01208\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{arm__math__types_8h_ac55f3ae81b5bc9053760baacf57e47f4}{float64\_t}}\ *\ pSrc,}
+\DoxyCodeLine{01209\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{arm__math__types_8h_ac55f3ae81b5bc9053760baacf57e47f4}{float64\_t}}\ *\ pDst,}
+\DoxyCodeLine{01210\ \ \ \ \ \ \ \ \ uint32\_t\ blockSize);}
+\DoxyCodeLine{01211\ }
+\DoxyCodeLine{01212\ }
+\DoxyCodeLine{01213\ \textcolor{preprocessor}{\#if\ defined(ARM\_MATH\_NEON)\ }}
+\DoxyCodeLine{01221\ \textcolor{keywordtype}{void}\ arm\_biquad\_cascade\_df2T\_compute\_coefs\_f32(}
+\DoxyCodeLine{01222\ \ \ uint8\_t\ numStages,}
+\DoxyCodeLine{01223\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{arm__math__types_8h_a4611b605e45ab401f02cab15c5e38715}{float32\_t}}\ *\ pCoeffs,}
+\DoxyCodeLine{01224\ \ \ \mbox{\hyperlink{arm__math__types_8h_a4611b605e45ab401f02cab15c5e38715}{float32\_t}}\ *\ pComputedCoeffs);}
+\DoxyCodeLine{01225\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{01233\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{filtering__functions_8h_afd8b4068de567e9012e444f1c2320e1c}{arm\_biquad\_cascade\_df2T\_init\_f32}}(}
+\DoxyCodeLine{01234\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structarm__biquad__cascade__df2_t__instance__f32}{arm\_biquad\_cascade\_df2T\_instance\_f32}}\ *\ S,}
+\DoxyCodeLine{01235\ \ \ \ \ \ \ \ \ uint8\_t\ numStages,}
+\DoxyCodeLine{01236\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{arm__math__types_8h_a4611b605e45ab401f02cab15c5e38715}{float32\_t}}\ *\ pCoeffs,}
+\DoxyCodeLine{01237\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{arm__math__types_8h_a4611b605e45ab401f02cab15c5e38715}{float32\_t}}\ *\ pState);}
+\DoxyCodeLine{01238\ }
+\DoxyCodeLine{01239\ }
+\DoxyCodeLine{01247\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{filtering__functions_8h_a31a77581f3cba5f360c84b160d770d98}{arm\_biquad\_cascade\_stereo\_df2T\_init\_f32}}(}
+\DoxyCodeLine{01248\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structarm__biquad__cascade__stereo__df2_t__instance__f32}{arm\_biquad\_cascade\_stereo\_df2T\_instance\_f32}}\ *\ S,}
+\DoxyCodeLine{01249\ \ \ \ \ \ \ \ \ uint8\_t\ numStages,}
+\DoxyCodeLine{01250\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{arm__math__types_8h_a4611b605e45ab401f02cab15c5e38715}{float32\_t}}\ *\ pCoeffs,}
+\DoxyCodeLine{01251\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{arm__math__types_8h_a4611b605e45ab401f02cab15c5e38715}{float32\_t}}\ *\ pState);}
+\DoxyCodeLine{01252\ }
+\DoxyCodeLine{01253\ }
+\DoxyCodeLine{01261\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{filtering__functions_8h_a79679d4c04f56755b08601f7fea54539}{arm\_biquad\_cascade\_df2T\_init\_f64}}(}
+\DoxyCodeLine{01262\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structarm__biquad__cascade__df2_t__instance__f64}{arm\_biquad\_cascade\_df2T\_instance\_f64}}\ *\ S,}
+\DoxyCodeLine{01263\ \ \ \ \ \ \ \ \ uint8\_t\ numStages,}
+\DoxyCodeLine{01264\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{arm__math__types_8h_ac55f3ae81b5bc9053760baacf57e47f4}{float64\_t}}\ *\ pCoeffs,}
+\DoxyCodeLine{01265\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{arm__math__types_8h_ac55f3ae81b5bc9053760baacf57e47f4}{float64\_t}}\ *\ pState);}
+\DoxyCodeLine{01266\ }
+\DoxyCodeLine{01267\ }
+\DoxyCodeLine{01271\ \ \ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct}}
+\DoxyCodeLine{01272\ \ \ \{}
+\DoxyCodeLine{01273\ \ \ \ \ \ \ \ \ \ \ uint16\_t\ \mbox{\hyperlink{structarm__fir__lattice__instance__q15_a38b179138d6a6c9cac4f8f79b6fd5357}{numStages}};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{01274\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\mbox{\hyperlink{structarm__fir__lattice__instance__q15_a37b90dea2bc3ee7c9951a9fe74db0cbb}{pState}};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{01275\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\mbox{\hyperlink{structarm__fir__lattice__instance__q15_a0248d4f9908c38f9c7865ea5261f6856}{pCoeffs}};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{01276\ \ \ \}\ \mbox{\hyperlink{structarm__fir__lattice__instance__q15}{arm\_fir\_lattice\_instance\_q15}};}
+\DoxyCodeLine{01277\ }
+\DoxyCodeLine{01281\ \ \ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct}}
+\DoxyCodeLine{01282\ \ \ \{}
+\DoxyCodeLine{01283\ \ \ \ \ \ \ \ \ \ \ uint16\_t\ \mbox{\hyperlink{structarm__fir__lattice__instance__q31_a9f3773bbb76bc5a8a5ee9d37786bf478}{numStages}};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{01284\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_adc89a3547f5324b7b3b95adec3806bc0}{q31\_t}}\ *\mbox{\hyperlink{structarm__fir__lattice__instance__q31_a08fe9494ab7cd336b791e9657adadcf6}{pState}};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{01285\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_adc89a3547f5324b7b3b95adec3806bc0}{q31\_t}}\ *\mbox{\hyperlink{structarm__fir__lattice__instance__q31_ac9e648f1e5bc7d5ee6d5f7d8d22b1e74}{pCoeffs}};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{01286\ \ \ \}\ \mbox{\hyperlink{structarm__fir__lattice__instance__q31}{arm\_fir\_lattice\_instance\_q31}};}
+\DoxyCodeLine{01287\ }
+\DoxyCodeLine{01291\ \ \ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct}}
+\DoxyCodeLine{01292\ \ \ \{}
+\DoxyCodeLine{01293\ \ \ \ \ \ \ \ \ \ \ uint16\_t\ \mbox{\hyperlink{structarm__fir__lattice__instance__f32_ad369bd9997a250f195254df37408a38f}{numStages}};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{01294\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{arm__math__types_8h_a4611b605e45ab401f02cab15c5e38715}{float32\_t}}\ *\mbox{\hyperlink{structarm__fir__lattice__instance__f32_ae348884a1ba9b83fadccd5da640cbcaf}{pState}};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{01295\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{arm__math__types_8h_a4611b605e45ab401f02cab15c5e38715}{float32\_t}}\ *\mbox{\hyperlink{structarm__fir__lattice__instance__f32_aec9f6580180489d073bb5be700d72bbc}{pCoeffs}};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{01296\ \ \ \}\ \mbox{\hyperlink{structarm__fir__lattice__instance__f32}{arm\_fir\_lattice\_instance\_f32}};}
+\DoxyCodeLine{01297\ }
+\DoxyCodeLine{01298\ }
+\DoxyCodeLine{01306\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{filtering__functions_8h_ae4657ac1025b5b4294fd4acc1e49e7f8}{arm\_fir\_lattice\_init\_q15}}(}
+\DoxyCodeLine{01307\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structarm__fir__lattice__instance__q15}{arm\_fir\_lattice\_instance\_q15}}\ *\ S,}
+\DoxyCodeLine{01308\ \ \ \ \ \ \ \ \ uint16\_t\ numStages,}
+\DoxyCodeLine{01309\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\ pCoeffs,}
+\DoxyCodeLine{01310\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\ pState);}
+\DoxyCodeLine{01311\ }
+\DoxyCodeLine{01312\ }
+\DoxyCodeLine{01320\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{filtering__functions_8h_afddb7fd49cb0e8a4b6d9546b58bf60fb}{arm\_fir\_lattice\_q15}}(}
+\DoxyCodeLine{01321\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structarm__fir__lattice__instance__q15}{arm\_fir\_lattice\_instance\_q15}}\ *\ S,}
+\DoxyCodeLine{01322\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\ pSrc,}
+\DoxyCodeLine{01323\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\ pDst,}
+\DoxyCodeLine{01324\ \ \ \ \ \ \ \ \ uint32\_t\ blockSize);}
+\DoxyCodeLine{01325\ }
+\DoxyCodeLine{01326\ }
+\DoxyCodeLine{01334\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{filtering__functions_8h_af7723f451f6d4cf2586bb4b63d2029cb}{arm\_fir\_lattice\_init\_q31}}(}
+\DoxyCodeLine{01335\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structarm__fir__lattice__instance__q31}{arm\_fir\_lattice\_instance\_q31}}\ *\ S,}
+\DoxyCodeLine{01336\ \ \ \ \ \ \ \ \ uint16\_t\ numStages,}
+\DoxyCodeLine{01337\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_adc89a3547f5324b7b3b95adec3806bc0}{q31\_t}}\ *\ pCoeffs,}
+\DoxyCodeLine{01338\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_adc89a3547f5324b7b3b95adec3806bc0}{q31\_t}}\ *\ pState);}
+\DoxyCodeLine{01339\ }
+\DoxyCodeLine{01340\ }
+\DoxyCodeLine{01348\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{filtering__functions_8h_a9ae2b76a2a1625d00f902919d0fdea05}{arm\_fir\_lattice\_q31}}(}
+\DoxyCodeLine{01349\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structarm__fir__lattice__instance__q31}{arm\_fir\_lattice\_instance\_q31}}\ *\ S,}
+\DoxyCodeLine{01350\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_adc89a3547f5324b7b3b95adec3806bc0}{q31\_t}}\ *\ pSrc,}
+\DoxyCodeLine{01351\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_adc89a3547f5324b7b3b95adec3806bc0}{q31\_t}}\ *\ pDst,}
+\DoxyCodeLine{01352\ \ \ \ \ \ \ \ \ uint32\_t\ blockSize);}
+\DoxyCodeLine{01353\ }
+\DoxyCodeLine{01354\ }
+\DoxyCodeLine{01362\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{filtering__functions_8h_a489e9fd4fed0037b5ed0947eaa12d68d}{arm\_fir\_lattice\_init\_f32}}(}
+\DoxyCodeLine{01363\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structarm__fir__lattice__instance__f32}{arm\_fir\_lattice\_instance\_f32}}\ *\ S,}
+\DoxyCodeLine{01364\ \ \ \ \ \ \ \ \ uint16\_t\ numStages,}
+\DoxyCodeLine{01365\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{arm__math__types_8h_a4611b605e45ab401f02cab15c5e38715}{float32\_t}}\ *\ pCoeffs,}
+\DoxyCodeLine{01366\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{arm__math__types_8h_a4611b605e45ab401f02cab15c5e38715}{float32\_t}}\ *\ pState);}
+\DoxyCodeLine{01367\ }
+\DoxyCodeLine{01368\ }
+\DoxyCodeLine{01376\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{filtering__functions_8h_a62053bf9d04f9f97ee5f4ef831533d68}{arm\_fir\_lattice\_f32}}(}
+\DoxyCodeLine{01377\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structarm__fir__lattice__instance__f32}{arm\_fir\_lattice\_instance\_f32}}\ *\ S,}
+\DoxyCodeLine{01378\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{arm__math__types_8h_a4611b605e45ab401f02cab15c5e38715}{float32\_t}}\ *\ pSrc,}
+\DoxyCodeLine{01379\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{arm__math__types_8h_a4611b605e45ab401f02cab15c5e38715}{float32\_t}}\ *\ pDst,}
+\DoxyCodeLine{01380\ \ \ \ \ \ \ \ \ uint32\_t\ blockSize);}
+\DoxyCodeLine{01381\ }
+\DoxyCodeLine{01382\ }
+\DoxyCodeLine{01386\ \ \ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct}}
+\DoxyCodeLine{01387\ \ \ \{}
+\DoxyCodeLine{01388\ \ \ \ \ \ \ \ \ \ \ uint16\_t\ \mbox{\hyperlink{structarm__iir__lattice__instance__q15_a96fbed313bef01070409fa182d26ba3f}{numStages}};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{01389\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\mbox{\hyperlink{structarm__iir__lattice__instance__q15_afd0136ab917b529554d93f41a5e04618}{pState}};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{01390\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\mbox{\hyperlink{structarm__iir__lattice__instance__q15_a41c214a1ec38d4a82fae8899d715dd29}{pkCoeffs}};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{01391\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\mbox{\hyperlink{structarm__iir__lattice__instance__q15_a4c4f57f45b223abbe2a9fb727bd2cad9}{pvCoeffs}};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{01392\ \ \ \}\ \mbox{\hyperlink{structarm__iir__lattice__instance__q15}{arm\_iir\_lattice\_instance\_q15}};}
+\DoxyCodeLine{01393\ }
+\DoxyCodeLine{01397\ \ \ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct}}
+\DoxyCodeLine{01398\ \ \ \{}
+\DoxyCodeLine{01399\ \ \ \ \ \ \ \ \ \ \ uint16\_t\ \mbox{\hyperlink{structarm__iir__lattice__instance__q31_a9df4570ed28c50fd9193ab654ff236ad}{numStages}};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{01400\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_adc89a3547f5324b7b3b95adec3806bc0}{q31\_t}}\ *\mbox{\hyperlink{structarm__iir__lattice__instance__q31_a941282745effd26a889fbfadf4b95e6a}{pState}};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{01401\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_adc89a3547f5324b7b3b95adec3806bc0}{q31\_t}}\ *\mbox{\hyperlink{structarm__iir__lattice__instance__q31_a1d30aa16aac7722936ea9dee59211863}{pkCoeffs}};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{01402\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_adc89a3547f5324b7b3b95adec3806bc0}{q31\_t}}\ *\mbox{\hyperlink{structarm__iir__lattice__instance__q31_a04507e2b982b1dfa97b7b55752dea6b9}{pvCoeffs}};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{01403\ \ \ \}\ \mbox{\hyperlink{structarm__iir__lattice__instance__q31}{arm\_iir\_lattice\_instance\_q31}};}
+\DoxyCodeLine{01404\ }
+\DoxyCodeLine{01408\ \ \ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct}}
+\DoxyCodeLine{01409\ \ \ \{}
+\DoxyCodeLine{01410\ \ \ \ \ \ \ \ \ \ \ uint16\_t\ \mbox{\hyperlink{structarm__iir__lattice__instance__f32_af8de449af5efe1f30be82f9ba35587ee}{numStages}};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{01411\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{arm__math__types_8h_a4611b605e45ab401f02cab15c5e38715}{float32\_t}}\ *\mbox{\hyperlink{structarm__iir__lattice__instance__f32_a30babe7815510219e6e3d28e6e4a5969}{pState}};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{01412\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{arm__math__types_8h_a4611b605e45ab401f02cab15c5e38715}{float32\_t}}\ *\mbox{\hyperlink{structarm__iir__lattice__instance__f32_aa69fcdd3775e828d450ce1bbd978fa31}{pkCoeffs}};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{01413\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{arm__math__types_8h_a4611b605e45ab401f02cab15c5e38715}{float32\_t}}\ *\mbox{\hyperlink{structarm__iir__lattice__instance__f32_afc7c8f577e6f27d097fe55f57e707f72}{pvCoeffs}};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{01414\ \ \ \}\ \mbox{\hyperlink{structarm__iir__lattice__instance__f32}{arm\_iir\_lattice\_instance\_f32}};}
+\DoxyCodeLine{01415\ }
+\DoxyCodeLine{01416\ }
+\DoxyCodeLine{01424\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{filtering__functions_8h_a754a44b604c386d132b4b05a3d9e0f44}{arm\_iir\_lattice\_f32}}(}
+\DoxyCodeLine{01425\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structarm__iir__lattice__instance__f32}{arm\_iir\_lattice\_instance\_f32}}\ *\ S,}
+\DoxyCodeLine{01426\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{arm__math__types_8h_a4611b605e45ab401f02cab15c5e38715}{float32\_t}}\ *\ pSrc,}
+\DoxyCodeLine{01427\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{arm__math__types_8h_a4611b605e45ab401f02cab15c5e38715}{float32\_t}}\ *\ pDst,}
+\DoxyCodeLine{01428\ \ \ \ \ \ \ \ \ uint32\_t\ blockSize);}
+\DoxyCodeLine{01429\ }
+\DoxyCodeLine{01430\ }
+\DoxyCodeLine{01440\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{filtering__functions_8h_aed3b0230bb77439dc902daa625985e04}{arm\_iir\_lattice\_init\_f32}}(}
+\DoxyCodeLine{01441\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structarm__iir__lattice__instance__f32}{arm\_iir\_lattice\_instance\_f32}}\ *\ S,}
+\DoxyCodeLine{01442\ \ \ \ \ \ \ \ \ uint16\_t\ numStages,}
+\DoxyCodeLine{01443\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{arm__math__types_8h_a4611b605e45ab401f02cab15c5e38715}{float32\_t}}\ *\ pkCoeffs,}
+\DoxyCodeLine{01444\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{arm__math__types_8h_a4611b605e45ab401f02cab15c5e38715}{float32\_t}}\ *\ pvCoeffs,}
+\DoxyCodeLine{01445\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{arm__math__types_8h_a4611b605e45ab401f02cab15c5e38715}{float32\_t}}\ *\ pState,}
+\DoxyCodeLine{01446\ \ \ \ \ \ \ \ \ uint32\_t\ blockSize);}
+\DoxyCodeLine{01447\ }
+\DoxyCodeLine{01448\ }
+\DoxyCodeLine{01456\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{filtering__functions_8h_a87d7df8f8787402d4331de156a82687f}{arm\_iir\_lattice\_q31}}(}
+\DoxyCodeLine{01457\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structarm__iir__lattice__instance__q31}{arm\_iir\_lattice\_instance\_q31}}\ *\ S,}
+\DoxyCodeLine{01458\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_adc89a3547f5324b7b3b95adec3806bc0}{q31\_t}}\ *\ pSrc,}
+\DoxyCodeLine{01459\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_adc89a3547f5324b7b3b95adec3806bc0}{q31\_t}}\ *\ pDst,}
+\DoxyCodeLine{01460\ \ \ \ \ \ \ \ \ uint32\_t\ blockSize);}
+\DoxyCodeLine{01461\ }
+\DoxyCodeLine{01462\ }
+\DoxyCodeLine{01472\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{filtering__functions_8h_ab686c14175581797d9c3ad7bf1d5cc1e}{arm\_iir\_lattice\_init\_q31}}(}
+\DoxyCodeLine{01473\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structarm__iir__lattice__instance__q31}{arm\_iir\_lattice\_instance\_q31}}\ *\ S,}
+\DoxyCodeLine{01474\ \ \ \ \ \ \ \ \ uint16\_t\ numStages,}
+\DoxyCodeLine{01475\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_adc89a3547f5324b7b3b95adec3806bc0}{q31\_t}}\ *\ pkCoeffs,}
+\DoxyCodeLine{01476\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_adc89a3547f5324b7b3b95adec3806bc0}{q31\_t}}\ *\ pvCoeffs,}
+\DoxyCodeLine{01477\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_adc89a3547f5324b7b3b95adec3806bc0}{q31\_t}}\ *\ pState,}
+\DoxyCodeLine{01478\ \ \ \ \ \ \ \ \ uint32\_t\ blockSize);}
+\DoxyCodeLine{01479\ }
+\DoxyCodeLine{01480\ }
+\DoxyCodeLine{01488\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{filtering__functions_8h_a49181562f33456fa979e474e2a657d19}{arm\_iir\_lattice\_q15}}(}
+\DoxyCodeLine{01489\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structarm__iir__lattice__instance__q15}{arm\_iir\_lattice\_instance\_q15}}\ *\ S,}
+\DoxyCodeLine{01490\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\ pSrc,}
+\DoxyCodeLine{01491\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\ pDst,}
+\DoxyCodeLine{01492\ \ \ \ \ \ \ \ \ uint32\_t\ blockSize);}
+\DoxyCodeLine{01493\ }
+\DoxyCodeLine{01494\ }
+\DoxyCodeLine{01504\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{filtering__functions_8h_a1f4bc2dd3d5641e96815d3a5aad58998}{arm\_iir\_lattice\_init\_q15}}(}
+\DoxyCodeLine{01505\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structarm__iir__lattice__instance__q15}{arm\_iir\_lattice\_instance\_q15}}\ *\ S,}
+\DoxyCodeLine{01506\ \ \ \ \ \ \ \ \ uint16\_t\ numStages,}
+\DoxyCodeLine{01507\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\ pkCoeffs,}
+\DoxyCodeLine{01508\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\ pvCoeffs,}
+\DoxyCodeLine{01509\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\ pState,}
+\DoxyCodeLine{01510\ \ \ \ \ \ \ \ \ uint32\_t\ blockSize);}
+\DoxyCodeLine{01511\ }
+\DoxyCodeLine{01512\ }
+\DoxyCodeLine{01516\ \ \ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct}}
+\DoxyCodeLine{01517\ \ \ \{}
+\DoxyCodeLine{01518\ \ \ \ \ \ \ \ \ \ \ uint16\_t\ \mbox{\hyperlink{structarm__lms__instance__f32_af73880d9009982f5d14529869494ec3d}{numTaps}};\ \ \ \ }
+\DoxyCodeLine{01519\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{arm__math__types_8h_a4611b605e45ab401f02cab15c5e38715}{float32\_t}}\ *\mbox{\hyperlink{structarm__lms__instance__f32_aaf94285be2f99b5b9af40bea8dcb14b9}{pState}};\ \ \ }
+\DoxyCodeLine{01520\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{arm__math__types_8h_a4611b605e45ab401f02cab15c5e38715}{float32\_t}}\ *\mbox{\hyperlink{structarm__lms__instance__f32_a4795c6f7d3f17cec15c2fd09f66edd1a}{pCoeffs}};\ \ }
+\DoxyCodeLine{01521\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{arm__math__types_8h_a4611b605e45ab401f02cab15c5e38715}{float32\_t}}\ \mbox{\hyperlink{structarm__lms__instance__f32_ae2af43d74c93dba16b876e10c97a5b99}{mu}};\ \ \ \ \ \ \ \ }
+\DoxyCodeLine{01522\ \ \ \}\ \mbox{\hyperlink{structarm__lms__instance__f32}{arm\_lms\_instance\_f32}};}
+\DoxyCodeLine{01523\ }
+\DoxyCodeLine{01524\ }
+\DoxyCodeLine{01534\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{filtering__functions_8h_ac518f7acd1778a8ee90e81c421cfbb90}{arm\_lms\_f32}}(}
+\DoxyCodeLine{01535\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structarm__lms__instance__f32}{arm\_lms\_instance\_f32}}\ *\ S,}
+\DoxyCodeLine{01536\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{arm__math__types_8h_a4611b605e45ab401f02cab15c5e38715}{float32\_t}}\ *\ pSrc,}
+\DoxyCodeLine{01537\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{arm__math__types_8h_a4611b605e45ab401f02cab15c5e38715}{float32\_t}}\ *\ pRef,}
+\DoxyCodeLine{01538\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{arm__math__types_8h_a4611b605e45ab401f02cab15c5e38715}{float32\_t}}\ *\ pOut,}
+\DoxyCodeLine{01539\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{arm__math__types_8h_a4611b605e45ab401f02cab15c5e38715}{float32\_t}}\ *\ pErr,}
+\DoxyCodeLine{01540\ \ \ \ \ \ \ \ \ uint32\_t\ blockSize);}
+\DoxyCodeLine{01541\ }
+\DoxyCodeLine{01542\ }
+\DoxyCodeLine{01552\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{filtering__functions_8h_a9fc7adca0966ff2cec1746fca8364cee}{arm\_lms\_init\_f32}}(}
+\DoxyCodeLine{01553\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structarm__lms__instance__f32}{arm\_lms\_instance\_f32}}\ *\ S,}
+\DoxyCodeLine{01554\ \ \ \ \ \ \ \ \ uint16\_t\ numTaps,}
+\DoxyCodeLine{01555\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{arm__math__types_8h_a4611b605e45ab401f02cab15c5e38715}{float32\_t}}\ *\ pCoeffs,}
+\DoxyCodeLine{01556\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{arm__math__types_8h_a4611b605e45ab401f02cab15c5e38715}{float32\_t}}\ *\ pState,}
+\DoxyCodeLine{01557\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{arm__math__types_8h_a4611b605e45ab401f02cab15c5e38715}{float32\_t}}\ mu,}
+\DoxyCodeLine{01558\ \ \ \ \ \ \ \ \ uint32\_t\ blockSize);}
+\DoxyCodeLine{01559\ }
+\DoxyCodeLine{01560\ }
+\DoxyCodeLine{01564\ \ \ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct}}
+\DoxyCodeLine{01565\ \ \ \{}
+\DoxyCodeLine{01566\ \ \ \ \ \ \ \ \ \ \ uint16\_t\ \mbox{\hyperlink{structarm__lms__instance__q15_a0078e894f805af1b360369e619fb57b3}{numTaps}};\ \ \ \ }
+\DoxyCodeLine{01567\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\mbox{\hyperlink{structarm__lms__instance__q15_a9a575ff82c1e68cbb583083439260d08}{pState}};\ \ \ \ \ \ \ }
+\DoxyCodeLine{01568\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\mbox{\hyperlink{structarm__lms__instance__q15_a42f95368b94898eb82608e1113d18cab}{pCoeffs}};\ \ \ \ \ \ }
+\DoxyCodeLine{01569\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ \mbox{\hyperlink{structarm__lms__instance__q15_aae46129d7cfd7f1c162cc502ed0a9d49}{mu}};\ \ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{01570\ \ \ \ \ \ \ \ \ \ \ uint32\_t\ \mbox{\hyperlink{structarm__lms__instance__q15_acca5fbaef4a52ae411de24c9a0b929cf}{postShift}};\ \ }
+\DoxyCodeLine{01571\ \ \ \}\ \mbox{\hyperlink{structarm__lms__instance__q15}{arm\_lms\_instance\_q15}};}
+\DoxyCodeLine{01572\ }
+\DoxyCodeLine{01573\ }
+\DoxyCodeLine{01584\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{filtering__functions_8h_a9544cc26f18cd4465cfbed371be822b3}{arm\_lms\_init\_q15}}(}
+\DoxyCodeLine{01585\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structarm__lms__instance__q15}{arm\_lms\_instance\_q15}}\ *\ S,}
+\DoxyCodeLine{01586\ \ \ \ \ \ \ \ \ uint16\_t\ numTaps,}
+\DoxyCodeLine{01587\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\ pCoeffs,}
+\DoxyCodeLine{01588\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\ pState,}
+\DoxyCodeLine{01589\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ mu,}
+\DoxyCodeLine{01590\ \ \ \ \ \ \ \ \ uint32\_t\ blockSize,}
+\DoxyCodeLine{01591\ \ \ \ \ \ \ \ \ uint32\_t\ postShift);}
+\DoxyCodeLine{01592\ }
+\DoxyCodeLine{01593\ }
+\DoxyCodeLine{01603\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{filtering__functions_8h_a12fd93f61401b365789cdfd5dca07e5b}{arm\_lms\_q15}}(}
+\DoxyCodeLine{01604\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structarm__lms__instance__q15}{arm\_lms\_instance\_q15}}\ *\ S,}
+\DoxyCodeLine{01605\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\ pSrc,}
+\DoxyCodeLine{01606\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\ pRef,}
+\DoxyCodeLine{01607\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\ pOut,}
+\DoxyCodeLine{01608\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\ pErr,}
+\DoxyCodeLine{01609\ \ \ \ \ \ \ \ \ uint32\_t\ blockSize);}
+\DoxyCodeLine{01610\ }
+\DoxyCodeLine{01611\ }
+\DoxyCodeLine{01615\ \ \ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct}}
+\DoxyCodeLine{01616\ \ \ \{}
+\DoxyCodeLine{01617\ \ \ \ \ \ \ \ \ \ \ uint16\_t\ \mbox{\hyperlink{structarm__lms__instance__q31_ac0d84f7d054555931ef8a62511fbcb8a}{numTaps}};\ \ \ \ }
+\DoxyCodeLine{01618\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_adc89a3547f5324b7b3b95adec3806bc0}{q31\_t}}\ *\mbox{\hyperlink{structarm__lms__instance__q31_a206d47b49de6f357f933ebe61520753c}{pState}};\ \ \ \ \ \ \ }
+\DoxyCodeLine{01619\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_adc89a3547f5324b7b3b95adec3806bc0}{q31\_t}}\ *\mbox{\hyperlink{structarm__lms__instance__q31_a4afe56e991a5416adfd462aa88bda500}{pCoeffs}};\ \ \ \ \ \ }
+\DoxyCodeLine{01620\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_adc89a3547f5324b7b3b95adec3806bc0}{q31\_t}}\ \mbox{\hyperlink{structarm__lms__instance__q31_acb6ca9996b3c5f740d5d6c8e9f4f1d46}{mu}};\ \ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{01621\ \ \ \ \ \ \ \ \ \ \ uint32\_t\ \mbox{\hyperlink{structarm__lms__instance__q31_a4705a8f0011bb9166e09bf5bd51e595e}{postShift}};\ \ }
+\DoxyCodeLine{01622\ \ \ \}\ \mbox{\hyperlink{structarm__lms__instance__q31}{arm\_lms\_instance\_q31}};}
+\DoxyCodeLine{01623\ }
+\DoxyCodeLine{01624\ }
+\DoxyCodeLine{01634\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{filtering__functions_8h_a69c9c64338c067f1fb4990dcdc8c143f}{arm\_lms\_q31}}(}
+\DoxyCodeLine{01635\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structarm__lms__instance__q31}{arm\_lms\_instance\_q31}}\ *\ S,}
+\DoxyCodeLine{01636\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_adc89a3547f5324b7b3b95adec3806bc0}{q31\_t}}\ *\ pSrc,}
+\DoxyCodeLine{01637\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_adc89a3547f5324b7b3b95adec3806bc0}{q31\_t}}\ *\ pRef,}
+\DoxyCodeLine{01638\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_adc89a3547f5324b7b3b95adec3806bc0}{q31\_t}}\ *\ pOut,}
+\DoxyCodeLine{01639\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_adc89a3547f5324b7b3b95adec3806bc0}{q31\_t}}\ *\ pErr,}
+\DoxyCodeLine{01640\ \ \ \ \ \ \ \ \ uint32\_t\ blockSize);}
+\DoxyCodeLine{01641\ }
+\DoxyCodeLine{01642\ }
+\DoxyCodeLine{01653\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{filtering__functions_8h_a8d4bc251169f4b102355097a9f7530d6}{arm\_lms\_init\_q31}}(}
+\DoxyCodeLine{01654\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structarm__lms__instance__q31}{arm\_lms\_instance\_q31}}\ *\ S,}
+\DoxyCodeLine{01655\ \ \ \ \ \ \ \ \ uint16\_t\ numTaps,}
+\DoxyCodeLine{01656\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_adc89a3547f5324b7b3b95adec3806bc0}{q31\_t}}\ *\ pCoeffs,}
+\DoxyCodeLine{01657\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_adc89a3547f5324b7b3b95adec3806bc0}{q31\_t}}\ *\ pState,}
+\DoxyCodeLine{01658\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_adc89a3547f5324b7b3b95adec3806bc0}{q31\_t}}\ mu,}
+\DoxyCodeLine{01659\ \ \ \ \ \ \ \ \ uint32\_t\ blockSize,}
+\DoxyCodeLine{01660\ \ \ \ \ \ \ \ \ uint32\_t\ postShift);}
+\DoxyCodeLine{01661\ }
+\DoxyCodeLine{01662\ }
+\DoxyCodeLine{01666\ \ \ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct}}
+\DoxyCodeLine{01667\ \ \ \{}
+\DoxyCodeLine{01668\ \ \ \ \ \ \ \ \ \ \ uint16\_t\ \mbox{\hyperlink{structarm__lms__norm__instance__f32_ac95f8ca3d816524c2070643852fac5e8}{numTaps}};\ \ \ \ \ }
+\DoxyCodeLine{01669\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{arm__math__types_8h_a4611b605e45ab401f02cab15c5e38715}{float32\_t}}\ *\mbox{\hyperlink{structarm__lms__norm__instance__f32_a0bc03338687002ed5f2e4a363eb095ec}{pState}};\ \ \ \ }
+\DoxyCodeLine{01670\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{arm__math__types_8h_a4611b605e45ab401f02cab15c5e38715}{float32\_t}}\ *\mbox{\hyperlink{structarm__lms__norm__instance__f32_a1ba688d90aba7de003ed4ad8e2e7ddda}{pCoeffs}};\ \ \ }
+\DoxyCodeLine{01671\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{arm__math__types_8h_a4611b605e45ab401f02cab15c5e38715}{float32\_t}}\ \mbox{\hyperlink{structarm__lms__norm__instance__f32_a84401d3cfc6c40f69c08223cf341b886}{mu}};\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{01672\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{arm__math__types_8h_a4611b605e45ab401f02cab15c5e38715}{float32\_t}}\ \mbox{\hyperlink{structarm__lms__norm__instance__f32_a6a4119e4f39447bbee31b066deafa16f}{energy}};\ \ \ \ \ }
+\DoxyCodeLine{01673\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{arm__math__types_8h_a4611b605e45ab401f02cab15c5e38715}{float32\_t}}\ \mbox{\hyperlink{structarm__lms__norm__instance__f32_aec958fe89b164a30f38bcca9f5d96218}{x0}};\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{01674\ \ \ \}\ \mbox{\hyperlink{structarm__lms__norm__instance__f32}{arm\_lms\_norm\_instance\_f32}};}
+\DoxyCodeLine{01675\ }
+\DoxyCodeLine{01676\ }
+\DoxyCodeLine{01686\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{filtering__functions_8h_a72b3755ed1cf97622851cbbeff83c69e}{arm\_lms\_norm\_f32}}(}
+\DoxyCodeLine{01687\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structarm__lms__norm__instance__f32}{arm\_lms\_norm\_instance\_f32}}\ *\ S,}
+\DoxyCodeLine{01688\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{arm__math__types_8h_a4611b605e45ab401f02cab15c5e38715}{float32\_t}}\ *\ pSrc,}
+\DoxyCodeLine{01689\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{arm__math__types_8h_a4611b605e45ab401f02cab15c5e38715}{float32\_t}}\ *\ pRef,}
+\DoxyCodeLine{01690\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{arm__math__types_8h_a4611b605e45ab401f02cab15c5e38715}{float32\_t}}\ *\ pOut,}
+\DoxyCodeLine{01691\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{arm__math__types_8h_a4611b605e45ab401f02cab15c5e38715}{float32\_t}}\ *\ pErr,}
+\DoxyCodeLine{01692\ \ \ \ \ \ \ \ \ uint32\_t\ blockSize);}
+\DoxyCodeLine{01693\ }
+\DoxyCodeLine{01694\ }
+\DoxyCodeLine{01704\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{filtering__functions_8h_ac7ccbaea863882056eee815456464670}{arm\_lms\_norm\_init\_f32}}(}
+\DoxyCodeLine{01705\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structarm__lms__norm__instance__f32}{arm\_lms\_norm\_instance\_f32}}\ *\ S,}
+\DoxyCodeLine{01706\ \ \ \ \ \ \ \ \ uint16\_t\ numTaps,}
+\DoxyCodeLine{01707\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{arm__math__types_8h_a4611b605e45ab401f02cab15c5e38715}{float32\_t}}\ *\ pCoeffs,}
+\DoxyCodeLine{01708\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{arm__math__types_8h_a4611b605e45ab401f02cab15c5e38715}{float32\_t}}\ *\ pState,}
+\DoxyCodeLine{01709\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{arm__math__types_8h_a4611b605e45ab401f02cab15c5e38715}{float32\_t}}\ mu,}
+\DoxyCodeLine{01710\ \ \ \ \ \ \ \ \ uint32\_t\ blockSize);}
+\DoxyCodeLine{01711\ }
+\DoxyCodeLine{01712\ }
+\DoxyCodeLine{01716\ \ \ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct}}
+\DoxyCodeLine{01717\ \ \ \{}
+\DoxyCodeLine{01718\ \ \ \ \ \ \ \ \ \ \ uint16\_t\ \mbox{\hyperlink{structarm__lms__norm__instance__q31_a28e4c085af69c9c3e2e95dacf8004c3e}{numTaps}};\ \ \ \ \ }
+\DoxyCodeLine{01719\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_adc89a3547f5324b7b3b95adec3806bc0}{q31\_t}}\ *\mbox{\hyperlink{structarm__lms__norm__instance__q31_a6b25c96cf048b77078d62f4252a01ec4}{pState}};\ \ \ \ \ \ \ \ }
+\DoxyCodeLine{01720\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_adc89a3547f5324b7b3b95adec3806bc0}{q31\_t}}\ *\mbox{\hyperlink{structarm__lms__norm__instance__q31_a57a64c1ff102d033c1bd05043f1d9955}{pCoeffs}};\ \ \ \ \ \ \ }
+\DoxyCodeLine{01721\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_adc89a3547f5324b7b3b95adec3806bc0}{q31\_t}}\ \mbox{\hyperlink{structarm__lms__norm__instance__q31_ad3dd2a2406e02fdaa7782ba6c3940a64}{mu}};\ \ \ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{01722\ \ \ \ \ \ \ \ \ \ \ uint8\_t\ \mbox{\hyperlink{structarm__lms__norm__instance__q31_a28d7b9e437817f83397e081967e90f3c}{postShift}};\ \ \ \ }
+\DoxyCodeLine{01723\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_adc89a3547f5324b7b3b95adec3806bc0}{q31\_t}}\ *\mbox{\hyperlink{structarm__lms__norm__instance__q31_adb1c356b4f9d6d1a9838577bc990e8eb}{recipTable}};\ \ \ \ }
+\DoxyCodeLine{01724\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_adc89a3547f5324b7b3b95adec3806bc0}{q31\_t}}\ \mbox{\hyperlink{structarm__lms__norm__instance__q31_a3c0ae42869afec8555dc8e3a7ef9b386}{energy}};\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{01725\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_adc89a3547f5324b7b3b95adec3806bc0}{q31\_t}}\ \mbox{\hyperlink{structarm__lms__norm__instance__q31_a47c4466d644e0d8ba407995adfa9b917}{x0}};\ \ \ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{01726\ \ \ \}\ \mbox{\hyperlink{structarm__lms__norm__instance__q31}{arm\_lms\_norm\_instance\_q31}};}
+\DoxyCodeLine{01727\ }
+\DoxyCodeLine{01728\ }
+\DoxyCodeLine{01738\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{filtering__functions_8h_ae12fc16232c8087345e5910fcb840be9}{arm\_lms\_norm\_q31}}(}
+\DoxyCodeLine{01739\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structarm__lms__norm__instance__q31}{arm\_lms\_norm\_instance\_q31}}\ *\ S,}
+\DoxyCodeLine{01740\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_adc89a3547f5324b7b3b95adec3806bc0}{q31\_t}}\ *\ pSrc,}
+\DoxyCodeLine{01741\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_adc89a3547f5324b7b3b95adec3806bc0}{q31\_t}}\ *\ pRef,}
+\DoxyCodeLine{01742\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_adc89a3547f5324b7b3b95adec3806bc0}{q31\_t}}\ *\ pOut,}
+\DoxyCodeLine{01743\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_adc89a3547f5324b7b3b95adec3806bc0}{q31\_t}}\ *\ pErr,}
+\DoxyCodeLine{01744\ \ \ \ \ \ \ \ \ uint32\_t\ blockSize);}
+\DoxyCodeLine{01745\ }
+\DoxyCodeLine{01746\ }
+\DoxyCodeLine{01757\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{filtering__functions_8h_a1d9659dbbea4c89a7a9d14d5fc0dd490}{arm\_lms\_norm\_init\_q31}}(}
+\DoxyCodeLine{01758\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structarm__lms__norm__instance__q31}{arm\_lms\_norm\_instance\_q31}}\ *\ S,}
+\DoxyCodeLine{01759\ \ \ \ \ \ \ \ \ uint16\_t\ numTaps,}
+\DoxyCodeLine{01760\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_adc89a3547f5324b7b3b95adec3806bc0}{q31\_t}}\ *\ pCoeffs,}
+\DoxyCodeLine{01761\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_adc89a3547f5324b7b3b95adec3806bc0}{q31\_t}}\ *\ pState,}
+\DoxyCodeLine{01762\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_adc89a3547f5324b7b3b95adec3806bc0}{q31\_t}}\ mu,}
+\DoxyCodeLine{01763\ \ \ \ \ \ \ \ \ uint32\_t\ blockSize,}
+\DoxyCodeLine{01764\ \ \ \ \ \ \ \ \ uint8\_t\ postShift);}
+\DoxyCodeLine{01765\ }
+\DoxyCodeLine{01766\ }
+\DoxyCodeLine{01770\ \ \ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct}}
+\DoxyCodeLine{01771\ \ \ \{}
+\DoxyCodeLine{01772\ \ \ \ \ \ \ \ \ \ \ uint16\_t\ \mbox{\hyperlink{structarm__lms__norm__instance__q15_a9ee7a45f4f315d7996a969e25fdc7146}{numTaps}};\ \ \ \ \ }
+\DoxyCodeLine{01773\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\mbox{\hyperlink{structarm__lms__norm__instance__q15_aa4de490b3bdbd03561b76ee07901c8e3}{pState}};\ \ \ \ \ \ \ \ }
+\DoxyCodeLine{01774\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\mbox{\hyperlink{structarm__lms__norm__instance__q15_ae7bca648c75a2ffa02d87852bb78bc8a}{pCoeffs}};\ \ \ \ \ \ \ }
+\DoxyCodeLine{01775\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ \mbox{\hyperlink{structarm__lms__norm__instance__q15_a7ce00f21d11cfda6d963240641deea8c}{mu}};\ \ \ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{01776\ \ \ \ \ \ \ \ \ \ \ uint8\_t\ \mbox{\hyperlink{structarm__lms__norm__instance__q15_aa0d435fbcf7dedb7179d4467e9b79e9f}{postShift}};\ \ \ \ }
+\DoxyCodeLine{01777\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\mbox{\hyperlink{structarm__lms__norm__instance__q15_a07d272351a3291ed09e3f42447609df0}{recipTable}};\ \ \ \ }
+\DoxyCodeLine{01778\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ \mbox{\hyperlink{structarm__lms__norm__instance__q15_a1c81ded399919d8181026bc1c8602e7b}{energy}};\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{01779\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ \mbox{\hyperlink{structarm__lms__norm__instance__q15_a3fc1d6f97d2c6d5324871de6895cb7e9}{x0}};\ \ \ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{01780\ \ \ \}\ \mbox{\hyperlink{structarm__lms__norm__instance__q15}{arm\_lms\_norm\_instance\_q15}};}
+\DoxyCodeLine{01781\ }
+\DoxyCodeLine{01782\ }
+\DoxyCodeLine{01792\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{filtering__functions_8h_af03debfeb77ec5a9934e1b23f1ff6c48}{arm\_lms\_norm\_q15}}(}
+\DoxyCodeLine{01793\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structarm__lms__norm__instance__q15}{arm\_lms\_norm\_instance\_q15}}\ *\ S,}
+\DoxyCodeLine{01794\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\ pSrc,}
+\DoxyCodeLine{01795\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\ pRef,}
+\DoxyCodeLine{01796\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\ pOut,}
+\DoxyCodeLine{01797\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\ pErr,}
+\DoxyCodeLine{01798\ \ \ \ \ \ \ \ \ uint32\_t\ blockSize);}
+\DoxyCodeLine{01799\ }
+\DoxyCodeLine{01800\ }
+\DoxyCodeLine{01811\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{filtering__functions_8h_a213ab1ee2e154cc2fa30d667b1994b89}{arm\_lms\_norm\_init\_q15}}(}
+\DoxyCodeLine{01812\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structarm__lms__norm__instance__q15}{arm\_lms\_norm\_instance\_q15}}\ *\ S,}
+\DoxyCodeLine{01813\ \ \ \ \ \ \ \ \ uint16\_t\ numTaps,}
+\DoxyCodeLine{01814\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\ pCoeffs,}
+\DoxyCodeLine{01815\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\ pState,}
+\DoxyCodeLine{01816\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ mu,}
+\DoxyCodeLine{01817\ \ \ \ \ \ \ \ \ uint32\_t\ blockSize,}
+\DoxyCodeLine{01818\ \ \ \ \ \ \ \ \ uint8\_t\ postShift);}
+\DoxyCodeLine{01819\ }
+\DoxyCodeLine{01820\ }
+\DoxyCodeLine{01829\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{filtering__functions_8h_a371054f6e5fd78bec668908251f1b2f2}{arm\_correlate\_f32}}(}
+\DoxyCodeLine{01830\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{arm__math__types_8h_a4611b605e45ab401f02cab15c5e38715}{float32\_t}}\ *\ pSrcA,}
+\DoxyCodeLine{01831\ \ \ \ \ \ \ \ \ uint32\_t\ srcALen,}
+\DoxyCodeLine{01832\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{arm__math__types_8h_a4611b605e45ab401f02cab15c5e38715}{float32\_t}}\ *\ pSrcB,}
+\DoxyCodeLine{01833\ \ \ \ \ \ \ \ \ uint32\_t\ srcBLen,}
+\DoxyCodeLine{01834\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{arm__math__types_8h_a4611b605e45ab401f02cab15c5e38715}{float32\_t}}\ *\ pDst);}
+\DoxyCodeLine{01835\ }
+\DoxyCodeLine{01836\ }
+\DoxyCodeLine{01845\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{filtering__functions_8h_a60b0d48a0247d7cc9148d9021844222b}{arm\_correlate\_f64}}(}
+\DoxyCodeLine{01846\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{arm__math__types_8h_ac55f3ae81b5bc9053760baacf57e47f4}{float64\_t}}\ *\ pSrcA,}
+\DoxyCodeLine{01847\ \ \ \ \ \ \ \ \ uint32\_t\ srcALen,}
+\DoxyCodeLine{01848\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{arm__math__types_8h_ac55f3ae81b5bc9053760baacf57e47f4}{float64\_t}}\ *\ pSrcB,}
+\DoxyCodeLine{01849\ \ \ \ \ \ \ \ \ uint32\_t\ srcBLen,}
+\DoxyCodeLine{01850\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{arm__math__types_8h_ac55f3ae81b5bc9053760baacf57e47f4}{float64\_t}}\ *\ pDst);}
+\DoxyCodeLine{01851\ }
+\DoxyCodeLine{01852\ }
+\DoxyCodeLine{01862\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{filtering__functions_8h_a3cfae563b16fa3be577cab5acf63aeea}{arm\_correlate\_opt\_q15}}(}
+\DoxyCodeLine{01863\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\ pSrcA,}
+\DoxyCodeLine{01864\ \ \ \ \ \ \ \ \ uint32\_t\ srcALen,}
+\DoxyCodeLine{01865\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\ pSrcB,}
+\DoxyCodeLine{01866\ \ \ \ \ \ \ \ \ uint32\_t\ srcBLen,}
+\DoxyCodeLine{01867\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\ pDst,}
+\DoxyCodeLine{01868\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\ pScratch);}
+\DoxyCodeLine{01869\ }
+\DoxyCodeLine{01870\ }
+\DoxyCodeLine{01879\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{filtering__functions_8h_a8fc4e632ab08b28435ff62e7eb65f508}{arm\_correlate\_q15}}(}
+\DoxyCodeLine{01880\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\ pSrcA,}
+\DoxyCodeLine{01881\ \ \ \ \ \ \ \ \ uint32\_t\ srcALen,}
+\DoxyCodeLine{01882\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\ pSrcB,}
+\DoxyCodeLine{01883\ \ \ \ \ \ \ \ \ uint32\_t\ srcBLen,}
+\DoxyCodeLine{01884\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\ pDst);}
+\DoxyCodeLine{01885\ }
+\DoxyCodeLine{01886\ }
+\DoxyCodeLine{01896\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{filtering__functions_8h_ab4dea2049c8a26118ee4de9b90f1b9bd}{arm\_correlate\_fast\_q15}}(}
+\DoxyCodeLine{01897\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\ pSrcA,}
+\DoxyCodeLine{01898\ \ \ \ \ \ \ \ \ uint32\_t\ srcALen,}
+\DoxyCodeLine{01899\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\ pSrcB,}
+\DoxyCodeLine{01900\ \ \ \ \ \ \ \ \ uint32\_t\ srcBLen,}
+\DoxyCodeLine{01901\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\ pDst);}
+\DoxyCodeLine{01902\ }
+\DoxyCodeLine{01903\ }
+\DoxyCodeLine{01913\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{filtering__functions_8h_a3fc8d680844a3d24af25e45df96c82f3}{arm\_correlate\_fast\_opt\_q15}}(}
+\DoxyCodeLine{01914\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\ pSrcA,}
+\DoxyCodeLine{01915\ \ \ \ \ \ \ \ \ uint32\_t\ srcALen,}
+\DoxyCodeLine{01916\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\ pSrcB,}
+\DoxyCodeLine{01917\ \ \ \ \ \ \ \ \ uint32\_t\ srcBLen,}
+\DoxyCodeLine{01918\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\ pDst,}
+\DoxyCodeLine{01919\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\ pScratch);}
+\DoxyCodeLine{01920\ }
+\DoxyCodeLine{01921\ }
+\DoxyCodeLine{01930\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{filtering__functions_8h_a9e8ad8bae8400dac2afc995d38594744}{arm\_correlate\_q31}}(}
+\DoxyCodeLine{01931\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_adc89a3547f5324b7b3b95adec3806bc0}{q31\_t}}\ *\ pSrcA,}
+\DoxyCodeLine{01932\ \ \ \ \ \ \ \ \ uint32\_t\ srcALen,}
+\DoxyCodeLine{01933\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_adc89a3547f5324b7b3b95adec3806bc0}{q31\_t}}\ *\ pSrcB,}
+\DoxyCodeLine{01934\ \ \ \ \ \ \ \ \ uint32\_t\ srcBLen,}
+\DoxyCodeLine{01935\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_adc89a3547f5324b7b3b95adec3806bc0}{q31\_t}}\ *\ pDst);}
+\DoxyCodeLine{01936\ }
+\DoxyCodeLine{01937\ }
+\DoxyCodeLine{01946\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{filtering__functions_8h_a1e85a8ceac5c0f27007e6ba2c8f20686}{arm\_correlate\_fast\_q31}}(}
+\DoxyCodeLine{01947\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_adc89a3547f5324b7b3b95adec3806bc0}{q31\_t}}\ *\ pSrcA,}
+\DoxyCodeLine{01948\ \ \ \ \ \ \ \ \ uint32\_t\ srcALen,}
+\DoxyCodeLine{01949\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_adc89a3547f5324b7b3b95adec3806bc0}{q31\_t}}\ *\ pSrcB,}
+\DoxyCodeLine{01950\ \ \ \ \ \ \ \ \ uint32\_t\ srcBLen,}
+\DoxyCodeLine{01951\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_adc89a3547f5324b7b3b95adec3806bc0}{q31\_t}}\ *\ pDst);}
+\DoxyCodeLine{01952\ }
+\DoxyCodeLine{01953\ }
+\DoxyCodeLine{01964\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{filtering__functions_8h_a3c672e8ef8360c652d351097535f080d}{arm\_correlate\_opt\_q7}}(}
+\DoxyCodeLine{01965\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ae541b6f232c305361e9b416fc9eed263}{q7\_t}}\ *\ pSrcA,}
+\DoxyCodeLine{01966\ \ \ \ \ \ \ \ \ uint32\_t\ srcALen,}
+\DoxyCodeLine{01967\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ae541b6f232c305361e9b416fc9eed263}{q7\_t}}\ *\ pSrcB,}
+\DoxyCodeLine{01968\ \ \ \ \ \ \ \ \ uint32\_t\ srcBLen,}
+\DoxyCodeLine{01969\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ae541b6f232c305361e9b416fc9eed263}{q7\_t}}\ *\ pDst,}
+\DoxyCodeLine{01970\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\ pScratch1,}
+\DoxyCodeLine{01971\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\ pScratch2);}
+\DoxyCodeLine{01972\ }
+\DoxyCodeLine{01973\ }
+\DoxyCodeLine{01982\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{filtering__functions_8h_ab5d8acc830313be970de59c2d5a26c72}{arm\_correlate\_q7}}(}
+\DoxyCodeLine{01983\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ae541b6f232c305361e9b416fc9eed263}{q7\_t}}\ *\ pSrcA,}
+\DoxyCodeLine{01984\ \ \ \ \ \ \ \ \ uint32\_t\ srcALen,}
+\DoxyCodeLine{01985\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ae541b6f232c305361e9b416fc9eed263}{q7\_t}}\ *\ pSrcB,}
+\DoxyCodeLine{01986\ \ \ \ \ \ \ \ \ uint32\_t\ srcBLen,}
+\DoxyCodeLine{01987\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ae541b6f232c305361e9b416fc9eed263}{q7\_t}}\ *\ pDst);}
+\DoxyCodeLine{01988\ }
+\DoxyCodeLine{01989\ }
+\DoxyCodeLine{01993\ \ \ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct}}
+\DoxyCodeLine{01994\ \ \ \{}
+\DoxyCodeLine{01995\ \ \ \ \ \ \ \ \ \ \ uint16\_t\ \mbox{\hyperlink{structarm__fir__sparse__instance__f32_a5e19e7f234ac30a3db843352bf2a8515}{numTaps}};\ \ \ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{01996\ \ \ \ \ \ \ \ \ \ \ uint16\_t\ \mbox{\hyperlink{structarm__fir__sparse__instance__f32_a57585aeca9dc8686e08df2865375a86d}{stateIndex}};\ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{01997\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{arm__math__types_8h_a4611b605e45ab401f02cab15c5e38715}{float32\_t}}\ *\mbox{\hyperlink{structarm__fir__sparse__instance__f32_a794af0916666d11cc564d6df08553555}{pState}};\ \ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{01998\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{arm__math__types_8h_a4611b605e45ab401f02cab15c5e38715}{float32\_t}}\ *\mbox{\hyperlink{structarm__fir__sparse__instance__f32_a4bc78b1761b6349e6842241e813d6446}{pCoeffs}};\ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{01999\ \ \ \ \ \ \ \ \ \ \ uint16\_t\ \mbox{\hyperlink{structarm__fir__sparse__instance__f32_af8b8c775f4084c36774f06c082b4c078}{maxDelay}};\ \ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{02000\ \ \ \ \ \ \ \ \ \ \ int32\_t\ *\mbox{\hyperlink{structarm__fir__sparse__instance__f32_aaa54ae67e5d10c6dd0d697945c638d31}{pTapDelay}};\ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{02001\ \ \ \}\ \mbox{\hyperlink{structarm__fir__sparse__instance__f32}{arm\_fir\_sparse\_instance\_f32}};}
+\DoxyCodeLine{02002\ }
+\DoxyCodeLine{02006\ \ \ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct}}
+\DoxyCodeLine{02007\ \ \ \{}
+\DoxyCodeLine{02008\ \ \ \ \ \ \ \ \ \ \ uint16\_t\ \mbox{\hyperlink{structarm__fir__sparse__instance__q31_a07b6c01e58ec6dde384719130d36b0dc}{numTaps}};\ \ \ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{02009\ \ \ \ \ \ \ \ \ \ \ uint16\_t\ \mbox{\hyperlink{structarm__fir__sparse__instance__q31_a557ed9d477e76e4ad2019344f19f568a}{stateIndex}};\ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{02010\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_adc89a3547f5324b7b3b95adec3806bc0}{q31\_t}}\ *\mbox{\hyperlink{structarm__fir__sparse__instance__q31_a830be89daa5a393b225048889aa045d1}{pState}};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{02011\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_adc89a3547f5324b7b3b95adec3806bc0}{q31\_t}}\ *\mbox{\hyperlink{structarm__fir__sparse__instance__q31_af714d56f8fec4f93ad557abce6994d45}{pCoeffs}};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{02012\ \ \ \ \ \ \ \ \ \ \ uint16\_t\ \mbox{\hyperlink{structarm__fir__sparse__instance__q31_afdd3a1dc72132c854dc379154b68b674}{maxDelay}};\ \ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{02013\ \ \ \ \ \ \ \ \ \ \ int32\_t\ *\mbox{\hyperlink{structarm__fir__sparse__instance__q31_ab87ae457adec8f727afefaa2599fc983}{pTapDelay}};\ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{02014\ \ \ \}\ \mbox{\hyperlink{structarm__fir__sparse__instance__q31}{arm\_fir\_sparse\_instance\_q31}};}
+\DoxyCodeLine{02015\ }
+\DoxyCodeLine{02019\ \ \ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct}}
+\DoxyCodeLine{02020\ \ \ \{}
+\DoxyCodeLine{02021\ \ \ \ \ \ \ \ \ \ \ uint16\_t\ \mbox{\hyperlink{structarm__fir__sparse__instance__q15_a0f66b126dd8b85f7467cfb01b7bc4d77}{numTaps}};\ \ \ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{02022\ \ \ \ \ \ \ \ \ \ \ uint16\_t\ \mbox{\hyperlink{structarm__fir__sparse__instance__q15_a89487f28cab52637426024005e478985}{stateIndex}};\ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{02023\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\mbox{\hyperlink{structarm__fir__sparse__instance__q15_a98b92b0f5208110129b9a67b1db90408}{pState}};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{02024\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\mbox{\hyperlink{structarm__fir__sparse__instance__q15_a4180a6d16a979b59b707a3e7b8cc274b}{pCoeffs}};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{02025\ \ \ \ \ \ \ \ \ \ \ uint16\_t\ \mbox{\hyperlink{structarm__fir__sparse__instance__q15_ad14cc1070eecf7e1926d8f67a8273182}{maxDelay}};\ \ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{02026\ \ \ \ \ \ \ \ \ \ \ int32\_t\ *\mbox{\hyperlink{structarm__fir__sparse__instance__q15_aeab2855176c6efdb231a73a3672837d5}{pTapDelay}};\ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{02027\ \ \ \}\ \mbox{\hyperlink{structarm__fir__sparse__instance__q15}{arm\_fir\_sparse\_instance\_q15}};}
+\DoxyCodeLine{02028\ }
+\DoxyCodeLine{02032\ \ \ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct}}
+\DoxyCodeLine{02033\ \ \ \{}
+\DoxyCodeLine{02034\ \ \ \ \ \ \ \ \ \ \ uint16\_t\ \mbox{\hyperlink{structarm__fir__sparse__instance__q7_a54cdd27ca1c672b126c38763ce678b1c}{numTaps}};\ \ \ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{02035\ \ \ \ \ \ \ \ \ \ \ uint16\_t\ \mbox{\hyperlink{structarm__fir__sparse__instance__q7_a2d2e65473fe3a3f2b953b4e0b60824df}{stateIndex}};\ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{02036\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ae541b6f232c305361e9b416fc9eed263}{q7\_t}}\ *\mbox{\hyperlink{structarm__fir__sparse__instance__q7_a18072cf3ef3666d588f0d49512f2b28f}{pState}};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{02037\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ae541b6f232c305361e9b416fc9eed263}{q7\_t}}\ *\mbox{\hyperlink{structarm__fir__sparse__instance__q7_a7f0989ef34fdb5d08ce5a5abf917218f}{pCoeffs}};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{02038\ \ \ \ \ \ \ \ \ \ \ uint16\_t\ \mbox{\hyperlink{structarm__fir__sparse__instance__q7_af74dacc1d34c078283e50f2530eb91df}{maxDelay}};\ \ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{02039\ \ \ \ \ \ \ \ \ \ \ int32\_t\ *\mbox{\hyperlink{structarm__fir__sparse__instance__q7_ac625393c84bc0342ffdf26fc4eba1ac1}{pTapDelay}};\ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{02040\ \ \ \}\ \mbox{\hyperlink{structarm__fir__sparse__instance__q7}{arm\_fir\_sparse\_instance\_q7}};}
+\DoxyCodeLine{02041\ }
+\DoxyCodeLine{02042\ }
+\DoxyCodeLine{02051\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{filtering__functions_8h_ac6817bc86974b7121c3288fce25dbc5f}{arm\_fir\_sparse\_f32}}(}
+\DoxyCodeLine{02052\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structarm__fir__sparse__instance__f32}{arm\_fir\_sparse\_instance\_f32}}\ *\ S,}
+\DoxyCodeLine{02053\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{arm__math__types_8h_a4611b605e45ab401f02cab15c5e38715}{float32\_t}}\ *\ pSrc,}
+\DoxyCodeLine{02054\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{arm__math__types_8h_a4611b605e45ab401f02cab15c5e38715}{float32\_t}}\ *\ pDst,}
+\DoxyCodeLine{02055\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{arm__math__types_8h_a4611b605e45ab401f02cab15c5e38715}{float32\_t}}\ *\ pScratchIn,}
+\DoxyCodeLine{02056\ \ \ \ \ \ \ \ \ uint32\_t\ blockSize);}
+\DoxyCodeLine{02057\ }
+\DoxyCodeLine{02058\ }
+\DoxyCodeLine{02069\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{filtering__functions_8h_a967a0564d6d59f2b9e12f4a5b7a3f877}{arm\_fir\_sparse\_init\_f32}}(}
+\DoxyCodeLine{02070\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structarm__fir__sparse__instance__f32}{arm\_fir\_sparse\_instance\_f32}}\ *\ S,}
+\DoxyCodeLine{02071\ \ \ \ \ \ \ \ \ uint16\_t\ numTaps,}
+\DoxyCodeLine{02072\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{arm__math__types_8h_a4611b605e45ab401f02cab15c5e38715}{float32\_t}}\ *\ pCoeffs,}
+\DoxyCodeLine{02073\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{arm__math__types_8h_a4611b605e45ab401f02cab15c5e38715}{float32\_t}}\ *\ pState,}
+\DoxyCodeLine{02074\ \ \ \ \ \ \ \ \ int32\_t\ *\ pTapDelay,}
+\DoxyCodeLine{02075\ \ \ \ \ \ \ \ \ uint16\_t\ maxDelay,}
+\DoxyCodeLine{02076\ \ \ \ \ \ \ \ \ uint32\_t\ blockSize);}
+\DoxyCodeLine{02077\ }
+\DoxyCodeLine{02078\ }
+\DoxyCodeLine{02087\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{filtering__functions_8h_aba9f7ef4acf293034af42baa2fd3df52}{arm\_fir\_sparse\_q31}}(}
+\DoxyCodeLine{02088\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structarm__fir__sparse__instance__q31}{arm\_fir\_sparse\_instance\_q31}}\ *\ S,}
+\DoxyCodeLine{02089\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_adc89a3547f5324b7b3b95adec3806bc0}{q31\_t}}\ *\ pSrc,}
+\DoxyCodeLine{02090\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_adc89a3547f5324b7b3b95adec3806bc0}{q31\_t}}\ *\ pDst,}
+\DoxyCodeLine{02091\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_adc89a3547f5324b7b3b95adec3806bc0}{q31\_t}}\ *\ pScratchIn,}
+\DoxyCodeLine{02092\ \ \ \ \ \ \ \ \ uint32\_t\ blockSize);}
+\DoxyCodeLine{02093\ }
+\DoxyCodeLine{02094\ }
+\DoxyCodeLine{02105\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{filtering__functions_8h_ade71e2e0432a0e6de36fa9f23b2c984c}{arm\_fir\_sparse\_init\_q31}}(}
+\DoxyCodeLine{02106\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structarm__fir__sparse__instance__q31}{arm\_fir\_sparse\_instance\_q31}}\ *\ S,}
+\DoxyCodeLine{02107\ \ \ \ \ \ \ \ \ uint16\_t\ numTaps,}
+\DoxyCodeLine{02108\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_adc89a3547f5324b7b3b95adec3806bc0}{q31\_t}}\ *\ pCoeffs,}
+\DoxyCodeLine{02109\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_adc89a3547f5324b7b3b95adec3806bc0}{q31\_t}}\ *\ pState,}
+\DoxyCodeLine{02110\ \ \ \ \ \ \ \ \ int32\_t\ *\ pTapDelay,}
+\DoxyCodeLine{02111\ \ \ \ \ \ \ \ \ uint16\_t\ maxDelay,}
+\DoxyCodeLine{02112\ \ \ \ \ \ \ \ \ uint32\_t\ blockSize);}
+\DoxyCodeLine{02113\ }
+\DoxyCodeLine{02114\ }
+\DoxyCodeLine{02124\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{filtering__functions_8h_ac3e43b06bff38ac8e62e145f88e9dbc7}{arm\_fir\_sparse\_q15}}(}
+\DoxyCodeLine{02125\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structarm__fir__sparse__instance__q15}{arm\_fir\_sparse\_instance\_q15}}\ *\ S,}
+\DoxyCodeLine{02126\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\ pSrc,}
+\DoxyCodeLine{02127\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\ pDst,}
+\DoxyCodeLine{02128\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\ pScratchIn,}
+\DoxyCodeLine{02129\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_adc89a3547f5324b7b3b95adec3806bc0}{q31\_t}}\ *\ pScratchOut,}
+\DoxyCodeLine{02130\ \ \ \ \ \ \ \ \ uint32\_t\ blockSize);}
+\DoxyCodeLine{02131\ }
+\DoxyCodeLine{02132\ }
+\DoxyCodeLine{02143\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{filtering__functions_8h_ad1c7f891760e91301aac7e3a48aca449}{arm\_fir\_sparse\_init\_q15}}(}
+\DoxyCodeLine{02144\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structarm__fir__sparse__instance__q15}{arm\_fir\_sparse\_instance\_q15}}\ *\ S,}
+\DoxyCodeLine{02145\ \ \ \ \ \ \ \ \ uint16\_t\ numTaps,}
+\DoxyCodeLine{02146\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\ pCoeffs,}
+\DoxyCodeLine{02147\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\ pState,}
+\DoxyCodeLine{02148\ \ \ \ \ \ \ \ \ int32\_t\ *\ pTapDelay,}
+\DoxyCodeLine{02149\ \ \ \ \ \ \ \ \ uint16\_t\ maxDelay,}
+\DoxyCodeLine{02150\ \ \ \ \ \ \ \ \ uint32\_t\ blockSize);}
+\DoxyCodeLine{02151\ }
+\DoxyCodeLine{02152\ }
+\DoxyCodeLine{02162\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{filtering__functions_8h_a319b3d9032ba723a8efb819b9d2a3676}{arm\_fir\_sparse\_q7}}(}
+\DoxyCodeLine{02163\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structarm__fir__sparse__instance__q7}{arm\_fir\_sparse\_instance\_q7}}\ *\ S,}
+\DoxyCodeLine{02164\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ae541b6f232c305361e9b416fc9eed263}{q7\_t}}\ *\ pSrc,}
+\DoxyCodeLine{02165\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ae541b6f232c305361e9b416fc9eed263}{q7\_t}}\ *\ pDst,}
+\DoxyCodeLine{02166\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ae541b6f232c305361e9b416fc9eed263}{q7\_t}}\ *\ pScratchIn,}
+\DoxyCodeLine{02167\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_adc89a3547f5324b7b3b95adec3806bc0}{q31\_t}}\ *\ pScratchOut,}
+\DoxyCodeLine{02168\ \ \ \ \ \ \ \ \ uint32\_t\ blockSize);}
+\DoxyCodeLine{02169\ }
+\DoxyCodeLine{02170\ }
+\DoxyCodeLine{02181\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{filtering__functions_8h_a5e74f8f4e4df85de5feb4e62125ff590}{arm\_fir\_sparse\_init\_q7}}(}
+\DoxyCodeLine{02182\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structarm__fir__sparse__instance__q7}{arm\_fir\_sparse\_instance\_q7}}\ *\ S,}
+\DoxyCodeLine{02183\ \ \ \ \ \ \ \ \ uint16\_t\ numTaps,}
+\DoxyCodeLine{02184\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ae541b6f232c305361e9b416fc9eed263}{q7\_t}}\ *\ pCoeffs,}
+\DoxyCodeLine{02185\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ae541b6f232c305361e9b416fc9eed263}{q7\_t}}\ *\ pState,}
+\DoxyCodeLine{02186\ \ \ \ \ \ \ \ \ int32\_t\ *\ pTapDelay,}
+\DoxyCodeLine{02187\ \ \ \ \ \ \ \ \ uint16\_t\ maxDelay,}
+\DoxyCodeLine{02188\ \ \ \ \ \ \ \ \ uint32\_t\ blockSize);}
+\DoxyCodeLine{02189\ }
+\DoxyCodeLine{02190\ }
+\DoxyCodeLine{02191\ }
+\DoxyCodeLine{02192\ }
+\DoxyCodeLine{02193\ \ }
+\DoxyCodeLine{02194\ }
+\DoxyCodeLine{02198\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src891ae011acb21fff2466c2146fca65e3_ab904513442afdf77d4f8c74f23cbb040}{\_\_STATIC\_FORCEINLINE}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{filtering__functions_8h_a189501700cbecf81c08a005bb16939d9}{arm\_circularWrite\_f32}}(}
+\DoxyCodeLine{02199\ \ \ int32\_t\ *\ circBuffer,}
+\DoxyCodeLine{02200\ \ \ int32\_t\ L,}
+\DoxyCodeLine{02201\ \ \ uint16\_t\ *\ writeOffset,}
+\DoxyCodeLine{02202\ \ \ int32\_t\ bufferInc,}
+\DoxyCodeLine{02203\ \ \ \textcolor{keyword}{const}\ int32\_t\ *\ src,}
+\DoxyCodeLine{02204\ \ \ int32\_t\ srcInc,}
+\DoxyCodeLine{02205\ \ \ uint32\_t\ blockSize)}
+\DoxyCodeLine{02206\ \ \ \{}
+\DoxyCodeLine{02207\ \ \ \ \ uint32\_t\ i\ =\ 0U;}
+\DoxyCodeLine{02208\ \ \ \ \ int32\_t\ wOffset;}
+\DoxyCodeLine{02209\ }
+\DoxyCodeLine{02210\ \ \ \ \ \textcolor{comment}{/*\ Copy\ the\ value\ of\ Index\ pointer\ that\ points}}
+\DoxyCodeLine{02211\ \textcolor{comment}{\ \ \ \ \ *\ to\ the\ current\ location\ where\ the\ input\ samples\ to\ be\ copied\ */}}
+\DoxyCodeLine{02212\ \ \ \ \ wOffset\ =\ *writeOffset;}
+\DoxyCodeLine{02213\ }
+\DoxyCodeLine{02214\ \ \ \ \ \textcolor{comment}{/*\ Loop\ over\ the\ blockSize\ */}}
+\DoxyCodeLine{02215\ \ \ \ \ i\ =\ blockSize;}
+\DoxyCodeLine{02216\ }
+\DoxyCodeLine{02217\ \ \ \ \ \textcolor{keywordflow}{while}\ (i\ >\ 0U)}
+\DoxyCodeLine{02218\ \ \ \ \ \{}
+\DoxyCodeLine{02219\ \ \ \ \ \ \ \textcolor{comment}{/*\ copy\ the\ input\ sample\ to\ the\ circular\ buffer\ */}}
+\DoxyCodeLine{02220\ \ \ \ \ \ \ circBuffer[wOffset]\ =\ *src;}
+\DoxyCodeLine{02221\ }
+\DoxyCodeLine{02222\ \ \ \ \ \ \ \textcolor{comment}{/*\ Update\ the\ input\ pointer\ */}}
+\DoxyCodeLine{02223\ \ \ \ \ \ \ src\ +=\ srcInc;}
+\DoxyCodeLine{02224\ }
+\DoxyCodeLine{02225\ \ \ \ \ \ \ \textcolor{comment}{/*\ Circularly\ update\ wOffset.\ \ Watch\ out\ for\ positive\ and\ negative\ value\ */}}
+\DoxyCodeLine{02226\ \ \ \ \ \ \ wOffset\ +=\ bufferInc;}
+\DoxyCodeLine{02227\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (wOffset\ >=\ L)}
+\DoxyCodeLine{02228\ \ \ \ \ \ \ \ \ wOffset\ -\/=\ L;}
+\DoxyCodeLine{02229\ }
+\DoxyCodeLine{02230\ \ \ \ \ \ \ \textcolor{comment}{/*\ Decrement\ the\ loop\ counter\ */}}
+\DoxyCodeLine{02231\ \ \ \ \ \ \ i-\/-\/;}
+\DoxyCodeLine{02232\ \ \ \ \ \}}
+\DoxyCodeLine{02233\ }
+\DoxyCodeLine{02234\ \ \ \ \ \textcolor{comment}{/*\ Update\ the\ index\ pointer\ */}}
+\DoxyCodeLine{02235\ \ \ \ \ *writeOffset\ =\ (uint16\_t)wOffset;}
+\DoxyCodeLine{02236\ \ \ \}}
+\DoxyCodeLine{02237\ }
+\DoxyCodeLine{02238\ }
+\DoxyCodeLine{02239\ }
+\DoxyCodeLine{02243\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src891ae011acb21fff2466c2146fca65e3_ab904513442afdf77d4f8c74f23cbb040}{\_\_STATIC\_FORCEINLINE}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{filtering__functions_8h_aa0e8f158699a65e023960d555274ad39}{arm\_circularRead\_f32}}(}
+\DoxyCodeLine{02244\ \ \ int32\_t\ *\ circBuffer,}
+\DoxyCodeLine{02245\ \ \ int32\_t\ L,}
+\DoxyCodeLine{02246\ \ \ int32\_t\ *\ readOffset,}
+\DoxyCodeLine{02247\ \ \ int32\_t\ bufferInc,}
+\DoxyCodeLine{02248\ \ \ int32\_t\ *\ dst,}
+\DoxyCodeLine{02249\ \ \ int32\_t\ *\ dst\_base,}
+\DoxyCodeLine{02250\ \ \ int32\_t\ dst\_length,}
+\DoxyCodeLine{02251\ \ \ int32\_t\ dstInc,}
+\DoxyCodeLine{02252\ \ \ uint32\_t\ blockSize)}
+\DoxyCodeLine{02253\ \ \ \{}
+\DoxyCodeLine{02254\ \ \ \ \ uint32\_t\ i\ =\ 0U;}
+\DoxyCodeLine{02255\ \ \ \ \ int32\_t\ rOffset;}
+\DoxyCodeLine{02256\ \ \ \ \ int32\_t*\ dst\_end;}
+\DoxyCodeLine{02257\ }
+\DoxyCodeLine{02258\ \ \ \ \ \textcolor{comment}{/*\ Copy\ the\ value\ of\ Index\ pointer\ that\ points}}
+\DoxyCodeLine{02259\ \textcolor{comment}{\ \ \ \ \ *\ to\ the\ current\ location\ from\ where\ the\ input\ samples\ to\ be\ read\ */}}
+\DoxyCodeLine{02260\ \ \ \ \ rOffset\ =\ *readOffset;}
+\DoxyCodeLine{02261\ \ \ \ \ dst\_end\ =\ dst\_base\ +\ dst\_length;}
+\DoxyCodeLine{02262\ }
+\DoxyCodeLine{02263\ \ \ \ \ \textcolor{comment}{/*\ Loop\ over\ the\ blockSize\ */}}
+\DoxyCodeLine{02264\ \ \ \ \ i\ =\ blockSize;}
+\DoxyCodeLine{02265\ }
+\DoxyCodeLine{02266\ \ \ \ \ \textcolor{keywordflow}{while}\ (i\ >\ 0U)}
+\DoxyCodeLine{02267\ \ \ \ \ \{}
+\DoxyCodeLine{02268\ \ \ \ \ \ \ \textcolor{comment}{/*\ copy\ the\ sample\ from\ the\ circular\ buffer\ to\ the\ destination\ buffer\ */}}
+\DoxyCodeLine{02269\ \ \ \ \ \ \ *dst\ =\ circBuffer[rOffset];}
+\DoxyCodeLine{02270\ }
+\DoxyCodeLine{02271\ \ \ \ \ \ \ \textcolor{comment}{/*\ Update\ the\ input\ pointer\ */}}
+\DoxyCodeLine{02272\ \ \ \ \ \ \ dst\ +=\ dstInc;}
+\DoxyCodeLine{02273\ }
+\DoxyCodeLine{02274\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (dst\ ==\ dst\_end)}
+\DoxyCodeLine{02275\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{02276\ \ \ \ \ \ \ \ \ dst\ =\ dst\_base;}
+\DoxyCodeLine{02277\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{02278\ }
+\DoxyCodeLine{02279\ \ \ \ \ \ \ \textcolor{comment}{/*\ Circularly\ update\ rOffset.\ \ Watch\ out\ for\ positive\ and\ negative\ value\ \ */}}
+\DoxyCodeLine{02280\ \ \ \ \ \ \ rOffset\ +=\ bufferInc;}
+\DoxyCodeLine{02281\ }
+\DoxyCodeLine{02282\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (rOffset\ >=\ L)}
+\DoxyCodeLine{02283\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{02284\ \ \ \ \ \ \ \ \ rOffset\ -\/=\ L;}
+\DoxyCodeLine{02285\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{02286\ }
+\DoxyCodeLine{02287\ \ \ \ \ \ \ \textcolor{comment}{/*\ Decrement\ the\ loop\ counter\ */}}
+\DoxyCodeLine{02288\ \ \ \ \ \ \ i-\/-\/;}
+\DoxyCodeLine{02289\ \ \ \ \ \}}
+\DoxyCodeLine{02290\ }
+\DoxyCodeLine{02291\ \ \ \ \ \textcolor{comment}{/*\ Update\ the\ index\ pointer\ */}}
+\DoxyCodeLine{02292\ \ \ \ \ *readOffset\ =\ rOffset;}
+\DoxyCodeLine{02293\ \ \ \}}
+\DoxyCodeLine{02294\ }
+\DoxyCodeLine{02295\ }
+\DoxyCodeLine{02299\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src891ae011acb21fff2466c2146fca65e3_ab904513442afdf77d4f8c74f23cbb040}{\_\_STATIC\_FORCEINLINE}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{filtering__functions_8h_a6799f043f7ab70c0d0e06fb9abbecb6e}{arm\_circularWrite\_q15}}(}
+\DoxyCodeLine{02300\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\ circBuffer,}
+\DoxyCodeLine{02301\ \ \ int32\_t\ L,}
+\DoxyCodeLine{02302\ \ \ uint16\_t\ *\ writeOffset,}
+\DoxyCodeLine{02303\ \ \ int32\_t\ bufferInc,}
+\DoxyCodeLine{02304\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\ src,}
+\DoxyCodeLine{02305\ \ \ int32\_t\ srcInc,}
+\DoxyCodeLine{02306\ \ \ uint32\_t\ blockSize)}
+\DoxyCodeLine{02307\ \ \ \{}
+\DoxyCodeLine{02308\ \ \ \ \ uint32\_t\ i\ =\ 0U;}
+\DoxyCodeLine{02309\ \ \ \ \ int32\_t\ wOffset;}
+\DoxyCodeLine{02310\ }
+\DoxyCodeLine{02311\ \ \ \ \ \textcolor{comment}{/*\ Copy\ the\ value\ of\ Index\ pointer\ that\ points}}
+\DoxyCodeLine{02312\ \textcolor{comment}{\ \ \ \ \ *\ to\ the\ current\ location\ where\ the\ input\ samples\ to\ be\ copied\ */}}
+\DoxyCodeLine{02313\ \ \ \ \ wOffset\ =\ *writeOffset;}
+\DoxyCodeLine{02314\ }
+\DoxyCodeLine{02315\ \ \ \ \ \textcolor{comment}{/*\ Loop\ over\ the\ blockSize\ */}}
+\DoxyCodeLine{02316\ \ \ \ \ i\ =\ blockSize;}
+\DoxyCodeLine{02317\ }
+\DoxyCodeLine{02318\ \ \ \ \ \textcolor{keywordflow}{while}\ (i\ >\ 0U)}
+\DoxyCodeLine{02319\ \ \ \ \ \{}
+\DoxyCodeLine{02320\ \ \ \ \ \ \ \textcolor{comment}{/*\ copy\ the\ input\ sample\ to\ the\ circular\ buffer\ */}}
+\DoxyCodeLine{02321\ \ \ \ \ \ \ circBuffer[wOffset]\ =\ *src;}
+\DoxyCodeLine{02322\ }
+\DoxyCodeLine{02323\ \ \ \ \ \ \ \textcolor{comment}{/*\ Update\ the\ input\ pointer\ */}}
+\DoxyCodeLine{02324\ \ \ \ \ \ \ src\ +=\ srcInc;}
+\DoxyCodeLine{02325\ }
+\DoxyCodeLine{02326\ \ \ \ \ \ \ \textcolor{comment}{/*\ Circularly\ update\ wOffset.\ \ Watch\ out\ for\ positive\ and\ negative\ value\ */}}
+\DoxyCodeLine{02327\ \ \ \ \ \ \ wOffset\ +=\ bufferInc;}
+\DoxyCodeLine{02328\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (wOffset\ >=\ L)}
+\DoxyCodeLine{02329\ \ \ \ \ \ \ \ \ wOffset\ -\/=\ L;}
+\DoxyCodeLine{02330\ }
+\DoxyCodeLine{02331\ \ \ \ \ \ \ \textcolor{comment}{/*\ Decrement\ the\ loop\ counter\ */}}
+\DoxyCodeLine{02332\ \ \ \ \ \ \ i-\/-\/;}
+\DoxyCodeLine{02333\ \ \ \ \ \}}
+\DoxyCodeLine{02334\ }
+\DoxyCodeLine{02335\ \ \ \ \ \textcolor{comment}{/*\ Update\ the\ index\ pointer\ */}}
+\DoxyCodeLine{02336\ \ \ \ \ *writeOffset\ =\ (uint16\_t)wOffset;}
+\DoxyCodeLine{02337\ \ \ \}}
+\DoxyCodeLine{02338\ }
+\DoxyCodeLine{02339\ }
+\DoxyCodeLine{02343\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src891ae011acb21fff2466c2146fca65e3_ab904513442afdf77d4f8c74f23cbb040}{\_\_STATIC\_FORCEINLINE}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{filtering__functions_8h_a4d8edf2fbaa68badce77740563de353f}{arm\_circularRead\_q15}}(}
+\DoxyCodeLine{02344\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\ circBuffer,}
+\DoxyCodeLine{02345\ \ \ int32\_t\ L,}
+\DoxyCodeLine{02346\ \ \ int32\_t\ *\ readOffset,}
+\DoxyCodeLine{02347\ \ \ int32\_t\ bufferInc,}
+\DoxyCodeLine{02348\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\ dst,}
+\DoxyCodeLine{02349\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}\ *\ dst\_base,}
+\DoxyCodeLine{02350\ \ \ int32\_t\ dst\_length,}
+\DoxyCodeLine{02351\ \ \ int32\_t\ dstInc,}
+\DoxyCodeLine{02352\ \ \ uint32\_t\ blockSize)}
+\DoxyCodeLine{02353\ \ \ \{}
+\DoxyCodeLine{02354\ \ \ \ \ uint32\_t\ i\ =\ 0;}
+\DoxyCodeLine{02355\ \ \ \ \ int32\_t\ rOffset;}
+\DoxyCodeLine{02356\ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ab5a8fb21a5b3b983d5f54f31614052ea}{q15\_t}}*\ dst\_end;}
+\DoxyCodeLine{02357\ }
+\DoxyCodeLine{02358\ \ \ \ \ \textcolor{comment}{/*\ Copy\ the\ value\ of\ Index\ pointer\ that\ points}}
+\DoxyCodeLine{02359\ \textcolor{comment}{\ \ \ \ \ *\ to\ the\ current\ location\ from\ where\ the\ input\ samples\ to\ be\ read\ */}}
+\DoxyCodeLine{02360\ \ \ \ \ rOffset\ =\ *readOffset;}
+\DoxyCodeLine{02361\ }
+\DoxyCodeLine{02362\ \ \ \ \ dst\_end\ =\ dst\_base\ +\ dst\_length;}
+\DoxyCodeLine{02363\ }
+\DoxyCodeLine{02364\ \ \ \ \ \textcolor{comment}{/*\ Loop\ over\ the\ blockSize\ */}}
+\DoxyCodeLine{02365\ \ \ \ \ i\ =\ blockSize;}
+\DoxyCodeLine{02366\ }
+\DoxyCodeLine{02367\ \ \ \ \ \textcolor{keywordflow}{while}\ (i\ >\ 0U)}
+\DoxyCodeLine{02368\ \ \ \ \ \{}
+\DoxyCodeLine{02369\ \ \ \ \ \ \ \textcolor{comment}{/*\ copy\ the\ sample\ from\ the\ circular\ buffer\ to\ the\ destination\ buffer\ */}}
+\DoxyCodeLine{02370\ \ \ \ \ \ \ *dst\ =\ circBuffer[rOffset];}
+\DoxyCodeLine{02371\ }
+\DoxyCodeLine{02372\ \ \ \ \ \ \ \textcolor{comment}{/*\ Update\ the\ input\ pointer\ */}}
+\DoxyCodeLine{02373\ \ \ \ \ \ \ dst\ +=\ dstInc;}
+\DoxyCodeLine{02374\ }
+\DoxyCodeLine{02375\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (dst\ ==\ dst\_end)}
+\DoxyCodeLine{02376\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{02377\ \ \ \ \ \ \ \ \ dst\ =\ dst\_base;}
+\DoxyCodeLine{02378\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{02379\ }
+\DoxyCodeLine{02380\ \ \ \ \ \ \ \textcolor{comment}{/*\ Circularly\ update\ wOffset.\ \ Watch\ out\ for\ positive\ and\ negative\ value\ */}}
+\DoxyCodeLine{02381\ \ \ \ \ \ \ rOffset\ +=\ bufferInc;}
+\DoxyCodeLine{02382\ }
+\DoxyCodeLine{02383\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (rOffset\ >=\ L)}
+\DoxyCodeLine{02384\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{02385\ \ \ \ \ \ \ \ \ rOffset\ -\/=\ L;}
+\DoxyCodeLine{02386\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{02387\ }
+\DoxyCodeLine{02388\ \ \ \ \ \ \ \textcolor{comment}{/*\ Decrement\ the\ loop\ counter\ */}}
+\DoxyCodeLine{02389\ \ \ \ \ \ \ i-\/-\/;}
+\DoxyCodeLine{02390\ \ \ \ \ \}}
+\DoxyCodeLine{02391\ }
+\DoxyCodeLine{02392\ \ \ \ \ \textcolor{comment}{/*\ Update\ the\ index\ pointer\ */}}
+\DoxyCodeLine{02393\ \ \ \ \ *readOffset\ =\ rOffset;}
+\DoxyCodeLine{02394\ \ \ \}}
+\DoxyCodeLine{02395\ }
+\DoxyCodeLine{02396\ }
+\DoxyCodeLine{02400\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src891ae011acb21fff2466c2146fca65e3_ab904513442afdf77d4f8c74f23cbb040}{\_\_STATIC\_FORCEINLINE}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{filtering__functions_8h_a28179a962e4bb51c73c195dcb2f969aa}{arm\_circularWrite\_q7}}(}
+\DoxyCodeLine{02401\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ae541b6f232c305361e9b416fc9eed263}{q7\_t}}\ *\ circBuffer,}
+\DoxyCodeLine{02402\ \ \ int32\_t\ L,}
+\DoxyCodeLine{02403\ \ \ uint16\_t\ *\ writeOffset,}
+\DoxyCodeLine{02404\ \ \ int32\_t\ bufferInc,}
+\DoxyCodeLine{02405\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ae541b6f232c305361e9b416fc9eed263}{q7\_t}}\ *\ src,}
+\DoxyCodeLine{02406\ \ \ int32\_t\ srcInc,}
+\DoxyCodeLine{02407\ \ \ uint32\_t\ blockSize)}
+\DoxyCodeLine{02408\ \ \ \{}
+\DoxyCodeLine{02409\ \ \ \ \ uint32\_t\ i\ =\ 0U;}
+\DoxyCodeLine{02410\ \ \ \ \ int32\_t\ wOffset;}
+\DoxyCodeLine{02411\ }
+\DoxyCodeLine{02412\ \ \ \ \ \textcolor{comment}{/*\ Copy\ the\ value\ of\ Index\ pointer\ that\ points}}
+\DoxyCodeLine{02413\ \textcolor{comment}{\ \ \ \ \ *\ to\ the\ current\ location\ where\ the\ input\ samples\ to\ be\ copied\ */}}
+\DoxyCodeLine{02414\ \ \ \ \ wOffset\ =\ *writeOffset;}
+\DoxyCodeLine{02415\ }
+\DoxyCodeLine{02416\ \ \ \ \ \textcolor{comment}{/*\ Loop\ over\ the\ blockSize\ */}}
+\DoxyCodeLine{02417\ \ \ \ \ i\ =\ blockSize;}
+\DoxyCodeLine{02418\ }
+\DoxyCodeLine{02419\ \ \ \ \ \textcolor{keywordflow}{while}\ (i\ >\ 0U)}
+\DoxyCodeLine{02420\ \ \ \ \ \{}
+\DoxyCodeLine{02421\ \ \ \ \ \ \ \textcolor{comment}{/*\ copy\ the\ input\ sample\ to\ the\ circular\ buffer\ */}}
+\DoxyCodeLine{02422\ \ \ \ \ \ \ circBuffer[wOffset]\ =\ *src;}
+\DoxyCodeLine{02423\ }
+\DoxyCodeLine{02424\ \ \ \ \ \ \ \textcolor{comment}{/*\ Update\ the\ input\ pointer\ */}}
+\DoxyCodeLine{02425\ \ \ \ \ \ \ src\ +=\ srcInc;}
+\DoxyCodeLine{02426\ }
+\DoxyCodeLine{02427\ \ \ \ \ \ \ \textcolor{comment}{/*\ Circularly\ update\ wOffset.\ \ Watch\ out\ for\ positive\ and\ negative\ value\ */}}
+\DoxyCodeLine{02428\ \ \ \ \ \ \ wOffset\ +=\ bufferInc;}
+\DoxyCodeLine{02429\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (wOffset\ >=\ L)}
+\DoxyCodeLine{02430\ \ \ \ \ \ \ \ \ wOffset\ -\/=\ L;}
+\DoxyCodeLine{02431\ }
+\DoxyCodeLine{02432\ \ \ \ \ \ \ \textcolor{comment}{/*\ Decrement\ the\ loop\ counter\ */}}
+\DoxyCodeLine{02433\ \ \ \ \ \ \ i-\/-\/;}
+\DoxyCodeLine{02434\ \ \ \ \ \}}
+\DoxyCodeLine{02435\ }
+\DoxyCodeLine{02436\ \ \ \ \ \textcolor{comment}{/*\ Update\ the\ index\ pointer\ */}}
+\DoxyCodeLine{02437\ \ \ \ \ *writeOffset\ =\ (uint16\_t)wOffset;}
+\DoxyCodeLine{02438\ \ \ \}}
+\DoxyCodeLine{02439\ }
+\DoxyCodeLine{02440\ }
+\DoxyCodeLine{02444\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src891ae011acb21fff2466c2146fca65e3_ab904513442afdf77d4f8c74f23cbb040}{\_\_STATIC\_FORCEINLINE}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{filtering__functions_8h_a734e6ec2b2d568236816464967326748}{arm\_circularRead\_q7}}(}
+\DoxyCodeLine{02445\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ae541b6f232c305361e9b416fc9eed263}{q7\_t}}\ *\ circBuffer,}
+\DoxyCodeLine{02446\ \ \ int32\_t\ L,}
+\DoxyCodeLine{02447\ \ \ int32\_t\ *\ readOffset,}
+\DoxyCodeLine{02448\ \ \ int32\_t\ bufferInc,}
+\DoxyCodeLine{02449\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ae541b6f232c305361e9b416fc9eed263}{q7\_t}}\ *\ dst,}
+\DoxyCodeLine{02450\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ae541b6f232c305361e9b416fc9eed263}{q7\_t}}\ *\ dst\_base,}
+\DoxyCodeLine{02451\ \ \ int32\_t\ dst\_length,}
+\DoxyCodeLine{02452\ \ \ int32\_t\ dstInc,}
+\DoxyCodeLine{02453\ \ \ uint32\_t\ blockSize)}
+\DoxyCodeLine{02454\ \ \ \{}
+\DoxyCodeLine{02455\ \ \ \ \ uint32\_t\ i\ =\ 0;}
+\DoxyCodeLine{02456\ \ \ \ \ int32\_t\ rOffset;}
+\DoxyCodeLine{02457\ \ \ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_ae541b6f232c305361e9b416fc9eed263}{q7\_t}}*\ dst\_end;}
+\DoxyCodeLine{02458\ }
+\DoxyCodeLine{02459\ \ \ \ \ \textcolor{comment}{/*\ Copy\ the\ value\ of\ Index\ pointer\ that\ points}}
+\DoxyCodeLine{02460\ \textcolor{comment}{\ \ \ \ \ *\ to\ the\ current\ location\ from\ where\ the\ input\ samples\ to\ be\ read\ */}}
+\DoxyCodeLine{02461\ \ \ \ \ rOffset\ =\ *readOffset;}
+\DoxyCodeLine{02462\ }
+\DoxyCodeLine{02463\ \ \ \ \ dst\_end\ =\ dst\_base\ +\ dst\_length;}
+\DoxyCodeLine{02464\ }
+\DoxyCodeLine{02465\ \ \ \ \ \textcolor{comment}{/*\ Loop\ over\ the\ blockSize\ */}}
+\DoxyCodeLine{02466\ \ \ \ \ i\ =\ blockSize;}
+\DoxyCodeLine{02467\ }
+\DoxyCodeLine{02468\ \ \ \ \ \textcolor{keywordflow}{while}\ (i\ >\ 0U)}
+\DoxyCodeLine{02469\ \ \ \ \ \{}
+\DoxyCodeLine{02470\ \ \ \ \ \ \ \textcolor{comment}{/*\ copy\ the\ sample\ from\ the\ circular\ buffer\ to\ the\ destination\ buffer\ */}}
+\DoxyCodeLine{02471\ \ \ \ \ \ \ *dst\ =\ circBuffer[rOffset];}
+\DoxyCodeLine{02472\ }
+\DoxyCodeLine{02473\ \ \ \ \ \ \ \textcolor{comment}{/*\ Update\ the\ input\ pointer\ */}}
+\DoxyCodeLine{02474\ \ \ \ \ \ \ dst\ +=\ dstInc;}
+\DoxyCodeLine{02475\ }
+\DoxyCodeLine{02476\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (dst\ ==\ dst\_end)}
+\DoxyCodeLine{02477\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{02478\ \ \ \ \ \ \ \ \ dst\ =\ dst\_base;}
+\DoxyCodeLine{02479\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{02480\ }
+\DoxyCodeLine{02481\ \ \ \ \ \ \ \textcolor{comment}{/*\ Circularly\ update\ rOffset.\ \ Watch\ out\ for\ positive\ and\ negative\ value\ */}}
+\DoxyCodeLine{02482\ \ \ \ \ \ \ rOffset\ +=\ bufferInc;}
+\DoxyCodeLine{02483\ }
+\DoxyCodeLine{02484\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (rOffset\ >=\ L)}
+\DoxyCodeLine{02485\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{02486\ \ \ \ \ \ \ \ \ rOffset\ -\/=\ L;}
+\DoxyCodeLine{02487\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{02488\ }
+\DoxyCodeLine{02489\ \ \ \ \ \ \ \textcolor{comment}{/*\ Decrement\ the\ loop\ counter\ */}}
+\DoxyCodeLine{02490\ \ \ \ \ \ \ i-\/-\/;}
+\DoxyCodeLine{02491\ \ \ \ \ \}}
+\DoxyCodeLine{02492\ }
+\DoxyCodeLine{02493\ \ \ \ \ \textcolor{comment}{/*\ Update\ the\ index\ pointer\ */}}
+\DoxyCodeLine{02494\ \ \ \ \ *readOffset\ =\ rOffset;}
+\DoxyCodeLine{02495\ \ \ \}}
+\DoxyCodeLine{02496\ }
+\DoxyCodeLine{02497\ }
+\DoxyCodeLine{02506\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{filtering__functions_8h_a2ea8733ba29641f2f081251da672dabf}{arm\_levinson\_durbin\_f32}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{arm__math__types_8h_a4611b605e45ab401f02cab15c5e38715}{float32\_t}}\ *phi,}
+\DoxyCodeLine{02507\ \ \ \mbox{\hyperlink{arm__math__types_8h_a4611b605e45ab401f02cab15c5e38715}{float32\_t}}\ *a,\ }
+\DoxyCodeLine{02508\ \ \ \mbox{\hyperlink{arm__math__types_8h_a4611b605e45ab401f02cab15c5e38715}{float32\_t}}\ *err,}
+\DoxyCodeLine{02509\ \ \ \textcolor{keywordtype}{int}\ nbCoefs);}
+\DoxyCodeLine{02510\ }
+\DoxyCodeLine{02511\ }
+\DoxyCodeLine{02520\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{filtering__functions_8h_a62b3cbd165b27673f5c17a6e72697e76}{arm\_levinson\_durbin\_q31}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_adc89a3547f5324b7b3b95adec3806bc0}{q31\_t}}\ *phi,}
+\DoxyCodeLine{02521\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_adc89a3547f5324b7b3b95adec3806bc0}{q31\_t}}\ *a,\ }
+\DoxyCodeLine{02522\ \ \ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src94b17e0c9eb159f6604b7500918c7321_adc89a3547f5324b7b3b95adec3806bc0}{q31\_t}}\ *err,}
+\DoxyCodeLine{02523\ \ \ \textcolor{keywordtype}{int}\ nbCoefs);}
+\DoxyCodeLine{02524\ }
+\DoxyCodeLine{02525\ \textcolor{preprocessor}{\#ifdef\ \ \ \_\_cplusplus}}
+\DoxyCodeLine{02526\ \}}
+\DoxyCodeLine{02527\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{02528\ }
+\DoxyCodeLine{02529\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{/*\ ifndef\ \_FILTERING\_FUNCTIONS\_H\_\ */}\textcolor{preprocessor}{}}
+
+\end{DoxyCode}

@@ -1,0 +1,197 @@
+\doxysection{fir\+\_\+filter.\+hpp}
+\hypertarget{fir__filter_8hpp_source}{}\label{fir__filter_8hpp_source}\index{Face\_Access\_inferencing/src/edge-\/impulse-\/sdk/dsp/spectral/fir\_filter.hpp@{Face\_Access\_inferencing/src/edge-\/impulse-\/sdk/dsp/spectral/fir\_filter.hpp}}
+\mbox{\hyperlink{fir__filter_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{00002\ \textcolor{comment}{\ *\ Copyright\ (c)\ 2024\ EdgeImpulse\ Inc.}}
+\DoxyCodeLine{00003\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00004\ \textcolor{comment}{\ *\ Generated\ by\ Edge\ Impulse\ and\ licensed\ under\ the\ applicable\ Edge\ Impulse}}
+\DoxyCodeLine{00005\ \textcolor{comment}{\ *\ Terms\ of\ Service.\ Community\ and\ Professional\ Terms\ of\ Service}}
+\DoxyCodeLine{00006\ \textcolor{comment}{\ *\ (https://docs.edgeimpulse.com/page/terms-\/of-\/service)\ or\ Enterprise\ Terms\ of}}
+\DoxyCodeLine{00007\ \textcolor{comment}{\ *\ Service\ (https://docs.edgeimpulse.com/page/enterprise-\/terms-\/of-\/service),}}
+\DoxyCodeLine{00008\ \textcolor{comment}{\ *\ according\ to\ your\ product\ plan\ subscription\ (the\ “License”).}}
+\DoxyCodeLine{00009\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00010\ \textcolor{comment}{\ *\ This\ software,\ documentation\ and\ other\ associated\ files\ (collectively\ referred}}
+\DoxyCodeLine{00011\ \textcolor{comment}{\ *\ to\ as\ the\ “Software”)\ is\ a\ single\ SDK\ variation\ generated\ by\ the\ Edge\ Impulse}}
+\DoxyCodeLine{00012\ \textcolor{comment}{\ *\ platform\ and\ requires\ an\ active\ paid\ Edge\ Impulse\ subscription\ to\ use\ this}}
+\DoxyCodeLine{00013\ \textcolor{comment}{\ *\ Software\ for\ any\ purpose.}}
+\DoxyCodeLine{00014\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00015\ \textcolor{comment}{\ *\ You\ may\ NOT\ use\ this\ Software\ unless\ you\ have\ an\ active\ Edge\ Impulse\ subscription}}
+\DoxyCodeLine{00016\ \textcolor{comment}{\ *\ that\ meets\ the\ eligibility\ requirements\ for\ the\ applicable\ License,\ subject\ to}}
+\DoxyCodeLine{00017\ \textcolor{comment}{\ *\ your\ full\ and\ continued\ compliance\ with\ the\ terms\ and\ conditions\ of\ the\ License,}}
+\DoxyCodeLine{00018\ \textcolor{comment}{\ *\ including\ without\ limitation\ any\ usage\ restrictions\ under\ the\ applicable\ License.}}
+\DoxyCodeLine{00019\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00020\ \textcolor{comment}{\ *\ If\ you\ do\ not\ have\ an\ active\ Edge\ Impulse\ product\ plan\ subscription,\ or\ if\ use}}
+\DoxyCodeLine{00021\ \textcolor{comment}{\ *\ of\ this\ Software\ exceeds\ the\ usage\ limitations\ of\ your\ Edge\ Impulse\ product\ plan}}
+\DoxyCodeLine{00022\ \textcolor{comment}{\ *\ subscription,\ you\ are\ not\ permitted\ to\ use\ this\ Software\ and\ must\ immediately}}
+\DoxyCodeLine{00023\ \textcolor{comment}{\ *\ delete\ and\ erase\ all\ copies\ of\ this\ Software\ within\ your\ control\ or\ possession.}}
+\DoxyCodeLine{00024\ \textcolor{comment}{\ *\ Edge\ Impulse\ reserves\ all\ rights\ and\ remedies\ available\ to\ enforce\ its\ rights.}}
+\DoxyCodeLine{00025\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00026\ \textcolor{comment}{\ *\ Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ the\ Software\ is}}
+\DoxyCodeLine{00027\ \textcolor{comment}{\ *\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,\ WITHOUT\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,}}
+\DoxyCodeLine{00028\ \textcolor{comment}{\ *\ either\ express\ or\ implied.\ See\ the\ License\ for\ the\ specific\ language\ governing}}
+\DoxyCodeLine{00029\ \textcolor{comment}{\ *\ permissions,\ disclaimers\ and\ limitations\ under\ the\ License.}}
+\DoxyCodeLine{00030\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{00031\ \textcolor{preprocessor}{\#ifndef\ \_\_FIR\_FILTER\_\_H\_\_}}
+\DoxyCodeLine{00032\ \textcolor{preprocessor}{\#define\ \_\_FIR\_FILTER\_\_H\_\_}}
+\DoxyCodeLine{00033\ }
+\DoxyCodeLine{00034\ \textcolor{preprocessor}{\#include\ <vector>}}
+\DoxyCodeLine{00035\ \textcolor{preprocessor}{\#include\ <cmath>}}
+\DoxyCodeLine{00036\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{filters_8hpp}{filters.hpp}}"{}}\ \textcolor{comment}{//for\ M\_PI}}
+\DoxyCodeLine{00037\ \textcolor{preprocessor}{\#include\ <limits>}}
+\DoxyCodeLine{00038\ }
+\DoxyCodeLine{00045\ \textcolor{keyword}{template}\ <\textcolor{keyword}{class}\ input\_t,\ \textcolor{keyword}{class}\ acc\_t>}
+\DoxyCodeLine{00046\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classfir__filter}{fir\_filter}}}
+\DoxyCodeLine{00047\ \{}
+\DoxyCodeLine{00048\ \textcolor{keyword}{private}:}
+\DoxyCodeLine{00054\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classfir__filter_a22d2d03b06369b2f619ff5027d1d576f}{set\_taps\_lowpass}}(\textcolor{keywordtype}{float}\ cutoff\_normalized,\ std::vector<float>\ \&f\_taps)}
+\DoxyCodeLine{00055\ \ \ \ \ \{}
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \ \ \textcolor{comment}{//http://www.dspguide.com/ch16/2.htm}}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}\ sine\_scale\ =\ 2\ *\ \mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2experimental_2microfrontend_2lib_2window__util_8c_ae71449b1cc6e6250b91f539153a7a0d3}{M\_PI}}\ *\ cutoff\_normalized;}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ offset\ is\ M/2...M\ is\ filter\ order\ -\/1.\ so\ truncation\ is\ desired}}
+\DoxyCodeLine{00059\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcaf138809236f667e9686fdd4aaf17705_aed7ea92f45bd273dde380a45ddced592}{offset}}\ =\ \mbox{\hyperlink{classfir__filter_ac7b488394730bfd8d6e0bd4e6e02b4a1}{filter\_size}}\ /\ 2;}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ \mbox{\hyperlink{classfir__filter_ac7b488394730bfd8d6e0bd4e6e02b4a1}{filter\_size}}\ /\ 2;\ i++)}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ \ \ \ \ f\_taps[i]\ =\ sin(sine\_scale\ *\ (i\ -\/\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcaf138809236f667e9686fdd4aaf17705_aed7ea92f45bd273dde380a45ddced592}{offset}}))\ /\ (i\ -\/\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcaf138809236f667e9686fdd4aaf17705_aed7ea92f45bd273dde380a45ddced592}{offset}});}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \ \ f\_taps[\mbox{\hyperlink{classfir__filter_ac7b488394730bfd8d6e0bd4e6e02b4a1}{filter\_size}}\ /\ 2]\ =\ sine\_scale;}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ \mbox{\hyperlink{classfir__filter_ac7b488394730bfd8d6e0bd4e6e02b4a1}{filter\_size}}\ /\ 2\ +\ 1;\ i\ <\ \mbox{\hyperlink{classfir__filter_ac7b488394730bfd8d6e0bd4e6e02b4a1}{filter\_size}};\ i++)}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ \ \ \ \ f\_taps[i]\ =\ sin(sine\_scale\ *\ (i\ -\/\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcaf138809236f667e9686fdd4aaf17705_aed7ea92f45bd273dde380a45ddced592}{offset}}))\ /\ (i\ -\/\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcaf138809236f667e9686fdd4aaf17705_aed7ea92f45bd273dde380a45ddced592}{offset}});}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00069\ \ \ \ \ \}}
+\DoxyCodeLine{00070\ }
+\DoxyCodeLine{00071\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classfir__filter_a0e464147beef616f628be922446871d4}{apply\_hamming}}(std::vector<float>\ \&f\_taps)}
+\DoxyCodeLine{00072\ \ \ \ \ \{}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ \mbox{\hyperlink{classfir__filter_ac7b488394730bfd8d6e0bd4e6e02b4a1}{filter\_size}};\ i++)}
+\DoxyCodeLine{00074\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \ \ \ \ \ \ f\_taps[i]\ *=\ 0.54\ -\/\ 0.46\ *\ cos(2\ *\ \mbox{\hyperlink{tflite-micro-arduino-examples-main_2src_2tensorflow_2lite_2experimental_2microfrontend_2lib_2window__util_8c_ae71449b1cc6e6250b91f539153a7a0d3}{M\_PI}}\ *\ i\ /\ (\mbox{\hyperlink{classfir__filter_ac7b488394730bfd8d6e0bd4e6e02b4a1}{filter\_size}}\ -\/\ 1));}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00077\ \ \ \ \ \}}
+\DoxyCodeLine{00078\ }
+\DoxyCodeLine{00079\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classfir__filter_a56f3d0ad5423921b28fd92a0888e13b1}{scale\_to\_unity\_gain}}(std::vector<float>\ \&f\_taps)}
+\DoxyCodeLine{00080\ \ \ \ \ \{}
+\DoxyCodeLine{00081\ \ \ \ \ \ \ \ \ \textcolor{comment}{//find\ the\ sum\ of\ taps}}
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}\ sum\ =\ 0;}
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{auto}\ tap\ :\ f\_taps)}
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00085\ \ \ \ \ \ \ \ \ \ \ \ \ sum\ +=\ tap;}
+\DoxyCodeLine{00086\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00087\ \ \ \ \ \ \ \ \ \textcolor{comment}{//scale\ down}}
+\DoxyCodeLine{00088\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{auto}\ \&tap\ :\ f\_taps)}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00090\ \ \ \ \ \ \ \ \ \ \ \ \ tap\ /=\ sum;}
+\DoxyCodeLine{00091\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00092\ \ \ \ \ \}}
+\DoxyCodeLine{00093\ }
+\DoxyCodeLine{00094\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classfir__filter_a43cadc324aa3a05aa3fd03c3e6551228}{convert\_lowpass\_to\_highpass}}(std::vector<float>\ \&f\_taps)}
+\DoxyCodeLine{00095\ \ \ \ \ \{}
+\DoxyCodeLine{00096\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ f\_taps.size();\ i\ +=\ 2)}
+\DoxyCodeLine{00097\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00098\ \ \ \ \ \ \ \ \ \ \ \ \ f\_taps[i]\ *=\ -\/1;}
+\DoxyCodeLine{00099\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00100\ \ \ \ \ \}}
+\DoxyCodeLine{00101\ }
+\DoxyCodeLine{00102\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00114\ \ \ \ \ \mbox{\hyperlink{classfir__filter_aa72b4d6e8b4c19c9b33618516ae7aaee}{fir\_filter}}(}
+\DoxyCodeLine{00115\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}\ \mbox{\hyperlink{ei__run__dsp_8h_a7b1ec6eee81fba90db3db34bdb8bcd91}{sampling\_frequency}},}
+\DoxyCodeLine{00116\ \ \ \ \ \ \ \ \ uint8\_t\ \mbox{\hyperlink{classfir__filter_ac7b488394730bfd8d6e0bd4e6e02b4a1}{filter\_size}},}
+\DoxyCodeLine{00117\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}\ lowpass\_cutoff,}
+\DoxyCodeLine{00118\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}\ highpass\_cutoff\ =\ 0,}
+\DoxyCodeLine{00119\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ decimation\_ratio\ =\ 1)\ :\ \ \mbox{\hyperlink{classfir__filter_ad5716cf8b1a70c81b3da83fbb331b3b2}{taps}}(\mbox{\hyperlink{classfir__filter_ac7b488394730bfd8d6e0bd4e6e02b4a1}{filter\_size}})\ ,\ \mbox{\hyperlink{classfir__filter_a3b1448f649d0b2792edf446ecdb2d76c}{history}}(\mbox{\hyperlink{classfir__filter_ac7b488394730bfd8d6e0bd4e6e02b4a1}{filter\_size}},\ 0)}
+\DoxyCodeLine{00120\ \ \ \ \ \{}
+\DoxyCodeLine{00121\ \ \ \ \ \ \ \ \ this-\/>filter\_size\ =\ \mbox{\hyperlink{classfir__filter_ac7b488394730bfd8d6e0bd4e6e02b4a1}{filter\_size}};}
+\DoxyCodeLine{00122\ \ \ \ \ \ \ \ \ std::vector<float>\ f\_taps(\mbox{\hyperlink{classfir__filter_ac7b488394730bfd8d6e0bd4e6e02b4a1}{filter\_size}},\ 0);}
+\DoxyCodeLine{00123\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ highpass\_cutoff\ ==\ 0\ \&\&\ lowpass\_cutoff\ ==\ 0\ )\ }
+\DoxyCodeLine{00124\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00125\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ei__run__classifier_8h_adda641ea28ba092cca93ceb401fe0807}{ei\_printf}}(\textcolor{stringliteral}{"{}You\ must\ choose\ either\ a\ lowpass\ or\ highpass\ cutoff"{}});}
+\DoxyCodeLine{00126\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};\ \textcolor{comment}{//\ return\ a\ filter\ that\ will\ return\ zeros\ always}}
+\DoxyCodeLine{00127\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00128\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (highpass\_cutoff\ ==\ 0)}
+\DoxyCodeLine{00129\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00130\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ use\ normalized\ frequency}}
+\DoxyCodeLine{00131\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfir__filter_a22d2d03b06369b2f619ff5027d1d576f}{set\_taps\_lowpass}}(lowpass\_cutoff\ /\ \mbox{\hyperlink{ei__run__dsp_8h_a7b1ec6eee81fba90db3db34bdb8bcd91}{sampling\_frequency}},\ f\_taps);}
+\DoxyCodeLine{00132\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00133\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (lowpass\_cutoff\ ==\ 0)}
+\DoxyCodeLine{00134\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00135\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//for\ highpass,\ we'll\ just\ design\ a\ lowpass\ filter,\ then\ invert\ its\ spectrum}}
+\DoxyCodeLine{00136\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfir__filter_a22d2d03b06369b2f619ff5027d1d576f}{set\_taps\_lowpass}}(highpass\_cutoff\ /\ \mbox{\hyperlink{ei__run__dsp_8h_a7b1ec6eee81fba90db3db34bdb8bcd91}{sampling\_frequency}},\ f\_taps);}
+\DoxyCodeLine{00137\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00138\ \ \ \ \ \ \ \ \ \textcolor{comment}{//todo\ bandpass}}
+\DoxyCodeLine{00139\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfir__filter_a0e464147beef616f628be922446871d4}{apply\_hamming}}(f\_taps);}
+\DoxyCodeLine{00140\ \ \ \ \ \ \ \ \ \textcolor{comment}{//scale\ to\ unity\ gain\ in\ passband\ (this\ prevents\ overflow)}}
+\DoxyCodeLine{00141\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfir__filter_a56f3d0ad5423921b28fd92a0888e13b1}{scale\_to\_unity\_gain}}(f\_taps);}
+\DoxyCodeLine{00142\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ aka\ if\ highpass\ filter}}
+\DoxyCodeLine{00143\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (lowpass\_cutoff\ ==\ 0)}
+\DoxyCodeLine{00144\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00145\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//now\ invert\ the\ spectrum}}
+\DoxyCodeLine{00146\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfir__filter_a43cadc324aa3a05aa3fd03c3e6551228}{convert\_lowpass\_to\_highpass}}(f\_taps);}
+\DoxyCodeLine{00147\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00148\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ scale\ and\ write\ into\ fixed\ point\ taps}}
+\DoxyCodeLine{00149\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ \mbox{\hyperlink{classfir__filter_ac7b488394730bfd8d6e0bd4e6e02b4a1}{filter\_size}};\ i++)}
+\DoxyCodeLine{00150\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00151\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfir__filter_ad5716cf8b1a70c81b3da83fbb331b3b2}{taps}}[i]\ =\ f\_taps[i]\ *\ 32767;}
+\DoxyCodeLine{00152\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00153\ \ \ \ \ \}}
+\DoxyCodeLine{00154\ }
+\DoxyCodeLine{00163\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classfir__filter_a07b355fc0a5e9d037a9982d3fc6a3144}{apply\_filter}}(}
+\DoxyCodeLine{00164\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ input\_t\ *src,}
+\DoxyCodeLine{00165\ \ \ \ \ \ \ \ \ input\_t\ *dest,}
+\DoxyCodeLine{00166\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{hello__world__model_8cc_a439227feff9d7f55384e8780cfc2eb82}{size}})}
+\DoxyCodeLine{00167\ \ \ \ \ \{}
+\DoxyCodeLine{00168\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ \mbox{\hyperlink{hello__world__model_8cc_a439227feff9d7f55384e8780cfc2eb82}{size}};\ i++)}
+\DoxyCodeLine{00169\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00170\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfir__filter_a3b1448f649d0b2792edf446ecdb2d76c}{history}}[\mbox{\hyperlink{classfir__filter_a39a0c68cd23146b7a39353ea56a26056}{write\_index}}]\ =\ src[i];}
+\DoxyCodeLine{00171\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ read\_index\ =\ \mbox{\hyperlink{classfir__filter_a39a0c68cd23146b7a39353ea56a26056}{write\_index}};}
+\DoxyCodeLine{00172\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//minus\ one\ b/c\ of\ the\ sign\ bit}}
+\DoxyCodeLine{00173\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{wm8960__regs_8h_ace4e4903c356d90d7a0e7548fc1e8b50}{shift}}\ =\ (\textcolor{keyword}{sizeof}(input\_t)\ *\ 8)\ -\/\ 1;}
+\DoxyCodeLine{00174\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//stuff\ a\ 1\ into\ one\ less\ than\ we're\ going\ to\ shift\ to\ effectively\ round}}
+\DoxyCodeLine{00175\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//this\ is\ essentially\ resetting\ the\ accumulator\ back\ to\ zero\ otherwise}}
+\DoxyCodeLine{00176\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ceva__typedef_8h_a2869741d7cb72353bf65981dc8213cf4}{acc\_t}}\ accumulator\ =\ 1\ <<\ (\mbox{\hyperlink{wm8960__regs_8h_ace4e4903c356d90d7a0e7548fc1e8b50}{shift}}\ -\/\ 1);}
+\DoxyCodeLine{00177\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{auto}\ tap\ :\ \mbox{\hyperlink{classfir__filter_ad5716cf8b1a70c81b3da83fbb331b3b2}{taps}})}
+\DoxyCodeLine{00178\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00179\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ accumulator\ +=\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{ceva__typedef_8h_a2869741d7cb72353bf65981dc8213cf4}{acc\_t}}\textcolor{keyword}{>}(tap)\ *\ \mbox{\hyperlink{classfir__filter_a3b1448f649d0b2792edf446ecdb2d76c}{history}}[read\_index];}
+\DoxyCodeLine{00180\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//wrap\ the\ read\ index}}
+\DoxyCodeLine{00181\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ read\_index\ =\ read\_index\ ==\ 0\ ?\ \mbox{\hyperlink{classfir__filter_ac7b488394730bfd8d6e0bd4e6e02b4a1}{filter\_size}}\ -\/\ 1\ :\ read\_index\ -\/\ 1;}
+\DoxyCodeLine{00182\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00183\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//wrap\ the\ write\ index}}
+\DoxyCodeLine{00184\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfir__filter_a39a0c68cd23146b7a39353ea56a26056}{write\_index}}++;}
+\DoxyCodeLine{00185\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{classfir__filter_a39a0c68cd23146b7a39353ea56a26056}{write\_index}}\ ==\ \mbox{\hyperlink{classfir__filter_ac7b488394730bfd8d6e0bd4e6e02b4a1}{filter\_size}})}
+\DoxyCodeLine{00186\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00187\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfir__filter_a39a0c68cd23146b7a39353ea56a26056}{write\_index}}\ =\ 0;}
+\DoxyCodeLine{00188\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00189\ }
+\DoxyCodeLine{00190\ \ \ \ \ \ \ \ \ \ \ \ \ accumulator\ >>=\ \mbox{\hyperlink{wm8960__regs_8h_ace4e4903c356d90d7a0e7548fc1e8b50}{shift}};}
+\DoxyCodeLine{00191\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//saturate\ if\ overflow}}
+\DoxyCodeLine{00192\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (accumulator\ >\ std::numeric\_limits<input\_t>::max())}
+\DoxyCodeLine{00193\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00194\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ dest[i]\ =\ std::numeric\_limits<input\_t>::max();}
+\DoxyCodeLine{00195\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00196\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (accumulator\ <\ std::numeric\_limits<input\_t>::min())}
+\DoxyCodeLine{00197\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00198\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ dest[i]\ =\ std::numeric\_limits<input\_t>::min();}
+\DoxyCodeLine{00199\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00200\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00201\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00202\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ dest[i]\ =\ accumulator;}
+\DoxyCodeLine{00203\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00204\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00205\ \ \ \ \ \}}
+\DoxyCodeLine{00206\ }
+\DoxyCodeLine{00212\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classfir__filter_a5557094f29853e26f477fca9756369e9}{reset}}()}
+\DoxyCodeLine{00213\ \ \ \ \ \{}
+\DoxyCodeLine{00214\ \ \ \ \ \ \ \ \ std::fill(\mbox{\hyperlink{classfir__filter_a3b1448f649d0b2792edf446ecdb2d76c}{history}}.begin(),\ \mbox{\hyperlink{classfir__filter_a3b1448f649d0b2792edf446ecdb2d76c}{history}}.end(),\ 0);}
+\DoxyCodeLine{00215\ \ \ \ \ \}}
+\DoxyCodeLine{00216\ }
+\DoxyCodeLine{00217\ \textcolor{keyword}{private}:}
+\DoxyCodeLine{00218\ \ \ \ \ std::vector<input\_t>\ \mbox{\hyperlink{classfir__filter_ad5716cf8b1a70c81b3da83fbb331b3b2}{taps}};}
+\DoxyCodeLine{00219\ \ \ \ \ std::vector<input\_t>\ \mbox{\hyperlink{classfir__filter_a3b1448f649d0b2792edf446ecdb2d76c}{history}};}
+\DoxyCodeLine{00220\ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{classfir__filter_a39a0c68cd23146b7a39353ea56a26056}{write\_index}}\ =\ 0;}
+\DoxyCodeLine{00221\ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{classfir__filter_ac7b488394730bfd8d6e0bd4e6e02b4a1}{filter\_size}};}
+\DoxyCodeLine{00222\ }
+\DoxyCodeLine{00223\ \ \ \ \ \textcolor{keyword}{friend}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classfir__filter_aa68575239ee58ad75132ad5ee34b3dae}{AccelerometerQuantizedTestCase}};}
+\DoxyCodeLine{00224\ }
+\DoxyCodeLine{00225\ \};}
+\DoxyCodeLine{00226\ \textcolor{preprocessor}{\#endif\ \ }}
+
+\end{DoxyCode}

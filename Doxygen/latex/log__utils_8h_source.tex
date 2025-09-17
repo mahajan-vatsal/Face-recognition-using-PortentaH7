@@ -1,0 +1,279 @@
+\doxysection{log\+\_\+utils.\+h}
+\hypertarget{log__utils_8h_source}{}\label{log__utils_8h_source}\index{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/main/tensorflow/lite/micro/tools/benchmarking/log\_utils.h@{Arduino/GetStartedWithMachineLearningOnArduino/tflite-\/micro-\/main/tensorflow/lite/micro/tools/benchmarking/log\_utils.h}}
+\mbox{\hyperlink{log__utils_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{/*\ Copyright\ 2023\ The\ TensorFlow\ Authors.\ All\ Rights\ Reserved.}}
+\DoxyCodeLine{00002\ \textcolor{comment}{}}
+\DoxyCodeLine{00003\ \textcolor{comment}{Licensed\ under\ the\ Apache\ License,\ Version\ 2.0\ (the\ "{}License"{});}}
+\DoxyCodeLine{00004\ \textcolor{comment}{you\ may\ not\ use\ this\ file\ except\ in\ compliance\ with\ the\ License.}}
+\DoxyCodeLine{00005\ \textcolor{comment}{You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{00006\ \textcolor{comment}{}}
+\DoxyCodeLine{00007\ \textcolor{comment}{\ \ \ \ http://www.apache.org/licenses/LICENSE-\/2.0}}
+\DoxyCodeLine{00008\ \textcolor{comment}{}}
+\DoxyCodeLine{00009\ \textcolor{comment}{Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ software}}
+\DoxyCodeLine{00010\ \textcolor{comment}{distributed\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,}}
+\DoxyCodeLine{00011\ \textcolor{comment}{WITHOUT\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,\ either\ express\ or\ implied.}}
+\DoxyCodeLine{00012\ \textcolor{comment}{See\ the\ License\ for\ the\ specific\ language\ governing\ permissions\ and}}
+\DoxyCodeLine{00013\ \textcolor{comment}{limitations\ under\ the\ License.}}
+\DoxyCodeLine{00014\ \textcolor{comment}{==============================================================================*/}}
+\DoxyCodeLine{00015\ }
+\DoxyCodeLine{00016\ \textcolor{preprocessor}{\#ifndef\ TFLM\_BENCHMARK\_INTERNAL\_LOG\_UTILS\_H\_}}
+\DoxyCodeLine{00017\ \textcolor{preprocessor}{\#define\ TFLM\_BENCHMARK\_INTERNAL\_LOG\_UTILS\_H\_}}
+\DoxyCodeLine{00018\ }
+\DoxyCodeLine{00019\ \textcolor{preprocessor}{\#include\ <algorithm>}}
+\DoxyCodeLine{00020\ \textcolor{preprocessor}{\#include\ <cstdarg>}}
+\DoxyCodeLine{00021\ \textcolor{preprocessor}{\#include\ <cstdint>}}
+\DoxyCodeLine{00022\ \textcolor{preprocessor}{\#include\ <cstring>}}
+\DoxyCodeLine{00023\ }
+\DoxyCodeLine{00024\ \textcolor{preprocessor}{\#include\ "{}tensorflow/lite/micro/micro\_log.h"{}}}
+\DoxyCodeLine{00025\ }
+\DoxyCodeLine{00026\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacetflite}{tflite}}\ \{}
+\DoxyCodeLine{00027\ }
+\DoxyCodeLine{00028\ \textcolor{comment}{//\ The\ maxmimum\ length\ of\ a\ string.}}
+\DoxyCodeLine{00029\ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{namespacetflite_ae56c9190a3f4562967c26e5c1a3a6be4}{kMaxStringLength}}\ =\ 32;}
+\DoxyCodeLine{00030\ }
+\DoxyCodeLine{00031\ \textcolor{comment}{//\ The\ maximum\ length\ of\ a\ table\ row,\ applies\ to\ the\ header\ as\ well.}}
+\DoxyCodeLine{00032\ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{namespacetflite_a2b5b2d93001623fdc97e2a27c239e15c}{kMaxRowLength}}\ =\ 100;}
+\DoxyCodeLine{00033\ }
+\DoxyCodeLine{00034\ \textcolor{comment}{//\ The\ default\ padding\ between\ columns\ in\ a\ table.}}
+\DoxyCodeLine{00035\ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{namespacetflite_a30b50bd055d1f1f7614a754708f03f2c}{kDefaultColumnPadding}}\ =\ 4;}
+\DoxyCodeLine{00036\ }
+\DoxyCodeLine{00037\ \textcolor{comment}{//\ Defines\ how\ formatted\ data\ is\ printed\ to\ stdout.}}
+\DoxyCodeLine{00038\ \textcolor{keyword}{enum\ class}\ \mbox{\hyperlink{namespacetflite_a9dfc4fbefe2d086996cc363ef3963e75}{PrettyPrintType}}\ \{}
+\DoxyCodeLine{00039\ \ \ \textcolor{comment}{//\ Prints\ as\ a\ CSV\ file.}}
+\DoxyCodeLine{00040\ \ \ \mbox{\hyperlink{namespacetflite_a9dfc4fbefe2d086996cc363ef3963e75a47e76f90e230ccc19e1f36375f5bfb69}{kCsv}},}
+\DoxyCodeLine{00041\ \ \ \textcolor{comment}{//\ Prints\ as\ a\ formatted\ table.}}
+\DoxyCodeLine{00042\ \ \ \mbox{\hyperlink{namespacetflite_a9dfc4fbefe2d086996cc363ef3963e75a1479f3239f37b30cf697eff1e629f61e}{kTable}},}
+\DoxyCodeLine{00043\ \};}
+\DoxyCodeLine{00044\ }
+\DoxyCodeLine{00045\ \textcolor{comment}{//\ Returns\ the\ length\ of\ the\ longest\ string\ in\ an\ array.}}
+\DoxyCodeLine{00046\ \textcolor{comment}{//\ Args:}}
+\DoxyCodeLine{00047\ \textcolor{comment}{//\ -\/\ strings:\ An\ array\ of\ strings.}}
+\DoxyCodeLine{00048\ \textcolor{comment}{//\ -\/\ count:\ The\ number\ of\ strings\ in\ the\ array.}}
+\DoxyCodeLine{00049\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{namespacetflite_a614f460240dc6e396865c3980ea0afd2}{GetLongestStringLength}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ strings[][\mbox{\hyperlink{namespacetflite_ae56c9190a3f4562967c26e5c1a3a6be4}{kMaxStringLength}}],\ \textcolor{keywordtype}{int}\ count);}
+\DoxyCodeLine{00050\ }
+\DoxyCodeLine{00051\ \textcolor{comment}{//\ Adds\ padding\ between\ two\ columns\ in\ a\ table.}}
+\DoxyCodeLine{00052\ \textcolor{comment}{//\ ex)\ "{}hello"{}\ is\ being\ inserted\ into\ a\ column.\ The\ largest\ value\ in\ that\ column}}
+\DoxyCodeLine{00053\ \textcolor{comment}{//\ \ \ \ \ is\ 10,\ and\ there's\ a\ global\ padding\ of\ 4\ spaces.\ Therefore,\ 9\ spaces\ (10}}
+\DoxyCodeLine{00054\ \textcolor{comment}{//\ \ \ \ \ -\/\ 5\ +\ 4)\ are\ added\ as\ padding.}}
+\DoxyCodeLine{00055\ \textcolor{comment}{//\ Args:}}
+\DoxyCodeLine{00056\ \textcolor{comment}{//\ -\/\ string:\ The\ input\ padding\ string.}}
+\DoxyCodeLine{00057\ \textcolor{comment}{//\ -\/\ size:\ The\ size\ of\ the\ string\ that's\ being\ inserted\ into\ a\ column.}}
+\DoxyCodeLine{00058\ \textcolor{comment}{//\ -\/\ max\_size:\ The\ size\ of\ the\ largest\ string\ in\ the\ column.}}
+\DoxyCodeLine{00059\ \textcolor{comment}{//\ -\/\ padding:\ The\ amount\ of\ padding\ to\ add\ to\ each\ column\ regardless\ of\ its}}
+\DoxyCodeLine{00060\ \textcolor{comment}{//\ \ \ \ \ size.}}
+\DoxyCodeLine{00061\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_abcbd2718857292fefb30eec562634f96}{FillColumnPadding}}(\textcolor{keywordtype}{char}*\ \textcolor{keywordtype}{string},\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{hello__world__model_8cc_a439227feff9d7f55384e8780cfc2eb82}{size}},\ \textcolor{keywordtype}{int}\ max\_size,}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{arc__mli_2conv_8cc_ad870e8457a2c13cdb2d9a3566118bb4e}{padding}}\ =\ \mbox{\hyperlink{namespacetflite_a30b50bd055d1f1f7614a754708f03f2c}{kDefaultColumnPadding}});}
+\DoxyCodeLine{00063\ }
+\DoxyCodeLine{00064\ \textcolor{comment}{//\ Fills\ a\ string\ with\ a\ specified\ value.}}
+\DoxyCodeLine{00065\ \textcolor{comment}{//\ Args:}}
+\DoxyCodeLine{00066\ \textcolor{comment}{//\ -\/\ string:\ The\ input\ string.\ This\ is\ filled\ in\ with\ the\ specified\ value.}}
+\DoxyCodeLine{00067\ \textcolor{comment}{//\ -\/\ size:\ The\ size\ of\ the\ string\ after\ being\ filled\ in.\ This\ must\ be\ less\ than}}
+\DoxyCodeLine{00068\ \textcolor{comment}{//\ \ \ \ \ the\ allocated\ space\ for\ the\ string.}}
+\DoxyCodeLine{00069\ \textcolor{comment}{//\ -\/\ buffer\_size:\ The\ size\ of\ the\ string's\ buffer.}}
+\DoxyCodeLine{00070\ \textcolor{comment}{//\ -\/\ value:\ The\ value\ to\ insert\ into\ the\ string.\ Defaults\ to\ a\ space.}}
+\DoxyCodeLine{00071\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_a602176f66507c10d541fb9cc236ab39f}{FillString}}(\textcolor{keywordtype}{char}*\ \textcolor{keywordtype}{string},\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{hello__world__model_8cc_a439227feff9d7f55384e8780cfc2eb82}{size}},\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{stacker_8cc_a799a743b3abd553a37fc01ad3097df08}{buffer\_size}},\ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{wm8960__regs_8h_a638e4503e0ae6ce655b7ad2e17e8f0ad}{value}}\ =\ \textcolor{charliteral}{'\ '});}
+\DoxyCodeLine{00072\ }
+\DoxyCodeLine{00073\ \textcolor{comment}{//\ Concatenates\ the\ input\ string\ onto\ the\ first.}}
+\DoxyCodeLine{00074\ \textcolor{comment}{//\ Args:}}
+\DoxyCodeLine{00075\ \textcolor{comment}{//\ -\/\ output:\ The\ destination\ string\ for\ where\ to\ append\ input.}}
+\DoxyCodeLine{00076\ \textcolor{comment}{//\ -\/\ input:\ The\ input\ string\ to\ concatenate.}}
+\DoxyCodeLine{00077\ \textcolor{comment}{//\ -\/\ size:\ The\ number\ of\ characters\ to\ concatenate\ from\ the\ first\ string.\ If}}
+\DoxyCodeLine{00078\ \textcolor{comment}{//\ \ \ \ \ negative,\ the\ whole\ input\ string\ will\ be\ concatenated.}}
+\DoxyCodeLine{00079\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_a0ff46c2f2d58a82f9eb16cb695fd8a56}{MicroStrcat}}(\textcolor{keywordtype}{char}*\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbcd3bbe90c4644d53fde1ce4e312f437_a7a2a916a8059078c2d7a05f46c7126fd}{output}},\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src5afb18c45f6346167aa977a363205143_a9cebfb3d6ddd692fbdd268cf4b9ad024}{input}},\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{hello__world__model_8cc_a439227feff9d7f55384e8780cfc2eb82}{size}}\ =\ -\/1);}
+\DoxyCodeLine{00080\ }
+\DoxyCodeLine{00081\ \textcolor{comment}{//\ Copies\ the\ input\ string\ into\ the\ output.}}
+\DoxyCodeLine{00082\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_adfe5b4b8ee5139b082f85473a193724b}{MicroStrcpy}}(\textcolor{keywordtype}{char}*\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbcd3bbe90c4644d53fde1ce4e312f437_a7a2a916a8059078c2d7a05f46c7126fd}{output}},\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2src5afb18c45f6346167aa977a363205143_a9cebfb3d6ddd692fbdd268cf4b9ad024}{input}});}
+\DoxyCodeLine{00083\ }
+\DoxyCodeLine{00084\ \textcolor{comment}{//\ Formats\ a\ division\ operation\ to\ have\ a\ specified\ number\ of\ decimal\ places.}}
+\DoxyCodeLine{00085\ \textcolor{comment}{//\ Args:}}
+\DoxyCodeLine{00086\ \textcolor{comment}{//\ -\/\ output:\ The\ output\ string\ to\ be\ formatted.}}
+\DoxyCodeLine{00087\ \textcolor{comment}{//\ -\/\ numerator:\ The\ numerator\ in\ the\ division\ operation.}}
+\DoxyCodeLine{00088\ \textcolor{comment}{//\ -\/\ denominator:\ The\ denominator\ in\ the\ division\ operation.}}
+\DoxyCodeLine{00089\ \textcolor{comment}{//\ -\/\ decimal\ places:\ The\ number\ of\ decimal\ places\ to\ print\ to.}}
+\DoxyCodeLine{00090\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_a71ed5e00708e8974311e7c955cea606c}{FormatIntegerDivide}}(\textcolor{keywordtype}{char}*\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbcd3bbe90c4644d53fde1ce4e312f437_a7a2a916a8059078c2d7a05f46c7126fd}{output}},\ int64\_t\ numerator,\ int64\_t\ denominator,}
+\DoxyCodeLine{00091\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ decimal\_places);}
+\DoxyCodeLine{00092\ }
+\DoxyCodeLine{00093\ \textcolor{comment}{//\ Formats\ a\ division\ operation\ as\ a\ percentage.}}
+\DoxyCodeLine{00094\ \textcolor{comment}{//\ Args:}}
+\DoxyCodeLine{00095\ \textcolor{comment}{//\ -\/\ output:\ The\ output\ string\ to\ be\ formatted.}}
+\DoxyCodeLine{00096\ \textcolor{comment}{//\ -\/\ numerator:\ The\ numerator\ in\ the\ division\ operation.}}
+\DoxyCodeLine{00097\ \textcolor{comment}{//\ -\/\ denominator:\ The\ denominator\ in\ the\ division\ operation.}}
+\DoxyCodeLine{00098\ \textcolor{comment}{//\ -\/\ decimal\ places:\ The\ number\ of\ decimal\ places\ to\ print\ to.}}
+\DoxyCodeLine{00099\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_aa177e1c75fd7e4ea3c6b5d89a728d660}{FormatAsPercentage}}(\textcolor{keywordtype}{char}*\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbcd3bbe90c4644d53fde1ce4e312f437_a7a2a916a8059078c2d7a05f46c7126fd}{output}},\ int64\_t\ numerator,\ int64\_t\ denominator,}
+\DoxyCodeLine{00100\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ decimal\_places);}
+\DoxyCodeLine{00101\ }
+\DoxyCodeLine{00102\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_a6d891ec3d7fb339f3f903875d27beb64}{PrettyPrintTableHeader}}(\mbox{\hyperlink{namespacetflite_a9dfc4fbefe2d086996cc363ef3963e75}{PrettyPrintType}}\ \mbox{\hyperlink{micro_2kernels_2overlap__add_8cc_a231b67310ea6e901bd0df1bded3963cf}{type}},\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ table\_name);}
+\DoxyCodeLine{00103\ }
+\DoxyCodeLine{00104\ \textcolor{comment}{//\ Formats\ a\ number\ as\ a\ string.}}
+\DoxyCodeLine{00105\ \textcolor{comment}{//\ Args:}}
+\DoxyCodeLine{00106\ \textcolor{comment}{//\ -\/\ output:\ The\ location\ of\ where\ to\ write\ the\ formatted\ number.}}
+\DoxyCodeLine{00107\ \textcolor{comment}{//\ -\/\ value:\ The\ value\ to\ write\ to\ a\ string.}}
+\DoxyCodeLine{00108\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{00109\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_a7602ed7c8b2b26fc011d6e65c7ce5938}{FormatNumber}}(\textcolor{keywordtype}{char}*\ \mbox{\hyperlink{_arduino_2_get_started_with_machine_learning_on_arduino_2tflite-micro-arduino-examples-main_2srcbcd3bbe90c4644d53fde1ce4e312f437_a7a2a916a8059078c2d7a05f46c7126fd}{output}},\ T\ \mbox{\hyperlink{wm8960__regs_8h_a638e4503e0ae6ce655b7ad2e17e8f0ad}{value}});}
+\DoxyCodeLine{00110\ }
+\DoxyCodeLine{00111\ \textcolor{comment}{//\ Pretty\ prints\ a\ table\ to\ stdout.}}
+\DoxyCodeLine{00112\ \textcolor{comment}{//\ Note:\ kMaxRows\ and\ kColumns\ should\ describe\ the\ allocated\ size\ of\ the\ table,}}
+\DoxyCodeLine{00113\ \textcolor{comment}{//\ \ \ \ \ \ \ not\ the\ amount\ of\ data\ that\ is\ populated.\ It\ is\ required\ that\ all}}
+\DoxyCodeLine{00114\ \textcolor{comment}{//\ \ \ \ \ \ \ columns\ are\ filled\ out,\ but\ not\ all\ rows.}}
+\DoxyCodeLine{00115\ \textcolor{comment}{//}}
+\DoxyCodeLine{00116\ \textcolor{comment}{//\ ex)\ PrintTable<3,\ 25>(headers,\ data,\ 4);}}
+\DoxyCodeLine{00117\ \textcolor{comment}{//\ \ \ \ \ This\ will\ print\ a\ table\ with\ 3\ columns\ and\ 4\ rows.\ In\ this\ example,\ it}}
+\DoxyCodeLine{00118\ \textcolor{comment}{//\ \ \ \ \ is\ required\ that\ data\ is\ defined\ as\ char[3][25][kMaxStringLength]\ to}}
+\DoxyCodeLine{00119\ \textcolor{comment}{//\ \ \ \ \ properly\ print.}}
+\DoxyCodeLine{00120\ \textcolor{comment}{//}}
+\DoxyCodeLine{00121\ \textcolor{comment}{//\ op\ \ \ \ \ \ \ \ cycles\ \ \ \ cpu\ \%}}
+\DoxyCodeLine{00122\ \textcolor{comment}{//\ -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}}
+\DoxyCodeLine{00123\ \textcolor{comment}{//\ foo\ \ \ \ \ |\ 1000\ \ \ \ \ |\ 10}}
+\DoxyCodeLine{00124\ \textcolor{comment}{//\ bar\ \ \ \ \ |\ 2500\ \ \ \ \ |\ 25}}
+\DoxyCodeLine{00125\ \textcolor{comment}{//\ baz\ \ \ \ \ |\ 1000\ \ \ \ \ |\ 10}}
+\DoxyCodeLine{00126\ \textcolor{comment}{//\ lorem\ \ \ |\ 2000\ \ \ \ \ |\ 20}}
+\DoxyCodeLine{00127\ \textcolor{comment}{//}}
+\DoxyCodeLine{00128\ \textcolor{comment}{//\ Args:}}
+\DoxyCodeLine{00129\ \textcolor{comment}{//\ -\/\ headers:\ A\ 1D\ array\ of\ strings\ containing\ the\ headers\ of\ the\ table.\ This}}
+\DoxyCodeLine{00130\ \textcolor{comment}{//\ \ \ \ \ must\ be\ equal\ in\ size\ to\ kColumns.}}
+\DoxyCodeLine{00131\ \textcolor{comment}{//\ -\/\ data:\ A\ 2D\ array\ of\ string\ data\ organized\ in\ [columns,\ rows].\ As\ stated}}
+\DoxyCodeLine{00132\ \textcolor{comment}{//\ \ \ \ \ above,\ it\ is\ required\ that\ all\ columns\ are\ populated,\ but\ not\ all\ rows.}}
+\DoxyCodeLine{00133\ \textcolor{comment}{//\ -\/\ rows:\ The\ number\ of\ populated\ rows\ in\ \`{}data`.}}
+\DoxyCodeLine{00134\ \textcolor{keyword}{template}\ <\textcolor{keywordtype}{int}\ kMaxRows,\ \textcolor{keywordtype}{int}\ kColumns>}
+\DoxyCodeLine{00135\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_aecc6b9c2f81e2c060567f009bb72e2b0}{PrintTable}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ headers[kColumns][\mbox{\hyperlink{namespacetflite_ae56c9190a3f4562967c26e5c1a3a6be4}{kMaxStringLength}}],}
+\DoxyCodeLine{00136\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{hello__world__model_8cc_ab2a9259b73b53c0bb06a6b242aa7ae32}{data}}[kColumns][kMaxRows][\mbox{\hyperlink{namespacetflite_ae56c9190a3f4562967c26e5c1a3a6be4}{kMaxStringLength}}],}
+\DoxyCodeLine{00137\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{ei__run__dsp_8h_ad2900253d2779d0db156053c95c88b24}{rows}})\ \{}
+\DoxyCodeLine{00138\ \ \ \textcolor{comment}{//\ Get\ the\ maximum\ width\ for\ each\ column\ in\ the\ table.}}
+\DoxyCodeLine{00139\ \ \ \textcolor{keywordtype}{int}\ max\_column\_width[kColumns];}
+\DoxyCodeLine{00140\ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ kColumns;\ ++i)\ \{}
+\DoxyCodeLine{00141\ \ \ \ \ max\_column\_width[i]\ =\ std::max(\mbox{\hyperlink{namespacetflite_a614f460240dc6e396865c3980ea0afd2}{GetLongestStringLength}}(\mbox{\hyperlink{hello__world__model_8cc_ab2a9259b73b53c0bb06a6b242aa7ae32}{data}}[i],\ \mbox{\hyperlink{ei__run__dsp_8h_ad2900253d2779d0db156053c95c88b24}{rows}}),}
+\DoxyCodeLine{00142\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{int}\textcolor{keyword}{>}(strlen(headers[i])));}
+\DoxyCodeLine{00143\ \ \ \}}
+\DoxyCodeLine{00144\ }
+\DoxyCodeLine{00145\ \ \ \textcolor{comment}{//\ Add\ padding\ between\ each\ item\ in\ the\ header\ so\ it\ can\ be\ printed\ on\ one}}
+\DoxyCodeLine{00146\ \ \ \textcolor{comment}{//\ line.}}
+\DoxyCodeLine{00147\ \ \ \textcolor{keywordtype}{char}\ header\_spaces[kColumns][\mbox{\hyperlink{namespacetflite_ae56c9190a3f4562967c26e5c1a3a6be4}{kMaxStringLength}}];}
+\DoxyCodeLine{00148\ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ kColumns;\ ++i)\ \{}
+\DoxyCodeLine{00149\ \ \ \ \ \mbox{\hyperlink{namespacetflite_abcbd2718857292fefb30eec562634f96}{FillColumnPadding}}(header\_spaces[i],\ strlen(headers[i]),\ max\_column\_width[i],}
+\DoxyCodeLine{00150\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_a30b50bd055d1f1f7614a754708f03f2c}{kDefaultColumnPadding}}\ +\ 2);}
+\DoxyCodeLine{00151\ \ \ \}}
+\DoxyCodeLine{00152\ }
+\DoxyCodeLine{00153\ \ \ \textcolor{comment}{//\ Print\ the\ header.}}
+\DoxyCodeLine{00154\ \ \ \textcolor{keywordtype}{char}\ header[\mbox{\hyperlink{namespacetflite_a2b5b2d93001623fdc97e2a27c239e15c}{kMaxRowLength}}];}
+\DoxyCodeLine{00155\ \ \ memset(header,\ 0,\ \mbox{\hyperlink{namespacetflite_a2b5b2d93001623fdc97e2a27c239e15c}{kMaxRowLength}});}
+\DoxyCodeLine{00156\ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ kColumns;\ ++i)\ \{}
+\DoxyCodeLine{00157\ \ \ \ \ \mbox{\hyperlink{namespacetflite_a0ff46c2f2d58a82f9eb16cb695fd8a56}{MicroStrcat}}(header,\ headers[i]);}
+\DoxyCodeLine{00158\ \ \ \ \ \mbox{\hyperlink{namespacetflite_a0ff46c2f2d58a82f9eb16cb695fd8a56}{MicroStrcat}}(header,\ header\_spaces[i]);}
+\DoxyCodeLine{00159\ \ \ \}}
+\DoxyCodeLine{00160\ \ \ \mbox{\hyperlink{_face___access__inferencing_2src_2edge-impulse-sdk_2tensorflow_2lite_2micro_2micro__log_8h_ab9bf491b4a37b06ba732fd7de6b04cb2}{MicroPrintf}}(\textcolor{stringliteral}{"{}\%s"{}},\ header);}
+\DoxyCodeLine{00161\ }
+\DoxyCodeLine{00162\ \ \ \textcolor{comment}{//\ Print\ a\ separator\ to\ separate\ the\ header\ from\ the\ data.}}
+\DoxyCodeLine{00163\ \ \ \textcolor{keywordtype}{char}\ separator[\mbox{\hyperlink{namespacetflite_a2b5b2d93001623fdc97e2a27c239e15c}{kMaxRowLength}}];}
+\DoxyCodeLine{00164\ \ \ \mbox{\hyperlink{namespacetflite_a602176f66507c10d541fb9cc236ab39f}{FillString}}(separator,\ strlen(header)\ -\/\ 1,\ \mbox{\hyperlink{namespacetflite_a2b5b2d93001623fdc97e2a27c239e15c}{kMaxRowLength}},\ \textcolor{charliteral}{'-\/'});}
+\DoxyCodeLine{00165\ \ \ \mbox{\hyperlink{_face___access__inferencing_2src_2edge-impulse-sdk_2tensorflow_2lite_2micro_2micro__log_8h_ab9bf491b4a37b06ba732fd7de6b04cb2}{MicroPrintf}}(\textcolor{stringliteral}{"{}\%s"{}},\ separator);}
+\DoxyCodeLine{00166\ }
+\DoxyCodeLine{00167\ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ \mbox{\hyperlink{ei__run__dsp_8h_ad2900253d2779d0db156053c95c88b24}{rows}};\ ++i)\ \{}
+\DoxyCodeLine{00168\ \ \ \ \ \textcolor{keywordtype}{char}\ spaces[kColumns][\mbox{\hyperlink{namespacetflite_ae56c9190a3f4562967c26e5c1a3a6be4}{kMaxStringLength}}];}
+\DoxyCodeLine{00169\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ j\ =\ 0;\ j\ <\ kColumns;\ ++j)\ \{}
+\DoxyCodeLine{00170\ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_abcbd2718857292fefb30eec562634f96}{FillColumnPadding}}(spaces[j],\ strlen(\mbox{\hyperlink{hello__world__model_8cc_ab2a9259b73b53c0bb06a6b242aa7ae32}{data}}[j][i]),\ max\_column\_width[j]);}
+\DoxyCodeLine{00171\ \ \ \ \ \}}
+\DoxyCodeLine{00172\ }
+\DoxyCodeLine{00173\ \ \ \ \ \textcolor{keywordtype}{char}\ row[\mbox{\hyperlink{namespacetflite_a2b5b2d93001623fdc97e2a27c239e15c}{kMaxRowLength}}];}
+\DoxyCodeLine{00174\ \ \ \ \ memset(row,\ 0,\ \mbox{\hyperlink{namespacetflite_a2b5b2d93001623fdc97e2a27c239e15c}{kMaxRowLength}});}
+\DoxyCodeLine{00175\ }
+\DoxyCodeLine{00176\ \ \ \ \ \textcolor{comment}{//\ Concatenate\ each\ column\ in\ a\ row\ with\ the\ format\ "{}[data][padding]|\ "{}}}
+\DoxyCodeLine{00177\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ j\ =\ 0;\ j\ <\ kColumns;\ ++j)\ \{}
+\DoxyCodeLine{00178\ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_a0ff46c2f2d58a82f9eb16cb695fd8a56}{MicroStrcat}}(row,\ \mbox{\hyperlink{hello__world__model_8cc_ab2a9259b73b53c0bb06a6b242aa7ae32}{data}}[j][i]);}
+\DoxyCodeLine{00179\ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_a0ff46c2f2d58a82f9eb16cb695fd8a56}{MicroStrcat}}(row,\ spaces[j]);}
+\DoxyCodeLine{00180\ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_a0ff46c2f2d58a82f9eb16cb695fd8a56}{MicroStrcat}}(row,\ \textcolor{stringliteral}{"{}|\ "{}});}
+\DoxyCodeLine{00181\ \ \ \ \ \}}
+\DoxyCodeLine{00182\ }
+\DoxyCodeLine{00183\ \ \ \ \ \mbox{\hyperlink{_face___access__inferencing_2src_2edge-impulse-sdk_2tensorflow_2lite_2micro_2micro__log_8h_ab9bf491b4a37b06ba732fd7de6b04cb2}{MicroPrintf}}(\textcolor{stringliteral}{"{}\%s"{}},\ row);}
+\DoxyCodeLine{00184\ \ \ \}}
+\DoxyCodeLine{00185\ }
+\DoxyCodeLine{00186\ \ \ \mbox{\hyperlink{_face___access__inferencing_2src_2edge-impulse-sdk_2tensorflow_2lite_2micro_2micro__log_8h_ab9bf491b4a37b06ba732fd7de6b04cb2}{MicroPrintf}}(separator);}
+\DoxyCodeLine{00187\ \ \ \mbox{\hyperlink{_face___access__inferencing_2src_2edge-impulse-sdk_2tensorflow_2lite_2micro_2micro__log_8h_ab9bf491b4a37b06ba732fd7de6b04cb2}{MicroPrintf}}(\textcolor{stringliteral}{"{}"{}});}
+\DoxyCodeLine{00188\ \}}
+\DoxyCodeLine{00189\ }
+\DoxyCodeLine{00190\ \textcolor{comment}{//\ Pretty\ prints\ a\ csv\ to\ stdout.}}
+\DoxyCodeLine{00191\ \textcolor{comment}{//\ Note:\ kMaxRows\ and\ kColumns\ should\ describe\ the\ allocated\ size\ of\ the\ table,}}
+\DoxyCodeLine{00192\ \textcolor{comment}{//\ \ \ \ \ \ \ not\ the\ amount\ of\ data\ that\ is\ populated.\ It\ is\ required\ that\ all}}
+\DoxyCodeLine{00193\ \textcolor{comment}{//\ \ \ \ \ \ \ columns\ are\ filled\ out,\ but\ not\ all\ rows.}}
+\DoxyCodeLine{00194\ \textcolor{comment}{//}}
+\DoxyCodeLine{00195\ \textcolor{comment}{//\ ex)}}
+\DoxyCodeLine{00196\ \textcolor{comment}{//\ op,cycles,\%cpu}}
+\DoxyCodeLine{00197\ \textcolor{comment}{//\ foo,1000,10}}
+\DoxyCodeLine{00198\ \textcolor{comment}{//\ bar,2500,25}}
+\DoxyCodeLine{00199\ \textcolor{comment}{//\ baz,1000,10}}
+\DoxyCodeLine{00200\ \textcolor{comment}{//}}
+\DoxyCodeLine{00201\ \textcolor{comment}{//\ Args:}}
+\DoxyCodeLine{00202\ \textcolor{comment}{//\ -\/\ headers:\ A\ 1D\ array\ of\ strings\ containing\ the\ headers\ of\ the\ table.\ This}}
+\DoxyCodeLine{00203\ \textcolor{comment}{//\ \ \ \ \ must\ be\ equal\ in\ size\ to\ kColumns.}}
+\DoxyCodeLine{00204\ \textcolor{comment}{//\ -\/\ data:\ A\ 2D\ array\ of\ string\ data\ organized\ in\ [columns,\ rows].\ As\ stated}}
+\DoxyCodeLine{00205\ \textcolor{comment}{//\ \ \ \ \ above,\ it\ is\ required\ that\ all\ columns\ are\ populated,\ but\ not\ all\ rows.}}
+\DoxyCodeLine{00206\ \textcolor{comment}{//\ -\/\ rows:\ The\ number\ of\ populated\ rows\ in\ \`{}data`.}}
+\DoxyCodeLine{00207\ \textcolor{keyword}{template}\ <\textcolor{keywordtype}{int}\ kMaxRows,\ \textcolor{keywordtype}{int}\ kColumns>}
+\DoxyCodeLine{00208\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_a6eefbacb8715052f0a847349304e74bf}{PrintCsv}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ headers[kColumns][\mbox{\hyperlink{namespacetflite_ae56c9190a3f4562967c26e5c1a3a6be4}{kMaxStringLength}}],}
+\DoxyCodeLine{00209\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{hello__world__model_8cc_ab2a9259b73b53c0bb06a6b242aa7ae32}{data}}[kColumns][kMaxRows][\mbox{\hyperlink{namespacetflite_ae56c9190a3f4562967c26e5c1a3a6be4}{kMaxStringLength}}],}
+\DoxyCodeLine{00210\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{ei__run__dsp_8h_ad2900253d2779d0db156053c95c88b24}{rows}})\ \{}
+\DoxyCodeLine{00211\ \ \ \textcolor{keywordtype}{char}\ header[\mbox{\hyperlink{namespacetflite_a2b5b2d93001623fdc97e2a27c239e15c}{kMaxRowLength}}];}
+\DoxyCodeLine{00212\ \ \ memset(header,\ 0,\ \mbox{\hyperlink{namespacetflite_a2b5b2d93001623fdc97e2a27c239e15c}{kMaxRowLength}});}
+\DoxyCodeLine{00213\ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ kColumns;\ ++i)\ \{}
+\DoxyCodeLine{00214\ \ \ \ \ \mbox{\hyperlink{namespacetflite_a0ff46c2f2d58a82f9eb16cb695fd8a56}{MicroStrcat}}(header,\ headers[i]);}
+\DoxyCodeLine{00215\ \ \ \ \ \textcolor{keywordflow}{if}\ (i\ <\ kColumns\ -\/\ 1)\ \{}
+\DoxyCodeLine{00216\ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_a0ff46c2f2d58a82f9eb16cb695fd8a56}{MicroStrcat}}(header,\ \textcolor{stringliteral}{"{},"{}});}
+\DoxyCodeLine{00217\ \ \ \ \ \}}
+\DoxyCodeLine{00218\ \ \ \}}
+\DoxyCodeLine{00219\ }
+\DoxyCodeLine{00220\ \ \ \mbox{\hyperlink{_face___access__inferencing_2src_2edge-impulse-sdk_2tensorflow_2lite_2micro_2micro__log_8h_ab9bf491b4a37b06ba732fd7de6b04cb2}{MicroPrintf}}(\textcolor{stringliteral}{"{}\%s"{}},\ header);}
+\DoxyCodeLine{00221\ }
+\DoxyCodeLine{00222\ \ \ \textcolor{keywordtype}{char}\ row[\mbox{\hyperlink{namespacetflite_a2b5b2d93001623fdc97e2a27c239e15c}{kMaxRowLength}}];}
+\DoxyCodeLine{00223\ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ \mbox{\hyperlink{ei__run__dsp_8h_ad2900253d2779d0db156053c95c88b24}{rows}};\ ++i)\ \{}
+\DoxyCodeLine{00224\ \ \ \ \ memset(row,\ 0,\ \mbox{\hyperlink{namespacetflite_a2b5b2d93001623fdc97e2a27c239e15c}{kMaxRowLength}});}
+\DoxyCodeLine{00225\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ j\ =\ 0;\ j\ <\ kColumns;\ ++j)\ \{}
+\DoxyCodeLine{00226\ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_a0ff46c2f2d58a82f9eb16cb695fd8a56}{MicroStrcat}}(row,\ \mbox{\hyperlink{hello__world__model_8cc_ab2a9259b73b53c0bb06a6b242aa7ae32}{data}}[j][i]);}
+\DoxyCodeLine{00227\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (j\ <\ kColumns\ -\/\ 1)\ \{}
+\DoxyCodeLine{00228\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_a0ff46c2f2d58a82f9eb16cb695fd8a56}{MicroStrcat}}(row,\ \textcolor{stringliteral}{"{},"{}});}
+\DoxyCodeLine{00229\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00230\ \ \ \ \ \}}
+\DoxyCodeLine{00231\ }
+\DoxyCodeLine{00232\ \ \ \ \ \mbox{\hyperlink{_face___access__inferencing_2src_2edge-impulse-sdk_2tensorflow_2lite_2micro_2micro__log_8h_ab9bf491b4a37b06ba732fd7de6b04cb2}{MicroPrintf}}(\textcolor{stringliteral}{"{}\%s"{}},\ row);}
+\DoxyCodeLine{00233\ \ \ \}}
+\DoxyCodeLine{00234\ }
+\DoxyCodeLine{00235\ \ \ \mbox{\hyperlink{_face___access__inferencing_2src_2edge-impulse-sdk_2tensorflow_2lite_2micro_2micro__log_8h_ab9bf491b4a37b06ba732fd7de6b04cb2}{MicroPrintf}}(\textcolor{stringliteral}{"{}"{}});\ \ \textcolor{comment}{//\ Serves\ as\ a\ new\ line.}}
+\DoxyCodeLine{00236\ \}}
+\DoxyCodeLine{00237\ }
+\DoxyCodeLine{00238\ \textcolor{comment}{//\ Prints\ a\ 2D\ array\ of\ strings\ in\ a\ formatted\ manner\ along\ with\ a\ table\ name}}
+\DoxyCodeLine{00239\ \textcolor{comment}{//\ that\ includes\ the\ table\ type.}}
+\DoxyCodeLine{00240\ \textcolor{comment}{//}}
+\DoxyCodeLine{00241\ \textcolor{comment}{//\ Note:\ kMaxRows\ and\ kColumns\ should\ describe\ the\ allocated\ size\ of\ the\ table,}}
+\DoxyCodeLine{00242\ \textcolor{comment}{//\ \ \ \ \ \ \ not\ the\ amount\ of\ data\ that\ is\ populated.\ It\ is\ required\ that\ all}}
+\DoxyCodeLine{00243\ \textcolor{comment}{//\ \ \ \ \ \ \ columns\ are\ filled\ out,\ but\ not\ all\ rows.}}
+\DoxyCodeLine{00244\ \textcolor{comment}{//}}
+\DoxyCodeLine{00245\ \textcolor{comment}{//\ ex)\ PrettyPrint::kCsv\ will\ print\ a\ csv\ with\ a\ [[\ CSV\ ]]:\ table\_name\ header.}}
+\DoxyCodeLine{00246\ \textcolor{comment}{//}}
+\DoxyCodeLine{00247\ \textcolor{comment}{//\ Args:}}
+\DoxyCodeLine{00248\ \textcolor{comment}{//\ -\/\ headers:\ A\ 1D\ array\ of\ strings\ containing\ the\ headers\ of\ the\ table.\ This}}
+\DoxyCodeLine{00249\ \textcolor{comment}{//\ \ \ \ \ must\ be\ equal\ in\ size\ to\ kColumns.}}
+\DoxyCodeLine{00250\ \textcolor{comment}{//\ -\/\ data:\ A\ 2D\ array\ of\ string\ data\ organized\ in\ [columns,\ rows].\ As\ stated}}
+\DoxyCodeLine{00251\ \textcolor{comment}{//\ \ \ \ \ above,\ it\ is\ required\ that\ all\ columns\ are\ populated,\ but\ not\ all\ rows.}}
+\DoxyCodeLine{00252\ \textcolor{comment}{//\ -\/\ rows:\ The\ number\ of\ populated\ rows\ in\ \`{}data`.}}
+\DoxyCodeLine{00253\ \textcolor{comment}{//\ -\/\ type:\ The\ format\ type\ that\ should\ be\ used\ to\ pretty\ print.}}
+\DoxyCodeLine{00254\ \textcolor{comment}{//\ -\/\ table\_name:\ The\ name\ of\ the\ table\ to\ be\ printed\ alongside\ the\ format\ type.}}
+\DoxyCodeLine{00255\ \textcolor{keyword}{template}\ <\textcolor{keywordtype}{int}\ kMaxRows,\ \textcolor{keywordtype}{int}\ kColumns>}
+\DoxyCodeLine{00256\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetflite_a4ba98ae7badc675a25576a7a78417ac8}{PrintFormattedData}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ headers[kColumns][\mbox{\hyperlink{namespacetflite_ae56c9190a3f4562967c26e5c1a3a6be4}{kMaxStringLength}}],}
+\DoxyCodeLine{00257\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{hello__world__model_8cc_ab2a9259b73b53c0bb06a6b242aa7ae32}{data}}[kColumns][kMaxRows][\mbox{\hyperlink{namespacetflite_ae56c9190a3f4562967c26e5c1a3a6be4}{kMaxStringLength}}],}
+\DoxyCodeLine{00258\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{ei__run__dsp_8h_ad2900253d2779d0db156053c95c88b24}{rows}},\ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacetflite_a9dfc4fbefe2d086996cc363ef3963e75}{PrettyPrintType}}\ \mbox{\hyperlink{micro_2kernels_2overlap__add_8cc_a231b67310ea6e901bd0df1bded3963cf}{type}},}
+\DoxyCodeLine{00259\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ table\_name)\ \{}
+\DoxyCodeLine{00260\ \ \ \mbox{\hyperlink{namespacetflite_a6d891ec3d7fb339f3f903875d27beb64}{PrettyPrintTableHeader}}(\mbox{\hyperlink{micro_2kernels_2overlap__add_8cc_a231b67310ea6e901bd0df1bded3963cf}{type}},\ table\_name);}
+\DoxyCodeLine{00261\ \ \ \textcolor{keywordflow}{switch}\ (\mbox{\hyperlink{micro_2kernels_2overlap__add_8cc_a231b67310ea6e901bd0df1bded3963cf}{type}})\ \{}
+\DoxyCodeLine{00262\ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{namespacetflite_a9dfc4fbefe2d086996cc363ef3963e75a47e76f90e230ccc19e1f36375f5bfb69}{PrettyPrintType::kCsv}}:}
+\DoxyCodeLine{00263\ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_a6eefbacb8715052f0a847349304e74bf}{PrintCsv<kMaxRows,\ kColumns>}}(headers,\ \mbox{\hyperlink{hello__world__model_8cc_ab2a9259b73b53c0bb06a6b242aa7ae32}{data}},\ \mbox{\hyperlink{ei__run__dsp_8h_ad2900253d2779d0db156053c95c88b24}{rows}});}
+\DoxyCodeLine{00264\ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00265\ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{namespacetflite_a9dfc4fbefe2d086996cc363ef3963e75a1479f3239f37b30cf697eff1e629f61e}{PrettyPrintType::kTable}}:}
+\DoxyCodeLine{00266\ \ \ \ \ \ \ \mbox{\hyperlink{namespacetflite_aecc6b9c2f81e2c060567f009bb72e2b0}{PrintTable<kMaxRows,\ kColumns>}}(headers,\ \mbox{\hyperlink{hello__world__model_8cc_ab2a9259b73b53c0bb06a6b242aa7ae32}{data}},\ \mbox{\hyperlink{ei__run__dsp_8h_ad2900253d2779d0db156053c95c88b24}{rows}});}
+\DoxyCodeLine{00267\ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00268\ \ \ \}}
+\DoxyCodeLine{00269\ \}}
+\DoxyCodeLine{00270\ }
+\DoxyCodeLine{00271\ \}\ \ \textcolor{comment}{//\ namespace\ tflite}}
+\DoxyCodeLine{00272\ }
+\DoxyCodeLine{00273\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ TFLM\_BENCHMARK\_INTERNAL\_LOG\_UTILS\_H\_}}
+
+\end{DoxyCode}

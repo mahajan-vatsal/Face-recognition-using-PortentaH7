@@ -1,0 +1,128 @@
+\doxysection{processing.\+hpp}
+\hypertarget{image_2processing_8hpp_source}{}\label{image_2processing_8hpp_source}\index{Face\_Access\_inferencing/src/edge-\/impulse-\/sdk/dsp/image/processing.hpp@{Face\_Access\_inferencing/src/edge-\/impulse-\/sdk/dsp/image/processing.hpp}}
+\mbox{\hyperlink{image_2processing_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{00002\ \textcolor{comment}{\ *\ Copyright\ (c)\ 2024\ EdgeImpulse\ Inc.}}
+\DoxyCodeLine{00003\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00004\ \textcolor{comment}{\ *\ Generated\ by\ Edge\ Impulse\ and\ licensed\ under\ the\ applicable\ Edge\ Impulse}}
+\DoxyCodeLine{00005\ \textcolor{comment}{\ *\ Terms\ of\ Service.\ Community\ and\ Professional\ Terms\ of\ Service}}
+\DoxyCodeLine{00006\ \textcolor{comment}{\ *\ (https://docs.edgeimpulse.com/page/terms-\/of-\/service)\ or\ Enterprise\ Terms\ of}}
+\DoxyCodeLine{00007\ \textcolor{comment}{\ *\ Service\ (https://docs.edgeimpulse.com/page/enterprise-\/terms-\/of-\/service),}}
+\DoxyCodeLine{00008\ \textcolor{comment}{\ *\ according\ to\ your\ product\ plan\ subscription\ (the\ “License”).}}
+\DoxyCodeLine{00009\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00010\ \textcolor{comment}{\ *\ This\ software,\ documentation\ and\ other\ associated\ files\ (collectively\ referred}}
+\DoxyCodeLine{00011\ \textcolor{comment}{\ *\ to\ as\ the\ “Software”)\ is\ a\ single\ SDK\ variation\ generated\ by\ the\ Edge\ Impulse}}
+\DoxyCodeLine{00012\ \textcolor{comment}{\ *\ platform\ and\ requires\ an\ active\ paid\ Edge\ Impulse\ subscription\ to\ use\ this}}
+\DoxyCodeLine{00013\ \textcolor{comment}{\ *\ Software\ for\ any\ purpose.}}
+\DoxyCodeLine{00014\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00015\ \textcolor{comment}{\ *\ You\ may\ NOT\ use\ this\ Software\ unless\ you\ have\ an\ active\ Edge\ Impulse\ subscription}}
+\DoxyCodeLine{00016\ \textcolor{comment}{\ *\ that\ meets\ the\ eligibility\ requirements\ for\ the\ applicable\ License,\ subject\ to}}
+\DoxyCodeLine{00017\ \textcolor{comment}{\ *\ your\ full\ and\ continued\ compliance\ with\ the\ terms\ and\ conditions\ of\ the\ License,}}
+\DoxyCodeLine{00018\ \textcolor{comment}{\ *\ including\ without\ limitation\ any\ usage\ restrictions\ under\ the\ applicable\ License.}}
+\DoxyCodeLine{00019\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00020\ \textcolor{comment}{\ *\ If\ you\ do\ not\ have\ an\ active\ Edge\ Impulse\ product\ plan\ subscription,\ or\ if\ use}}
+\DoxyCodeLine{00021\ \textcolor{comment}{\ *\ of\ this\ Software\ exceeds\ the\ usage\ limitations\ of\ your\ Edge\ Impulse\ product\ plan}}
+\DoxyCodeLine{00022\ \textcolor{comment}{\ *\ subscription,\ you\ are\ not\ permitted\ to\ use\ this\ Software\ and\ must\ immediately}}
+\DoxyCodeLine{00023\ \textcolor{comment}{\ *\ delete\ and\ erase\ all\ copies\ of\ this\ Software\ within\ your\ control\ or\ possession.}}
+\DoxyCodeLine{00024\ \textcolor{comment}{\ *\ Edge\ Impulse\ reserves\ all\ rights\ and\ remedies\ available\ to\ enforce\ its\ rights.}}
+\DoxyCodeLine{00025\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00026\ \textcolor{comment}{\ *\ Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ the\ Software\ is}}
+\DoxyCodeLine{00027\ \textcolor{comment}{\ *\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,\ WITHOUT\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,}}
+\DoxyCodeLine{00028\ \textcolor{comment}{\ *\ either\ express\ or\ implied.\ See\ the\ License\ for\ the\ specific\ language\ governing}}
+\DoxyCodeLine{00029\ \textcolor{comment}{\ *\ permissions,\ disclaimers\ and\ limitations\ under\ the\ License.}}
+\DoxyCodeLine{00030\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{00031\ \textcolor{preprocessor}{\#ifndef\ \_\_EIDSP\_IMAGE\_PROCESSING\_\_H\_\_}}
+\DoxyCodeLine{00032\ \textcolor{preprocessor}{\#define\ \_\_EIDSP\_IMAGE\_PROCESSING\_\_H\_\_}}
+\DoxyCodeLine{00033\ }
+\DoxyCodeLine{00034\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{ei__utils_8h}{edge-\/impulse-\/sdk/dsp/ei\_utils.h}}"{}}}
+\DoxyCodeLine{00035\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{ei__classifier__porting_8h}{edge-\/impulse-\/sdk/porting/ei\_classifier\_porting.h}}"{}}}
+\DoxyCodeLine{00036\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{returntypes_8hpp}{edge-\/impulse-\/sdk/dsp/returntypes.hpp}}"{}}}
+\DoxyCodeLine{00037\ }
+\DoxyCodeLine{00038\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespaceei}{ei}}\ \{\ \textcolor{keyword}{namespace\ }image\ \{\ \textcolor{keyword}{namespace\ }processing\ \{}
+\DoxyCodeLine{00039\ }
+\DoxyCodeLine{00040\ \textcolor{keyword}{enum}\ \mbox{\hyperlink{namespaceei_1_1image_1_1processing_a4e056eede2cc32ca54bb100ecd3eb6fb}{YUV\_OPTIONS}}}
+\DoxyCodeLine{00041\ \{}
+\DoxyCodeLine{00042\ \ \ \ \ \mbox{\hyperlink{namespaceei_1_1image_1_1processing_a4e056eede2cc32ca54bb100ecd3eb6fba528d92408777a97120a58e10a0838925}{BIG\_ENDIAN\_ORDER}}\ =\ 1,\ \textcolor{comment}{//RGB\ reading\ from\ low\ to\ high\ memory.\ \ Otherwise,\ uses\ native\ encoding}}
+\DoxyCodeLine{00043\ \ \ \ \ \mbox{\hyperlink{namespaceei_1_1image_1_1processing_a4e056eede2cc32ca54bb100ecd3eb6fbaa48295841054437d62ce1283510620b8}{PAD\_4B}}\ =\ 2,\ \textcolor{comment}{//\ pad\ 0x00\ on\ the\ high\ B.\ ie\ 0x00RRGGBB}}
+\DoxyCodeLine{00044\ \};}
+\DoxyCodeLine{00045\ }
+\DoxyCodeLine{00054\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{namespaceei_1_1image_1_1processing_a72f6a0f80456143136d5f95ae4b3128e}{yuv422\_to\_rgb888}}(}
+\DoxyCodeLine{00055\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *rgb\_out,}
+\DoxyCodeLine{00056\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *yuv\_in,}
+\DoxyCodeLine{00057\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ in\_size\_B,}
+\DoxyCodeLine{00058\ \ \ \ \ \mbox{\hyperlink{namespaceei_1_1image_1_1processing_a4e056eede2cc32ca54bb100ecd3eb6fb}{YUV\_OPTIONS}}\ opts);}
+\DoxyCodeLine{00059\ }
+\DoxyCodeLine{00074\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{namespaceei_1_1image_1_1processing_a5440c4c637bbbbb68c0961fc8417b495}{cropImage}}(}
+\DoxyCodeLine{00075\ \ \ \ \ \textcolor{keyword}{const}\ uint8\_t\ *srcImage,}
+\DoxyCodeLine{00076\ \ \ \ \ \textcolor{keywordtype}{int}\ srcWidth,}
+\DoxyCodeLine{00077\ \ \ \ \ \textcolor{keywordtype}{int}\ srcHeight,}
+\DoxyCodeLine{00078\ \ \ \ \ \textcolor{keywordtype}{int}\ startX,}
+\DoxyCodeLine{00079\ \ \ \ \ \textcolor{keywordtype}{int}\ startY,}
+\DoxyCodeLine{00080\ \ \ \ \ uint8\_t\ *dstImage,}
+\DoxyCodeLine{00081\ \ \ \ \ \textcolor{keywordtype}{int}\ dstWidth,}
+\DoxyCodeLine{00082\ \ \ \ \ \textcolor{keywordtype}{int}\ dstHeight,}
+\DoxyCodeLine{00083\ \ \ \ \ \textcolor{keywordtype}{int}\ iBpp);}
+\DoxyCodeLine{00084\ }
+\DoxyCodeLine{00097\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{namespaceei_1_1image_1_1processing_a3269f19c386f833d4319baebe216b744}{crop\_image\_rgb888\_packed}}(}
+\DoxyCodeLine{00098\ \ \ \ \ \textcolor{keyword}{const}\ uint8\_t\ *srcImage,}
+\DoxyCodeLine{00099\ \ \ \ \ \textcolor{keywordtype}{int}\ srcWidth,}
+\DoxyCodeLine{00100\ \ \ \ \ \textcolor{keywordtype}{int}\ srcHeight,}
+\DoxyCodeLine{00101\ \ \ \ \ \textcolor{keywordtype}{int}\ startX,}
+\DoxyCodeLine{00102\ \ \ \ \ \textcolor{keywordtype}{int}\ startY,}
+\DoxyCodeLine{00103\ \ \ \ \ uint8\_t\ *dstImage,}
+\DoxyCodeLine{00104\ \ \ \ \ \textcolor{keywordtype}{int}\ dstWidth,}
+\DoxyCodeLine{00105\ \ \ \ \ \textcolor{keywordtype}{int}\ dstHeight);}
+\DoxyCodeLine{00106\ }
+\DoxyCodeLine{00107\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{namespaceei_1_1image_1_1processing_a16b3c9275d5ce155569863ffdb8c7c6b}{RGB888\_B\_SIZE}}\ =\ 3;}
+\DoxyCodeLine{00108\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{namespaceei_1_1image_1_1processing_a35d3a5e06e4cc519277a81bb1919a0cb}{MONO\_B\_SIZE}}\ =\ 1;}
+\DoxyCodeLine{00109\ }
+\DoxyCodeLine{00124\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{namespaceei_1_1image_1_1processing_a668b4059142d53787d86e3b3c3d65618}{resize\_image}}(}
+\DoxyCodeLine{00125\ \ \ \ \ \textcolor{keyword}{const}\ uint8\_t\ *srcImage,}
+\DoxyCodeLine{00126\ \ \ \ \ \textcolor{keywordtype}{int}\ srcWidth,}
+\DoxyCodeLine{00127\ \ \ \ \ \textcolor{keywordtype}{int}\ srcHeight,}
+\DoxyCodeLine{00128\ \ \ \ \ uint8\_t\ *dstImage,}
+\DoxyCodeLine{00129\ \ \ \ \ \textcolor{keywordtype}{int}\ dstWidth,}
+\DoxyCodeLine{00130\ \ \ \ \ \textcolor{keywordtype}{int}\ dstHeight,}
+\DoxyCodeLine{00131\ \ \ \ \ \textcolor{keywordtype}{int}\ pixel\_size\_B);}
+\DoxyCodeLine{00132\ }
+\DoxyCodeLine{00145\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespaceei_1_1image_1_1processing_a83b37707a4491f63a2f40b2118f865c6}{calculate\_crop\_dims}}(}
+\DoxyCodeLine{00146\ \ \ \ \ \textcolor{keywordtype}{int}\ srcWidth,}
+\DoxyCodeLine{00147\ \ \ \ \ \textcolor{keywordtype}{int}\ srcHeight,}
+\DoxyCodeLine{00148\ \ \ \ \ \textcolor{keywordtype}{int}\ dstWidth,}
+\DoxyCodeLine{00149\ \ \ \ \ \textcolor{keywordtype}{int}\ dstHeight,}
+\DoxyCodeLine{00150\ \ \ \ \ \textcolor{keywordtype}{int}\ \&cropWidth,}
+\DoxyCodeLine{00151\ \ \ \ \ \textcolor{keywordtype}{int}\ \&cropHeight);}
+\DoxyCodeLine{00152\ }
+\DoxyCodeLine{00164\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{namespaceei_1_1image_1_1processing_a2f88615900c80cb8bafb201658d56e39}{crop\_and\_interpolate\_rgb888}}(}
+\DoxyCodeLine{00165\ \ \ \ \ \textcolor{keyword}{const}\ uint8\_t\ *srcImage,}
+\DoxyCodeLine{00166\ \ \ \ \ \textcolor{keywordtype}{int}\ srcWidth,}
+\DoxyCodeLine{00167\ \ \ \ \ \textcolor{keywordtype}{int}\ srcHeight,}
+\DoxyCodeLine{00168\ \ \ \ \ uint8\_t\ *dstImage,}
+\DoxyCodeLine{00169\ \ \ \ \ \textcolor{keywordtype}{int}\ dstWidth,}
+\DoxyCodeLine{00170\ \ \ \ \ \textcolor{keywordtype}{int}\ dstHeight);}
+\DoxyCodeLine{00171\ }
+\DoxyCodeLine{00186\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{namespaceei_1_1image_1_1processing_ab4ef3492ac1d29a741072d72076ab081}{crop\_and\_interpolate\_image}}(}
+\DoxyCodeLine{00187\ \ \ \ \ \textcolor{keyword}{const}\ uint8\_t\ *srcImage,}
+\DoxyCodeLine{00188\ \ \ \ \ \textcolor{keywordtype}{int}\ srcWidth,}
+\DoxyCodeLine{00189\ \ \ \ \ \textcolor{keywordtype}{int}\ srcHeight,}
+\DoxyCodeLine{00190\ \ \ \ \ uint8\_t\ *dstImage,}
+\DoxyCodeLine{00191\ \ \ \ \ \textcolor{keywordtype}{int}\ dstWidth,}
+\DoxyCodeLine{00192\ \ \ \ \ \textcolor{keywordtype}{int}\ dstHeight,}
+\DoxyCodeLine{00193\ \ \ \ \ \textcolor{keywordtype}{int}\ pixel\_size\_B);}
+\DoxyCodeLine{00194\ }
+\DoxyCodeLine{00195\ }
+\DoxyCodeLine{00196\ }
+\DoxyCodeLine{00210\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{namespaceei_1_1image_1_1processing_a79c6ad80a28f051dba73685c1d930122}{resize\_image\_using\_mode}}(}
+\DoxyCodeLine{00211\ \ \ \ \ \textcolor{keyword}{const}\ uint8\_t\ *srcImage,}
+\DoxyCodeLine{00212\ \ \ \ \ \textcolor{keywordtype}{int}\ srcWidth,}
+\DoxyCodeLine{00213\ \ \ \ \ \textcolor{keywordtype}{int}\ srcHeight,}
+\DoxyCodeLine{00214\ \ \ \ \ uint8\_t\ *dstImage,}
+\DoxyCodeLine{00215\ \ \ \ \ \textcolor{keywordtype}{int}\ dstWidth,}
+\DoxyCodeLine{00216\ \ \ \ \ \textcolor{keywordtype}{int}\ dstHeight,}
+\DoxyCodeLine{00217\ \ \ \ \ \textcolor{keywordtype}{int}\ pixel\_size\_B,}
+\DoxyCodeLine{00218\ \ \ \ \ \textcolor{keywordtype}{int}\ mode);}
+\DoxyCodeLine{00219\ \}\}\}\ \textcolor{comment}{//namespaces}}
+\DoxyCodeLine{00220\ \textcolor{preprocessor}{\#endif\ }}
+
+\end{DoxyCode}

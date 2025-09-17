@@ -1,0 +1,20 @@
+var searchData=
+[
+  ['xtensa_5fsqrt_5f64_0',['xtensa_sqrt_64',['../micro_2kernels_2xtensa_2filter__bank__square__root_8cc.html#add477af7bac3c8ecda53708a91bab173',1,'filter_bank_square_root.cc']]],
+  ['xtensacalculateopdatafullyconnected_1',['XtensaCalculateOpDataFullyConnected',['../namespacetflite.html#acf2a565fa3238fdc5be50d1093e9c475',1,'tflite']]],
+  ['xtensaevalfullyconnectedquantizedint8_2',['XtensaEvalFullyConnectedQuantizedInt8',['../namespacetflite.html#a5728ef10afa3ae9e1b409f9dacfddc42',1,'tflite']]],
+  ['xtensaevalmax_3',['XtensaEvalMax',['../namespacetflite.html#ab7b88681ecf88717e61909b80c70b2f8',1,'tflite']]],
+  ['xtensaevalmean_4',['XtensaEvalMean',['../namespacetflite.html#a30aa2e6665d7119952a2f749a2744c68',1,'tflite']]],
+  ['xtensaevalsoftmaxint8int16_5',['XtensaEvalSoftmaxInt8Int16',['../namespacetflite.html#aab3a04febcee6489610a4ec47f3aed56',1,'tflite']]],
+  ['xtensaevalsum_6',['XtensaEvalSum',['../namespacetflite.html#acba46e8012917f92b25c022da495294d',1,'tflite']]],
+  ['xtensainitfullyconnected_7',['XtensaInitFullyConnected',['../namespacetflite.html#a041ae937c5e8bfe3e94ecde5e4989d5d',1,'tflite']]],
+  ['xtensainitreduce_8',['XtensaInitReduce',['../namespacetflite.html#a8c94b663aa318c8bf862422adf795ae6',1,'tflite']]],
+  ['xtensainitsoftmax_9',['XtensaInitSoftmax',['../namespacetflite.html#a4563d6d3e2f04ac9b490baaa5a44eff4',1,'tflite']]],
+  ['xtensapoolinginit_10',['XtensaPoolingInit',['../namespacetflite.html#a851e0916d8eeeb732667371b0d63f986',1,'tflite']]],
+  ['xtensapreparefullyconnected_11',['XtensaPrepareFullyConnected',['../namespacetflite.html#acd4c72a514af6451da6b8d38cd984261',1,'tflite']]],
+  ['xtensapreparemax_12',['XtensaPrepareMax',['../namespacetflite.html#a876aeca80162ab0a7e7e8377bc0bd8c6',1,'tflite']]],
+  ['xtensapreparemeanorsum_13',['XtensaPrepareMeanOrSum',['../namespacetflite.html#ad7de026e5c26deb2221ab94884660680',1,'tflite']]],
+  ['xtensapreparesoftmax_14',['XtensaPrepareSoftmax',['../namespacetflite.html#a2d8992410cd5dba08f510a5987d44700',1,'tflite']]],
+  ['xxd_5foutput_5fto_5fbytes_15',['xxd_output_to_bytes',['../namespaceflatbuffer__utils.html#a3a6df576ff6b7a733dced74b9dd4af37',1,'flatbuffer_utils']]],
+  ['xxd_5foutput_5fto_5fobject_16',['xxd_output_to_object',['../namespaceflatbuffer__utils.html#abfd0c33865958069439b039d14482036',1,'flatbuffer_utils']]]
+];
